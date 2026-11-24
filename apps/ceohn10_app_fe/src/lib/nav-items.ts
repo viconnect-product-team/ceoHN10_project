@@ -66,7 +66,6 @@ export const navGroups: NavGroup[] = [
       { key: "nav.governance", icon: Vote, to: "/voting" },
       { key: "nav.eventReg", icon: ClipboardList, to: "/event-registrations" },
       { key: "nav.checkin", icon: ScanLine, to: "/checkin" },
-      { key: "checkinQr.title", icon: QrCode, to: "/checkin-qr" },
     ],
   },
   {

@@ -664,70 +664,95 @@ async function handleResponse(response: Response, endpoint = "") {
   }
 }
 
+// Bộ nhớ đệm deduplication cho các request GET đang bay (in-flight) để triệt tiêu gọi API trùng lặp
+const inFlightGetRequests = new Map<string, Promise<any>>();
+
 export async function fetchNestApi<T = any>(
   endpoint: string,
   options: Omit<RequestInit, "body"> & { body?: any } = {},
 ): Promise<T> {
+  const method = (options.method || "GET").toUpperCase();
   const token = getAuthToken();
-  const headers = new Headers(options.headers);
-  headers.set("Content-Type", "application/json");
-  if (token) {
-    headers.set("Authorization", `Bearer ${token}`);
-  }
-
   const mappedEndpoint = mapEndpoint(endpoint);
-  let requestBody = options.body;
-  if (
-    requestBody &&
-    typeof requestBody === "object" &&
-    !(requestBody instanceof FormData) &&
-    !(typeof Blob !== "undefined" && requestBody instanceof Blob) &&
-    !(typeof ArrayBuffer !== "undefined" && requestBody instanceof ArrayBuffer)
-  ) {
-    requestBody = JSON.stringify(cleanUrls(requestBody));
-  } else if (requestBody && typeof requestBody === "string") {
-    try {
-      const parsedBody = JSON.parse(requestBody);
-      requestBody = JSON.stringify(cleanUrls(parsedBody));
-    } catch (e) {
-      // Ignore if not JSON
-    }
+
+  // In-flight deduplication cho GET request không có custom body
+  const isGetRequest = method === "GET" && !options.body;
+  const dedupKey = isGetRequest ? `${token || "anon"}:${mappedEndpoint}` : null;
+
+  if (dedupKey && inFlightGetRequests.has(dedupKey)) {
+    return inFlightGetRequests.get(dedupKey) as Promise<T>;
   }
 
-  const baseUrl = getBaseApiUrl();
-  const signal =
-    options.signal ||
-    (typeof AbortSignal !== "undefined" && "timeout" in AbortSignal
-      ? AbortSignal.timeout(15000)
-      : undefined);
-  let response = await fetch(`${baseUrl}${mappedEndpoint}`, {
-    ...options,
-    signal,
-    body: requestBody,
-    headers,
-  });
-
-  const isAuthEndpoint =
-    endpoint.includes("/auth/login") ||
-    endpoint.includes("/auth/register") ||
-    endpoint.includes("/auth/refresh") ||
-    endpoint.includes("/auth/reset-password") ||
-    endpoint.includes("/auth/forgot-password");
-
-  if (response.status === 401 && !isAuthEndpoint) {
-    const newAccessToken = await trySilentRefresh();
-    if (newAccessToken) {
-      headers.set("Authorization", `Bearer ${newAccessToken}`);
-      response = await fetch(`${baseUrl}${mappedEndpoint}`, {
-        ...options,
-        signal,
-        body: requestBody,
-        headers,
-      });
+  const executeRequest = async (): Promise<T> => {
+    const headers = new Headers(options.headers);
+    headers.set("Content-Type", "application/json");
+    if (token) {
+      headers.set("Authorization", `Bearer ${token}`);
     }
+
+    let requestBody = options.body;
+    if (
+      requestBody &&
+      typeof requestBody === "object" &&
+      !(requestBody instanceof FormData) &&
+      !(typeof Blob !== "undefined" && requestBody instanceof Blob) &&
+      !(typeof ArrayBuffer !== "undefined" && requestBody instanceof ArrayBuffer)
+    ) {
+      requestBody = JSON.stringify(cleanUrls(requestBody));
+    } else if (requestBody && typeof requestBody === "string") {
+      try {
+        const parsedBody = JSON.parse(requestBody);
+        requestBody = JSON.stringify(cleanUrls(parsedBody));
+      } catch (e) {
+        // Ignore if not JSON
+      }
+    }
+
+    const baseUrl = getBaseApiUrl();
+    const signal =
+      options.signal ||
+      (typeof AbortSignal !== "undefined" && "timeout" in AbortSignal
+        ? AbortSignal.timeout(15000)
+        : undefined);
+    let response = await fetch(`${baseUrl}${mappedEndpoint}`, {
+      ...options,
+      signal,
+      body: requestBody,
+      headers,
+    });
+
+    const isAuthEndpoint =
+      endpoint.includes("/auth/login") ||
+      endpoint.includes("/auth/register") ||
+      endpoint.includes("/auth/refresh") ||
+      endpoint.includes("/auth/reset-password") ||
+      endpoint.includes("/auth/forgot-password");
+
+    if (response.status === 401 && !isAuthEndpoint) {
+      const newAccessToken = await trySilentRefresh();
+      if (newAccessToken) {
+        headers.set("Authorization", `Bearer ${newAccessToken}`);
+        response = await fetch(`${baseUrl}${mappedEndpoint}`, {
+          ...options,
+          signal,
+          body: requestBody,
+          headers,
+        });
+      }
+    }
+
+    return handleResponse(response, endpoint);
+  };
+
+  if (dedupKey) {
+    const promise = executeRequest().finally(() => {
+      inFlightGetRequests.delete(dedupKey);
+    });
+    inFlightGetRequests.set(dedupKey, promise);
+    return promise;
   }
 
-  return handleResponse(response, endpoint);
+  return executeRequest();
 }
 
 export async function fetchNestApiFromServer<T = any>(

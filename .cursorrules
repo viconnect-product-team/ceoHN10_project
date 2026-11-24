@@ -1,6 +1,56 @@
 # ==============================================================================
 # BỘ LUẬT DỰ ÁN (PROJECT RULES & AI CODEGEN STANDARDS) - CEO HN10 PROJECT
 # Vai trò: Tech Lead | Định dạng: .cursorrules
+# 24/11/2026 (v12.77) — ĐÓNG GÓI HỆ THỐNG UI SPECS (.agents/ui-specs/), TINH GỌN MEMORY.MD & PHÂN ĐỊNH RÕ RÀNG CƠ SỞ DỮ LIỆU LOCALHOST VS SERVER DEV:
+#   * [PHÂN ĐỊNH CƠ SỞ DỮ LIỆU CHUẨN MỰC THEO MÔI TRƯỜNG]:
+#     - Môi trường Test / Phát triển Localhost: Sử dụng CSDL `127.0.0.1:5432/ceohn10_project`.
+#     - Môi trường Server Dev / Staging / Production: Sử dụng CSDL `113.20.107.184:6432/ceohn10_project?pgbouncer=true`.
+#     - Tuyệt đối không trỏ sang CSDL lạ `14.225.217.232`. Cấm tuyệt đối mock/fake dữ liệu tĩnh để che giấu lỗi DB.
+#   * [ĐẶC TẢ GIAO DIỆN BẮT BUỘC ĐỌC CHO AI AGENT (.agents/ui-specs/)]:
+#     - Mobile App: Đọc `.agents/ui-specs/UI_SPEC_MOBILE_APP_CEOHN10.md` (3 màu chính trắng/xám/đen + 2 màu nhấn đỏ/xanh, không icon cạnh tiêu đề, header tối giản HN10, Bento Grid 4 khối, Slider sự kiện, Timeline tiến độ, Footer tròn QR nổi).
+#     - Web CRM & Master Platform: Đọc `.agents/ui-specs/UI_SPEC_CRM_QUAN_TRI.md` (Light mode Navy `#002B70`, Sidebar 6 nhóm menu có drawer mobile đệm pr-14, Quản trị RBAC email + mã học viên, cột thao tác tối đa 3 nút + menu 3 chấm, co dãn cột, Quỹ Tổng thời gian thực + cấp 6 ban, 4 nguồn thu có xem chi tiết + xuất Excel, học phí 1tr/2tr).
+#   * [TINH GỌN MEMORY.MD & DỌN DẸP THƯ MỤC GỐC]:
+#     - Dọn dẹp các thư mục rỗng ở root (`src/`, `docs/`, `modules/`, `dist-modules/`).
+#     - Lưu trữ 20,000 dòng changelog cũ vào `document/history/CHANGELOG_ARCHIVE_v1_v12.md`.
+#     - Viết lại `MEMORY.md` siêu tinh gọn (< 150 dòng), cấm viết lại toàn bộ file, chỉ cập nhật 1-2 bullet points.
+# 24/11/2026 (v12.76) — TỐI GIẢN TOÀN DIỆN MOBILE APP CEO HN10 (3 MÀU CHÍNH TRẮNG - XÁM NHẠT - TEXT ĐEN KÈM 2 ĐIỂM NHẤN ĐỎ & XANH, BỎ HẾT ICON CẠNH TIÊU ĐỀ, BỎ STORY HIGHLIGHTS, HEADER TỐI GIẢN), CHUẨN HÓA TÊN ĐĂNG NHẬP RBAC (EMAIL + MÃ HỌC VIÊN), SỬA TRIỆT ĐỂ RESPONSIVE CRM PLATFORM (ẢNH 2, 3), LÀM LẠI BÁO CÁO TÀI CHÍNH QUỸ TỔNG & TEST PASS 29/29 SUITES 100%:
+#   * [GIAO DIỆN MOBILE APP CEO HN10 TỐI GIẢN CHUẨN MỰC]:
+#     - Bảng màu tối giản 3 màu chính: Nền trắng (`bg-white`), Xám nhạt (`bg-slate-50`, `bg-slate-100`, `border-slate-200`, `text-slate-500`), Text đen (`text-slate-900`) cùng 2 màu điểm nhấn: Đỏ (`#DC2626` / `text-red-600` / `bg-red-600`) và Xanh (`#1D4ED8` / `text-blue-600` / `bg-blue-600`). Loại bỏ hoàn toàn nền đen u tối và gradient phức tạp.
+#     - Bỏ hết icon logo cạnh label text tiêu đề ở tất cả các màn (Trung Tâm Vận Hành Doanh Nhân, Sự Kiện Tiêu Điểm, Lộ Trình Đào Tạo, Timeline Trạm Đào Tạo, Chương Trình Đào Tạo, Sự Kiện, Mạng Lưới Bạn Học), giữ tiêu đề text thuần túy thanh lịch.
+#     - Header tối giản: Chỉ gồm Logo CEO HN10 (badge xanh `HN10`) bên trái cùng 2 icon Thông báo (`Bell` có chấm đỏ) và Tin nhắn (`MessageSquare` có chấm xanh) bên phải. Bỏ copy mã học viên và nút QR to trên header.
+#     - Bỏ hẳn dấu ấn tiêu điểm: Xóa bỏ 100% dải Story Highlights tròn u tối và modal xem story ở trang chủ.
+#     - Bento Grid Mẫu 2 tối giản: Thẻ QR (icon Xanh, mở thẻ quét), Radar B2B (icon Đỏ, khám phá), Kho Tài liệu (icon Xanh, tải giáo trình), Diễn đàn (icon Đỏ, thảo luận).
+#     - Sự kiện dạng Slide Editorial: Nền trắng viền xám nhẹ, trích dẫn danh ngôn, số lượng CEO, nút Chi tiết (xám nhạt), nút Vé QR (Xanh) và nút Đăng ký (Đỏ).
+#     - Tiến độ: Circular Gauge 82% (Track xám, stroke Xanh, % Đỏ) kèm Timeline trạm đào tạo (trạm xong màu Xanh, trạm đang học màu Đỏ).
+#     - Footer Floating Luxury Rounded Bar Mẫu 1: Nền trắng mờ `bg-white/95 backdrop-blur-md border border-slate-200`, active tab màu Xanh (`text-blue-600`), nút tròn QR trung tâm nổi màu Xanh (`bg-blue-600 text-white`).
+#   * [CHUẨN HÓA TÊN ĐĂNG NHẬP RBAC & RESPONSIVE CRM PLATFORM (ẢNH 1, 2, 3)]:
+#     - Tên đăng nhập RBAC: Hiển thị chính xác Email đăng nhập (`acc.email`) và Mã học viên / Mã quản trị viên (`acc.code || acc.memberCode`). Lọc sạch tài khoản giả lập hoặc username lạ.
+#     - Sửa triệt để lỗi responsive CRM Platform (`master.index.tsx` - Ảnh 2): Sidebar trên mobile/tablet ẩn mặc định và thu gọn vào Drawer trượt, mở bằng nút hamburger. Vùng `<main>` mở rộng chiếm trọn 100% full-width, không còn bị chia đôi hay đè ép rách layout.
+#     - CRM CEO HN10 (`Sidebar.tsx` & `MobileMenuDrawer.tsx` - Ảnh 3): Header có đệm an toàn `pr-14`, nút đóng `X` cố định, drawer đóng tự động khi điều hướng route.
+#   * [KHÔI PHỤC NHÀ TÀI TRỢ & LÀM LẠI BÁO CÁO TÀI CHÍNH QUỸ TỔNG]:
+#     - Khôi phục menu "Nhà tài trợ & Quỹ tài trợ" (`/sponsors`) trên Sidebar CRM.
+#     - Quỹ Tổng hiển thị nổi bật ở hero header, số dư biến động theo thời gian thực (Đầu kỳ 2.1 Tỷ + Tổng thu - Tổng cấp các ban = Tồn quỹ).
+#     - 4 Nguồn thu minh bạch có nút "Xem chi tiết" mở danh sách người nộp + xuất Excel. Quỹ Tổng chỉ cấp tiền cho 6 Ban chuyên môn.
+#   * [KIỂM THỬ TOÀN DIỆN LOCALHOST PASS 100% (29/29 TESTS)]:
+#     - Chạy thành công trọn vẹn 29/29 tests bao gồm Auth, RBAC, Event Free/Paid, Ticketing VietQR/Cash/Guest, Check-in Online/Offline, Lucky Draw, Voting, Feedback, Member Create/Import, Tuition Fee 1M/2M, Playwright E2E UI Mobile App và CRM Platform Mobile.
+#     - TypeScript Type Check: Frontend và Backend đều đạt 0 errors (Exit code 0). Tuyệt đối tuân thủ Rule 0 & Rule 1: Không git commit hay push.
+# 24/11/2026 (v12.75) — CHUẨN HÓA GIAO DIỆN MOBILE APP CEO HN10 (BENTO GRID MẪU 2, SLIDE SỰ KIỆN CONCEPT 3, TIMELINE TIẾN ĐỘ, FLOATING FOOTER MẪU 1) & TEST E2E LOCALHOST PASS 100%:
+#   * [GIAO DIỆN MOBILE APP CEO HN10]:
+#     - Bố cục Bento Grid: Tông Vàng Hoàng Gia (`#C5A059`), Đỏ Đô Thượng Lưu (`#8B1E2F`), Hổ Phách Amber (`#D97706`), nền kem ngà ngọc trai (`#FDFBF7` / `#F8FAFC`). TUYỆT ĐỐI KHÔNG DÙNG MÀU XANH, KHÔNG MÀU TÍM.
+#     - 4 khối Bento: Thẻ QR Danh Thiếp 1 Chạm, Radar B2B Connect, Kho Tài Liệu VIP (Slide + Excel), Diễn Đàn Lớp Học (Thảo luận thực chiến).
+#     - Dải Story Highlights tròn phát sáng (Chủ tịch, Gala, Lớp học, Radar B2B, Bản tin).
+#     - Slide Sự Kiện lướt ngang Carousel chuẩn điện ảnh với trích dẫn danh ngôn và số lượng CEO xác nhận.
+#     - Tiến độ: Circular Gauge % (82% Tín Chỉ) KÈM Timeline các trạm đào tạo.
+#     - Footer: Floating Luxury Rounded Bottom Nav Bar (Mẫu 1) bo góc mềm mại lơ lửng trên nền, có nút QR trung tâm.
+#   * [KIỂM THỬ E2E TOÀN DIỆN LOCALHOST PASS 100% (28/28 TESTS)]:
+#     - Auth & RBAC (đăng nhập email/mã học viên, 15 roles, 38 permissions).
+#     - Tạo sự kiện (miễn phí, có phí).
+#     - Đăng ký vé đa hình thức (miễn phí tự động cấp vé, VietQR SePay, tiền mặt tại chỗ, khách vãng lai trước giờ G).
+#     - Check-in sự kiện (quét QR hợp lệ, chống gian lận quét trùng, chế độ offline check-in tự động sync).
+#     - Hoạt động trong sự kiện (Moments Gallery, Lucky Draw bốc thăm, Live Voting Polls).
+#     - Sau sự kiện (Đánh giá 5 sao kèm link ảnh, Báo cáo kiểm toán tài chính sự kiện).
+#     - Quản trị học viên (tạo mới, batch import, chính sách phí tham gia CLB: 1 triệu ưu đãi 1 tháng tuyển sinh, 2 triệu sau 1 tháng).
+#     - Playwright browser E2E trực tiếp trên Chrome headless: Đạt exit code 0.
 # 23/11/2026 (v12.63) — QUY CHUẨN BẮT BUỘC NGINX SUCCESS TRƯỚC KHI PUSH CODE VÀ NẠP VÀO SERVER & GỠ BỎ HOÀN TOÀN CEO 1983 KHỎI MASTER PLATFORM CRM:
 #   * [QUY ĐỊNH TỐI CAO NGINX SUCCESS (NGINX VALIDATION GATE)]:
 #     - Mọi kịch bản push code, CI/CD và deploy cập nhật cấu hình Nginx Reverse Proxy BẮT BUỘC phải chạy kiểm tra cú pháp `nginx -t` đạt SUCCESS (exit code 0) thì MỚI ĐƯỢC PHÉP nạp vào server hoặc reload Nginx.

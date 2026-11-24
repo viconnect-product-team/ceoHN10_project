@@ -7,7 +7,7 @@ export interface ParsedRecipientItem {
   phone?: string;
   position?: string;
   amount?: number | string;
-  paymentStatus?: "paid" | "unpaid" | "free";
+  paymentStatus?: "paid" | "unpaid" | "free" | "invited_free";
   memberCode?: string;
   department?: string;
   lecturer?: string;

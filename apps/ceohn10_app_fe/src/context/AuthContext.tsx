@@ -485,6 +485,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSessionCookies(sess);
     scheduleRefresh(sess.access_token, sess.refresh_token);
 
+    // Coalesce / Debounce các event broadcast để tránh phát ra bão event liên tiếp làm giật lag & duplicate API calls
+    const broadcastEventDebounced = (name: string, detail?: any) => {
+      if (typeof window === 'undefined') return;
+      window.requestAnimationFrame(() => {
+        if (detail !== undefined) {
+          window.dispatchEvent(new CustomEvent(name, { detail }));
+        } else {
+          window.dispatchEvent(new Event(name));
+        }
+      });
+    };
+
     // Đồng bộ Ma Trận Phân Quyền RBAC thời gian thực về localStorage cho mọi tài khoản
     fetch(`${API_BASE}/api/admin/permission-matrix`, {
       headers: { Authorization: `Bearer ${sess.access_token}` },
@@ -494,8 +506,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const matrixData = data?.categories || (Array.isArray(data) && data[0]?.features ? data : null) || (Array.isArray(data?.rows) && data?.rows[0]?.features ? data.rows : null);
         if (Array.isArray(matrixData) && matrixData.length > 0 && Array.isArray(matrixData[0]?.features)) {
           localStorage.setItem(RBAC_MATRIX_STORAGE_KEY, JSON.stringify(matrixData));
-          window.dispatchEvent(new CustomEvent('rbac-matrix-synced', { detail: matrixData }));
-          window.dispatchEvent(new Event('role-changed'));
+          broadcastEventDebounced('rbac-matrix-synced', matrixData);
         }
       })
       .catch(() => { });
@@ -526,7 +537,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const matrixData = fresh.permissionMatrix.categories || (Array.isArray(fresh.permissionMatrix) && fresh.permissionMatrix[0]?.features ? fresh.permissionMatrix : null) || (Array.isArray(fresh.permissionMatrix.rows) && fresh.permissionMatrix.rows[0]?.features ? fresh.permissionMatrix.rows : null);
             if (Array.isArray(matrixData) && matrixData.length > 0 && Array.isArray(matrixData[0]?.features)) {
               localStorage.setItem(RBAC_MATRIX_STORAGE_KEY, JSON.stringify(matrixData));
-              window.dispatchEvent(new CustomEvent('rbac-matrix-synced', { detail: matrixData }));
+              broadcastEventDebounced('rbac-matrix-synced', matrixData);
             }
           }
         }
@@ -537,9 +548,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Tuyệt đối không broadcast trong quá trình refresh token nền định kỳ để tránh nhấp nháy UI
     if (!isBackgroundRefresh || isIdentityChanged) {
       if (typeof window !== 'undefined') {
-        window.dispatchEvent(new Event('vba_auth_changed'));
-        window.dispatchEvent(new Event('profile-updated'));
-        window.dispatchEvent(new Event('role-changed'));
+        broadcastEventDebounced('vba_auth_changed');
+        broadcastEventDebounced('profile-updated');
+        broadcastEventDebounced('role-changed');
       }
     }
   }

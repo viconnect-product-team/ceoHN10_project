@@ -718,11 +718,7 @@ export function isRouteAllowedByMatrix(route: string, roleKey: SystemRoleKey, us
   }
 
   // 1. Phân hệ Phân Quyền & Quản Trị Người Dùng (/accounts & /permissions):
-  // Yêu cầu bắt buộc: "phân quyền phải đưa vào màn quản trị platform crm không đưa vào màn crm hệ thống thường ceohn10"
-  // Do đó, trên Sidebar CRM thường, 2 route này KHÔNG xuất hiện (chỉ nằm trong Cổng Quản Trị Nền Tảng /master)
-  if (cleanRoute === "/accounts" || cleanRoute === "/permissions") {
-    return false;
-  }
+  // Chỉ mở quyền truy cập cho Quản trị viên và Ban Điều Hành (xử lý tiếp ở isTopAdmin)
 
   // ĐẶC QUYỀN QUẢN TRỊ TỐI CAO (PLATFORM ADMIN / ADMIN / LỚP TRƯỞNG / BAN ĐIỀU HÀNH / TRƯỞNG BAN)
   // Đảm bảo các tài khoản quản trị và điều hành luôn luôn thấy đầy đủ toàn bộ các chức năng của CEO HN10

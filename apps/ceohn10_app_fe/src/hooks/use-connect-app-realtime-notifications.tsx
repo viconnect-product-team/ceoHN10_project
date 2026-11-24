@@ -40,19 +40,18 @@ export function useConnectAppRealtimeNotifications() {
       }
     };
 
+    let invalidateTimer: any = null;
     const invalidateEverything = () => {
-      void qc.invalidateQueries({ queryKey: notificationKeys.root });
-      void qc.invalidateQueries({ queryKey: bcMobileHomeKeys.root });
-      void qc.invalidateQueries({ queryKey: ["bc-home"] });
-      void qc.invalidateQueries({ queryKey: ["user-connections"] });
-      void qc.invalidateQueries({ queryKey: ["network-requests"] });
-      void qc.invalidateQueries({ queryKey: ["network-incoming-requests"] });
-      void qc.invalidateQueries({ queryKey: ["network-status-counts"] });
-      void qc.invalidateQueries({ queryKey: ["crm-events-home"] });
-      void qc.invalidateQueries({ queryKey: ["my-notifications"] });
-      void qc.invalidateQueries({ queryKey: ["member-notifications"] });
-      void qc.invalidateQueries({ queryKey: ["notifications"] });
-      void qc.invalidateQueries({ queryKey: ["member-app"] });
+      if (invalidateTimer) clearTimeout(invalidateTimer);
+      invalidateTimer = setTimeout(() => {
+        void qc.invalidateQueries({ queryKey: notificationKeys.root });
+        void qc.invalidateQueries({ queryKey: bcMobileHomeKeys.root });
+        void qc.invalidateQueries({ queryKey: ["bc-home"] });
+        void qc.invalidateQueries({ queryKey: ["user-connections"] });
+        void qc.invalidateQueries({ queryKey: ["network-requests"] });
+        void qc.invalidateQueries({ queryKey: ["crm-events-home"] });
+        void qc.invalidateQueries({ queryKey: ["member-app"] });
+      }, 300);
     };
 
     const shouldShowToast = (keys: (string | undefined | null)[]): boolean => {

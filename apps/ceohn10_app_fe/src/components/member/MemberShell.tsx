@@ -929,6 +929,8 @@ function MemberTabBar() {
   const isMustChangePassword = typeof window !== "undefined" && localStorage.getItem("vba_must_change_password") === "true";
   // Bottom tab bar remains persistent so search/input focus never causes footer loss.
   if (isMustChangePassword) return null;
+  // Trang chủ Học viên CEO HN10 (/association) đã tích hợp thanh Floating Luxury Footer Mẫu 1 độc quyền
+  if (pathname === "/association" || pathname === "/association/") return null;
 
   return (
     <>

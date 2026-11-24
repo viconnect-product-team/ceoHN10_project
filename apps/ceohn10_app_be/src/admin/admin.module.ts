@@ -3,11 +3,13 @@ import { AdminController } from './admin.controller';
 import { NotificationsController } from './notifications.controller';
 import { DynamicFieldsController } from './dynamic-fields.controller';
 import { FinancialReportController } from './financial-report.controller';
+import { FinancialInitController } from './financial-init.controller';
 import { MasterSettingsController } from './master-settings.controller';
 import { AdminService } from './admin.service';
 import { AdminRepository } from './admin.repository';
 import { DynamicFieldsService } from './dynamic-fields.service';
 import { FinancialReportService } from './financial-report.service';
+import { FinancialInitService } from './financial-init.service';
 import { MasterSettingsService } from './master-settings.service';
 import { PrismaModule } from '../prisma/prisma.module';
 import { AuthModule } from '../auth/auth.module';
@@ -21,6 +23,7 @@ import { MailModule } from '../mail/mail.module';
     NotificationsController,
     DynamicFieldsController,
     FinancialReportController,
+    FinancialInitController,
     MasterSettingsController,
   ],
   providers: [
@@ -28,6 +31,7 @@ import { MailModule } from '../mail/mail.module';
     AdminRepository,
     DynamicFieldsService,
     FinancialReportService,
+    FinancialInitService,
     MasterSettingsService,
   ],
   exports: [
@@ -35,6 +39,7 @@ import { MailModule } from '../mail/mail.module';
     AdminRepository,
     DynamicFieldsService,
     FinancialReportService,
+    FinancialInitService,
     MasterSettingsService,
   ],
 })

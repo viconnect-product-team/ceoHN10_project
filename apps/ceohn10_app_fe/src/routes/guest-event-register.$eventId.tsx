@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Calendar,
   MapPin,
@@ -23,6 +23,10 @@ import {
   Briefcase,
   AlertCircle,
   Tag,
+  Award,
+  Heart,
+  Share2,
+  Compass,
 } from "lucide-react";
 import { fetchNestApi } from "@/lib/api-client";
 import { toast } from "sonner";
@@ -43,7 +47,12 @@ export const Route = createFileRoute("/guest-event-register/$eventId")({
     if (!event) {
       event = null;
     }
-    return { event };
+    const realEventId = event?.id || params.eventId;
+    const ticketsRes = realEventId
+      ? await fetchNestApi<any[]>(`/events/${realEventId}/tickets`).catch(() => [])
+      : [];
+    const eventTickets = Array.isArray(ticketsRes) ? ticketsRes : [];
+    return { event, tickets: eventTickets };
   },
   component: StandaloneGuestEventRegistrationPage,
   head: ({ loaderData }) => ({
@@ -58,7 +67,8 @@ export const Route = createFileRoute("/guest-event-register/$eventId")({
 });
 
 function StandaloneGuestEventRegistrationPage() {
-  const { event } = Route.useLoaderData();
+  const { event, tickets: rawTickets } = Route.useLoaderData();
+  const eventTickets: any[] = Array.isArray(rawTickets) ? rawTickets : [];
 
   if (!event) {
     return (
@@ -87,12 +97,83 @@ function StandaloneGuestEventRegistrationPage() {
   const [isSearchingCode, setIsSearchingCode] = useState(false);
   const [codeLookupSuccess, setCodeLookupSuccess] = useState<string | null>(null);
 
-  const [fullName, setFullName] = useState("");
+  // Paxlaw-style Recipient Name from URL hash (#pham-hong-nguyen) or search params
+  const [inviteeName, setInviteeName] = useState(() => {
+    if (typeof window !== "undefined") {
+      const hash = window.location.hash.replace(/^#/, "");
+      if (hash) {
+        return decodeURIComponent(hash)
+          .split(/[-_+\s]+/)
+          .filter(Boolean)
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+          .join(" ");
+      }
+      const sp = new URLSearchParams(window.location.search);
+      const guest = sp.get("guest") || sp.get("name") || sp.get("recipient");
+      if (guest) {
+        return decodeURIComponent(guest)
+          .split(/[-_+\s]+/)
+          .filter(Boolean)
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+          .join(" ");
+      }
+    }
+    return "";
+  });
+
+  const [fullName, setFullName] = useState(() => inviteeName || "");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [company, setCompany] = useState("");
   const [position, setPosition] = useState("");
-  const [ticketType, setTicketType] = useState("Standard");
+
+  const [showVietQrModal, setShowVietQrModal] = useState(false);
+  const [hasConfirmedPayment, setHasConfirmedPayment] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const handleHashChange = () => {
+        const hash = window.location.hash.replace(/^#/, "");
+        if (hash) {
+          const parsed = decodeURIComponent(hash)
+            .split(/[-_+\s]+/)
+            .filter(Boolean)
+            .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+            .join(" ");
+          setInviteeName(parsed);
+          setFullName((prev) => prev || parsed);
+        }
+      };
+      window.addEventListener("hashchange", handleHashChange);
+      return () => window.removeEventListener("hashchange", handleHashChange);
+    }
+  }, []);
+
+  // Khởi tạo ticketType dựa trên URL search params (VD: ?ticketType=VIP) hoặc vé đầu tiên
+  const [ticketType, setTicketType] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search);
+      const urlType = sp.get("ticketType") || sp.get("ticket_type") || sp.get("type");
+      if (urlType) {
+        const decoded = decodeURIComponent(urlType);
+        if (eventTickets.length > 0) {
+          const match = eventTickets.find(
+            (t) =>
+              t.name.toLowerCase() === decoded.toLowerCase() ||
+              t.id.toLowerCase() === decoded.toLowerCase() ||
+              (decoded.toUpperCase().includes("VIP") && t.name.toUpperCase().includes("VIP"))
+          );
+          if (match) return match.name;
+        }
+        return decoded;
+      }
+    }
+    if (eventTickets.length > 0) {
+      return eventTickets[0].name;
+    }
+    return "Vé Tiêu Chuẩn";
+  });
+
   const [ticketCount, setTicketCount] = useState(1);
   const [note, setNote] = useState("");
   const [isCheckinNow, setIsCheckinNow] = useState(() => {
@@ -128,7 +209,17 @@ function StandaloneGuestEventRegistrationPage() {
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const totalAttendeesCount = 1 + additionalAttendees.length;
-  const ticketPrice = Number(event.ticket_price || event.ticketPrice || event.fee || 0);
+
+  // Tính giá vé của hạng vé đang chọn
+  const activeTicketObj = eventTickets.find(
+    (t) =>
+      t.name === ticketType ||
+      t.id === ticketType ||
+      (ticketType.toUpperCase().includes("VIP") && t.name.toUpperCase().includes("VIP"))
+  );
+  const ticketPrice = activeTicketObj
+    ? Number(activeTicketObj.price || 0)
+    : Number(event.ticket_price || event.ticketPrice || event.fee || 0);
   const isFree = ticketPrice === 0;
   const totalAmount = ticketPrice * totalAttendeesCount;
   const isFull = (() => {
@@ -136,6 +227,18 @@ function StandaloneGuestEventRegistrationPage() {
     const reg = Number(event.registered || event.registeredCount || event.attendeesCount || 0);
     return cap > 0 && reg >= cap;
   })();
+
+  const bankAccount = (event as any).bank_account || (event as any).bankAccount || "0983101010";
+  const bankName = (event as any).bank_name || (event as any).bankName || "MB Bank (Ngân Hàng Quân Đội)";
+  const bankOwner = (event as any).bank_owner || (event as any).bankOwner || "CLB DOANH NHAN CEO HN10";
+  const bankCode = "970422"; // MB Bank bin
+  const dynamicMemo = `CEOHN10_${(fullName || "DK").replace(/[^a-zA-Z0-9]/g, "").toUpperCase().slice(0, 8)}_${Date.now().toString(36).slice(-4).toUpperCase()}`;
+  const popupVietQrUrl = `https://img.vietqr.io/image/${bankCode}-${bankAccount}-compact2.png?amount=${totalAmount}&addInfo=${encodeURIComponent(dynamicMemo)}&accountName=${encodeURIComponent(bankOwner)}`;
+
+  const handleOpenBankApp = () => {
+    const deepLink = `https://api.vietqr.io/pay?bank=${bankCode}&acc=${bankAccount}&amount=${totalAmount}&des=${encodeURIComponent(dynamicMemo)}`;
+    window.open(deepLink, "_blank");
+  };
 
   const handleLookupMemberCode = async (codeToSearch: string, attendeeIndex?: number) => {
     const trimmed = codeToSearch.trim().toUpperCase();
@@ -241,6 +344,22 @@ function StandaloneGuestEventRegistrationPage() {
       }
     }
 
+    // Với sự kiện có phí: Khi bấm đăng ký, hiện mã QR nổi lên kèm link app ngân hàng
+    if (!isFree && !hasConfirmedPayment) {
+      setShowVietQrModal(true);
+      return;
+    }
+
+    await executeRegistrationSubmit();
+  }
+
+  async function handleConfirmPaymentAndSubmit() {
+    setShowVietQrModal(false);
+    setHasConfirmedPayment(true);
+    await executeRegistrationSubmit();
+  }
+
+  async function executeRegistrationSubmit() {
     setSubmitting(true);
     try {
       const allAttendees = [
@@ -272,7 +391,7 @@ function StandaloneGuestEventRegistrationPage() {
           email: email.trim().toLowerCase(),
           company: company.trim(),
           position: position.trim(),
-          ticketType,
+          ticketType: activeTicketObj?.name || ticketType,
           ticketCount: totalAttendeesCount,
           ticketPrice,
           note: note.trim(),
@@ -556,31 +675,45 @@ function StandaloneGuestEventRegistrationPage() {
     );
   }
 
-  // 2. SUCCESS CONFIRMATION VIEW
+  // 2. SUCCESS CONFIRMATION VIEW (LỜI CẢM ƠN TRANG TRỌNG)
   if (result) {
     const isPaid = !result.isFree && result.totalAmount > 0;
 
     return (
-      <div className="min-h-screen bg-[#F0F4F9] py-8 sm:py-12 px-4 flex items-center justify-center font-sans text-slate-800">
-        <div className="max-w-xl w-full bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-          <div className="bg-gradient-to-r from-[#002B70] via-[#003B95] to-[#0A4DB0] px-6 py-7 text-white text-center relative overflow-hidden">
-            <div className="absolute -top-10 -right-10 w-32 h-32 bg-amber-400/20 rounded-full blur-2xl pointer-events-none" />
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-400 text-[#001D4A] rounded-full text-xs font-black uppercase tracking-wider mb-2 shadow-sm">
-              <Sparkles className="w-3.5 h-3.5" />
+      <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0F172A] to-[#020617] py-8 sm:py-16 px-4 flex items-center justify-center font-sans text-slate-100">
+        <div className="max-w-xl w-full bg-slate-900/95 rounded-3xl shadow-[0_0_60px_rgba(217,119,6,0.2)] border-2 border-amber-500/40 overflow-hidden animate-in fade-in zoom-in-95 duration-200 backdrop-blur-md">
+          {/* Header kim loại vàng sang trọng */}
+          <div className="bg-gradient-to-r from-amber-600 via-amber-400 to-amber-600 px-6 py-8 text-slate-950 text-center relative overflow-hidden">
+            <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/30 rounded-full blur-2xl pointer-events-none" />
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-slate-950 text-amber-300 rounded-full text-xs font-black uppercase tracking-wider mb-2 shadow-sm border border-amber-400/50">
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <span>TRÂN TRỌNG CẢM ƠN QUÝ ĐẠI BIỂU</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-serif font-black text-slate-950 px-2 leading-snug">
               {result.status === "attended" || result.checkedInAt || isCheckinNow
                 ? "ĐÃ CHECK-IN VÀO CỬA THÀNH CÔNG"
                 : "ĐĂNG KÝ THAM DỰ THÀNH CÔNG"}
-            </div>
-            <h1 className="text-xl sm:text-2xl font-black text-white px-2 leading-snug">
-              {result.eventTitle || event.name}
             </h1>
-            <p className="text-blue-100 text-xs mt-1.5 flex items-center justify-center gap-2">
-              <Calendar className="w-3.5 h-3.5 text-amber-300" />
-              {result.eventDate || event.date || "Sắp diễn ra"}
+            <p className="text-slate-900 text-xs sm:text-sm mt-1.5 font-bold flex items-center justify-center gap-2">
+              <Calendar className="w-4 h-4 text-slate-950" />
+              {result.eventDate || event.date || "CLB Doanh Nhân CEO HN10"}
             </p>
           </div>
 
           <div className="p-6 sm:p-8 space-y-6">
+            {/* LỜI CẢM ƠN TỪ BAN TỔ CHỨC */}
+            <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-5 text-left space-y-3">
+              <div className="font-serif font-bold text-amber-300 text-base sm:text-lg flex items-center gap-2">
+                <Heart className="w-5 h-5 text-amber-400 shrink-0 fill-amber-400/30" />
+                <span>Kính gửi Quý Anh/Chị {result.fullName || inviteeName || "Đại biểu"},</span>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                Ban Tổ Chức CLB Doanh Nhân CEO HN10 (HanoiBA) xin chân thành gửi lời cảm ơn sâu sắc nhất tới Quý Anh/Chị đã hoàn tất đăng ký tham dự chương trình <strong className="text-amber-300 font-semibold">{result.eventTitle || event.name}</strong>.
+              </p>
+              <p className="text-xs text-slate-400 leading-relaxed italic border-t border-amber-500/20 pt-2">
+                "Sự hiện diện quý báu của Quý Anh/Chị là niềm vinh hạnh to lớn cho sự kiện và là động lực mạnh mẽ để cộng đồng Doanh Nhân CEO HN10 không ngừng gắn kết, phát triển bền vững."
+              </p>
+            </div>
             {(result.status === "attended" || result.checkedInAt || isCheckinNow) && (
               <div className="bg-gradient-to-r from-emerald-600 to-teal-700 text-white font-bold px-4 py-3 rounded-2xl text-center text-sm shadow-md flex items-center justify-center gap-2 border border-emerald-400">
                 <CheckCircle2 className="w-5 h-5 text-amber-300 shrink-0" />
@@ -860,82 +993,123 @@ function StandaloneGuestEventRegistrationPage() {
     );
   }
 
-  // 3. FORM VIEW (ĐĂNG KÝ SỰ KIỆN CHO KHÁCH MỜI)
+  // 3. FORM VIEW (THƯ MỜI SỰ KIỆN PAXLAW-STYLE)
   return (
-    <div className="min-h-screen bg-[#F0F4F9] py-8 sm:py-12 px-4 font-sans text-slate-800">
+    <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0F172A] to-[#020617] py-8 sm:py-16 px-4 font-sans text-slate-200">
       <div className="max-w-2xl mx-auto space-y-6">
-        {/* Banner Card */}
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="h-4 sm:h-5 bg-gradient-to-r from-[#002B70] via-[#003B95] to-amber-500" />
-          <div className="p-6 sm:p-8">
-            <div className="flex items-center gap-3 mb-4">
-              <img
-                src="/images/logo/logo-ceohn10.png"
-                alt="CLB Doanh Nhân CEO HN10"
-                className="h-10 sm:h-12 w-auto object-contain"
-                onError={(e) => {
-                  (e.target as HTMLElement).style.display = "none";
-                }}
-              />
-              <div>
-                <div className="text-xs font-bold text-amber-600 uppercase tracking-widest">
-                  CLB DOANH NHÂN CEO HN10
-                </div>
-                <div className="text-xs text-slate-500 font-medium">
-                  Ban Tổ Chức Sự Kiện & Ban Truyền Thông
-                </div>
+        {/* THIỆP MỜI SANG TRỌNG THEO PHONG CÁCH PAXLAW */}
+        <div className="rounded-3xl border-2 border-amber-500/40 bg-slate-900/95 shadow-[0_0_50px_rgba(217,119,6,0.15)] overflow-hidden backdrop-blur-md relative">
+          {/* Viền kim loại vàng hoàng gia */}
+          <div className="h-2 bg-gradient-to-r from-amber-600 via-amber-300 to-amber-600" />
+
+          <div className="p-6 sm:p-10 text-center space-y-6 relative">
+            {/* Logo & Tổ Chức */}
+            <div className="flex flex-col items-center justify-center gap-2">
+              <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shadow-inner">
+                <Award className="w-8 h-8 text-amber-400" />
+              </div>
+              <div className="text-[11px] font-black tracking-[0.25em] text-amber-400 uppercase">
+                HANOIBA · HIỆP HỘI DOANH NGHIỆP TRẺ HÀ NỘI
+              </div>
+              <div className="text-xs font-bold tracking-widest text-slate-300 uppercase">
+                CLB DOANH NHÂN CEO HN10
               </div>
             </div>
 
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 border border-blue-200 text-[#003B95] rounded-full text-[11px] font-bold uppercase tracking-wider mb-2">
-              ✦ BẢN ĐĂNG KÝ ĐẠI BIỂU & KHÁCH MỜI THAM DỰ ✦
-            </div>
-
-            <h1 className="text-2xl sm:text-3xl font-black text-[#003B95] leading-tight mb-4">
-              {event.name}
-            </h1>
-
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-5 text-xs sm:text-sm text-slate-600 mb-4 pb-4 border-b border-slate-100">
-              {event.date && (
-                <span className="flex items-center gap-1.5 font-medium">
-                  <Calendar className="w-4 h-4 text-amber-500 shrink-0" />
-                  {event.date}
-                </span>
-              )}
-              {event.location && (
-                <span className="flex items-center gap-1.5 font-medium">
-                  <MapPin className="w-4 h-4 text-amber-500 shrink-0" />
-                  <span className="truncate">{event.location}</span>
-                </span>
-              )}
-            </div>
-
-            {/* Fee / Pricing Summary Box */}
-            <div className="flex items-center justify-between bg-slate-50 border border-slate-200 p-4 rounded-2xl">
-              <div>
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wide block">
-                  Phí tham dự chương trình
-                </span>
-                <span className="text-xs text-slate-500">
-                  {isFree ? "Miễn phí toàn bộ sự kiện & quay số trúng thưởng" : "Bao gồm tiệc trà, tài liệu & kết nối giao thương"}
-                </span>
+            {/* Tiêu đề thư mời */}
+            <div className="space-y-1.5 pt-1">
+              <div className="text-[11px] font-semibold tracking-[0.3em] text-amber-400/80 uppercase">
+                ✦ FORMAL INVITATION ✦
               </div>
-              <div>
-                {isFree ? (
-                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full font-black text-xs sm:text-sm uppercase tracking-wide">
-                    ✦ Miễn Phí (0 đ)
-                  </span>
-                ) : (
-                  <span className="text-base sm:text-lg font-black text-amber-600">
-                    {new Intl.NumberFormat("vi-VN").format(ticketPrice)} đ / vé
-                  </span>
+              <h2 className="text-2xl sm:text-4xl font-serif font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 leading-tight">
+                THƯ MỜI THAM DỰ
+              </h2>
+            </div>
+
+            {/* Khung tôn vinh danh tính đại biểu (Personalized Paxlaw Invitee Name) */}
+            <div className="bg-gradient-to-r from-amber-500/10 via-amber-400/20 to-amber-500/10 border-2 border-amber-400/60 rounded-2xl py-4 px-6 shadow-md mx-auto max-w-lg">
+              <span className="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-amber-300 block mb-1">
+                TRÂN TRỌNG KÍNH MỜI
+              </span>
+              <div className="text-xl sm:text-3xl font-serif font-black text-amber-300 drop-shadow-sm uppercase">
+                {inviteeName || fullName || "QUÝ ĐẠI BIỂU & DOANH NHÂN"}
+              </div>
+              <span className="text-[11px] text-slate-400 font-medium block mt-1">
+                Tới tham dự chương trình đặc biệt cùng Cộng đồng Doanh Nhân CEO HN10
+              </span>
+            </div>
+
+            {/* Tên Sự Kiện */}
+            <div className="space-y-2 pt-2">
+              <h1 className="text-xl sm:text-2xl font-bold text-white font-serif leading-snug">
+                {event.name}
+              </h1>
+              {event.subtitle && (
+                <p className="text-xs sm:text-sm text-slate-400 italic max-w-lg mx-auto">
+                  {event.subtitle}
+                </p>
+              )}
+            </div>
+
+            {/* Thông Tin Thời Gian, Địa Điểm, Dresscode */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left pt-2">
+              <div className="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/80 space-y-1.5">
+                <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider">
+                  <Calendar className="w-4 h-4 text-amber-400" />
+                  <span>Thời gian tổ chức</span>
+                </div>
+                <div className="text-xs sm:text-sm font-semibold text-slate-200">
+                  {event.date || "Theo thông báo từ BTC"}
+                </div>
+                <div className="text-[11px] text-slate-400 flex items-center gap-1">
+                  <Clock className="w-3 h-3 text-slate-500" />
+                  <span>Đón khách & Check-in: 30 phút trước khai mạc</span>
+                </div>
+              </div>
+
+              <div className="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/80 space-y-1.5">
+                <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider">
+                  <MapPin className="w-4 h-4 text-amber-400" />
+                  <span>Địa điểm diễn ra</span>
+                </div>
+                <div className="text-xs sm:text-sm font-semibold text-slate-200 truncate">
+                  {event.location || "Trung tâm Hội nghị"}
+                </div>
+                {event.location && (
+                  <a
+                    href={`https://maps.google.com/?q=${encodeURIComponent(event.location)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-400 hover:text-amber-300 underline"
+                  >
+                    <Compass className="w-3 h-3" />
+                    <span>Xem bản đồ đường đi</span>
+                  </a>
                 )}
               </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-rose-600 font-medium">
-              <span>* Biểu thị câu hỏi bắt buộc</span>
-              <span className="text-slate-400">Thời gian điền: ~ 1 phút</span>
+            {/* Fee & Dress Code */}
+            <div className="bg-amber-500/10 rounded-2xl p-4 border border-amber-500/20 text-xs text-left flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div>
+                <span className="font-bold text-amber-400 uppercase tracking-wide block">
+                  Quy định trang phục (Dress Code):
+                </span>
+                <span className="text-slate-300 text-[11px]">
+                  Trang phục lịch sự, Vest, Áo dài hoặc Doanh nhân công sở.
+                </span>
+              </div>
+              <div className="shrink-0">
+                {isFree ? (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-full font-bold text-xs uppercase tracking-wide">
+                    ✦ Miễn Phí (0 đ)
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-amber-400/20 text-amber-300 border border-amber-400/40 rounded-full font-bold text-xs uppercase tracking-wide">
+                    {new Intl.NumberFormat("vi-VN").format(ticketPrice)} đ / vé
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -1328,29 +1502,43 @@ function StandaloneGuestEventRegistrationPage() {
               Chọn hạng vé phù hợp với tư cách tham dự chương trình.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-              {[
-                { id: "Standard", label: "Vé Tiêu Chuẩn", desc: "Tham dự toàn bộ chương trình" },
-                { id: "VIP", label: "Vé VIP Doanh Nhân", desc: "Bàn tiệc trang trọng, tài liệu VIP" },
-                { id: "Guest", label: "Khách Mời Danh Dự", desc: "Khách mời đặc biệt từ BTC" },
-              ].map((t) => (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => setTicketType(t.id)}
-                  className={`p-3.5 rounded-2xl border text-left transition cursor-pointer ${ticketType === t.id
-                      ? "border-[#003B95] bg-blue-50/60 ring-2 ring-[#003B95]/20 shadow-xs"
-                      : "border-slate-200 hover:border-slate-300 bg-slate-50/50"
+              {(eventTickets.length > 0
+                ? eventTickets
+                : [
+                    { id: "Standard", name: "Vé Tiêu Chuẩn", price: ticketPrice, description: "Tham dự toàn bộ chương trình" },
+                    { id: "VIP", name: "Vé VIP Doanh Nhân", price: ticketPrice > 0 ? ticketPrice * 2 : 500000, description: "Bàn tiệc trang trọng, tài liệu VIP" },
+                    { id: "Guest", name: "Khách Mời Danh Dự", price: 0, description: "Khách mời đặc biệt từ BTC" },
+                  ]
+              ).map((t: any) => {
+                const isSelected =
+                  ticketType === t.name ||
+                  ticketType === t.id ||
+                  (ticketType.toUpperCase().includes("VIP") && (t.name || "").toUpperCase().includes("VIP"));
+                const tPrice = Number(t.price || 0);
+                return (
+                  <button
+                    key={t.id || t.name}
+                    type="button"
+                    onClick={() => setTicketType(t.name || t.id)}
+                    className={`p-3.5 rounded-2xl border text-left transition cursor-pointer ${
+                      isSelected
+                        ? "border-[#003B95] bg-blue-50/60 ring-2 ring-[#003B95]/20 shadow-xs"
+                        : "border-slate-200 hover:border-slate-300 bg-slate-50/50"
                     }`}
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-bold text-xs text-slate-900">{t.label}</span>
-                    {ticketType === t.id && (
-                      <CheckCircle2 className="w-4 h-4 text-[#003B95]" />
-                    )}
-                  </div>
-                  <span className="text-[11px] text-slate-500 block leading-tight">{t.desc}</span>
-                </button>
-              ))}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-bold text-xs text-slate-900">{t.name || t.label}</span>
+                      {isSelected && (
+                        <CheckCircle2 className="w-4 h-4 text-[#003B95]" />
+                      )}
+                    </div>
+                    <div className="text-xs font-bold text-[#003B95] mb-1">
+                      {tPrice <= 0 ? "Miễn phí (0đ)" : `${tPrice.toLocaleString("vi-VN")} đ`}
+                    </div>
+                    <span className="text-[11px] text-slate-500 block leading-tight">{t.description || t.desc}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -1445,6 +1633,126 @@ function StandaloneGuestEventRegistrationPage() {
           </p>
         </div>
       </div>
+
+      {/* ── VIETQR BANKING POPUP MODAL (KHI BẤM ĐĂNG KÝ SỰ KIỆN CÓ PHÍ) ── */}
+      {showVietQrModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in">
+          <div className="w-full max-w-md rounded-3xl bg-slate-900 border-2 border-amber-500/50 p-6 shadow-2xl text-slate-100 relative space-y-4">
+            <div className="flex items-center justify-between border-b border-amber-500/20 pb-3">
+              <div className="flex items-center gap-2">
+                <CreditCard className="w-5 h-5 text-amber-400" />
+                <h3 className="font-bold text-sm text-amber-300 uppercase tracking-wide">
+                  Mã VietQR Thanh Toán Sự Kiện
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowVietQrModal(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-white cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="text-center space-y-1">
+              <p className="text-xs text-slate-400">Số tiền thanh toán ({totalAttendeesCount} vé):</p>
+              <div className="text-2xl font-black text-amber-400 font-mono">
+                {new Intl.NumberFormat("vi-VN").format(totalAmount)} đ
+              </div>
+              <p className="text-[11px] text-slate-400">
+                Loại vé: <strong className="text-slate-200">{activeTicketObj?.name || ticketType}</strong>
+              </p>
+            </div>
+
+            {/* QR Code Container */}
+            <div className="w-60 h-60 mx-auto bg-white p-3 rounded-2xl border-2 border-amber-400 shadow-lg flex items-center justify-center">
+              <img
+                src={popupVietQrUrl}
+                alt="VietQR Thanh Toán Sự Kiện"
+                className="w-full h-full object-contain"
+              />
+            </div>
+
+            {/* Bank details with 1-click copy */}
+            <div className="bg-slate-800/90 rounded-2xl p-3.5 border border-slate-700 text-xs space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">Ngân hàng:</span>
+                <span className="font-bold text-slate-200">{bankName}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">Số tài khoản:</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-mono font-bold text-amber-300">{bankAccount}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleCopy(bankAccount, "Số tài khoản")}
+                    className="p-1 rounded bg-slate-700 hover:bg-slate-600 text-slate-300 cursor-pointer"
+                    title="Sao chép STK"
+                  >
+                    {copiedField === "Số tài khoản" ? (
+                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">Chủ tài khoản:</span>
+                <span className="font-bold text-slate-200">{bankOwner}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">Nội dung CK:</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-mono font-bold text-amber-300 bg-amber-400/10 px-1.5 py-0.5 rounded border border-amber-500/30">
+                    {dynamicMemo}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleCopy(dynamicMemo, "Nội dung")}
+                    className="p-1 rounded bg-slate-700 hover:bg-slate-600 text-slate-300 cursor-pointer"
+                    title="Sao chép nội dung"
+                  >
+                    {copiedField === "Nội dung" ? (
+                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons: Deeplink to Bank App + Confirm */}
+            <div className="space-y-2 pt-1">
+              <button
+                type="button"
+                onClick={handleOpenBankApp}
+                className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 text-slate-950 font-black text-xs sm:text-sm shadow-lg flex items-center justify-center gap-2 hover:opacity-90 cursor-pointer transition"
+              >
+                <ExternalLink className="w-4 h-4" />
+                <span>Mở Ứng Dụng Ngân Hàng Để Thanh Toán Ngay</span>
+              </button>
+
+              <button
+                type="button"
+                disabled={submitting}
+                onClick={handleConfirmPaymentAndSubmit}
+                className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow flex items-center justify-center gap-2 cursor-pointer transition disabled:opacity-60"
+              >
+                {submitting ? (
+                  <span className="animate-spin">↻ Đang xác nhận...</span>
+                ) : (
+                  <>
+                    <CheckCircle2 className="w-4 h-4 text-emerald-200" />
+                    <span>Tôi Đã Chuyển Khoản Xong (Xem Lời Cảm Ơn)</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

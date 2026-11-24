@@ -2511,33 +2511,67 @@ export class AdminService implements OnModuleInit {
         SELECT * FROM public.transactions
         ORDER BY date DESC, created_at DESC
       `;
-      let res = rows.map((tx) => ({
-        id: tx.code || String(tx.id),
-        date: tx.date
-          ? tx.date instanceof Date
-            ? `${tx.date.getFullYear()}-${String(tx.date.getMonth() + 1).padStart(2, '0')}-${String(tx.date.getDate()).padStart(2, '0')}`
-            : String(tx.date).slice(0, 10)
-          : '',
-        type: tx.type,
-        category: tx.category || 'Khác',
-        description: tx.description ?? '',
-        amount: Number(tx.amount ?? 0),
-        method: tx.method || 'bank',
-        status: tx.status || 'completed',
-        advanceAmount: Number(tx.advance_amount ?? 0),
-        refundAmount: Number(tx.refund_amount ?? 0),
-        invoiceUrl: tx.invoice_url ?? '',
-        recipient: tx.recipient ?? '',
-      }));
 
-      // Đồng bộ trực tiếp từ đăng ký sự kiện có phí đã thanh toán (payment_status = 'paid')
+      // 1. Lấy danh sách các vé đã thanh toán hợp lệ (không bị hủy)
+      const validPaidRegs = await this.prisma.$queryRaw<any[]>`
+        SELECT id FROM public.event_registrations
+        WHERE (payment_status = 'paid' OR payment_status = 'completed')
+          AND payment_amount > 0
+          AND (status IS NULL OR (status != 'cancelled' AND status != 'canceled'))
+      `.catch(() => []);
+      const validPaidRegIds = new Set(validPaidRegs.map((r) => String(r.id)));
+
+      // 2. Lấy danh sách các vé đã bị hủy hoặc chuyển sang chưa thanh toán
+      const cancelledRegs = await this.prisma.$queryRaw<any[]>`
+        SELECT id FROM public.event_registrations
+        WHERE status = 'cancelled' OR status = 'canceled' OR payment_status = 'cancelled' OR payment_status = 'unpaid'
+      `.catch(() => []);
+      const cancelledRegIds = new Set(cancelledRegs.map((r) => String(r.id)));
+
+      // 3. Lọc bỏ các giao dịch mồ côi từ vé đã hủy/xóa để Báo cáo tài chính Realtime 100%
+      let res = rows
+        .filter((tx) => {
+          const code = String(tx.code || '');
+          const desc = String(tx.description || '');
+          if (tx.category === 'Vé sự kiện' || code.startsWith('THU-EV')) {
+            const match = code.match(/THU-EV(\d+)/) || desc.match(/Mã vé: #(\d+)/) || desc.match(/Vé (\d+)/);
+            if (match && match[1]) {
+              const regId = match[1];
+              if (cancelledRegIds.has(regId)) return false;
+              if (!validPaidRegIds.has(regId)) return false;
+            }
+          }
+          return true;
+        })
+        .map((tx) => ({
+          id: tx.code || String(tx.id),
+          date: tx.date
+            ? tx.date instanceof Date
+              ? `${tx.date.getFullYear()}-${String(tx.date.getMonth() + 1).padStart(2, '0')}-${String(tx.date.getDate()).padStart(2, '0')}`
+              : String(tx.date).slice(0, 10)
+            : '',
+          type: tx.type,
+          category: tx.category || 'Khác',
+          description: tx.description ?? '',
+          amount: Number(tx.amount ?? 0),
+          method: tx.method || 'bank',
+          status: tx.status || 'completed',
+          advanceAmount: Number(tx.advance_amount ?? 0),
+          refundAmount: Number(tx.refund_amount ?? 0),
+          invoiceUrl: tx.invoice_url ?? '',
+          recipient: tx.recipient ?? '',
+        }));
+
+      // Đồng bộ trực tiếp từ đăng ký sự kiện có phí đã thanh toán và chưa bị hủy
       try {
         const eventRegRows = await this.prisma.$queryRaw<any[]>`
           SELECT er.id, er.member_name, er.payment_amount, er.payment_method, er.created_at, er.registered_at,
                  COALESCE(ev.name, ev.title, 'Sự kiện CLB') as event_title
           FROM public.event_registrations er
           LEFT JOIN public.events ev ON er.event_id = ev.id
-          WHERE (er.payment_status = 'paid' OR er.payment_status = 'completed') AND er.payment_amount > 0
+          WHERE (er.payment_status = 'paid' OR er.payment_status = 'completed')
+            AND er.payment_amount > 0
+            AND (er.status IS NULL OR (er.status != 'cancelled' AND er.status != 'canceled'))
         `.catch(() => []);
 
         const existingCodes = new Set(res.map((r) => r.id));

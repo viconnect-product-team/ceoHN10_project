@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback, useMemo } from "react";
+import React, { useRef, useState, useCallback, useMemo, useEffect } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -8,6 +8,7 @@ import {
   Search,
   Plus,
   X,
+  MoreHorizontal,
   type LucideIcon,
 } from "lucide-react";
 import { Pagination } from "@/components/dashboard/DataTablePagination";
@@ -99,6 +100,187 @@ export function useCustomTableSort<T>(
   };
 }
 
+export interface TableActionItem {
+  key?: string;
+  label: string;
+  icon?: LucideIcon | React.ComponentType<{ className?: string }>;
+  onClick: (e: React.MouseEvent) => void;
+  disabled?: boolean;
+  danger?: boolean;
+  variant?: "default" | "primary" | "danger" | "success" | "warning";
+  className?: string;
+  hidden?: boolean;
+}
+
+/**
+ * Component hiển thị nhóm thao tác theo chuẩn tối đa 3 thao tác:
+ * - Nếu <= 3 thao tác: hiển thị đầy đủ trực tiếp.
+ * - Nếu > 3 thao tác: hiển thị 2 thao tác đầu + nút 3 chấm (...) mở popup chứa các thao tác còn lại.
+ */
+export function TableActionsGroup({
+  actions,
+  maxVisible = 3,
+  children,
+}: {
+  actions?: TableActionItem[];
+  maxVisible?: number;
+  children?: React.ReactNode;
+}) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [menuOpen]);
+
+  if (actions && Array.isArray(actions)) {
+    const visibleActions = actions.filter((a) => !a.hidden);
+    if (visibleActions.length <= maxVisible) {
+      return (
+        <div className="flex items-center justify-center gap-1.5 flex-wrap">
+          {visibleActions.map((act, i) => {
+            const Icon = act.icon;
+            return (
+              <button
+                key={act.key || i}
+                type="button"
+                onClick={act.onClick}
+                disabled={act.disabled}
+                title={act.label}
+                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
+                  act.danger
+                    ? "bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-950/40 dark:text-red-400"
+                    : act.variant === "primary"
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : act.variant === "success"
+                    ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950/40"
+                    : act.variant === "warning"
+                    ? "bg-amber-50 text-amber-800 hover:bg-amber-100 dark:bg-amber-950/40"
+                    : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300"
+                } ${act.className || ""}`}
+              >
+                {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
+                <span>{act.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      );
+    }
+
+    const directActions = visibleActions.slice(0, maxVisible - 1);
+    const extraActions = visibleActions.slice(maxVisible - 1);
+
+    return (
+      <div className="relative inline-flex items-center justify-center gap-1.5" ref={menuRef}>
+        {directActions.map((act, i) => {
+          const Icon = act.icon;
+          return (
+            <button
+              key={act.key || i}
+              type="button"
+              onClick={act.onClick}
+              disabled={act.disabled}
+              title={act.label}
+              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
+                act.danger
+                  ? "bg-red-50 text-red-600 hover:bg-red-100"
+                  : act.variant === "primary"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300"
+              } ${act.className || ""}`}
+            >
+              {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
+              <span>{act.label}</span>
+            </button>
+          );
+        })}
+
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setMenuOpen((prev) => !prev);
+          }}
+          className="inline-flex items-center justify-center w-7 h-7 rounded-md border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 cursor-pointer transition shadow-2xs"
+          title="Thao tác khác"
+          aria-label="Thao tác khác"
+        >
+          <MoreHorizontal className="w-4 h-4" />
+        </button>
+
+        {menuOpen && (
+          <div className="absolute right-0 top-full mt-1 w-44 z-50 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 shadow-lg py-1 text-left text-xs">
+            {extraActions.map((act, i) => {
+              const Icon = act.icon;
+              return (
+                <button
+                  key={act.key || i}
+                  type="button"
+                  disabled={act.disabled}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMenuOpen(false);
+                    act.onClick(e);
+                  }}
+                  className={`w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                    act.danger ? "text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30" : "text-slate-700 dark:text-slate-200"
+                  }`}
+                >
+                  {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
+                  <span className="truncate">{act.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  const childArray = React.Children.toArray(children).filter(Boolean);
+  if (childArray.length <= maxVisible) {
+    return <div className="flex items-center justify-center gap-1.5 flex-wrap">{children}</div>;
+  }
+
+  const directChildren = childArray.slice(0, maxVisible - 1);
+  const extraChildren = childArray.slice(maxVisible - 1);
+
+  return (
+    <div className="relative inline-flex items-center justify-center gap-1.5" ref={menuRef}>
+      {directChildren}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          setMenuOpen((prev) => !prev);
+        }}
+        className="inline-flex items-center justify-center w-7 h-7 rounded-md border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 cursor-pointer transition shadow-2xs"
+        title="Thao tác khác"
+        aria-label="Thao tác khác"
+      >
+        <MoreHorizontal className="w-4 h-4" />
+      </button>
+      {menuOpen && (
+        <div className="absolute right-0 top-full mt-1 min-w-[160px] z-50 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 shadow-lg p-1.5 text-left text-xs space-y-1">
+          {extraChildren.map((child, i) => (
+            <div key={i} onClick={() => setMenuOpen(false)} className="w-full [&>button]:w-full [&>button]:justify-start [&>button]:py-1.5 [&>button]:px-2.5">
+              {child}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export interface CustomTableProps<T> {
   columns: CustomTableColumn<T>[];
   data: T[];
@@ -116,7 +298,9 @@ export interface CustomTableProps<T> {
   actionColumn?: {
     title?: string;
     width?: number | string;
-    render: (row: T, index: number) => React.ReactNode;
+    minWidth?: number;
+    actions?: (row: T, index: number) => TableActionItem[];
+    render?: (row: T, index: number) => React.ReactNode;
   };
   loading?: boolean;
   emptyText?: string;
@@ -239,17 +423,16 @@ export function CustomTable<T>({
               })}
 
               {actionColumn && (
-                <th
-                  style={{
-                    width:
-                      typeof actionColumn.width === "number"
-                        ? `${actionColumn.width}px`
-                        : actionColumn.width || 128,
-                  }}
+                <ResizableHeaderCell
+                  label={actionColumn.title || "THAO TÁC"}
+                  width={colWidths["__action_col__"] || actionColumn.width || 128}
+                  minWidth={actionColumn.minWidth || 80}
+                  align="center"
                   className="px-4 text-center select-none font-bold"
+                  onResize={(w) => handleResize("__action_col__", w)}
                 >
-                  {actionColumn.title || "THAO TÁC"}
-                </th>
+                  <span className="uppercase">{actionColumn.title || "THAO TÁC"}</span>
+                </ResizableHeaderCell>
               )}
             </tr>
           </thead>
@@ -334,7 +517,13 @@ export function CustomTable<T>({
 
                     {actionColumn && (
                       <td className="px-4 text-center">
-                        {actionColumn.render(row, index)}
+                        {actionColumn.actions ? (
+                          <TableActionsGroup actions={actionColumn.actions(row, index)} maxVisible={3} />
+                        ) : actionColumn.render ? (
+                          <TableActionsGroup maxVisible={3}>
+                            {actionColumn.render(row, index)}
+                          </TableActionsGroup>
+                        ) : null}
                       </td>
                     )}
                   </tr>

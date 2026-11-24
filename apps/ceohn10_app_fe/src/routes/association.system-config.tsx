@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { BRAND_ASSETS } from "@/config/branding";
 import {
   Settings as Cog,
   Globe,
@@ -179,7 +180,7 @@ export function AssociationSystemConfigScreen() {
           <div className="absolute top-0 right-0 w-32 h-32 bg-amber-400/10 rounded-full blur-2xl pointer-events-none" />
           <div className="flex items-center gap-3.5 relative z-10">
             <div className="h-13 w-13 rounded-2xl bg-white p-1.5 shadow-md flex items-center justify-center shrink-0 border border-amber-400/60">
-              <img src="/ceohn10-logo.png" alt="CEO HN10" className="h-full w-full object-contain" />
+              <img src={BRAND_ASSETS.logoSquare} alt="CEO HN10" className="h-full w-full object-contain" />
             </div>
             <div className="min-w-0 flex-1">
               <div className="text-[10px] uppercase font-extrabold tracking-widest text-amber-300">

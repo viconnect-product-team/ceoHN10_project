@@ -40,6 +40,10 @@ import { useT, type TKey } from "@/lib/i18n";
 import { fetchNestApi, resolveMediaUrl } from "@/lib/api-client";
 import { AvatarUploadField } from "@/components/business-connect/mobile/me/AvatarUploadField";
 import { useRole, clearMeCache } from "@/hooks/use-role";
+import { ScopeRoleAssignmentSection } from "@/components/rbac/ScopeRoleAssignmentSection";
+import { RbacMatrixSection } from "@/components/rbac/RbacMatrixSection";
+import { RbacPermissionMatrix } from "@/components/dashboard/RbacPermissionMatrix";
+import { RbacAuditLogsSection } from "@/components/rbac/RbacAuditLogsSection";
 import {
   ROLE_OPTIONS,
   DEPARTMENT_OPTIONS,
@@ -89,6 +93,7 @@ function AccountManagementPage() {
   const [activeTab, setActiveTab] = useState<"profile" | "security" | "users" | "preferences">(
     searchTab || (action === "reset_password" ? "users" : "profile")
   );
+  const [rbacSubTab, setRbacSubTab] = useState<"users" | "scope_assignments" | "matrix" | "audit">("users");
 
   useEffect(() => {
     if (searchTab === "users" || searchTab === "security" || searchTab === "preferences" || searchTab === "profile") {
@@ -214,9 +219,7 @@ function AccountManagementPage() {
     while (clean.startsWith("@")) {
       clean = clean.slice(1).trim();
     }
-    // Nếu là địa chỉ email (chứa @) thì hiển thị nguyên bản sạch, tuyệt đối không thêm tiền tố @
-    if (clean.includes("@")) return clean;
-    return clean ? `@${clean}` : "—";
+    return clean || "—";
   };
 
   const canManageUsers =
@@ -817,6 +820,80 @@ function AccountManagementPage() {
 
         {/* ── QUẢN TRỊ NGƯỜI DÙNG & PHÂN QUYỀN TÀI KHOẢN (DUY NHẤT) ── */}
         <div className="space-y-6">
+          {/* Sub-tabs: Tài Khoản | Phân Công Scope | Ma Trận Quyền | Nhật Ký Audit */}
+          <div className="p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-wrap gap-1.5 shadow-2xs">
+            <button
+              type="button"
+              onClick={() => setRbacSubTab("users")}
+              className={`flex-1 min-w-[140px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
+                rbacSubTab === "users"
+                  ? "bg-slate-900 dark:bg-slate-800 text-white shadow-sm ring-1 ring-slate-800"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800/60"
+              }`}
+            >
+              <Users className="size-4 text-primary" />
+              <span>Quản Lý Tài Khoản</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setRbacSubTab("scope_assignments")}
+              className={`flex-1 min-w-[140px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
+                rbacSubTab === "scope_assignments"
+                  ? "bg-slate-900 dark:bg-slate-800 text-white shadow-sm ring-1 ring-slate-800"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800/60"
+              }`}
+            >
+              <ShieldCheck className="size-4 text-amber-500" />
+              <span>Phân Công Chức Vụ & Scope</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded-md font-semibold bg-amber-400/20 text-amber-300">
+                15 Roles
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setRbacSubTab("matrix")}
+              className={`flex-1 min-w-[140px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
+                rbacSubTab === "matrix"
+                  ? "bg-slate-900 dark:bg-slate-800 text-white shadow-sm ring-1 ring-slate-800"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800/60"
+              }`}
+            >
+              <SlidersHorizontal className="size-4 text-indigo-500" />
+              <span>Ma Trận Quyền Hạn</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded-md font-semibold bg-indigo-400/20 text-indigo-300">
+                38 Perms
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setRbacSubTab("audit")}
+              className={`flex-1 min-w-[140px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
+                rbacSubTab === "audit"
+                  ? "bg-slate-900 dark:bg-slate-800 text-white shadow-sm ring-1 ring-slate-800"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800/60"
+              }`}
+            >
+              <ShieldAlert className="size-4 text-red-500" />
+              <span>Nhật Ký Kiểm Toán (Audit)</span>
+            </button>
+          </div>
+
+          {rbacSubTab === "scope_assignments" && (
+            <ScopeRoleAssignmentSection />
+          )}
+
+          {rbacSubTab === "matrix" && (
+            <div className="space-y-4">
+              <RbacPermissionMatrix />
+            </div>
+          )}
+
+          {rbacSubTab === "audit" && (
+            <RbacAuditLogsSection />
+          )}
+
+          {rbacSubTab === "users" && (
+            <>
           {/* Stats Row */}
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             <StatCard
@@ -925,11 +1002,29 @@ function AccountManagementPage() {
               },
               {
                 key: "username",
-                label: "Tên đăng nhập",
-                width: 140,
-                render: (u: any) => (
-                  <span className="font-mono text-xs text-foreground font-medium">{displayUsername(u.username || u.email)}</span>
-                ),
+                label: "Tên đăng nhập vào App",
+                width: 220,
+                render: (u: any) => {
+                  const email = u.email ? String(u.email).trim() : "";
+                  const memberCode = (u.memberCode || u.username || "").replace(/^@+/, "").trim();
+                  return (
+                    <div className="flex flex-col gap-0.5">
+                      {email && (
+                        <div className="flex items-center gap-1.5 font-medium text-xs text-foreground">
+                          <Mail className="h-3 w-3 text-muted-foreground shrink-0" />
+                          <span className="truncate max-w-[190px]">{email}</span>
+                        </div>
+                      )}
+                      {memberCode && memberCode !== email && (
+                        <div className="flex items-center gap-1.5 font-mono text-[11px] text-muted-foreground">
+                          <span className="font-bold text-primary">Mã HV:</span>
+                          <span>{memberCode}</span>
+                        </div>
+                      )}
+                      {!email && !memberCode && <span className="text-muted-foreground">—</span>}
+                    </div>
+                  );
+                },
               },
               {
                 key: "department",
@@ -1102,6 +1197,8 @@ function AccountManagementPage() {
               ),
             }}
           />
+          </>
+        )}
         </div>
       </div>
 

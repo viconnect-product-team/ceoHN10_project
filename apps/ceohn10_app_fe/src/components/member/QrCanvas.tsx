@@ -24,6 +24,7 @@ export function QrCanvas({
   logoOffsetX = 0,
   logoOffsetY = 0,
   className = "",
+  id,
 }: {
   value: string;
   size?: number;
@@ -46,6 +47,7 @@ export function QrCanvas({
   /** Vertical logo offset as a fraction of QR size (-0.25 to 0.25). */
   logoOffsetY?: number;
   className?: string;
+  id?: string;
 }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const [ready, setReady] = useState(false);
@@ -128,6 +130,7 @@ export function QrCanvas({
     >
       <canvas
         ref={ref}
+        id={id}
         width={size}
         height={size}
         aria-label="Mã QR"

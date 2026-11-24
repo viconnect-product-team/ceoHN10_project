@@ -37,6 +37,7 @@ import {
   AlertTriangle,
   Share2,
   Headphones,
+  ScanLine,
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -2132,6 +2133,29 @@ function EventsScreen() {
                 </div>
               </div>
 
+              {/* NÚT CHECK-IN SỰ KIỆN QUAN TRỌNG (YÊU CẦU 5) */}
+              <div className="w-full flex items-center gap-2">
+                <Link
+                  to="/association/checkin"
+                  className="flex-1 py-3 px-4 rounded-2xl bg-gradient-to-r from-red-600 to-rose-700 text-white font-black text-xs shadow-md flex items-center justify-center gap-2 transition active:scale-98 cursor-pointer hover:from-red-700 hover:to-rose-800"
+                >
+                  <ScanLine className="size-4 text-amber-300" />
+                  <span>Check-in Sự Kiện Ngay (Quét Mã QR)</span>
+                </Link>
+
+                {registeredEvents.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setAllTicketsModalOpen(true)}
+                    className="py-3 px-3.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs shadow-md flex items-center justify-center gap-1.5 transition active:scale-98 cursor-pointer"
+                    title="Mở Thẻ Vé QR của tôi"
+                  >
+                    <Ticket className="size-4" />
+                    <span>Vé ({registeredEvents.length})</span>
+                  </button>
+                )}
+              </div>
+
               {/* Shortcut Danh Mục Lịch Hoạt Động CLB */}
               <Link
                 to="/association/calendar"
@@ -2452,19 +2476,49 @@ function EventsScreen() {
                           </span>
                         </div>
 
-                        <button
-                          type="button"
-                          onClick={(evt) => {
-                            evt.stopPropagation();
-                            handleSelectEvent(e);
-                          }}
-                          className={`px-3 py-1.5 rounded-lg border flex justify-start items-center gap-1.5 text-sm font-semibold font-['Inter'] leading-5 active:scale-95 transition cursor-pointer shadow-xs ${registered
-                            ? "bg-emerald-600 border-emerald-600 text-white"
-                            : "bg-[#003B95] hover:bg-[#002B70] border-[#003B95] text-white"
-                            }`}
-                        >
-                          <span>{registered ? "Đã đăng ký (Xem chi tiết)" : "Xem chi tiết"}</span>
-                        </button>
+                        <div className="flex items-center gap-1.5">
+                          {registered && (
+                            <button
+                              type="button"
+                              onClick={(evt) => {
+                                evt.stopPropagation();
+                                const targetReg = registeredEvents.find((r) => r.id === e.id) || (e as any);
+                                setTicketPassModal({
+                                  eventTitle: e.title || "Sự Kiện CLB Doanh Nhân CEO HN10",
+                                  ticketCode: targetReg?.ticketCode || targetReg?.invoiceNo || `TICKET-${e.id}`,
+                                  luckyNumber: targetReg?.luckyNumber || "#1983",
+                                  ticketType: targetReg?.ticketType || "Hội Viên Chính Thức",
+                                  ticketCount: 1,
+                                  isFree: targetReg?.isFree ?? Boolean((e as any).price === 0),
+                                  date: e.date || `${e.day}/${e.month}`,
+                                  time: e.time || "",
+                                  location: e.place || "",
+                                  attendeeName: (user as any)?.name || "Hội Viên CEO HN10",
+                                  qrUrl: getQrUrl(targetReg?.ticketCode || `TICKET-${e.id}`, 280),
+                                });
+                              }}
+                              className="px-2.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs flex items-center gap-1 active:scale-95 transition cursor-pointer shadow-xs"
+                              title="Mở mã QR Check-in điểm danh"
+                            >
+                              <QrCode className="size-3.5" />
+                              <span>Mã Check-in</span>
+                            </button>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={(evt) => {
+                              evt.stopPropagation();
+                              handleSelectEvent(e);
+                            }}
+                            className={`px-3 py-1.5 rounded-lg border flex justify-start items-center gap-1.5 text-sm font-semibold font-['Inter'] leading-5 active:scale-95 transition cursor-pointer shadow-xs ${registered
+                              ? "bg-emerald-600 border-emerald-600 text-white"
+                              : "bg-[#003B95] hover:bg-[#002B70] border-[#003B95] text-white"
+                              }`}
+                          >
+                            <span>{registered ? "Chi tiết" : "Xem chi tiết"}</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   );

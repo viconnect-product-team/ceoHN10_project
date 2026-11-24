@@ -32,6 +32,8 @@ import { AppShell } from "@/components/dashboard/AppShell";
 import { PageHeader } from "@/components/dashboard/PageKit";
 import { fetchNestApi, resolveMediaUrl } from "@/lib/api-client";
 import { useRole, clearMeCache } from "@/hooks/use-role";
+import { BRAND_ASSETS } from "@/config/branding";
+import { EmptyState } from "@/components/common";
 import { ROLE_OPTIONS, DEPARTMENT_OPTIONS, normalizeRole, normalizeDept } from "@/lib/rbac-permission-helpers";
 import { SYSTEM_ROLES, COMMITTEES } from "@/components/dashboard/RbacPermissionMatrix";
 import {
@@ -1099,11 +1101,11 @@ function AccountsPage() {
         {/* Header với Icon Logo */}
         <div className="flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 pb-5">
           <img
-            src="/ceohn10-logo.png"
+            src={BRAND_ASSETS.logoSquare}
             alt="CEO HN10"
             className="w-16 h-16 object-contain shrink-0"
             onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = '/brand-header-logo.png';
+              (e.currentTarget as HTMLImageElement).src = BRAND_ASSETS.logoHeader;
             }}
           />
           <div className="flex-1">
@@ -1519,6 +1521,21 @@ function AccountsPage() {
                     </tr>
                   );
                 })}
+                {paginatedAccounts.length === 0 && (
+                  <tr>
+                    <td colSpan={10} className="p-8">
+                      <EmptyState
+                        title="Không tìm thấy tài khoản phù hợp"
+                        description="Vui lòng thử tìm kiếm với từ khóa khác hoặc điều chỉnh bộ lọc phòng ban, vai trò."
+                        action={{
+                          label: "Tạo tài khoản mới",
+                          onClick: () => setIsAddOpen(true),
+                          icon: <Plus className="w-4 h-4" />,
+                        }}
+                      />
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

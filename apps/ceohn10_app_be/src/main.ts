@@ -1,3 +1,11 @@
+// Global BigInt toJSON Polyfill: Ngăn chặn triệt để lỗi "Do not know how to serialize a BigInt" trong Express/NestJS
+if (typeof (BigInt.prototype as any).toJSON !== 'function') {
+  (BigInt.prototype as any).toJSON = function () {
+    const int = Number(this);
+    return Number.isSafeInteger(int) ? int : this.toString();
+  };
+}
+
 import * as fs from 'fs';
 import * as path from 'path';
 import * as net from 'net';
@@ -58,14 +66,19 @@ async function resolveDatabaseConfig() {
   const localDbUrl =
     'postgresql://app1:5%5ES0CEpvYwC1%28%23YN1UoJ@127.0.0.1:5432/ceohn10_project';
 
-  // Nếu trong .env có DATABASE_URL trỏ vào localhost/127.0.0.1 thì giữ nguyên để chạy offline local thuần
-  if (
-    process.env.DATABASE_URL &&
-    (process.env.DATABASE_URL.includes('127.0.0.1') || process.env.DATABASE_URL.includes('localhost'))
-  ) {
-    // Giữ nguyên database localhost
-  } else if (!process.env.DATABASE_URL) {
-    process.env.DATABASE_URL = localDbUrl;
+  // Nhận diện môi trường triển khai thực tế:
+  // 1. Khi chạy trên Server Dev / Production Container (NODE_ENV=production, Docker): Dùng CSDL Remote 113.20.107.184:6432
+  // 2. Khi chạy trên Localhost máy cá nhân: Luôn dùng CSDL Localhost 127.0.0.1:5432
+  const isServer =
+    process.env.NODE_ENV === 'production' ||
+    process.env.IS_DOCKER === 'true' ||
+    fs.existsSync('/.dockerenv') ||
+    Boolean(process.env.REMOTE_SERVER);
+
+  if (isServer) {
+    process.env.DATABASE_URL = process.env.REMOTE_DATABASE_URL || remoteDbUrl;
+  } else {
+    process.env.DATABASE_URL = process.env.LOCAL_DATABASE_URL || localDbUrl;
   }
 
   const isLocal =
@@ -94,6 +107,7 @@ import { createVietnameseValidationPipe } from './common/pipes/validation.pipe';
 import { RateLimiterMiddleware } from './common/middleware/rate-limiter.middleware';
 import { QuerySanitizerMiddleware } from './common/middleware/query-sanitizer.middleware';
 import { PayloadGuardMiddleware } from './common/middleware/payload-guard.middleware';
+import { BigIntInterceptor } from './common/interceptors/bigint.interceptor';
 
 async function bootstrap() {
   await resolveDatabaseConfig();
@@ -142,7 +156,14 @@ async function bootstrap() {
   });
 
   app.setGlobalPrefix('api', {
-    exclude: ['share', 'share/(.*)', 'api/share', 'api/share/(.*)'],
+    exclude: [
+      'share',
+      'share/(.*)',
+      'api/share',
+      'api/share/(.*)',
+      'webhooks/(.*)',
+      'payment/sepay-webhook',
+    ],
   });
   // VULN-11 Fix: Khóa chặt chính sách CORS Whitelist theo các tên miền chính thức, ngăn ngừa CSRF & rò rỉ dữ liệu
   const isDev = process.env.NODE_ENV !== 'production';
@@ -185,9 +206,10 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // Đăng ký bộ chuẩn hóa Validate và Bắt lỗi tiếng Việt toàn cục
+  // Đăng ký bộ chuẩn hóa Validate, Bắt lỗi tiếng Việt và Khắc phục triệt để lỗi BigInt JSON Serialization
   app.useGlobalPipes(createVietnameseValidationPipe());
   app.useGlobalFilters(new AllExceptionsFilter());
+  app.useGlobalInterceptors(new BigIntInterceptor());
 
   const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 4003;
   await app.listen(port, '0.0.0.0');

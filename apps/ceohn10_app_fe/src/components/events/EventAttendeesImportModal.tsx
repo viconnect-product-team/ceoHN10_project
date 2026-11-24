@@ -21,10 +21,16 @@ import {
   MapPin,
   Tag,
   Check,
+  ShieldAlert,
 } from "lucide-react";
 import { toast } from "sonner";
 import { fetchNestApi } from "@/lib/api-client";
 import { parseSingleDocument, type ParsedFileResult, type ParsedRecipientItem } from "@/lib/ai-excel-email-parser";
+
+export interface EventImportRecipient extends ParsedRecipientItem {
+  ticketType?: string;
+  validationError?: string;
+}
 
 interface EventAttendeesImportModalProps {
   open: boolean;
@@ -47,8 +53,9 @@ export function EventAttendeesImportModal({
   const [parsing, setParsing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [parsedFile, setParsedFile] = useState<ParsedFileResult | null>(null);
-  const [recipients, setRecipients] = useState<ParsedRecipientItem[]>([]);
+  const [recipients, setRecipients] = useState<EventImportRecipient[]>([]);
   const [detectedColumns, setDetectedColumns] = useState<string[]>([]);
+  const [declaredTickets, setDeclaredTickets] = useState<any[]>([]);
 
   // 1. Quản lý danh sách sự kiện live: lấy từ props hoặc call API GET /events
   const [availableEvents, setAvailableEvents] = useState<any[]>(() => {
@@ -61,7 +68,7 @@ export function EventAttendeesImportModal({
     return String(initialEventId || event?.id || (eventsList && eventsList[0]?.id) || "");
   });
 
-  // Tự động gọi API lấy toàn bộ danh sách sự kiện đang có trong CSDL 113.20.107.184:6432
+  // Tự động gọi API lấy toàn bộ danh sách sự kiện đang có trong CSDL
   useEffect(() => {
     if (!open) return;
     fetchNestApi<any[]>("/events")
@@ -83,6 +90,31 @@ export function EventAttendeesImportModal({
     const found = availableEvents.find((e) => String(e.id) === String(selectedEventId));
     return found || event || availableEvents[0] || null;
   }, [availableEvents, selectedEventId, event]);
+
+  // Tải danh sách các loại vé đã khai báo của sự kiện
+  useEffect(() => {
+    if (!open || !selectedEventId) {
+      setDeclaredTickets([]);
+      return;
+    }
+    fetchNestApi<any[]>(`/events/${selectedEventId}/tickets`)
+      .then((res) => {
+        if (Array.isArray(res) && res.length > 0) {
+          setDeclaredTickets(res);
+        } else if (currentEvent?.tickets && Array.isArray(currentEvent.tickets)) {
+          setDeclaredTickets(currentEvent.tickets);
+        } else {
+          setDeclaredTickets([]);
+        }
+      })
+      .catch(() => {
+        if (currentEvent?.tickets && Array.isArray(currentEvent.tickets)) {
+          setDeclaredTickets(currentEvent.tickets);
+        } else {
+          setDeclaredTickets([]);
+        }
+      });
+  }, [open, selectedEventId, currentEvent]);
 
   const eventTitle = currentEvent?.name || currentEvent?.title || "Sự kiện CLB CEO HN10";
   const currentEventFee = Number(currentEvent?.ticket_price || currentEvent?.ticketPrice || currentEvent?.fee || 0);
@@ -176,32 +208,133 @@ export function EventAttendeesImportModal({
 
       setDetectedColumns(Array.from(customCols));
 
-      // Điền giá vé mặc định và nhận diện trạng thái thanh toán chuẩn xác (Paid vs Unpaid vs Free)
-      const normalizedRecipients = (res.recipients || []).map((r) => {
-        const fee = r.amount !== undefined && r.amount !== null && String(r.amount).trim() !== ""
-          ? Number(r.amount) || 0
-          : defaultTicketPrice;
+      // 1. Kiểm tra validation theo quy định sự kiện:
+      const activeTickets = declaredTickets.length > 0 
+        ? declaredTickets 
+        : (currentEvent?.tickets && Array.isArray(currentEvent.tickets) && currentEvent.tickets.length > 0)
+          ? currentEvent.tickets 
+          : [];
 
-        let status: "paid" | "unpaid" | "free" = "unpaid";
-        if (isCurrentEventFree || (defaultTicketPrice === 0 && fee === 0)) {
+      const isEventFree = isCurrentEventFree || (defaultTicketPrice === 0 && currentEventFee === 0 && activeTickets.length === 0);
+
+      // Điền giá vé, loại vé và nhận diện trạng thái thanh toán chuẩn xác kèm validation
+      let hasValidationError = false;
+
+      const normalizedRecipients: EventImportRecipient[] = (res.recipients || []).map((r, idx) => {
+        const rawStatus = String(r.paymentStatus || (r as any).status || "").toLowerCase();
+        const isInvited = rawStatus.includes("mời") || rawStatus.includes("moi") || rawStatus.includes("invited");
+
+        // Tìm loại vé trong các cột
+        const dyn = r.dynamicFields || {};
+        let rawTicketName = String(
+          (r as any).ticketType ||
+          dyn["Loại vé"] ||
+          dyn["Tên vé"] ||
+          dyn["Hạng vé"] ||
+          dyn["Vé"] ||
+          dyn["Loại"] ||
+          dyn["Ticket Type"] ||
+          dyn["Ticket"] ||
+          ""
+        ).trim();
+
+        // Tìm số tiền / giá vé trong file
+        let rawFee = 0;
+        let feeProvided = false;
+        const rawPriceStr = r.amount !== undefined && r.amount !== null && r.amount !== "" 
+          ? String(r.amount) 
+          : (dyn["Giá vé"] || dyn["Phí"] || dyn["Số tiền"] || dyn["Phí tham dự"] || "");
+        if (rawPriceStr !== undefined && rawPriceStr !== null && String(rawPriceStr).trim() !== "") {
+          const clean = String(rawPriceStr).replace(/[^0-9]/g, "");
+          if (clean) {
+            rawFee = parseInt(clean, 10);
+            feeProvided = true;
+          }
+        }
+
+        let status: "paid" | "unpaid" | "invited_free" | "free" = "unpaid";
+        let finalTicketType = rawTicketName || "Vé Tiêu Chuẩn";
+        let finalAmount = rawFee > 0 ? rawFee : defaultTicketPrice;
+        let validationError: string | undefined = undefined;
+
+        if (isEventFree) {
           status = "free";
-        } else if (r.paymentStatus === "paid") {
-          status = "paid";
-        } else if (r.paymentStatus === "free") {
-          status = fee === 0 ? "free" : "paid";
+          finalAmount = 0;
+          finalTicketType = "Vé Miễn Phí";
+          if (feeProvided && rawFee > 0) {
+            validationError = `Sự kiện là MIỄN PHÍ nhưng file có thu phí ${rawFee.toLocaleString("vi-VN")} đ!`;
+            hasValidationError = true;
+          }
+        } else if (isInvited) {
+          status = "invited_free";
+          finalAmount = 0;
+          finalTicketType = "Vé Mời Miễn Phí";
+        } else if (activeTickets.length > 0) {
+          // (A) Sự kiện có nhiều loại vé đã khai báo sẵn: BẮT BUỘC KHỚP LOẠI VÉ VÀ GIÁ VÉ
+          const rawTicketLower = rawTicketName.toLowerCase();
+          const matchedTicket = activeTickets.find((dt: any) => {
+            const dtNameLower = String(dt.name || "").trim().toLowerCase();
+            return (
+              dtNameLower === rawTicketLower ||
+              (rawTicketLower && (dtNameLower.includes(rawTicketLower) || rawTicketLower.includes(dtNameLower)))
+            );
+          });
+
+          if (!matchedTicket) {
+            const validNames = activeTickets.map((t: any) => `"${t.name}" (${Number(t.price).toLocaleString("vi-VN")} đ)`).join(", ");
+            validationError = `Loại vé "${rawTicketName || 'Trống'}" không khớp với các vé sự kiện (${validNames})!`;
+            hasValidationError = true;
+          } else {
+            finalTicketType = matchedTicket.name;
+            const expectedPrice = Number(matchedTicket.price || 0);
+
+            // Kiểm tra giá tiền có bị lệch không
+            if (feeProvided && rawFee > 0 && rawFee !== expectedPrice) {
+              validationError = `Vé "${matchedTicket.name}" bị lệch giá! File: ${rawFee.toLocaleString("vi-VN")} đ ≠ Hệ thống: ${expectedPrice.toLocaleString("vi-VN")} đ`;
+              hasValidationError = true;
+            }
+            finalAmount = expectedPrice;
+          }
+
+          if (r.paymentStatus === "paid" || rawStatus.includes("đã thanh toán") || rawStatus.includes("paid") || rawStatus.includes("ck")) {
+            status = "paid";
+          } else {
+            status = "unpaid";
+          }
         } else {
-          status = "unpaid";
+          // (B) Sự kiện 1 mức giá mặc định
+          if (feeProvided && rawFee > 0 && defaultTicketPrice > 0 && rawFee !== defaultTicketPrice) {
+            validationError = `Lệch giá vé! File: ${rawFee.toLocaleString("vi-VN")} đ ≠ Mặc định: ${defaultTicketPrice.toLocaleString("vi-VN")} đ`;
+            hasValidationError = true;
+          }
+          finalAmount = defaultTicketPrice;
+          if (r.paymentStatus === "paid" || rawStatus.includes("đã thanh toán") || rawStatus.includes("paid") || rawStatus.includes("ck")) {
+            status = "paid";
+          } else {
+            status = "unpaid";
+          }
         }
 
         return {
           ...r,
-          amount: fee,
+          ticketType: finalTicketType,
+          amount: finalAmount,
           paymentStatus: status,
+          validationError,
         };
       });
 
       setRecipients(normalizedRecipients);
-      toast.success(`Đã phân tích tệp ${file.name}: Tìm thấy ${normalizedRecipients.length} đại biểu tham dự!`);
+
+      const invalidCount = normalizedRecipients.filter((r) => Boolean(r.validationError)).length;
+      if (invalidCount > 0) {
+        toast.error(
+          `CẢNH BÁO: Phát hiện ${invalidCount} vé bị lệch giá hoặc sai loại vé đã khai báo của sự kiện! Theo quy định, không được phép import vào hệ thống!`,
+          { duration: 7000 }
+        );
+      } else {
+        toast.success(`Đã phân tích tệp ${file.name}: Tìm thấy ${normalizedRecipients.length} đại biểu tham dự hợp lệ!`);
+      }
     } catch (err: any) {
       toast.error(err?.message || "Lỗi khi phân tích tệp tài liệu");
     } finally {
@@ -210,43 +343,66 @@ export function EventAttendeesImportModal({
     }
   };
 
-  // Toggle nhanh trạng thái từng đại biểu
+  // Toggle nhanh trạng thái từng đại biểu: Đã thanh toán -> Chưa thanh toán -> Khách mời miễn phí -> Đã thanh toán
   const handleTogglePaymentStatus = (index: number) => {
     setRecipients((prev) =>
       prev.map((r, i) => {
         if (i !== index) return r;
-        let nextStatus: "paid" | "unpaid" | "free" = "paid";
+        let nextStatus: "paid" | "unpaid" | "invited_free" | "free" = "paid";
+        let nextAmount = defaultTicketPrice;
         if (r.paymentStatus === "paid") {
           nextStatus = "unpaid";
+          nextAmount = defaultTicketPrice;
         } else if (r.paymentStatus === "unpaid") {
+          nextStatus = "invited_free";
+          nextAmount = 0;
+        } else if (r.paymentStatus === "invited_free") {
           nextStatus = "paid";
+          nextAmount = defaultTicketPrice;
         } else {
           nextStatus = "paid";
+          nextAmount = defaultTicketPrice;
         }
-        return { ...r, paymentStatus: nextStatus };
+        return { ...r, paymentStatus: nextStatus, amount: nextAmount };
       })
     );
   };
 
   // Thao tác hàng loạt: Tất cả đã thanh toán
   const handleSetAllPaid = () => {
-    setRecipients((prev) => prev.map((r) => ({ ...r, paymentStatus: "paid" })));
+    setRecipients((prev) =>
+      prev.map((r) => ({ ...r, paymentStatus: "paid", amount: defaultTicketPrice }))
+    );
     toast.success("Đã chuyển tất cả đại biểu sang: ĐÃ THANH TOÁN (Nhận vé ngay)");
   };
 
   // Thao tác hàng loạt: Tất cả chưa thanh toán
   const handleSetAllUnpaid = () => {
-    setRecipients((prev) => prev.map((r) => ({ ...r, paymentStatus: "unpaid" })));
+    setRecipients((prev) =>
+      prev.map((r) => ({ ...r, paymentStatus: "unpaid", amount: defaultTicketPrice }))
+    );
     toast.info("Đã chuyển tất cả đại biểu sang: CHƯA THANH TOÁN (Sẽ gửi mail hướng dẫn CK)");
+  };
+
+  // Thao tác hàng loạt: Tất cả là khách mời không thu phí
+  const handleSetAllInvited = () => {
+    setRecipients((prev) =>
+      prev.map((r) => ({ ...r, paymentStatus: "invited_free", amount: 0 }))
+    );
+    toast.success("Đã chuyển tất cả đại biểu sang: KHÁCH MỜI (Miễn phí 100%)");
   };
 
   // Thao tác hàng loạt: Đảo trạng thái
   const handleInvertStatus = () => {
     setRecipients((prev) =>
-      prev.map((r) => ({
-        ...r,
-        paymentStatus: r.paymentStatus === "paid" ? "unpaid" : "paid",
-      }))
+      prev.map((r) => {
+        const nextStatus = r.paymentStatus === "paid" ? "unpaid" : "paid";
+        return {
+          ...r,
+          paymentStatus: nextStatus,
+          amount: defaultTicketPrice,
+        };
+      })
     );
   };
 
@@ -260,10 +416,13 @@ export function EventAttendeesImportModal({
     setRecipients((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Tính toán chỉ số thống kê
+  // Tính toán chỉ số thống kê & validation
   const paidCount = recipients.filter((r) => r.paymentStatus === "paid").length;
   const unpaidCount = recipients.filter((r) => r.paymentStatus === "unpaid").length;
-  const freeCount = recipients.filter((r) => r.paymentStatus === "free").length;
+  const freeCount = recipients.filter(
+    (r) => r.paymentStatus === "free" || r.paymentStatus === "invited_free"
+  ).length;
+  const invalidCount = recipients.filter((r) => Boolean(r.validationError)).length;
   const totalAmountToFund = recipients
     .filter((r) => r.paymentStatus === "paid")
     .reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
@@ -280,6 +439,22 @@ export function EventAttendeesImportModal({
       return;
     }
 
+    // Validation kiểm tra tính hợp lệ trước khi submit:
+    // (1) Tuyệt đối chặn import nếu có vé bị lệch giá hoặc sai loại vé đã khai báo
+    if (invalidCount > 0) {
+      toast.error(
+        `Không thể nhập danh sách: Phát hiện ${invalidCount} đại biểu có vé bị lệch giá hoặc sai loại vé đã khai báo của sự kiện. Vui lòng điều chỉnh lại tệp trước khi nhập!`,
+        { duration: 7000 }
+      );
+      return;
+    }
+
+    // (2) Validation nếu sự kiện là miễn phí
+    if (isCurrentEventFree && recipients.some((r) => Number(r.amount) > 0)) {
+      toast.error("Sự kiện được đánh dấu là MIỄN PHÍ. Không được phép nhập đại biểu có thu phí!");
+      return;
+    }
+
     setSubmitting(true);
     try {
       const recordsPayload = recipients.map((r) => ({
@@ -289,6 +464,7 @@ export function EventAttendeesImportModal({
         company: r.company,
         position: r.position,
         paymentStatus: r.paymentStatus,
+        ticketType: r.ticketType,
         ticketFee: Number(r.amount) || 0,
         note: r.notes,
         ...(r.dynamicFields || {}),
@@ -410,7 +586,64 @@ export function EventAttendeesImportModal({
                 </span>
               </div>
             )}
+
+            {/* Các loại vé đã khai báo sẵn của sự kiện */}
+            {declaredTickets.length > 0 && (
+              <div className="mt-3 p-3 bg-blue-50/80 border border-blue-200 rounded-xl">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-blue-900 mb-2">
+                  <Tag className="w-4 h-4 text-blue-700" />
+                  <span>Các loại vé đã khai báo của sự kiện (Bắt buộc file import phải khớp đúng loại vé & giá tiền):</span>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  {declaredTickets.map((tk: any) => (
+                    <div
+                      key={tk.id || tk.name}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-blue-300 shadow-2xs text-xs font-bold text-blue-950"
+                    >
+                      <span className="w-2 h-2 rounded-full bg-blue-600" />
+                      <span>{tk.name}</span>
+                      <span className="font-mono text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 font-black">
+                        {Number(tk.price || 0).toLocaleString("vi-VN")} đ
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
+
+          {/* Banner Cảnh Báo Vi Phạm Validation Vé */}
+          {invalidCount > 0 && (
+            <div className="p-4 rounded-2xl bg-rose-50 border-2 border-rose-300 flex items-start gap-3 shadow-xs">
+              <ShieldAlert className="h-6 w-6 text-rose-600 shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h4 className="text-sm font-black text-rose-900 uppercase tracking-tight">
+                  Chặn Import: Phát Hiện {invalidCount} Đại Biểu Bị Lệch Giá Hoặc Sai Loại Vé Đã Khai Báo!
+                </h4>
+                <p className="text-xs text-rose-800 mt-1 leading-relaxed">
+                  Theo quy định của hệ thống, tệp danh sách đăng ký khi import <strong>bắt buộc phải khớp đúng theo loại vé và giá vé</strong> đã được tạo theo sự kiện trong hệ thống. Nếu loại vé hoặc giá vé bị lệch thì <strong>tuyệt đối không được import vào chức năng đăng ký sự kiện</strong>.
+                </p>
+                <div className="mt-2.5 max-h-36 overflow-y-auto space-y-1.5 text-xs">
+                  {recipients
+                    .map((r, i) => ({ r, i }))
+                    .filter(({ r }) => Boolean(r.validationError))
+                    .map(({ r, i }) => (
+                      <div
+                        key={i}
+                        className="p-2 rounded-lg bg-white border border-rose-200 text-rose-900 flex flex-col sm:flex-row sm:items-center justify-between gap-1 shadow-2xs font-medium"
+                      >
+                        <div>
+                          <strong>Dòng {i + 1}: {r.name}</strong> ({r.phone || r.email || "Chưa có liên hệ"})
+                        </div>
+                        <span className="font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded text-[11px]">
+                          {r.validationError}
+                        </span>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* File Upload Zone */}
           <div
@@ -433,7 +666,7 @@ export function EventAttendeesImportModal({
               {parsing ? "Đang phân tích tệp tài liệu..." : "Kéo thả hoặc bấm để tải tệp Word (.docx), Excel (.xlsx), hoặc PDF (.pdf)"}
             </p>
             <p className="text-xs text-slate-500 mt-1">
-              Hệ thống tự động nhận diện Họ tên, SĐT, Email, Công ty, Chức vụ, Trạng thái thanh toán (Đã CK / Tiền mặt / Chưa CK) và mọi cột dữ liệu tùy ý.
+              Hệ thống tự động nhận diện Họ tên, SĐT, Email, Công ty, Chức vụ, Loại vé, Giá vé, Trạng thái thanh toán và kiểm tra tính hợp lệ theo vé sự kiện.
             </p>
           </div>
 
@@ -464,11 +697,22 @@ export function EventAttendeesImportModal({
                 </div>
               </div>
 
-              <div className="p-3 rounded-2xl bg-blue-50 border border-blue-200">
-                <span className="text-[11px] font-semibold text-blue-800 uppercase">Ghi Nhận Quỹ Sự Kiện</span>
-                <div className="text-xl font-black text-blue-900 mt-0.5 flex items-center gap-1.5">
-                  <Wallet className="h-4 w-4" />
-                  <span>{totalAmountToFund.toLocaleString("vi-VN")} đ</span>
+              <div className={`p-3 rounded-2xl border ${invalidCount > 0 ? "bg-rose-50 border-rose-300" : "bg-blue-50 border-blue-200"}`}>
+                <span className={`text-[11px] font-semibold uppercase ${invalidCount > 0 ? "text-rose-700" : "text-blue-800"}`}>
+                  {invalidCount > 0 ? "Vé Bị Sai / Lệch Giá" : "Ghi Nhận Quỹ Sự Kiện"}
+                </span>
+                <div className={`text-xl font-black mt-0.5 flex items-center gap-1.5 ${invalidCount > 0 ? "text-rose-700" : "text-blue-900"}`}>
+                  {invalidCount > 0 ? (
+                    <>
+                      <ShieldAlert className="h-4 w-4 text-rose-600" />
+                      <span>{invalidCount} lỗi</span>
+                    </>
+                  ) : (
+                    <>
+                      <Wallet className="h-4 w-4 text-blue-600" />
+                      <span>{totalAmountToFund.toLocaleString("vi-VN")} đ</span>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -532,6 +776,14 @@ export function EventAttendeesImportModal({
                   </button>
                   <button
                     type="button"
+                    onClick={handleSetAllInvited}
+                    className="px-2.5 py-1 rounded-lg bg-purple-50 text-purple-800 hover:bg-purple-100 border border-purple-300 text-[11px] font-bold flex items-center gap-1 transition cursor-pointer shadow-2xs"
+                  >
+                    <Sparkles className="h-3.5 w-3.5 text-purple-600" />
+                    Khách mời (0đ)
+                  </button>
+                  <button
+                    type="button"
                     onClick={handleInvertStatus}
                     className="px-2 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-[11px] font-semibold flex items-center gap-1 transition cursor-pointer"
                     title="Đảo ngược trạng thái"
@@ -551,6 +803,7 @@ export function EventAttendeesImportModal({
                       <th className="py-2.5 px-3">Số Điện Thoại</th>
                       <th className="py-2.5 px-3">Email</th>
                       <th className="py-2.5 px-3">Công Ty / Chức Danh</th>
+                      <th className="py-2.5 px-3">Loại Vé</th>
                       <th className="py-2.5 px-3">Phí Vé (VNĐ)</th>
                       <th className="py-2.5 px-3">Trạng Thái Thanh Toán</th>
                       {/* Dynamic Columns Headers */}
@@ -566,81 +819,116 @@ export function EventAttendeesImportModal({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {recipients.map((r, idx) => (
-                      <tr key={idx} className="hover:bg-slate-50/80 transition">
-                        <td className="py-2 px-3 font-mono text-slate-400">{idx + 1}</td>
-                        <td className="py-2 px-3 font-semibold text-slate-900">{r.name}</td>
-                        <td className="py-2 px-3 font-mono text-slate-600">{r.phone || "—"}</td>
-                        <td className="py-2 px-3 text-blue-600 truncate max-w-[140px]">{r.email}</td>
-                        <td className="py-2 px-3 truncate max-w-[140px]">
-                          {r.company ? <span className="font-medium text-slate-800">{r.company}</span> : "—"}
-                          {r.position ? <span className="text-slate-400 text-[10px] block">{r.position}</span> : null}
-                        </td>
-                        <td className="py-2 px-3">
-                          <input
-                            type="number"
-                            value={r.amount || 0}
-                            onChange={(e) => handleUpdateAmount(idx, Number(e.target.value))}
-                            className="w-24 px-2 py-1 rounded-lg border border-slate-200 font-mono font-bold text-xs"
-                          />
-                        </td>
-                        <td className="py-2 px-3">
-                          <button
-                            type="button"
-                            onClick={() => handleTogglePaymentStatus(idx)}
-                            className={`px-2.5 py-1 rounded-full text-[11px] font-bold flex items-center gap-1 transition cursor-pointer shadow-2xs ${
-                              r.paymentStatus === "paid"
-                                ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border border-emerald-300"
-                                : r.paymentStatus === "free"
-                                ? "bg-blue-100 text-blue-800 hover:bg-blue-200 border border-blue-300"
-                                : "bg-amber-100 text-amber-800 hover:bg-amber-200 border border-amber-300"
-                            }`}
-                          >
-                            {r.paymentStatus === "paid" ? (
-                              <>
-                                <CheckCircle2 className="h-3 w-3 text-emerald-600" />
-                                <span>Đã thanh toán (Nhận vé)</span>
-                              </>
-                            ) : r.paymentStatus === "free" ? (
-                              <>
-                                <Sparkles className="h-3 w-3 text-blue-600" />
-                                <span>Miễn phí (Nhận vé)</span>
-                              </>
-                            ) : (
-                              <>
-                                <AlertCircle className="h-3 w-3 text-amber-600" />
-                                <span>Chưa thanh toán (Nhắc nợ)</span>
-                              </>
+                    {recipients.map((r, idx) => {
+                      const isRowInvalid = Boolean(r.validationError);
+                      return (
+                        <tr
+                          key={idx}
+                          className={`transition ${
+                            isRowInvalid
+                              ? "bg-rose-50/90 hover:bg-rose-100/90 border-l-4 border-l-rose-600"
+                              : "hover:bg-slate-50/80"
+                          }`}
+                        >
+                          <td className="py-2 px-3 font-mono text-slate-400">
+                            {idx + 1}
+                            {isRowInvalid && (
+                              <ShieldAlert className="w-3.5 h-3.5 text-rose-600 inline ml-1" />
                             )}
-                          </button>
-                        </td>
-
-                        {/* Dynamic Columns Values */}
-                        {detectedColumns.map((col) => {
-                          const val = (r.dynamicFields && r.dynamicFields[col] !== undefined)
-                            ? r.dynamicFields[col]
-                            : ((r as any)[col] ?? "—");
-                          return (
-                            <td
-                              key={col}
-                              className="py-2 px-3 whitespace-nowrap text-slate-700 border-l border-slate-100 font-medium"
+                          </td>
+                          <td className="py-2 px-3 font-semibold text-slate-900">
+                            <div>{r.name}</div>
+                            {isRowInvalid && (
+                              <div className="text-[10px] text-rose-700 font-bold mt-0.5">
+                                ❌ {r.validationError}
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-2 px-3 font-mono text-slate-600">{r.phone || "—"}</td>
+                          <td className="py-2 px-3 text-blue-600 truncate max-w-[140px]">{r.email}</td>
+                          <td className="py-2 px-3 truncate max-w-[140px]">
+                            {r.company ? <span className="font-medium text-slate-800">{r.company}</span> : "—"}
+                            {r.position ? <span className="text-slate-400 text-[10px] block">{r.position}</span> : null}
+                          </td>
+                          <td className="py-2 px-3">
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold ${
+                              isRowInvalid
+                                ? "bg-rose-100 text-rose-800 border border-rose-300"
+                                : "bg-blue-50 text-blue-800 border border-blue-200"
+                            }`}>
+                              {r.ticketType || "Vé Tiêu Chuẩn"}
+                            </span>
+                          </td>
+                          <td className="py-2 px-3">
+                            <input
+                              type="number"
+                              value={r.amount || 0}
+                              onChange={(e) => handleUpdateAmount(idx, Number(e.target.value))}
+                              className={`w-24 px-2 py-1 rounded-lg border font-mono font-bold text-xs ${
+                                isRowInvalid
+                                  ? "border-rose-400 bg-rose-50 text-rose-900"
+                                  : "border-slate-200"
+                              }`}
+                            />
+                          </td>
+                          <td className="py-2 px-3">
+                            <button
+                              type="button"
+                              onClick={() => handleTogglePaymentStatus(idx)}
+                              className={`px-2.5 py-1 rounded-full text-[11px] font-bold flex items-center gap-1 transition cursor-pointer shadow-2xs ${
+                                r.paymentStatus === "paid"
+                                  ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border border-emerald-300"
+                                  : r.paymentStatus === "free" || r.paymentStatus === "invited_free"
+                                  ? "bg-purple-100 text-purple-800 hover:bg-purple-200 border border-purple-300"
+                                  : "bg-amber-100 text-amber-800 hover:bg-amber-200 border border-amber-300"
+                              }`}
                             >
-                              {String(val || "—")}
-                            </td>
-                          );
-                        })}
+                              {r.paymentStatus === "paid" ? (
+                                <>
+                                  <CheckCircle2 className="h-3 w-3 text-emerald-600" />
+                                  <span>Đã thanh toán (Nhận vé)</span>
+                                </>
+                              ) : r.paymentStatus === "free" || r.paymentStatus === "invited_free" ? (
+                                <>
+                                  <Sparkles className="h-3 w-3 text-purple-600" />
+                                  <span>Khách mời (0đ)</span>
+                                </>
+                              ) : (
+                                <>
+                                  <AlertCircle className="h-3 w-3 text-amber-600" />
+                                  <span>Chưa thanh toán (Nhắc nợ)</span>
+                                </>
+                              )}
+                            </button>
+                          </td>
 
-                        <td className="py-2 px-3 text-right">
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteRecipient(idx)}
-                            className="p-1 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
+                          {/* Dynamic Columns Values */}
+                          {detectedColumns.map((col) => {
+                            const val = (r.dynamicFields && r.dynamicFields[col] !== undefined)
+                              ? r.dynamicFields[col]
+                              : ((r as any)[col] ?? "—");
+                            return (
+                              <td
+                                key={col}
+                                className="py-2 px-3 whitespace-nowrap text-slate-700 border-l border-slate-100 font-medium"
+                              >
+                                {String(val || "—")}
+                              </td>
+                            );
+                          })}
+
+                          <td className="py-2 px-3 text-right">
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteRecipient(idx)}
+                              className="p-1 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -651,9 +939,13 @@ export function EventAttendeesImportModal({
         {/* Footer Actions */}
         <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="text-xs text-slate-600 font-medium text-center sm:text-left">
-            {recipients.length > 0 ? (
+            {invalidCount > 0 ? (
+              <span className="text-rose-700 font-bold">
+                ⚠️ Chặn import: Có {invalidCount} đại biểu bị lệch giá hoặc sai loại vé đã khai báo của sự kiện.
+              </span>
+            ) : recipients.length > 0 ? (
               <span>
-                Sẵn sàng nạp <strong>{recipients.length}</strong> đại biểu vào sự kiện <strong>"{eventTitle}"</strong> (Quỹ: +{totalAmountToFund.toLocaleString("vi-VN")} đ)
+                Sẵn sàng nạp <strong>{recipients.length}</strong> đại biểu hợp lệ vào sự kiện <strong>"{eventTitle}"</strong> (Quỹ: +{totalAmountToFund.toLocaleString("vi-VN")} đ)
               </span>
             ) : (
               "Vui lòng chọn sự kiện và tải tệp danh sách đại biểu để tiếp tục"
@@ -671,13 +963,18 @@ export function EventAttendeesImportModal({
             <button
               type="button"
               onClick={handleSubmitImport}
-              disabled={submitting || recipients.length === 0}
-              className="py-2 px-5 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white font-bold text-xs flex items-center gap-2 shadow-md transition cursor-pointer disabled:opacity-50"
+              disabled={submitting || recipients.length === 0 || invalidCount > 0}
+              className="py-2 px-5 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white font-bold text-xs flex items-center gap-2 shadow-md transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? (
                 <>
                   <RefreshCw className="h-4 w-4 animate-spin" />
                   <span>Đang Nhập & Bắn Vé Điện Tử...</span>
+                </>
+              ) : invalidCount > 0 ? (
+                <>
+                  <ShieldAlert className="h-4 w-4 text-rose-300" />
+                  <span>Chặn Import ({invalidCount} vé sai/lệch)</span>
                 </>
               ) : (
                 <>

@@ -27,6 +27,10 @@ import {
   Square,
   QrCode,
   FileText,
+  Sparkles,
+  Settings2,
+  ShieldCheck,
+  Tag,
 } from "lucide-react";
 import { AppShell } from "@/components/dashboard/AppShell";
 import { EmptyState, NoSearchResult } from "@/components/dashboard/StateKit";
@@ -51,14 +55,34 @@ import type { Member } from "@/lib/members-data";
 import { InvoiceExportModal, type InvoiceItem } from "@/components/dashboard/InvoiceExportModal";
 import { VnpayPaymentModal } from "@/components/common/VnpayPaymentModal";
 
+// ── CẤU TRÚC CHÍNH SÁCH PHÍ THAM GIA CLB (TUYỂN SINH 1 THÁNG) ──
+export interface AdmissionPolicy {
+  policyName: string;
+  startDate: string; // Ngày bắt đầu tuyển sinh, e.g. "2026-01-01"
+  endDate: string; // Ngày kết thúc tuyển sinh 1 tháng, e.g. "2026-02-01"
+  earlyFee: number; // Mức phí tham gia ưu đãi trong 1 tháng tuyển sinh (tự khai báo, default 1.000.000đ)
+  standardFee: number; // Mức phí sau 1 tháng: 2.000.000đ (hoặc 3.000.000đ / 4.000.000đ tùy chính sách)
+  policyDescription: string;
+}
+
+export const DEFAULT_ADMISSION_POLICY: AdmissionPolicy = {
+  policyName: "Chính Sách Tuyển Sinh & Phí Tham Gia CLB CEO HN10",
+  startDate: "2026-01-01",
+  endDate: "2026-02-01",
+  earlyFee: 1000000,
+  standardFee: 2000000,
+  policyDescription:
+    "Trong thời gian 1 tháng tuyển sinh, vé tham gia đăng ký là mức giá ưu đãi (có thể tự khai báo). Sau 1 tháng tuyển sinh, mức phí tiêu chuẩn là 2.000.000 VNĐ (hoặc 3.000.000 VNĐ / 4.000.000 VNĐ tùy theo quy định của ban điều hành CEO HN10).",
+};
+
 export const Route = createFileRoute("/fees/")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Hội phí — CEO HN10" },
-      { name: "description", content: "Quản lý hóa đơn hội phí và giao dịch tài chính hiệp hội." },
-      { property: "og:title", content: "Hội phí — CEO HN10" },
-      { property: "og:description", content: "Theo dõi tỷ lệ thu hội phí của hiệp hội." },
+      { title: "Phí Tham Gia CLB CEO HN10" },
+      { name: "description", content: "Quản lý phí tham gia CLB, chính sách tuyển sinh 1 tháng và giao dịch tài chính học viên." },
+      { property: "og:title", content: "Phí Tham Gia CLB CEO HN10" },
+      { property: "og:description", content: "Theo dõi tỷ lệ thu phí tham gia của CLB CEO HN10." },
     ],
   }),
   loader: async () => {
@@ -291,6 +315,30 @@ function FeesPage() {
   const [invoiceExportOpen, setInvoiceExportOpen] = useState(false);
   const [vnpayModalOpen, setVnpayModalOpen] = useState(false);
   const [selectedVnpayFee, setSelectedVnpayFee] = useState<FeeRecord | null>(null);
+
+  // Quản lý chính sách phí tham gia CLB (1 tháng tuyển sinh)
+  const [admissionPolicy, setAdmissionPolicy] = useState<AdmissionPolicy>(() => {
+    try {
+      const saved = typeof window !== "undefined" ? localStorage.getItem("ceohn10_admission_policy") : null;
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return DEFAULT_ADMISSION_POLICY;
+  });
+  const [isPolicyModalOpen, setIsPolicyModalOpen] = useState(false);
+
+  const isEarlyPeriod = useMemo(() => {
+    const today = new Date().toISOString().slice(0, 10);
+    return today <= admissionPolicy.endDate && today >= admissionPolicy.startDate;
+  }, [admissionPolicy.startDate, admissionPolicy.endDate]);
+
+  const savePolicy = (p: AdmissionPolicy) => {
+    setAdmissionPolicy(p);
+    try {
+      localStorage.setItem("ceohn10_admission_policy", JSON.stringify(p));
+    } catch {}
+    setIsPolicyModalOpen(false);
+    toast.success("Đã cập nhật chính sách phí tham gia CLB CEO HN10!");
+  };
 
   const handleDelete = async (r: FeeRecord) => {
     if (!window.confirm(t("fees.deleteConfirm"))) return;
@@ -535,6 +583,68 @@ function FeesPage() {
             >
               <Plus className="h-3.5 w-3.5" aria-hidden="true" />
               {t("fees.newInvoice")}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* ── BANNER CHÍNH SÁCH PHÍ THAM GIA CLB (1 THÁNG TUYỂN SINH) ── */}
+      <div className="mb-5 overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/5 via-primary/10 to-transparent p-4 sm:p-5 shadow-xs">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-start gap-3">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-base font-bold text-foreground">{admissionPolicy.policyName}</h2>
+                {isEarlyPeriod ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Đang trong 1 tháng tuyển sinh ưu đãi
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-400">
+                    <Clock className="h-3 w-3" />
+                    Áp dụng phí tiêu chuẩn sau tuyển sinh
+                  </span>
+                )}
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground line-clamp-2 max-w-2xl">
+                {admissionPolicy.policyDescription}
+              </p>
+              <div className="mt-2.5 flex flex-wrap items-center gap-3 text-xs">
+                <div className="flex items-center gap-1.5 rounded-md bg-card/80 px-2.5 py-1 font-medium border border-border/80">
+                  <Tag className="h-3.5 w-3.5 text-emerald-600" />
+                  <span className="text-muted-foreground">Vé 1 tháng tuyển sinh:</span>
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                    {formatVnd(admissionPolicy.earlyFee)}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 rounded-md bg-card/80 px-2.5 py-1 font-medium border border-border/80">
+                  <Wallet className="h-3.5 w-3.5 text-primary" />
+                  <span className="text-muted-foreground">Phí sau 1 tháng:</span>
+                  <span className="font-bold text-primary">
+                    {formatVnd(admissionPolicy.standardFee)}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground">(2M / 3M / 4M)</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <CalendarClock className="h-3.5 w-3.5" />
+                  <span>
+                    Thời hạn: {new Date(admissionPolicy.startDate).toLocaleDateString("vi-VN")} - {new Date(admissionPolicy.endDate).toLocaleDateString("vi-VN")}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          {can(PERMISSIONS.FINANCE_MANAGE) && (
+            <button
+              onClick={() => setIsPolicyModalOpen(true)}
+              className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-primary/30 bg-card px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-primary/5 hover:border-primary cursor-pointer transition shadow-xs"
+            >
+              <Settings2 className="h-4 w-4 text-primary" />
+              <span>Thiết Lập Chính Sách</span>
             </button>
           )}
         </div>
@@ -958,6 +1068,8 @@ function FeesPage() {
         <CreateInvoiceModal
           members={members}
           defaultYear={year}
+          admissionPolicy={admissionPolicy}
+          isEarlyPeriod={isEarlyPeriod}
           onClose={() => setShowCreate(false)}
           onCreate={async (payload) => {
             if (!can(PERMISSIONS.FINANCE_MANAGE)) {
@@ -973,6 +1085,14 @@ function FeesPage() {
               toast.error(String((e as Error).message ?? e));
             }
           }}
+        />
+      )}
+
+      {isPolicyModalOpen && (
+        <AdmissionPolicyModal
+          policy={admissionPolicy}
+          onClose={() => setIsPolicyModalOpen(false)}
+          onSave={savePolicy}
         />
       )}
 
@@ -1329,11 +1449,15 @@ function FeeCard({
 function CreateInvoiceModal({
   members,
   defaultYear,
+  admissionPolicy,
+  isEarlyPeriod,
   onClose,
   onCreate,
 }: {
   members: Member[];
   defaultYear: number;
+  admissionPolicy?: AdmissionPolicy;
+  isEarlyPeriod?: boolean;
   onClose: () => void;
   onCreate: (p: {
     memberId: string;
@@ -1345,7 +1469,12 @@ function CreateInvoiceModal({
   const t = useT();
   const [memberId, setMemberId] = useState(members[0]?.id ?? "");
   const [year, setYear] = useState(defaultYear);
-  const [amount, setAmount] = useState("");
+  const initialAmount = admissionPolicy
+    ? isEarlyPeriod
+      ? admissionPolicy.earlyFee
+      : admissionPolicy.standardFee
+    : 2000000;
+  const [amount, setAmount] = useState(String(initialAmount));
   const [dueDate, setDueDate] = useState(new Date().toISOString().slice(0, 10));
   const [busy, setBusy] = useState(false);
 
@@ -1366,10 +1495,10 @@ function CreateInvoiceModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-base font-bold text-foreground">{t("fees.form.title")}</h3>
+          <h3 className="text-base font-bold text-foreground">Tạo Hóa Đơn Phí Tham Gia CLB</h3>
           <button
             onClick={onClose}
-            className="rounded-md p-1 text-muted-foreground hover:bg-accent"
+            className="rounded-md p-1 text-muted-foreground hover:bg-accent cursor-pointer"
           >
             <X className="h-4 w-4" />
           </button>
@@ -1417,6 +1546,44 @@ function CreateInvoiceModal({
               />
             </div>
           </div>
+
+          {admissionPolicy && (
+            <div className="rounded-xl border border-border bg-muted/40 p-2.5">
+              <div className="mb-1.5 flex items-center justify-between text-[11px] font-semibold text-muted-foreground">
+                <span>Chọn nhanh theo chính sách tuyển sinh:</span>
+                {isEarlyPeriod && (
+                  <span className="text-emerald-600 font-bold">● Đang tuyển sinh</span>
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setAmount(String(admissionPolicy.earlyFee))}
+                  className={`rounded-lg border px-2 py-1.5 text-xs font-medium text-left transition cursor-pointer ${
+                    Number(amount) === admissionPolicy.earlyFee
+                      ? "border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold"
+                      : "border-border bg-card hover:bg-accent text-foreground"
+                  }`}
+                >
+                  <div className="text-[10px] text-muted-foreground">Ưu đãi 1 tháng</div>
+                  <div>{formatVnd(admissionPolicy.earlyFee)}</div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAmount(String(admissionPolicy.standardFee))}
+                  className={`rounded-lg border px-2 py-1.5 text-xs font-medium text-left transition cursor-pointer ${
+                    Number(amount) === admissionPolicy.standardFee
+                      ? "border-primary bg-primary/10 text-primary font-bold"
+                      : "border-border bg-card hover:bg-accent text-foreground"
+                  }`}
+                >
+                  <div className="text-[10px] text-muted-foreground">Chuẩn sau 1 tháng</div>
+                  <div>{formatVnd(admissionPolicy.standardFee)}</div>
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="block">
             <span className="mb-1 block text-xs font-semibold text-muted-foreground">
               {t("fees.form.amount")}
@@ -1433,19 +1600,179 @@ function CreateInvoiceModal({
         <div className="mt-5 flex justify-end gap-2">
           <button
             onClick={onClose}
-            className="rounded-lg border border-border bg-card px-3 py-2 text-sm font-semibold text-foreground hover:bg-accent"
+            className="rounded-lg border border-border bg-card px-3 py-2 text-sm font-semibold text-foreground hover:bg-accent cursor-pointer"
           >
             {t("common.cancel")}
           </button>
           <button
             onClick={submit}
             disabled={busy || !memberId || !amount}
-            className="rounded-lg px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50"
+            className="rounded-lg px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50 cursor-pointer shadow-xs"
             style={{ background: "var(--gradient-primary)" }}
           >
             {t("fees.form.create")}
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function AdmissionPolicyModal({
+  policy,
+  onClose,
+  onSave,
+}: {
+  policy: AdmissionPolicy;
+  onClose: () => void;
+  onSave: (p: AdmissionPolicy) => void;
+}) {
+  const [formData, setFormData] = useState<AdmissionPolicy>(policy);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave(formData);
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-lg rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mb-4 flex items-center justify-between border-b border-border/80 pb-3">
+          <div className="flex items-center gap-2">
+            <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary/10 text-primary">
+              <Settings2 className="h-4 w-4" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-foreground">Thiết Lập Chính Sách Tuyển Sinh & Phí Tham Gia</h3>
+              <p className="text-xs text-muted-foreground">Quy định mức phí ưu đãi trong 1 tháng và phí chuẩn sau 1 tháng</p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="rounded-md p-1 text-muted-foreground hover:bg-accent cursor-pointer"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="mb-1 block text-xs font-semibold text-muted-foreground">
+              Tên chính sách
+            </label>
+            <input
+              type="text"
+              value={formData.policyName}
+              onChange={(e) => setFormData({ ...formData, policyName: e.target.value })}
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-muted-foreground">
+                Ngày bắt đầu tuyển sinh
+              </label>
+              <StandardDateInput
+                value={formData.startDate}
+                onChange={(iso) => setFormData({ ...formData, startDate: iso })}
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-muted-foreground">
+                Hạn chót 1 tháng tuyển sinh
+              </label>
+              <StandardDateInput
+                value={formData.endDate}
+                onChange={(iso) => setFormData({ ...formData, endDate: iso })}
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-1 block text-xs font-semibold text-muted-foreground">
+              Mức phí ưu đãi trong 1 tháng tuyển sinh (tự khai báo)
+            </label>
+            <FormattedCurrencyInput
+              value={String(formData.earlyFee)}
+              onChange={(_fmt, num) => setFormData({ ...formData, earlyFee: num })}
+              placeholder="1.000.000 đ"
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400"
+            />
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Áp dụng cho học viên đăng ký trong vòng 1 tháng tuyển sinh kể từ ngày mở.
+            </p>
+          </div>
+
+          <div>
+            <label className="mb-1 block text-xs font-semibold text-muted-foreground">
+              Mức phí chuẩn sau 1 tháng tuyển sinh
+            </label>
+            <div className="mb-2 flex flex-wrap gap-2">
+              {[2000000, 3000000, 4000000].map((rate) => (
+                <button
+                  key={rate}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, standardFee: rate })}
+                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold cursor-pointer transition ${
+                    formData.standardFee === rate
+                      ? "border-primary bg-primary text-primary-foreground shadow-xs"
+                      : "border-border bg-card hover:bg-accent text-foreground"
+                  }`}
+                >
+                  {formatVnd(rate)}
+                </button>
+              ))}
+            </div>
+            <FormattedCurrencyInput
+              value={String(formData.standardFee)}
+              onChange={(_fmt, num) => setFormData({ ...formData, standardFee: num })}
+              placeholder="2.000.000 đ"
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-semibold"
+            />
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Tùy thuộc chính sách CEO HN10: tiêu chuẩn 2 triệu, hoặc 3 triệu, 4 triệu cho khóa đào tạo/thành viên chính thức.
+            </p>
+          </div>
+
+          <div>
+            <label className="mb-1 block text-xs font-semibold text-muted-foreground">
+              Diễn giải chính sách
+            </label>
+            <textarea
+              rows={3}
+              value={formData.policyDescription}
+              onChange={(e) => setFormData({ ...formData, policyDescription: e.target.value })}
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-xs"
+            />
+          </div>
+
+          <div className="mt-5 flex justify-end gap-2 border-t border-border/80 pt-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg border border-border bg-card px-4 py-2 text-xs font-semibold text-foreground hover:bg-accent cursor-pointer"
+            >
+              Hủy Bỏ
+            </button>
+            <button
+              type="submit"
+              className="rounded-lg px-4 py-2 text-xs font-semibold text-primary-foreground cursor-pointer shadow-xs"
+              style={{ background: "var(--gradient-primary)" }}
+            >
+              Lưu Chính Sách
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

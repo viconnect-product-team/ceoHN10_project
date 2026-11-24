@@ -149,11 +149,16 @@ export function ProfileMenu() {
           <button
             onClick={() => {
               setOpen(false);
-              navigate({ to: "/account-settings" });
+              if (typeof window !== "undefined") {
+                window.location.href = "/master?tab=accounts";
+              } else {
+                navigate({ to: "/master", search: { tab: "accounts" } as any });
+              }
             }}
-            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-foreground hover:bg-muted"
+            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-foreground hover:bg-muted font-medium"
           >
-            <UserCog className="h-4 w-4 text-muted-foreground" /> {t("nav.account")}
+            <UserCog className="h-4 w-4 text-[#003B95] dark:text-blue-400" />
+            <span>Quản trị tài khoản &amp; Phân quyền</span>
           </button>
           <button
             onClick={() => {

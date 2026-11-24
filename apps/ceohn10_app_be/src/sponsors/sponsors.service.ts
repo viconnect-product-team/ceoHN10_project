@@ -28,12 +28,16 @@ export {
   UpdateEventPrizeDto,
 };
 
+import { BaseService } from '../common';
+
 @Injectable()
-export class SponsorsService {
+export class SponsorsService extends BaseService {
   constructor(
     private readonly sponsorsRepo: SponsorsRepository,
     private readonly mailService: MailService,
-  ) { }
+  ) {
+    super('SponsorsService');
+  }
 
   private async resolveAssociationId(assocId?: string): Promise<string> {
     if (assocId) return assocId;

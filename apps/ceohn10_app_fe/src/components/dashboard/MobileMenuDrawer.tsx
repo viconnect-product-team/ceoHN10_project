@@ -26,7 +26,7 @@ export function MobileMenuDrawer({
       <DrawerPrimitive.Portal>
         <DrawerPrimitive.Overlay className="fixed inset-0 z-40 bg-foreground/50 backdrop-blur-sm transition-opacity duration-300 data-[state=closed]:opacity-0 data-[state=open]:opacity-100 lg:hidden" />
         <DrawerPrimitive.Content
-          className="fixed inset-y-0 left-0 z-50 flex w-[280px] max-w-[85vw] flex-col shadow-2xl outline-none transition-transform duration-300 ease-out will-change-transform lg:hidden"
+          className="fixed inset-y-0 left-0 z-50 flex w-[300px] max-w-[85vw] flex-col bg-sidebar text-sidebar-foreground shadow-2xl outline-none transition-transform duration-300 ease-out will-change-transform lg:hidden"
           role="dialog"
           aria-modal="true"
           aria-label={t("nav.menu")}
@@ -36,15 +36,16 @@ export function MobileMenuDrawer({
             {t("nav.menu")}
           </DrawerPrimitive.Description>
 
-          {/* Explicit, focusable close button */}
+          {/* Nút đóng drawer cố định góc phải trên với khoảng đệm an toàn */}
           <DrawerPrimitive.Close
             aria-label={t("action.close")}
-            className="absolute right-2 top-2 z-10 inline-flex h-9 w-9 items-center justify-center rounded-lg text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+            className="absolute right-3 top-3.5 z-20 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-sidebar-accent/70 text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </DrawerPrimitive.Close>
 
-          <Sidebar mobile onNavigate={() => onOpenChange(false)} />
+          {/* Lazy render nội dung Sidebar: chỉ mount khi drawer thực sự mở để triệt tiêu việc gọi API trùng lặp */}
+          {open && <Sidebar mobile onNavigate={() => onOpenChange(false)} />}
           {/* Swipe handle */}
           <div
             aria-hidden="true"

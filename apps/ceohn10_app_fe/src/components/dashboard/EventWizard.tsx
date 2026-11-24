@@ -214,8 +214,24 @@ function EventWizardDialog({
       if (!tk.name.trim()) {
         errs[`ticket_${idx}_name`] = "Vui lòng nhập tên hạng vé!";
       }
+      const priceNum = parseVndNumber(tk.price);
+      if (!info.isPaid && priceNum > 0) {
+        errs[`ticket_${idx}_price`] = "Sự kiện miễn phí không được tạo vé có phí";
+      }
     });
     setErrors(errs);
+    if (!info.isPaid && tickets.some((tk) => parseVndNumber(tk.price) > 0)) {
+      toast.error("Đây là sự kiện miễn phí không được tạo vé có phí cho sự kiện!");
+      return false;
+    }
+    if (info.isPaid && tickets.length === 0) {
+      toast.error("Bạn đã chọn sự kiện Có thu phí, vui lòng thêm ít nhất 1 hạng vé!");
+      return false;
+    }
+    if (info.isPaid && !tickets.some((tk) => parseVndNumber(tk.price) > 0)) {
+      toast.error("Bạn đã chọn sự kiện Có thu phí, vui lòng thiết lập ít nhất 1 hạng vé có phí lớn hơn 0đ!");
+      return false;
+    }
     if (Object.keys(errs).length > 0) {
       toast.error("Vui lòng nhập tên cho các hạng vé!");
       return false;
@@ -243,7 +259,7 @@ function EventWizardDialog({
     }
     setSubmitting(true);
     try {
-      const computedTicketPrice = tickets.length > 0
+      const computedTicketPrice = info.isPaid && tickets.length > 0
         ? Math.max(0, ...tickets.map((tk) => parseVndNumber(tk.price)))
         : 0;
 
@@ -267,7 +283,7 @@ function EventWizardDialog({
           photoGalleryUrl: info.photoGalleryUrl || "",
           isFixed: !!info.isFixed,
           recurrenceRule: info.recurrenceRule || "",
-          isPaid: info.isPaid ?? (computedTicketPrice > 0),
+          isPaid: !!info.isPaid,
           ticketPrice: computedTicketPrice,
           fee: computedTicketPrice,
           description: info.description || "",
@@ -277,7 +293,7 @@ function EventWizardDialog({
           qrFields,
           tickets: tickets.map((tk) => ({
             name: tk.name.trim(),
-            price: parseVndNumber(tk.price),
+            price: info.isPaid ? parseVndNumber(tk.price) : 0,
             quantity: parseInt(String(tk.quantity).replace(/\D/g, ""), 10) || 0,
             description: tk.description.trim(),
           })),
@@ -379,8 +395,40 @@ function EventWizardDialog({
 
         {/* Body */}
         <div className="flex-1 overflow-y-auto p-5 bg-background text-foreground">
-          {step === 0 && <InfoStep info={info} setInfo={setInfo} errors={errors} setErrors={setErrors} />}
-          {step === 1 && <TicketStep tickets={tickets} setTickets={setTickets} errors={errors} setErrors={setErrors} />}
+          {step === 0 && (
+            <InfoStep
+              info={info}
+              setInfo={setInfo}
+              errors={errors}
+              setErrors={setErrors}
+              onTogglePaid={(newPaid) => {
+                setInfo({ ...info, isPaid: newPaid });
+                if (newPaid) {
+                  if (tickets.length === 0 || tickets.every((t) => parseVndNumber(t.price) === 0)) {
+                    setTickets([
+                      { name: "Vé VIP", price: "500000", quantity: "50", description: "Bàn tiệc VIP, tài liệu cao cấp" },
+                      { name: "Vé Tiêu Chuẩn", price: "200000", quantity: "100", description: "Tham dự toàn bộ chương trình" },
+                    ]);
+                  }
+                } else {
+                  setTickets((prev) =>
+                    prev.length > 0
+                      ? prev.map((t) => ({ ...t, price: "0" }))
+                      : [{ name: "Vé Tiêu Chuẩn", price: "0", quantity: "", description: "Miễn phí tham dự" }]
+                  );
+                }
+              }}
+            />
+          )}
+          {step === 1 && (
+            <TicketStep
+              isPaid={!!info.isPaid}
+              tickets={tickets}
+              setTickets={setTickets}
+              errors={errors}
+              setErrors={setErrors}
+            />
+          )}
           {step === 2 && <QrStep qrFields={qrFields} toggleQr={toggleQr} sample={qrSample} />}
           {step === 3 && createdEvent && (
             <AttendeeRegistrationStep event={createdEvent} tickets={tickets} onClose={close} />
@@ -459,11 +507,13 @@ function InfoStep({
   setInfo,
   errors,
   setErrors,
+  onTogglePaid,
 }: {
   info: Info;
   setInfo: (v: Info) => void;
   errors: Record<string, string>;
   setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  onTogglePaid?: (v: boolean) => void;
 }) {
   const t = useT();
   const currentTpl = EVENT_TYPE_TEMPLATES[info.type as EventTypeKey] || EVENT_TYPE_TEMPLATES.forum;
@@ -961,7 +1011,7 @@ function InfoStep({
             <div className="flex items-center gap-2 mt-1">
               <button
                 type="button"
-                onClick={() => setInfo({ ...info, isPaid: false })}
+                onClick={() => onTogglePaid ? onTogglePaid(false) : setInfo({ ...info, isPaid: false })}
                 className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${!info.isPaid
                     ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400"
                     : "border-border bg-background text-muted-foreground hover:text-foreground"
@@ -971,7 +1021,7 @@ function InfoStep({
               </button>
               <button
                 type="button"
-                onClick={() => setInfo({ ...info, isPaid: true })}
+                onClick={() => onTogglePaid ? onTogglePaid(true) : setInfo({ ...info, isPaid: true })}
                 className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${info.isPaid
                     ? "border-amber-500 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400"
                     : "border-border bg-background text-muted-foreground hover:text-foreground"
@@ -1048,11 +1098,13 @@ function InfoStep({
 }
 
 function TicketStep({
+  isPaid,
   tickets,
   setTickets,
   errors,
   setErrors,
 }: {
+  isPaid: boolean;
   tickets: TicketDraft[];
   setTickets: (v: TicketDraft[]) => void;
   errors: Record<string, string>;
@@ -1071,6 +1123,22 @@ function TicketStep({
         </h3>
         <p className="mt-0.5 text-xs text-muted-foreground">{t("ewz.tickets.hint")}</p>
       </div>
+
+      {!isPaid ? (
+        <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
+          <Check className="h-4 w-4 shrink-0 text-emerald-600" />
+          <span>
+            Sự kiện này được thiết lập <strong>Miễn phí (Free)</strong> ở Bước 1. Mọi hạng vé tạo ra đều có giá 0 đồng (miễn phí tham dự).
+          </span>
+        </div>
+      ) : (
+        <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-xs text-[#003B95] dark:text-blue-300 flex items-center gap-2">
+          <Ticket className="h-4 w-4 shrink-0 text-[#003B95]" />
+          <span>
+            Sự kiện <strong>Có thu phí</strong>. Vui lòng thiết lập giá vé (VIP, Tiêu Chuẩn...) để đại biểu thanh toán khi đăng ký.
+          </span>
+        </div>
+      )}
 
       {tickets.length === 0 && (
         <p className="rounded-lg border border-dashed border-border bg-muted/30 p-4 text-center text-xs text-muted-foreground">
@@ -1140,12 +1208,19 @@ function TicketStep({
                 <VndCurrencyInput
                   id={`ewz-ticket-price-${i}`}
                   placeholder="0 (0 là miễn phí)"
-                  className={inputCls}
-                  value={parseVndNumber(tk.price)}
-                  onChange={(val) => update(i, { price: String(val) })}
+                  className={`${inputCls} ${!isPaid ? "bg-muted cursor-not-allowed opacity-80" : ""}`}
+                  value={!isPaid ? 0 : parseVndNumber(tk.price)}
+                  onChange={(val) => {
+                    if (!isPaid && val > 0) {
+                      toast.error("đây là sự kiện miễn phí không được tạo vé có phí cho sự kiện");
+                      update(i, { price: "0" });
+                      return;
+                    }
+                    update(i, { price: String(val) });
+                  }}
                 />
                 <p className="mt-1 text-[10.5px] text-muted-foreground">
-                  {parseVndNumber(tk.price) <= 0
+                  {!isPaid || parseVndNumber(tk.price) <= 0
                     ? "Vé 0 đồng = Miễn phí tham dự."
                     : "Từ 1 đ trở lên = Vé có phí bắt buộc thanh toán."}
                 </p>
@@ -1208,7 +1283,13 @@ function TicketStep({
 
       <button
         type="button"
-        onClick={() => setTickets([...tickets, emptyTicket()])}
+        onClick={() => {
+          if (!isPaid) {
+            setTickets([...tickets, { name: "", price: "0", quantity: "", description: "" }]);
+          } else {
+            setTickets([...tickets, { name: "", price: "200000", quantity: "", description: "" }]);
+          }
+        }}
         className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-border bg-muted/30 py-2.5 text-sm font-semibold text-[#003B95] dark:text-blue-400 hover:bg-muted transition cursor-pointer"
       >
         <Plus className="h-4 w-4" aria-hidden="true" /> {t("ewz.tickets.add")}
