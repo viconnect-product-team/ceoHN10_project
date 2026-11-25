@@ -449,8 +449,20 @@ export class EventsController {
   }
 
   @Post('ticket-checkout')
-  async performTicketCheckout(@Body('ticketCode') ticketCode: string) {
-    return this.eventsService.performTicketCheckout(ticketCode);
+  async performTicketCheckout(
+    @Body('ticketCode') ticketCode?: string,
+    @Body('registrationId') registrationId?: string,
+    @Body('attendeeId') attendeeId?: string,
+    @Body('code') code?: string,
+    @Body() body?: any,
+  ) {
+    const raw = ticketCode || registrationId || attendeeId || code || body?.ticketCode || body?.registrationId || body?.attendeeId || body?.code || (typeof body === 'string' ? body : '');
+    return this.eventsService.performTicketCheckout(raw);
+  }
+
+  @Post('registrations/:id/checkout')
+  async performRegistrationCheckout(@Param('id') id: string) {
+    return this.eventsService.performTicketCheckout(id);
   }
 
   // ── OFFLINE CHECKIN ENGINE (HỖ TRỢ KHU VỰC MẤT SÓNG / KHÔNG CÓ MẠNG) ─────────

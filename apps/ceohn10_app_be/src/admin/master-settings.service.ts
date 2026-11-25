@@ -324,11 +324,18 @@ export class MasterSettingsService {
       }
     }
 
+    const savedConfig = (rows && rows[0]?.value)
+      ? (typeof rows[0].value === 'string' ? JSON.parse(rows[0].value) : rows[0].value)
+      : config;
+    const updatedAt = (rows && rows[0]?.updated_at)
+      ? rows[0].updated_at
+      : new Date().toISOString();
+
     return {
       success: true,
       setting_key: 'sepay_integration_config',
-      config: typeof rows[0].value === 'string' ? JSON.parse(rows[0].value) : rows[0].value,
-      updated_at: rows[0].updated_at,
+      config: savedConfig,
+      updated_at: updatedAt,
     };
   }
 

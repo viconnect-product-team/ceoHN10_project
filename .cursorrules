@@ -1,6 +1,16 @@
 # ==============================================================================
 # BỘ LUẬT DỰ ÁN (PROJECT RULES & AI CODEGEN STANDARDS) - CEO HN10 PROJECT
 # Vai trò: Tech Lead | Định dạng: .cursorrules
+# 25/11/2026 (v12.78) — HOÀN THIỆN LUỒNG CHECK-OUT VÉ SỰ KIỆN, BÓC TÁCH MÃ VÉ ĐA NGUỒN, TỐI ƯU GỌI SỰ KIỆN MOBILE APP & SỬA LỖI LƯU CẤU HÌNH SEPAY:
+#   * [LUỒNG CHECK-OUT VÉ SỰ KIỆN (PERFORM TICKET CHECK-OUT)]:
+#     - Hàm `resolveCleanTicketCode`: Tự động phân tích JSON payload từ camera quét QR, URL search params (`?ticket=...`, `?regId=...`), và chuỗi thông thường.
+#     - Hàm `performTicketCheckout`: Kiểm tra điều kiện bắt buộc (chặn chưa check-in và chặn check-out trùng lặp); cập nhật `checked_out_at = NOW()`, `status = 'checked_out'`; đồng bộ `member_checkins`; gửi email thư cảm ơn và thông báo giờ ra về cho đại biểu.
+#     - Giao diện Soát vé & Modal Check-in (`EventCheckinGatekeeperModal`): Bổ sung nút Check-out riêng cho từng đại biểu đã check-in; thẻ vé (`EventTicketPassModal`) hiển thị badge trạng thái Check-in / Check-out trực quan.
+#   * [GỌI SỰ KIỆN TRÊN MOBILE APP (ASSOCIATION.EVENTS.TSX)]:
+#     - Ưu tiên gọi trực tiếp `/events/my-events` và `/events` từ client API, cập nhật vào state `clientEvents`, xóa sạch mock static array trong `association.index.tsx` theo Strict No-Mock Law.
+#     - Loại bỏ lỗi query cột không tồn tại `member_id` trong `event_registrations`, hỗ trợ đầy đủ cả 2 association ID của CLB.
+#   * [LƯU CẤU HÌNH SEPAY MASTER ADMIN (/master)]:
+#     - Gỡ bỏ decorator `@RequireActions` không khớp, bảo vệ an toàn `savedConfig`, tuân thủ Rule 0 không fallback sang IP sập.
 # 24/11/2026 (v12.77) — ĐÓNG GÓI HỆ THỐNG UI SPECS (.agents/ui-specs/), TINH GỌN MEMORY.MD & PHÂN ĐỊNH RÕ RÀNG CƠ SỞ DỮ LIỆU LOCALHOST VS SERVER DEV:
 #   * [PHÂN ĐỊNH CƠ SỞ DỮ LIỆU CHUẨN MỰC THEO MÔI TRƯỜNG]:
 #     - Môi trường Test / Phát triển Localhost: Sử dụng CSDL `127.0.0.1:5432/ceohn10_project`.

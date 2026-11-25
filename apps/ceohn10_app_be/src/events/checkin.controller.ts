@@ -43,6 +43,11 @@ export class CheckinController {
     return this.eventsService.undoCheckInAttendee(body.attendeeId);
   }
 
+  @Post('checkout')
+  async checkOut(@Body() body: CheckinAttendeeDto) {
+    return this.eventsService.performTicketCheckout(body.attendeeId);
+  }
+
   @Post('record')
   async recordMemberCheckin(
     @Request() req: any,

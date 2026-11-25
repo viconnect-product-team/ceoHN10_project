@@ -1190,39 +1190,41 @@ function EventsScreen() {
   const { data: member } = useServerData<MyMember | null>(() => fetchMember(), null, "vba_my_member");
   const [clientEvents, setClientEvents] = useState<MyEvent[]>([]);
 
+  const loadEventsDirect = async () => {
+    try {
+      const myEvs = await fetchNestApi<any[]>("/events/my-events").catch(() => null);
+      if (Array.isArray(myEvs) && myEvs.length > 0) {
+        setClientEvents(myEvs);
+        return;
+      }
+      const allEvs = await fetchNestApi<any[]>("/events").catch(() => null);
+      if (Array.isArray(allEvs) && allEvs.length > 0) {
+        const mapped: MyEvent[] = allEvs.map((e: any) => ({
+          id: e.id,
+          day: e.day || (e.date ? new Date(e.date).getDate().toString() : "20"),
+          month: e.month || (e.date ? `TH${new Date(e.date).getMonth() + 1}` : "TH10"),
+          title: e.name || e.title || "Sự kiện CLB CEO HN10",
+          time: e.time || `${e.start_time || "08:00"} - ${e.end_time || "11:30"}`,
+          place: e.location || "CLB Doanh Nhân CEO HN10",
+          registered: Boolean(e.registered),
+          date: e.date,
+          description: e.description,
+          image: e.image || e.banner,
+          banner: e.banner || e.image,
+          ticketPrice: Number(e.ticket_price || e.fee || 0),
+          fee: Number(e.fee || e.ticket_price || 0),
+          capacity: Number(e.capacity || 0),
+        }));
+        setClientEvents(mapped);
+      }
+    } catch (err) {
+      console.warn("[association.events] Lỗi tải danh sách sự kiện từ API:", err);
+    }
+  };
+
   useEffect(() => {
     let isMounted = true;
-    fetchNestApi<any[]>("/events/my-events")
-      .then((data) => {
-        if (!isMounted) return;
-        if (Array.isArray(data) && data.length > 0) {
-          setClientEvents(data);
-        } else {
-          fetchNestApi<any[]>("/events").then((evList) => {
-            if (!isMounted) return;
-            if (Array.isArray(evList) && evList.length > 0) {
-              const mapped: MyEvent[] = evList.map((e: any) => ({
-                id: e.id,
-                day: e.day || (e.date ? new Date(e.date).getDate().toString() : "20"),
-                month: e.month || (e.date ? `TH${new Date(e.date).getMonth() + 1}` : "TH10"),
-                title: e.name || e.title || "Sự kiện CLB CEO HN10",
-                time: e.time || `${e.start_time || "08:00"} - ${e.end_time || "11:30"}`,
-                place: e.location || "CLB Doanh Nhân CEO HN10",
-                registered: Boolean(e.registered),
-                date: e.date,
-                description: e.description,
-                image: e.image || e.banner,
-                banner: e.banner || e.image,
-                ticketPrice: Number(e.ticket_price || e.fee || 0),
-                fee: Number(e.fee || e.ticket_price || 0),
-                capacity: Number(e.capacity || 0),
-              }));
-              setClientEvents(mapped);
-            }
-          }).catch(() => {});
-        }
-      })
-      .catch(() => {});
+    loadEventsDirect();
     return () => { isMounted = false; };
   }, []);
 
@@ -1260,6 +1262,8 @@ function EventsScreen() {
           setLocalRegistered({});
         }
       } catch { }
+      loadEventsDirect();
+      reload();
     };
     window.addEventListener("vba.events.changed", handleEventsChanged);
     return () => window.removeEventListener("vba.events.changed", handleEventsChanged);
@@ -1502,7 +1506,7 @@ function EventsScreen() {
 
     // Chỉ kích hoạt khi URL có tham số đăng ký, mã vé hoặc xem chi tiết sự kiện
     if (action === "register" || action === "dang-ky" || targetEventId || ticketParam || qrData) {
-      const allEvs = serverEvents || [];
+      const allEvs = (clientEvents && clientEvents.length > 0) ? clientEvents : (serverEvents || []);
       const matched = allEvs.find((ev) => ev.id === targetEventId) || allEvs[0];
 
       if (action === "ticket" && ticketParam) {
@@ -1549,14 +1553,14 @@ function EventsScreen() {
         }
       }
     }
-  }, [serverEvents]);
+  }, [serverEvents, clientEvents]);
 
   const isRegistered = (e: MyEvent) => {
     if (localRegistered[e.id] !== undefined) return localRegistered[e.id];
     return !!e.registered;
   };
 
-  const events = (serverEvents && serverEvents.length > 0) ? serverEvents : clientEvents;
+  const events = (clientEvents && clientEvents.length > 0) ? clientEvents : ((serverEvents && serverEvents.length > 0) ? serverEvents : []);
   const upcomingEvents = events.filter((e) => !isEventPast(e));
   const pastEvents = events.filter((e) => isEventPast(e));
 

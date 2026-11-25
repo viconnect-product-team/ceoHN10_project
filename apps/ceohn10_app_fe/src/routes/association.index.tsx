@@ -269,7 +269,10 @@ export function CeoHn10StudentAppScreen() {
 
       // 2. Load Real Events from Backend
       try {
-        const eventsRes = await fetchNestApi<any[]>("/events");
+        let eventsRes = await fetchNestApi<any[]>("/events/my-events").catch(() => null);
+        if (!Array.isArray(eventsRes) || eventsRes.length === 0) {
+          eventsRes = await fetchNestApi<any[]>("/events").catch(() => null);
+        }
         if (Array.isArray(eventsRes) && eventsRes.length > 0) {
           setEvents(
             eventsRes.map((e, idx) => ({
@@ -289,48 +292,7 @@ export function CeoHn10StudentAppScreen() {
             }))
           );
         } else {
-          // Default Event Carousel list for Slide View (Concept 3)
-          setEvents([
-            {
-              id: "evt-01",
-              name: "Dạ Tiệc Tất Niên Year End Party 2026: Gắn Kết & Tôn Vinh",
-              date: "2026-12-26T18:00:00.000Z",
-              location: "Ballroom Khách Sạn Melia, Hà Nội",
-              status: "upcoming",
-              description: "Đêm hội kết nối tinh hoa, tôn vinh các doanh nghiệp tiêu biểu và giao lưu nghệ thuật thượng đỉnh của Hiệp hội CEO HN10.",
-              isRegistered: true,
-              ticketCode: `VIP-MELIA-${derivedStudentCode}`,
-              price: 0,
-              highlightQuote: "“Tôn vinh hành trình kiên định và bản lĩnh tiên phong của các nhà lãnh đạo.”",
-              confirmedCount: 68,
-            },
-            {
-              id: "evt-02",
-              name: "Lễ Khai Giảng Khóa Học Doanh Trí CEO HN10 Khóa II",
-              date: "2026-12-30T08:30:00.000Z",
-              location: "Trung Tâm Hội Nghị Quốc Gia Hà Nội",
-              status: "upcoming",
-              description: "Lễ ra mắt học phần chiến lược mới, trao học bổng kết nối và khai phóng tư duy điều hành hiện đại.",
-              isRegistered: false,
-              ticketCode: `TKT-KG2-${derivedStudentCode}`,
-              price: 1000000,
-              highlightQuote: "“Học hỏi không ngừng là vũ khí tối thượng của người thuyền trưởng.”",
-              confirmedCount: 45,
-            },
-            {
-              id: "evt-03",
-              name: "Diễn Đàn Giao Thương B2B & Chuỗi Cung Ứng Thủ Đô",
-              date: "2027-01-10T14:00:00.000Z",
-              location: "Trụ Sở Hiệp Hội Doanh Nghiệp HanoiBA",
-              status: "upcoming",
-              description: "Ký kết 20 biên bản ghi nhớ hợp tác thương mại đa ngành, xúc tiến đầu tư nội khối CEO HN10.",
-              isRegistered: false,
-              ticketCode: `TKT-B2B-${derivedStudentCode}`,
-              price: 0,
-              highlightQuote: "“Một cánh én không làm nên mùa xuân, một doanh nhân cần cả một cộng đồng.”",
-              confirmedCount: 52,
-            },
-          ]);
+          setEvents([]);
         }
       } catch (err) {
         setEvents([]);

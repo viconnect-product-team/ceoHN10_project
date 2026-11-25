@@ -1432,6 +1432,8 @@ export class EventsService extends BaseService implements OnModuleInit {
             FROM public.events e
             LEFT JOIN public.associations a ON e.association_id = a.id
             WHERE e.association_id = ${assocId}::uuid
+               OR e.association_id = '00000000-0000-4000-8000-000000000001'::uuid
+               OR e.association_id = 'c1983000-0000-4000-8000-000000001983'::uuid
             ORDER BY (e.date >= CURRENT_DATE) DESC, e.date ASC
           `.catch(() => [])
         : this.prisma.$queryRaw<any[]>`
@@ -1442,12 +1444,12 @@ export class EventsService extends BaseService implements OnModuleInit {
           `.catch(() => []),
       !isGuest
         ? this.prisma.$queryRaw<any[]>`
-            SELECT code FROM public.members WHERE user_id = ${userId}::uuid LIMIT 1
+            SELECT code, email, phone FROM public.members WHERE user_id = ${userId}::uuid LIMIT 1
           `.catch(() => [])
         : Promise.resolve([]),
     ]);
 
-    if (events.length === 0) {
+    if (!events || events.length === 0) {
       events = await this.prisma.$queryRaw<any[]>`
         SELECT e.*, a.name as association_name, a.logo_url as association_logo
         FROM public.events e
@@ -1456,7 +1458,7 @@ export class EventsService extends BaseService implements OnModuleInit {
       `.catch(() => []);
     }
 
-    const memberRow = me[0];
+    const memberRow = me && me.length > 0 ? me[0] : null;
     const userRow = !isGuest
       ? await this.prisma.vione_users
           .findUnique({ where: { id: userId } })
@@ -1466,23 +1468,24 @@ export class EventsService extends BaseService implements OnModuleInit {
     const myEmail = memberRow?.email || userRow?.email;
     const myPhone = memberRow?.phone || (userRow as any)?.phone;
     let regIds = new Set<string>();
-
-    const regs = await this.prisma.$queryRaw<any[]>`
-      SELECT id, event_id, lucky_number, ticket_type, status, payment_status, payment_amount
-      FROM public.event_registrations
-      WHERE status != 'cancelled'
-        AND (
-          (${myCode}::text IS NOT NULL AND member_code = ${myCode})
-          OR (${myEmail}::text IS NOT NULL AND email = ${myEmail})
-          OR (${myPhone}::text IS NOT NULL AND phone = ${myPhone})
-          OR member_id = ${userId}
-        )
-    `.catch(() => []);
     const regMap = new Map<string, any>();
-    for (const r of regs) {
-      regMap.set(String(r.event_id), r);
+
+    if (!isGuest && (myCode || myEmail || myPhone)) {
+      const regs = await this.prisma.$queryRaw<any[]>`
+        SELECT id, event_id, lucky_number, ticket_type, status, payment_status, payment_amount
+        FROM public.event_registrations
+        WHERE status != 'cancelled'
+          AND (
+            (${myCode || ''} != '' AND UPPER(TRIM(member_code)) = UPPER(TRIM(${myCode || ''})))
+            OR (${myEmail || ''} != '' AND LOWER(TRIM(email)) = LOWER(TRIM(${myEmail || ''})))
+            OR (${myPhone || ''} != '' AND TRIM(phone) = TRIM(${myPhone || ''}))
+          )
+      `.catch(() => []);
+      for (const r of regs) {
+        regMap.set(String(r.event_id), r);
+      }
+      regIds = new Set(regs.map((r) => String(r.event_id)));
     }
-    regIds = new Set(regs.map((r) => String(r.event_id)));
 
     const MONTHS = [
       'JAN',
@@ -4692,18 +4695,58 @@ export class EventsService extends BaseService implements OnModuleInit {
 
   // ── 1-TIME CHECKIN & CHECKOUT ENFORCEMENT & PUBLIC TICKET LOOKUP ─────────────
 
-  async getTicketStatus(ticketCode: string) {
-    if (!ticketCode || !ticketCode.trim()) {
-      throw new BadRequestException('Mã vé không được để trống');
+  private resolveCleanTicketCode(rawCode: any): string {
+    if (!rawCode) return '';
+    let str = String(rawCode).trim();
+    if (!str) return '';
+
+    // Gỡ bỏ dấu ngoặc kép / nháy đơn bọc chuỗi
+    if ((str.startsWith('"') && str.endsWith('"')) || (str.startsWith("'") && str.endsWith("'"))) {
+      str = str.slice(1, -1).trim();
     }
-    const clean = ticketCode.trim();
+
+    // 1. Phân tích nếu chuỗi là JSON (từ camera quét QR payload)
+    if (str.startsWith('{') && str.endsWith('}')) {
+      try {
+        const parsed = JSON.parse(str);
+        const candidate = parsed.ticketCode || parsed.registrationId || parsed.id || parsed.code || parsed.luckyNumber || parsed.phone;
+        if (candidate) return String(candidate).trim();
+      } catch {}
+    }
+
+    // 2. Phân tích nếu chuỗi là URL (từ camera quét QR URL web)
+    if (str.includes('http://') || str.includes('https://') || str.includes('?') || str.includes('/ticket')) {
+      try {
+        const urlObj = str.startsWith('http') ? new URL(str) : new URL(`http://dummy.local/${str.replace(/^\/+/, '')}`);
+        const candidate = urlObj.searchParams.get('ticket') || 
+                          urlObj.searchParams.get('ticketCode') || 
+                          urlObj.searchParams.get('regId') || 
+                          urlObj.searchParams.get('registrationId') || 
+                          urlObj.searchParams.get('id') ||
+                          urlObj.searchParams.get('code');
+        if (candidate) return candidate.trim();
+      } catch {}
+    }
+
+    return str;
+  }
+
+  async getTicketStatus(ticketCode: string) {
+    const clean = this.resolveCleanTicketCode(ticketCode);
+    if (!clean) {
+      throw new BadRequestException('Mã vé không được để trống hoặc không hợp lệ');
+    }
     const rows = await this.prisma.$queryRaw<any[]>`
       SELECT r.*, e.name as event_name, e.title as event_title, e.date as event_date, e.location as event_location, e.start_time, e.end_time
       FROM public.event_registrations r
       LEFT JOIN public.events e ON e.id = r.event_id
       WHERE r.id = ${clean} 
-         OR UPPER(TRIM(r.member_code)) = UPPER(${clean})
+         OR UPPER(TRIM(COALESCE(r.member_code, ''))) = UPPER(${clean})
          OR r.lucky_number = ${clean}
+         OR r.phone = ${clean}
+         OR LOWER(TRIM(COALESCE(r.email, ''))) = LOWER(${clean})
+         OR (r.qr_payload IS NOT NULL AND r.qr_payload = ${clean})
+         OR (r.qr_code IS NOT NULL AND r.qr_code = ${clean})
       ORDER BY r.created_at DESC
       LIMIT 1
     `.catch(() => []);
@@ -4840,17 +4883,22 @@ export class EventsService extends BaseService implements OnModuleInit {
   }
 
   async performTicketCheckin(ticketCode: string, method: string = 'web', attendedParts?: string[]) {
-    if (!ticketCode || !ticketCode.trim()) {
-      throw new BadRequestException('Mã vé không được để trống');
+    const clean = this.resolveCleanTicketCode(ticketCode);
+    if (!clean) {
+      throw new BadRequestException('Mã vé không được để trống hoặc không hợp lệ');
     }
-    const clean = ticketCode.trim();
     const rows = await this.prisma.$queryRaw<any[]>`
-      SELECT r.*, e.name as event_name, e.title as event_title, e.association_id as event_assoc_id
+      SELECT r.*, e.name as event_name, e.title as event_title, e.association_id as event_assoc_id,
+             e.date as event_date, e.start_time, e.end_time, e.time as event_time
       FROM public.event_registrations r
       LEFT JOIN public.events e ON e.id = r.event_id
       WHERE r.id = ${clean} 
-         OR UPPER(TRIM(r.member_code)) = UPPER(${clean})
+         OR UPPER(TRIM(COALESCE(r.member_code, ''))) = UPPER(${clean})
          OR r.lucky_number = ${clean}
+         OR r.phone = ${clean}
+         OR LOWER(TRIM(COALESCE(r.email, ''))) = LOWER(${clean})
+         OR (r.qr_payload IS NOT NULL AND r.qr_payload = ${clean})
+         OR (r.qr_code IS NOT NULL AND r.qr_code = ${clean})
       ORDER BY r.created_at DESC
       LIMIT 1
     `.catch(() => []);
@@ -4910,7 +4958,7 @@ export class EventsService extends BaseService implements OnModuleInit {
     `, partsJson, isLate, checkinTimeliness, reg.id);
 
     // UC-EVT-05-1: Gửi email xác nhận điểm danh check-in thành công cho đại biểu
-    if (reg.email && reg.email.includes('@')) {
+    if (reg.email && reg.email.includes('@') && this.mailService) {
       const seatInfo = reg.seat_assignment ? `Vị trí chỗ ngồi / Ghế số của Quý Anh/Chị: ${reg.seat_assignment}` : 'Quý Anh/Chị vui lòng liên hệ Ban Lễ Tân tại sảnh để được hướng dẫn vị trí ngồi.';
       this.mailService.sendDirectEmail({
         to: reg.email,
@@ -4985,17 +5033,21 @@ export class EventsService extends BaseService implements OnModuleInit {
   }
 
   async performTicketCheckout(ticketCode: string) {
-    if (!ticketCode || !ticketCode.trim()) {
-      throw new BadRequestException('Mã vé không được để trống');
+    const clean = this.resolveCleanTicketCode(ticketCode);
+    if (!clean) {
+      throw new BadRequestException('Mã vé không được để trống hoặc không hợp lệ');
     }
-    const clean = ticketCode.trim();
     const rows = await this.prisma.$queryRaw<any[]>`
-      SELECT r.*, e.name as event_name, e.title as event_title
+      SELECT r.*, e.name as event_name, e.title as event_title, e.association_id as event_assoc_id
       FROM public.event_registrations r
       LEFT JOIN public.events e ON e.id = r.event_id
       WHERE r.id = ${clean} 
-         OR UPPER(TRIM(r.member_code)) = UPPER(${clean})
+         OR UPPER(TRIM(COALESCE(r.member_code, ''))) = UPPER(${clean})
          OR r.lucky_number = ${clean}
+         OR r.phone = ${clean}
+         OR LOWER(TRIM(COALESCE(r.email, ''))) = LOWER(${clean})
+         OR (r.qr_payload IS NOT NULL AND r.qr_payload = ${clean})
+         OR (r.qr_code IS NOT NULL AND r.qr_code = ${clean})
       ORDER BY r.created_at DESC
       LIMIT 1
     `.catch(() => []);
@@ -5012,6 +5064,13 @@ export class EventsService extends BaseService implements OnModuleInit {
         ok: false,
         notCheckedIn: true,
         message: 'Vé này chưa được thực hiện check-in vào cửa! Vui lòng check-in trước.',
+        ticket: {
+          id: reg.id,
+          memberName: reg.member_name,
+          eventTitle: reg.event_name || reg.event_title,
+          phone: reg.phone,
+          company: reg.company,
+        },
       };
     }
 
@@ -5021,8 +5080,17 @@ export class EventsService extends BaseService implements OnModuleInit {
       return {
         ok: false,
         alreadyCheckedOut: true,
-        message: `Vé này ĐÃ THỰC HIỆN CHECK-OUT lúc ${formattedTime}!`,
+        message: `Vé này ĐÃ THỰC HIỆN CHECK-OUT lúc ${formattedTime}! Không thể check-out lại.`,
         checkedOutAt: formattedTime,
+        ticket: {
+          id: reg.id,
+          memberName: reg.member_name,
+          eventTitle: reg.event_name || reg.event_title,
+          phone: reg.phone,
+          company: reg.company,
+          checkedInAt: reg.checked_in_at ? new Date(reg.checked_in_at).toLocaleString('vi-VN') : null,
+          checkedOutAt: formattedTime,
+        },
       };
     }
 
@@ -5033,6 +5101,71 @@ export class EventsService extends BaseService implements OnModuleInit {
       WHERE id = $1
     `, reg.id);
 
+    // Cập nhật member_checkins nếu có
+    await this.prisma.$executeRawUnsafe(`
+      UPDATE public.member_checkins
+      SET status = 'checked_out'
+      WHERE member_code = $1 AND event_title = $2
+    `, reg.member_code || '', reg.event_name || reg.event_title || '').catch(() => {});
+
+    // Gửi email cảm ơn Quý đại biểu đã tham gia sự kiện
+    if (reg.email && reg.email.includes('@') && this.mailService) {
+      const attendeeName = reg.member_name || 'Quý Hội viên / Quý Đại biểu';
+      const eventTitle = reg.event_name || reg.event_title || 'Sự kiện CLB CEO HN10';
+      const checkedInTimeStr = reg.checked_in_at ? new Date(reg.checked_in_at).toLocaleString('vi-VN') : 'Đã check-in';
+      const checkedOutTimeStr = now.toLocaleString('vi-VN');
+
+      this.mailService.sendDirectEmail({
+        to: reg.email,
+        subject: `[THƯ CẢM ƠN] Ban Tổ Chức CLB CEO HN10 Cảm Ơn Quý Đại Biểu — ${eventTitle}`,
+        html: `
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 620px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
+            <div style="background: linear-gradient(135deg, #003B95 0%, #1e40af 100%); padding: 32px 24px; text-align: center; color: #ffffff;">
+              <div style="display: inline-block; padding: 6px 14px; background: rgba(255,255,255,0.15); border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.25);">
+                HANOIBA · CLB DOANH NHÂN CEO HN10
+              </div>
+              <h1 style="margin: 0; font-size: 22px; font-weight: 800; line-height: 1.3; color: #ffffff;">THƯ CẢM ƠN THAM DỰ SỰ KIỆN</h1>
+              <p style="margin: 8px 0 0; font-size: 14px; opacity: 0.9; color: #bfdbfe;">Trân trọng cảm ơn sự hiện diện quý báu của Quý Anh/Chị</p>
+            </div>
+
+            <div style="padding: 28px 24px; color: #1e293b; line-height: 1.6;">
+              <p style="font-size: 15px; margin: 0 0 16px;">
+                Kính gửi Anh/Chị: <strong style="color: #003B95; font-size: 16px;">${attendeeName}</strong>,
+              </p>
+              <p style="font-size: 14px; color: #475569; margin: 0 0 20px;">
+                Ban Tổ Chức CLB Doanh Nhân CEO HN10 (HanoiBA) xin gửi lời cảm ơn chân thành và sâu sắc nhất tới Quý Anh/Chị đã dành thời gian quý báu đến tham dự chương trình <strong>${eventTitle}</strong>.
+              </p>
+
+              <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 18px; margin-bottom: 24px;">
+                <div style="font-size: 15px; font-weight: 800; color: #166534; margin-bottom: 10px;">THÔNG TIN XÁC NHẬN RA VỀ (CHECK-OUT):</div>
+                <div style="font-size: 13px; color: #334155; margin-bottom: 6px;">
+                  🎫 <strong>Mã vé:</strong> ${reg.id}
+                </div>
+                <div style="font-size: 13px; color: #334155; margin-bottom: 6px;">
+                  🟢 <strong>Thời gian vào cửa (Check-in):</strong> ${checkedInTimeStr}
+                </div>
+                <div style="font-size: 13px; color: #15803d; font-weight: 700; margin-bottom: 6px;">
+                  🏁 <strong>Thời gian ra về (Check-out):</strong> ${checkedOutTimeStr}
+                </div>
+                ${reg.seat_assignment ? `<div style="font-size: 13px; color: #334155;">📍 <strong>Vị trí ghế:</strong> ${reg.seat_assignment}</div>` : ''}
+              </div>
+
+              <p style="font-size: 14px; color: #475569; margin: 0 0 16px;">
+                Sự hiện diện và đồng hành của Quý Doanh nhân đã góp phần tạo nên thành công rực rỡ cho sự kiện. Kính chúc Quý Anh/Chị cùng Doanh nghiệp ngày càng phát triển, vươn tầm và luôn kết nối bền chặt cùng đại gia đình CEO HN10!
+              </p>
+
+              <div style="background: #f8fafc; border-left: 4px solid #003B95; border-radius: 0 8px 8px 0; padding: 14px 18px; margin-top: 24px;">
+                <div style="font-size: 13px; font-weight: 700; color: #003B95; margin-bottom: 4px;">BAN ĐIỀU HÀNH CLB DOANH NHÂN CEO HN10</div>
+                <div style="font-size: 12px; color: #64748b;">Hội Doanh Nhân Trẻ Hà Nội (HanoiBA)</div>
+              </div>
+            </div>
+          </div>
+        `,
+      }).catch((err) => {
+        this.logger.warn(`Lỗi gửi email cảm ơn check-out cho ${reg.email}: ${err?.message}`);
+      });
+    }
+
     return {
       ok: true,
       message: 'Check-out (ra về) thành công! Cảm ơn Quý đại biểu đã tham gia sự kiện.',
@@ -5040,7 +5173,15 @@ export class EventsService extends BaseService implements OnModuleInit {
       ticket: {
         id: reg.id,
         memberName: reg.member_name,
+        memberCode: reg.member_code,
+        phone: reg.phone,
+        company: reg.company,
+        position: reg.position,
         eventTitle: reg.event_name || reg.event_title,
+        ticketType: reg.ticket_type,
+        seatAssignment: reg.seat_assignment,
+        checkedInAt: reg.checked_in_at ? new Date(reg.checked_in_at).toLocaleString('vi-VN') : null,
+        checkedOutAt: now.toLocaleString('vi-VN'),
       },
     };
   }
