@@ -11,6 +11,7 @@ export interface EventPartConfig {
   id: string;
   name: string;
   fee: number;
+  guestFee?: number;
   isParty?: boolean;
   items: EventSubItem[];
 }
@@ -21,6 +22,7 @@ export function createDefaultCeoHn10Parts(): EventPartConfig[] {
       id: "part_1",
       name: "Lễ Khai Giảng CEO HN10",
       fee: 0,
+      guestFee: 0,
       isParty: false,
       items: [
         { time: "08:00 - 08:30", title: "Đón khách & giao lưu" },
@@ -30,7 +32,8 @@ export function createDefaultCeoHn10Parts(): EventPartConfig[] {
     {
       id: "part_2",
       name: "Dự Tiệc Chúc Mừng",
-      fee: 500000,
+      fee: 1000,
+      guestFee: 0,
       isParty: true,
       items: [{ time: "11:30 - 14:00", title: "Tiệc trưa chúc mừng & kết nối B2B" }],
     },
@@ -58,6 +61,7 @@ export function EventPartsEditor({
         id: `part_${Date.now()}_${idx}`,
         name: `Phần ${idx}: Chương trình`,
         fee: 0,
+        guestFee: 0,
         isParty: false,
         items: [{ time: "18:30", title: "Hoạt động chính" }],
       },
@@ -163,7 +167,7 @@ export function EventPartsEditor({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
-              <div className="sm:col-span-7">
+              <div className="sm:col-span-6">
                 <label className="block text-[11px] font-semibold text-muted-foreground mb-1">
                   Tên phần chương trình chính
                 </label>
@@ -175,9 +179,19 @@ export function EventPartsEditor({
                   className="h-9 w-full rounded-xl border border-border bg-background px-3 text-xs font-semibold text-foreground"
                 />
               </div>
-              <div className="sm:col-span-5">
+              <div className="sm:col-span-3">
+                <label className="block text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 mb-1">
+                  Vé Khách mời (0 = Free)
+                </label>
+                <VndCurrencyInput
+                  value={Number(part.guestFee ?? 0)}
+                  onChange={(val) => updatePart(pIdx, { guestFee: Number(String(val).replace(/\D/g, "")) || 0 })}
+                  placeholder="0"
+                />
+              </div>
+              <div className="sm:col-span-3">
                 <label className="block text-[11px] font-semibold text-muted-foreground mb-1">
-                  Phí tham dự phần này (VNĐ, 0 = Miễn phí)
+                  Vé Khách khác (VNĐ)
                 </label>
                 <VndCurrencyInput
                   value={Number(part.fee || 0)}

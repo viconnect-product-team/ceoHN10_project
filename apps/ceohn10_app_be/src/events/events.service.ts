@@ -6867,10 +6867,13 @@ export class EventsService extends BaseService implements OnModuleInit {
     }
 
     // Trường hợp tham dự 1 phần hoặc toàn bộ (UC-INV-04, UC-INV-05)
+    const ticketTier: 'invited_guest' | 'other_participant' =
+      body.ticketTier === 'invited_guest' ? 'invited_guest' : 'other_participant';
+    const tierBadge = ticketTier === 'invited_guest' ? 'Vé Khách mời' : 'Vé Khách tham dự';
     const partsLabel =
       attendMode === 'full'
-        ? `Tham dự toàn bộ (${selectedPartNames.join(' + ') || 'Lễ + Tiệc'})`
-        : `Chỉ dự: ${selectedPartNames.join(', ') || '1 phần'}`;
+        ? `${tierBadge} · Tham dự toàn bộ (${selectedPartNames.join(' + ') || 'Lễ + Tiệc'})`
+        : `${tierBadge} · Chỉ dự: ${selectedPartNames.join(', ') || '1 phần'}`;
 
     const paymentStatus = totalFee > 0 ? 'pending' : 'free';
     const regStatus = totalFee > 0 ? 'pending' : 'confirmed';
@@ -6878,6 +6881,7 @@ export class EventsService extends BaseService implements OnModuleInit {
       title,
       company,
       attendMode,
+      ticketTier,
       selectedPartNames,
       attendees,
       source: 'public_invitation_rsvp',

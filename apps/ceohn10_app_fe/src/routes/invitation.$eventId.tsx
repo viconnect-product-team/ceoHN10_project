@@ -52,6 +52,7 @@ function PublicInvitationPage() {
   const [customFullName, setCustomFullName] = useState("");
   const [customTitle, setCustomTitle] = useState("");
   const [customCompany, setCustomCompany] = useState("");
+  const [ticketTier, setTicketTier] = useState<"invited_guest" | "other_participant">("other_participant");
   const [submitting, setSubmitting] = useState(false);
 
   // Result & SePay payment state
@@ -70,13 +71,17 @@ function PublicInvitationPage() {
       .then((res) => {
         setData(res);
         if (res?.guest) {
+          setTicketTier("invited_guest");
           setCustomFullName(res.guest.fullName || "");
           setCustomTitle(res.guest.title || "");
           setCustomCompany(res.guest.company || "");
           setContactEmail(res.guest.email || "");
           setContactPhone(res.guest.phone || "");
         } else if (initialSlug) {
+          setTicketTier("invited_guest");
           setCustomFullName(formatSlugFallback(initialSlug));
+        } else {
+          setTicketTier("other_participant");
         }
       })
       .catch(() => setData(null))
@@ -168,7 +173,7 @@ function PublicInvitationPage() {
 
     parts.forEach((p, idx) => {
       const subTimes = Array.isArray(p.items) ? p.items.map((it: any) => `${it.time} ${it.title}`).join(" · ") : "";
-      const feeNum = Number(p.fee || 0);
+      const feeNum = ticketTier === "invited_guest" ? Number(p.guestFee ?? 0) : Number(p.fee || 0);
       opts.push({
         key: `part_${p.id || idx}`,
         mode: "single_part",
@@ -180,7 +185,10 @@ function PublicInvitationPage() {
     });
 
     if (parts.length > 1) {
-      const totalUnit = parts.reduce((s, p) => s + Number(p.fee || 0), 0);
+      const totalUnit = parts.reduce(
+        (s, p) => s + (ticketTier === "invited_guest" ? Number(p.guestFee ?? 0) : Number(p.fee || 0)),
+        0,
+      );
       opts.push({
         key: "full_all",
         mode: "full",
@@ -201,7 +209,7 @@ function PublicInvitationPage() {
     });
 
     return opts;
-  }, [parts]);
+  }, [parts, ticketTier]);
 
   const activeOpt = rsvpOptions.find((o) => o.key === selectedOption);
   const totalFee = activeOpt && activeOpt.mode !== "declined" ? activeOpt.unitFee * attendeeCount : 0;
@@ -239,6 +247,7 @@ function PublicInvitationPage() {
           selectedPartNames: activeOpt.partNames,
           attendeeCount: activeOpt.mode === "declined" ? 0 : attendeeCount,
           attendees: activeOpt.mode === "declined" ? [] : attendees,
+          ticketTier,
           totalFee,
         }),
       });
@@ -516,6 +525,37 @@ function PublicInvitationPage() {
                       />
                     </div>
                   )}
+                </div>
+
+                {/* Chọn loại vé: Khách mời (Miễn phí) vs Khách tham gia khác */}
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-slate-200">Đối tượng vé áp dụng</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setTicketTier("invited_guest")}
+                      className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
+                        ticketTier === "invited_guest"
+                          ? "border-emerald-400 bg-emerald-500/15 text-white"
+                          : "border-white/15 bg-slate-800/40 text-slate-300 hover:border-white/30"
+                      }`}
+                    >
+                      <div className="text-xs font-bold">Vé Khách mời</div>
+                      <div className="text-[11px] text-emerald-300">Miễn phí (theo thư mời)</div>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTicketTier("other_participant")}
+                      className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
+                        ticketTier === "other_participant"
+                          ? "border-amber-400 bg-amber-500/15 text-white"
+                          : "border-white/15 bg-slate-800/40 text-slate-300 hover:border-white/30"
+                      }`}
+                    >
+                      <div className="text-xs font-bold">Khách tham gia khác</div>
+                      <div className="text-[11px] text-amber-300">Tính phí theo vé sự kiện</div>
+                    </button>
+                  </div>
                 </div>
 
                 {/* Câu hỏi & Các options theo từng phần sự kiện */}
