@@ -592,7 +592,7 @@ export function CeoHn10StudentAppScreen() {
           <img
             src={isLight ? "/hn10-logo.png" : "/hn10-logo-2.png"}
             alt="CEO HN10"
-            className="h-9 w-11 shrink-0 object-contain bg-transparent"
+            className={`h-9 w-11 shrink-0 object-contain bg-transparent ${isLight ? "brightness-0" : ""}`}
           />
           <div>
             <h1 className="text-xs font-black text-slate-900 dark:text-white tracking-tight leading-tight">

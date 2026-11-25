@@ -79,6 +79,19 @@ function RootErrorComponent({ error, reset }: { error: unknown; reset: () => voi
   const message = error instanceof Error ? error.message : String(error ?? "Unknown error");
   const isAuthError = message.includes("Unauthorized") || message.includes("No token provided");
 
+  const hasStoredToken =
+    typeof window !== "undefined" &&
+    Boolean(
+      localStorage.getItem("vibe_token") ||
+        localStorage.getItem("access_token") ||
+        localStorage.getItem("token"),
+    );
+  const isSyncingAuth =
+    isAuthError &&
+    hasStoredToken &&
+    typeof window !== "undefined" &&
+    sessionStorage.getItem("auth_token_reload_attempt") !== "1";
+
   useEffect(() => {
     // Log the raw thrown value: some throws are non-Error (undefined/null),
     // which otherwise surface as an opaque "Uncaught undefined".
@@ -99,6 +112,17 @@ function RootErrorComponent({ error, reset }: { error: unknown; reset: () => voi
       }
     }
   }, [error, isAuthError]);
+
+  if (isSyncingAuth) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="text-center space-y-2">
+          <div className="mx-auto h-7 w-7 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <p className="text-sm text-muted-foreground">Đang đồng bộ phiên làm việc...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">

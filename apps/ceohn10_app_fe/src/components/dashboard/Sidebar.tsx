@@ -88,7 +88,6 @@ const crmOverview: Item[] = [
   { key: "nav.dashboard", icon: LayoutDashboard, to: "/", label: "Tổng quan" },
   { key: "nav.aiAssistant" as TKey, icon: Sparkles, to: "/ai-assistant", label: "Trợ lý AI" },
   { key: "nav.members", icon: Users, to: "/members", label: "Học viên" },
-  { key: "nav.departments" as TKey, icon: Building2, to: "/departments", label: "Ban chuyên môn" },
 ];
 
 // 2. Nhóm SỰ KIỆN
@@ -749,7 +748,7 @@ export function Sidebar({
         <img
           src={brandLogo}
           alt={brandName}
-          className="h-10 w-12 shrink-0 object-contain bg-transparent p-0 border-0 shadow-none"
+          className={`h-10 w-12 shrink-0 object-contain bg-transparent p-0 border-0 shadow-none ${theme === "light" ? "brightness-0" : ""}`}
           onError={(e) => {
             (e.currentTarget as HTMLImageElement).src = "/hn10-logo-2.png";
           }}
