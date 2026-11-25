@@ -41,6 +41,7 @@ import {
   ChevronLeft,
   ChevronRight,
   UserPlus,
+  UploadCloud,
 } from "lucide-react";
 import { AppShell } from "@/components/dashboard/AppShell";
 import { fetchNestApi } from "@/lib/api-client";
@@ -56,6 +57,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { exportToExcel } from "@/lib/excel-export";
+import { DynamicImportWizardModal } from "@/components/dynamic-import/DynamicImportWizardModal";
 
 export const Route = createFileRoute("/classes/")({
   ssr: false,
@@ -573,6 +575,8 @@ function ClassesManagementPage() {
   // State: Sessions & Classes
   const [sessions, setSessions] = useState<CourseSession[]>(DEFAULT_SESSIONS);
   const [selectedSessionForQr, setSelectedSessionForQr] = useState<CourseSession | null>(null);
+  const [isDynamicImportOpen, setIsDynamicImportOpen] = useState(false);
+  const [dynamicImportEntity, setDynamicImportEntity] = useState<"class" | "teacher" | "member">("class");
 
   // View modes: Courses
   const [coursesViewMode, setCoursesViewMode] = useState<"dashboard" | "grid" | "table">("dashboard");
@@ -1264,6 +1268,18 @@ function ClassesManagementPage() {
                   <ViewModeSwitcher value={coursesViewMode} onChange={setCoursesViewMode} />
                   <Button
                     size="sm"
+                    onClick={() => {
+                      setDynamicImportEntity("class");
+                      setIsDynamicImportOpen(true);
+                    }}
+                    className="h-8 gap-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
+                    title="Import danh sách buổi học, chuyên đề từ Excel, Word, PDF"
+                  >
+                    <UploadCloud className="h-3.5 w-3.5" />
+                    <span>Import File</span>
+                  </Button>
+                  <Button
+                    size="sm"
                     onClick={() => setIsAddSessionOpen(true)}
                     className="h-8 gap-1.5 text-xs font-semibold bg-[#002B70] hover:bg-[#003B95] text-white cursor-pointer"
                   >
@@ -1343,7 +1359,7 @@ function ClassesManagementPage() {
                           <th className="px-3.5 py-3">Thời Gian &amp; Địa Điểm</th>
                           <th className="px-3.5 py-3 text-center">Điểm Danh</th>
                           <th className="px-3.5 py-3 text-center">Trạng Thái</th>
-                          <th className="px-3.5 py-3 text-right">Thao Tác</th>
+                          <th className="px-3.5 py-3 text-center">THAO TÁC</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border">
@@ -1387,20 +1403,20 @@ function ClassesManagementPage() {
                                   : "Sắp tới"}
                               </span>
                             </td>
-                            <td className="px-3.5 py-3 text-right">
-                              <div className="flex items-center justify-end gap-1.5">
+                            <td className="px-3.5 py-3 text-center">
+                              <div className="inline-flex items-center justify-center gap-1.5">
                                 <button
                                   type="button"
                                   onClick={() => setSelectedSessionForQr(sess)}
-                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-primary/30 bg-primary/5 hover:bg-primary/10 text-primary text-[11px] font-semibold transition cursor-pointer"
+                                  className="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-primary/30 bg-primary/5 hover:bg-primary/10 text-primary transition cursor-pointer"
                                   title="Chiếu mã QR điểm danh"
                                 >
-                                  <QrCode className="size-3" /> QR
+                                  <QrCode className="size-3.5" />
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => handleOpenEditSession(sess)}
-                                  className="p-1 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition cursor-pointer"
+                                  className="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-border hover:bg-blue-50 text-blue-600 transition cursor-pointer"
                                   title="Chỉnh sửa buổi học"
                                 >
                                   <Pencil className="size-3.5" />
@@ -1408,7 +1424,7 @@ function ClassesManagementPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleDeleteSession(sess.id)}
-                                  className="p-1 rounded-lg hover:bg-rose-50 text-rose-500 transition cursor-pointer"
+                                  className="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-border hover:bg-rose-50 text-rose-500 transition cursor-pointer"
                                   title="Xóa buổi học"
                                 >
                                   <Trash2 className="size-3.5" />
@@ -1561,7 +1577,7 @@ function ClassesManagementPage() {
                           <th className="px-3.5 py-3">Địa Điểm</th>
                           <th className="px-3.5 py-3 text-center">Sĩ Số Đã Đến</th>
                           <th className="px-3.5 py-3 text-center">Trạng Thái</th>
-                          <th className="px-3.5 py-3 text-right">Hành Động</th>
+                          <th className="px-3.5 py-3 text-center">THAO TÁC</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border">
@@ -1608,12 +1624,12 @@ function ClassesManagementPage() {
                                   : "Sắp tới"}
                               </span>
                             </td>
-                            <td className="px-3.5 py-3 text-right">
-                              <div className="flex items-center justify-end gap-1.5">
+                            <td className="px-3.5 py-3 text-center">
+                              <div className="inline-flex items-center justify-center gap-1.5">
                                 <button
                                   type="button"
                                   onClick={() => setSelectedSessionForQr(sess)}
-                                  className="p-1 rounded-lg hover:bg-primary/10 text-primary transition cursor-pointer"
+                                  className="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-primary/30 bg-primary/5 hover:bg-primary/10 text-primary transition cursor-pointer"
                                   title="QR"
                                 >
                                   <QrCode className="size-3.5" />
@@ -1621,7 +1637,7 @@ function ClassesManagementPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleOpenEditSession(sess)}
-                                  className="p-1 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition cursor-pointer"
+                                  className="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-border hover:bg-blue-50 text-blue-600 transition cursor-pointer"
                                   title="Sửa"
                                 >
                                   <Pencil className="size-3.5" />
@@ -1629,7 +1645,7 @@ function ClassesManagementPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleDeleteSession(sess.id)}
-                                  className="p-1 rounded-lg hover:bg-rose-50 text-rose-500 transition cursor-pointer"
+                                  className="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-border hover:bg-rose-50 text-rose-500 transition cursor-pointer"
                                   title="Xóa"
                                 >
                                   <Trash2 className="size-3.5" />
@@ -1695,6 +1711,18 @@ function ClassesManagementPage() {
                   <ViewModeSwitcher value={teachersViewMode} onChange={setTeachersViewMode} />
                   <Button
                     size="sm"
+                    onClick={() => {
+                      setDynamicImportEntity("teacher");
+                      setIsDynamicImportOpen(true);
+                    }}
+                    className="h-8 gap-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
+                    title="Import danh sách giảng viên từ Excel, Word, PDF"
+                  >
+                    <UploadCloud className="h-3.5 w-3.5" />
+                    <span>Import File</span>
+                  </Button>
+                  <Button
+                    size="sm"
                     onClick={() => setIsAddTeacherOpen(true)}
                     className="h-8 gap-1.5 text-xs font-semibold cursor-pointer bg-primary text-primary-foreground"
                   >
@@ -1747,7 +1775,7 @@ function ClassesManagementPage() {
                           <th className="px-3.5 py-3 text-center">Lớp Phụ Trách</th>
                           <th className="px-3.5 py-3 text-center">Lượt Học Viên</th>
                           <th className="px-3.5 py-3">Liên Hệ</th>
-                          <th className="px-3.5 py-3 text-right">Thao Tác</th>
+                          <th className="px-3.5 py-3 text-center">THAO TÁC</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border">
@@ -1774,12 +1802,12 @@ function ClassesManagementPage() {
                               <div>{tc.phone}</div>
                               <div>{tc.email}</div>
                             </td>
-                            <td className="px-3.5 py-3 text-right">
-                              <div className="flex items-center justify-end gap-1.5">
+                            <td className="px-3.5 py-3 text-center">
+                              <div className="inline-flex items-center justify-center gap-1.5">
                                 <button
                                   type="button"
                                   onClick={() => handleOpenEditTeacher(tc)}
-                                  className="p-1 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition cursor-pointer"
+                                  className="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-border hover:bg-blue-50 text-blue-600 transition cursor-pointer"
                                   title="Chỉnh sửa thông tin giảng viên"
                                 >
                                   <Pencil className="size-3.5" />
@@ -1787,7 +1815,7 @@ function ClassesManagementPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleDeleteTeacher(tc.id)}
-                                  className="p-1 rounded-lg hover:bg-rose-50 text-rose-500 transition cursor-pointer"
+                                  className="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-border hover:bg-rose-50 text-rose-500 transition cursor-pointer"
                                   title="Xóa giảng viên"
                                 >
                                   <Trash2 className="size-3.5" />
@@ -1898,7 +1926,7 @@ function ClassesManagementPage() {
                           <th className="px-3.5 py-3 text-center">Lượt Học Viên</th>
                           <th className="px-3.5 py-3">Số Điện Thoại</th>
                           <th className="px-3.5 py-3">Email</th>
-                          <th className="px-3.5 py-3 text-right">Thao Tác</th>
+                          <th className="px-3.5 py-3 text-center">THAO TÁC</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border">
@@ -1930,12 +1958,12 @@ function ClassesManagementPage() {
                             <td className="px-3.5 py-3 font-mono text-[11px] text-muted-foreground">
                               {tc.email}
                             </td>
-                            <td className="px-3.5 py-3 text-right">
-                              <div className="flex items-center justify-end gap-1.5">
+                            <td className="px-3.5 py-3 text-center">
+                              <div className="inline-flex items-center justify-center gap-1.5">
                                 <button
                                   type="button"
                                   onClick={() => handleOpenEditTeacher(tc)}
-                                  className="p-1 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition cursor-pointer"
+                                  className="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-border hover:bg-blue-50 text-blue-600 transition cursor-pointer"
                                   title="Sửa"
                                 >
                                   <Pencil className="size-3.5" />
@@ -1943,7 +1971,7 @@ function ClassesManagementPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleDeleteTeacher(tc.id)}
-                                  className="p-1 rounded-lg hover:bg-rose-50 text-rose-500 transition cursor-pointer"
+                                  className="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-border hover:bg-rose-50 text-rose-500 transition cursor-pointer"
                                   title="Xóa"
                                 >
                                   <Trash2 className="size-3.5" />
@@ -2023,6 +2051,18 @@ function ClassesManagementPage() {
 
                 <div className="flex items-center gap-2">
                   <ViewModeSwitcher value={studentsViewMode} onChange={setStudentsViewMode} />
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setDynamicImportEntity("member");
+                      setIsDynamicImportOpen(true);
+                    }}
+                    className="h-8 gap-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
+                    title="Import danh sách học viên từ Excel, Word, PDF"
+                  >
+                    <UploadCloud className="h-3.5 w-3.5" />
+                    <span>Import File</span>
+                  </Button>
                   <Button
                     size="sm"
                     variant="outline"
@@ -2129,7 +2169,7 @@ function ClassesManagementPage() {
                           <th className="px-3.5 py-3 text-center">Quỹ Lớp (2tr)</th>
                           <th className="px-3.5 py-3 text-right">Nợ Quỹ Phạt</th>
                           <th className="px-3.5 py-3 text-center">Điểm Tín Nhiệm</th>
-                          <th className="px-3.5 py-3 text-right">Thao Tác</th>
+                          <th className="px-3.5 py-3 text-center">THAO TÁC</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border">
@@ -2207,12 +2247,12 @@ function ClassesManagementPage() {
                             <td className="px-3.5 py-3 text-center font-bold">
                               <span className="text-amber-600">★ {s.karmaPoints}</span>
                             </td>
-                            <td className="px-3.5 py-3 text-right">
-                              <div className="flex items-center justify-end gap-1.5">
+                            <td className="px-3.5 py-3 text-center">
+                              <div className="inline-flex items-center justify-center gap-1.5">
                                 <button
                                   type="button"
                                   onClick={() => handleOpenEditStudent(s)}
-                                  className="p-1 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition cursor-pointer"
+                                  className="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-border hover:bg-blue-50 text-blue-600 transition cursor-pointer"
                                   title="Chỉnh sửa học viên"
                                 >
                                   <Pencil className="size-3.5" />
@@ -2220,7 +2260,7 @@ function ClassesManagementPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleDeleteStudent(s.id)}
-                                  className="p-1 rounded-lg hover:bg-rose-50 text-rose-500 transition cursor-pointer"
+                                  className="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-border hover:bg-rose-50 text-rose-500 transition cursor-pointer"
                                   title="Xóa học viên"
                                 >
                                   <Trash2 className="size-3.5" />
@@ -2363,7 +2403,7 @@ function ClassesManagementPage() {
                           <th className="px-3.5 py-3">Quỹ Lớp (2tr)</th>
                           <th className="px-3.5 py-3">Nợ Phạt</th>
                           <th className="px-3.5 py-3">Điện Thoại</th>
-                          <th className="px-3.5 py-3 text-right">Thao Tác</th>
+                          <th className="px-3.5 py-3 text-center">THAO TÁC</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border">
@@ -2398,12 +2438,12 @@ function ClassesManagementPage() {
                             <td className="px-3.5 py-3 font-mono text-[11px] text-muted-foreground">
                               {s.phone}
                             </td>
-                            <td className="px-3.5 py-3 text-right">
-                              <div className="flex items-center justify-end gap-1.5">
+                            <td className="px-3.5 py-3 text-center">
+                              <div className="inline-flex items-center justify-center gap-1.5">
                                 <button
                                   type="button"
                                   onClick={() => handleOpenEditStudent(s)}
-                                  className="p-1 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition cursor-pointer"
+                                  className="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-border hover:bg-blue-50 text-blue-600 transition cursor-pointer"
                                   title="Sửa"
                                 >
                                   <Pencil className="size-3.5" />
@@ -2411,7 +2451,7 @@ function ClassesManagementPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleDeleteStudent(s.id)}
-                                  className="p-1 rounded-lg hover:bg-rose-50 text-rose-500 transition cursor-pointer"
+                                  className="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-border hover:bg-rose-50 text-rose-500 transition cursor-pointer"
                                   title="Xóa"
                                 >
                                   <Trash2 className="size-3.5" />
@@ -3541,6 +3581,24 @@ function ClassesManagementPage() {
             )}
           </DialogContent>
         </Dialog>
+
+        {/* Dynamic Import Wizard Modal: Nhập dữ liệu Lớp học, Giảng viên, Học viên */}
+        <DynamicImportWizardModal
+          isOpen={isDynamicImportOpen}
+          onClose={() => setIsDynamicImportOpen(false)}
+          entityType={dynamicImportEntity}
+          entityTitle={
+            dynamicImportEntity === "class"
+              ? "Lớp học & Buổi đào tạo CEO HN10"
+              : dynamicImportEntity === "teacher"
+              ? "Giảng viên & Chuyên gia CEO HN10"
+              : "Học viên Lớp Doanh Nhân CEO HN10"
+          }
+          onSuccess={() => {
+            classesQ.refetch();
+            toast.success("Đã đồng bộ dữ liệu lớp học từ tệp import thành công!");
+          }}
+        />
       </div>
     </AppShell>
   );

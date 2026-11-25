@@ -36,7 +36,9 @@ export class CreateMemberDto {
     department: z.string().optional().nullable(),
     code: z.string().optional().nullable(),
     avatar: z.string().optional().nullable(),
-  });
+    customData: z.record(z.any()).optional().nullable(),
+    custom_data: z.record(z.any()).optional().nullable(),
+  }).passthrough();
 
   name!: string;
   contact?: string;
@@ -57,6 +59,8 @@ export class CreateMemberDto {
   department?: string;
   code?: string;
   avatar?: string;
+  customData?: Record<string, any>;
+  custom_data?: Record<string, any>;
 }
 
 export class UpdateMemberDto {
@@ -100,7 +104,9 @@ export class UpdateMemberDto {
     coverUrl: z.string().optional().nullable(),
     companyName: z.string().optional().nullable(),
     company: z.string().optional().nullable(),
-  });
+    customData: z.record(z.any()).optional().nullable(),
+    custom_data: z.record(z.any()).optional().nullable(),
+  }).passthrough();
 
   name?: string;
   contact?: string;
@@ -126,6 +132,8 @@ export class UpdateMemberDto {
   coverUrl?: string;
   companyName?: string;
   company?: string;
+  customData?: Record<string, any>;
+  custom_data?: Record<string, any>;
 }
 
 export class UpdateMemberContactDto {

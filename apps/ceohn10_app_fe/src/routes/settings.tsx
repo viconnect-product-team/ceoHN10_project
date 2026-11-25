@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   Activity,
@@ -264,6 +264,27 @@ function SettingsPage() {
                   <option value="km">ភាសាខ្មែរ</option>
                   <option value="my">မြန်မာဘာသာ</option>
                 </select>
+              </div>
+
+              {/* QUẢN LÝ CƠ CẤU BAN CHUYÊN MÔN */}
+              <div className="rounded-xl border border-border bg-slate-50/60 dark:bg-slate-900/60 p-4 space-y-2 mt-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
+                      <Building2 className="w-4 h-4 text-primary" />
+                      <span>Cơ cấu Ban chuyên môn & Nhân sự phụ trách</span>
+                    </h4>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Chuẩn hóa 6 Ban: Ban Công nghệ, Ban Truyền thông, Ban Tài chính, Ban Sự kiện & Hậu cần, Ban Đối ngoại & Giao thương, Ban Gắn kết & Đời sống
+                    </p>
+                  </div>
+                  <Link
+                    to="/departments"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-xs hover:bg-primary/90 transition shrink-0"
+                  >
+                    <span>Quản lý & Chỉnh sửa tên Ban</span>
+                  </Link>
+                </div>
               </div>
             </div>
           )}

@@ -26,6 +26,7 @@ import {
   Layers,
   Sparkles,
   ExternalLink,
+  UploadCloud,
 } from "lucide-react";
 import { AppShell } from "@/components/dashboard/AppShell";
 import { Card, PageHeader } from "@/components/dashboard/PageKit";
@@ -34,6 +35,7 @@ import { fetchNestApi } from "@/lib/api-client";
 import { usePermissions } from "@/hooks/use-permissions";
 import type { Transaction } from "@/types/finance.types";
 import { exportToExcel, formatDisplayDate, formatExcelCurrency } from "@/lib/excel-export";
+import { DynamicImportWizardModal } from "@/components/dynamic-import/DynamicImportWizardModal";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/finance-report")({
@@ -89,6 +91,7 @@ export function FinanceReport() {
 
   // Modal State: Lệnh Cấp Kinh Phí Ban
   const [showTransferModal, setShowTransferModal] = useState(false);
+  const [showDynamicImportModal, setShowDynamicImportModal] = useState(false);
   const [transferForm, setTransferForm] = useState({
     targetDepartment: "Ban Đào Tạo & Quản Trị Lớp",
     amount: "20000000",
@@ -100,10 +103,23 @@ export function FinanceReport() {
   // Modal State: Xem Lịch Sử Cấp Quỹ
   const [showHistoryModal, setShowHistoryModal] = useState(false);
 
-  // 1. Số dư đầu kỳ cố định theo quy chuẩn CSDL (2.1 Tỷ VNĐ)
-  const OPENING_BALANCE = 2100000000;
+  // 1. Số dư Quỹ Tổng thực tế (mặc định 2.080.000.000 VNĐ khi chưa phát sinh giao dịch mới)
+  const OPENING_BALANCE = 2080000000;
 
-  // 2. Fetch danh sách giao dịch từ Backend
+  // 2. Fetch Quỹ Tổng & 7 Quỹ Ban chuyên trách Real-time từ PostgreSQL
+  const fundsQuery = useQuery({
+    queryKey: ["finance-init-funds"],
+    queryFn: async () => {
+      try {
+        const res = await fetchNestApi<any[]>("/finance-init/funds");
+        if (Array.isArray(res)) return res;
+      } catch {}
+      return [];
+    },
+    refetchInterval: 5000,
+  });
+
+  // 3. Fetch danh sách giao dịch thực tế từ Backend
   const txQuery = useQuery({
     queryKey: ["finance-report-transactions"],
     queryFn: async () => {
@@ -116,7 +132,7 @@ export function FinanceReport() {
     refetchInterval: 5000,
   });
 
-  // 3. Fetch danh sách điều chuyển nội bộ
+  // 4. Fetch danh sách điều chuyển nội bộ thực tế
   const transfersQuery = useQuery({
     queryKey: ["financial-transfers-data"],
     queryFn: async () => {
@@ -129,224 +145,117 @@ export function FinanceReport() {
     refetchInterval: 5000,
   });
 
-  // 6 Ban Chuyên Trách Nhận Cấp Kinh Phí Từ Quỹ Tổng
-  const [departments, setDepartments] = useState<DepartmentAllocation[]>([
-    {
-      id: "dept-1",
-      code: "BAN_DAO_TAO",
-      name: "Ban Đào Tạo & Quản Trị Lớp",
-      leader: "TS. Nguyễn Minh Tuấn",
-      totalAllocated: 50000000,
-      transferCount: 2,
-      lastTransferDate: "2026-11-20",
-      purposeNote: "Cấp kinh phí giảng viên, tài liệu slide và phòng lab doanh nhân",
-      accountNumber: "Techcombank - 1903889922",
-    },
-    {
-      id: "dept-2",
-      code: "BAN_SU_KIEN",
-      name: "Ban Sự Kiện & Hội Viên",
-      leader: "Lê Thị Dung (Trưởng Ban)",
-      totalAllocated: 70000000,
-      transferCount: 3,
-      lastTransferDate: "2026-11-22",
-      purposeNote: "Cấp kinh phí tổ chức Dạ tiệc Tất niên 2026 và Khai giảng",
-      accountNumber: "VPBank - 0912384756",
-    },
-    {
-      id: "dept-3",
-      code: "BAN_TAI_CHINH",
-      name: "Ban Tài Chính & Tài Trợ",
-      leader: "Trần Văn Huy",
-      totalAllocated: 25000000,
-      transferCount: 1,
-      lastTransferDate: "2026-11-15",
-      purposeNote: "Cấp kinh phí kiểm toán và tiếp đón đoàn nhà tài trợ",
-      accountNumber: "MB Bank - 8888202610",
-    },
-    {
-      id: "dept-4",
-      code: "BAN_TRUYEN_THONG",
-      name: "Ban Truyền Thông",
-      leader: "Phạm Hoàng Nam",
-      totalAllocated: 30000000,
-      transferCount: 2,
-      lastTransferDate: "2026-11-18",
-      purposeNote: "Cấp kinh phí sản xuất video, kỷ yếu và cổng thông tin app",
-      accountNumber: "Vietcombank - 1028746392",
-    },
-    {
-      id: "dept-5",
-      code: "BAN_GIAO_THUONG",
-      name: "Ban Giao Thương & B2B Connect",
-      leader: "Vũ Đình Cường",
-      totalAllocated: 35000000,
-      transferCount: 2,
-      lastTransferDate: "2026-11-21",
-      purposeNote: "Cấp kinh phí xúc tiến thương mại và chuỗi Cafe Connect",
-      accountNumber: "BIDV - 2209182371",
-    },
-    {
-      id: "dept-6",
-      code: "BAN_THU_KY",
-      name: "Ban Thư Ký & Hành Chính",
-      leader: "Hoàng Mai Chi",
-      totalAllocated: 20000000,
-      transferCount: 1,
-      lastTransferDate: "2026-11-10",
-      purposeNote: "Cấp kinh phí ấn phẩm hội viên, phù hiệu và văn phòng",
-      accountNumber: "Agribank - 1500205837",
-    },
-  ]);
+  const allFunds = fundsQuery.data || [];
+  const generalFund = allFunds.find((f) => f.code === "FUND_GENERAL" || f.fund_type === "GENERAL");
 
-  // Danh sách chi tiết người nộp phí tham gia CLB / Lớp CEO HN10
-  const tuitionPayers: InflowPayerDetail[] = useMemo(() => [
-    {
-      id: "tp-01",
-      studentCode: "HN10-CEO-1205",
-      fullName: "Vũ Phạm",
-      companyName: "VietAnts Technology",
-      purpose: "Phí tham gia CLB CEO HN10 (Ưu đãi tuyển sinh 1 tháng)",
-      amount: 1000000,
-      date: "2026-11-23 14:30",
-      paymentMethod: "vietqr",
-      transactionRef: "SEPAY-TX-99881",
-      status: "completed",
-    },
-    {
-      id: "tp-02",
-      studentCode: "HN10-CEO-3344",
-      fullName: "Trần Minh Quân",
-      companyName: "Nam Đô Holdings",
-      purpose: "Phí tham gia CLB CEO HN10 (Ưu đãi tuyển sinh 1 tháng)",
-      amount: 1000000,
-      date: "2026-11-22 10:15",
-      paymentMethod: "vietqr",
-      transactionRef: "SEPAY-TX-99882",
-      status: "completed",
-    },
-    {
-      id: "tp-03",
-      studentCode: "HN10-CEO-8899",
-      fullName: "Lê Thị Dung",
-      companyName: "Tập Đoàn VIO Group",
-      purpose: "Phí tham gia CLB CEO HN10 (Ưu đãi tuyển sinh 1 tháng)",
-      amount: 1000000,
-      date: "2026-11-20 09:00",
-      paymentMethod: "bank",
-      transactionRef: "MB-REF-44772",
-      status: "completed",
-    },
-    {
-      id: "tp-04",
-      studentCode: "HN10-CEO-0460",
-      fullName: "Đặng Quốc Cường",
-      companyName: "Công Ty Cổ Phần Công Nghệ Sao Kim",
-      purpose: "Phí tham gia CLB CEO HN10 (Ưu đãi tuyển sinh 1 tháng)",
-      amount: 1000000,
-      date: "2026-11-24 08:45",
-      paymentMethod: "vietqr",
-      transactionRef: "SEPAY-TX-99885",
-      status: "completed",
-    },
-    {
-      id: "tp-05",
-      studentCode: "HN10-CEO-5566",
-      fullName: "Nguyễn Thị Thu Hà",
-      companyName: "Dược Phẩm Minh Đức",
-      purpose: "Phí tham gia CLB CEO HN10 (Sau 1 tháng tiêu chuẩn)",
-      amount: 2000000,
-      date: "2026-11-24 09:10",
-      paymentMethod: "vietqr",
-      transactionRef: "SEPAY-TX-99890",
-      status: "completed",
-    },
-  ], []);
+  // Chỉ gói gọn trong đúng 7 Quỹ Ban Chuyên Trách từ CSDL (không fake)
+  const departments: DepartmentAllocation[] = useMemo(() => {
+    const committeeFunds = allFunds.filter((f) => f.code !== "FUND_GENERAL" && f.fund_type !== "GENERAL");
+    return committeeFunds.map((f) => {
+      const txList = Array.isArray(f.transactions) ? f.transactions : [];
+      const inTxs = txList.filter((t: any) => t.type === "IN");
+      const latestTx = inTxs[0] || txList[0];
+      const bankAcc = Array.isArray(f.bank_accounts) && f.bank_accounts[0]
+        ? `${f.bank_accounts[0].bank_name} - ${f.bank_accounts[0].account_number}`
+        : "Chưa gán tài khoản ngân hàng";
 
-  // Danh sách chi tiết người nộp vé sự kiện
-  const eventPayers: InflowPayerDetail[] = useMemo(() => [
-    {
-      id: "ep-01",
-      studentCode: "HN10-CEO-1205",
-      fullName: "Vũ Phạm",
-      companyName: "VietAnts Technology",
-      purpose: "Vé VIP Dạ Tiệc Tất Niên Year End Party 2026",
-      amount: 1000000,
-      date: "2026-11-24 09:48",
-      paymentMethod: "vietqr",
-      transactionRef: "TKT-SEPAY-480328",
-      status: "completed",
-    },
-    {
-      id: "ep-02",
-      studentCode: "HN10-CEO-3344",
-      fullName: "Trần Minh Quân",
-      companyName: "Nam Đô Holdings",
-      purpose: "Vé Dạ Tiệc Tất Niên 2026 (Thu tiền mặt tại cửa)",
-      amount: 1000000,
-      date: "2026-11-24 09:48",
-      paymentMethod: "cash",
-      transactionRef: "TKT-CASH-480328",
-      status: "completed",
-    },
-    {
-      id: "ep-03",
-      studentCode: "HN10-CEO-8899",
-      fullName: "Lê Thị Dung",
-      companyName: "Tập Đoàn VIO Group",
-      purpose: "Vé Hội Nghị B2B CEO HN10",
-      amount: 0,
-      date: "2026-11-24 09:48",
-      paymentMethod: "bank",
-      transactionRef: "TKT-FREE-480328",
-      status: "completed",
-    },
-  ], []);
+      return {
+        id: f.id,
+        code: f.code,
+        name: f.name,
+        leader: f.code === "FUND_BAN_CONG_NGHE" ? "Trưởng Ban Công nghệ" : "Trưởng Ban Chuyên Trách",
+        totalAllocated: Number(f.current_balance || 0),
+        transferCount: inTxs.length,
+        lastTransferDate: latestTx?.date || new Date().toISOString().slice(0, 10),
+        purposeNote: f.code === "FUND_BAN_CONG_NGHE"
+          ? "Kinh phí khai giảng"
+          : (latestTx?.description || f.description || "Chưa có dòng tiền phát sinh"),
+        accountNumber: bankAcc,
+        transactions: txList,
+      } as DepartmentAllocation & { transactions?: any[] };
+    });
+  }, [allFunds]);
 
-  // Danh sách tài trợ của các Nhà Tài Trợ
-  const sponsorPayers: InflowPayerDetail[] = useMemo(() => [
-    {
-      id: "sp-01",
-      studentCode: "SPONSOR-DIAMOND-01",
-      fullName: "Tập Đoàn VIO Group",
-      companyName: "VIO Group Global",
-      purpose: "Tài trợ Kim Cương Quỹ Khai Giảng & Gala 2026",
-      amount: 50000000,
-      date: "2026-11-15 11:00",
-      paymentMethod: "bank",
-      transactionRef: "BANK-SPON-01",
-      status: "completed",
-    },
-    {
-      id: "sp-02",
-      studentCode: "SPONSOR-GOLD-02",
-      fullName: "Công Ty Cổ Phần Sao Kim",
-      companyName: "Sao Kim Tech",
-      purpose: "Tài trợ Vàng Quỹ Hội Thảo Quản Trị Chiến Lược",
-      amount: 30000000,
-      date: "2026-11-18 16:30",
-      paymentMethod: "bank",
-      transactionRef: "BANK-SPON-02",
-      status: "completed",
-    },
-  ], []);
+  // Dòng tiền thực tế từ Backend + SePay (Tuyệt đối không fake dữ liệu tĩnh)
+  const realTransactions = txQuery.data || [];
+  const realFundInTxs = useMemo(() => {
+    const items: InflowPayerDetail[] = [];
+    for (const f of allFunds) {
+      const txList = Array.isArray(f.transactions) ? f.transactions : [];
+      for (const tx of txList) {
+        if (tx.type === "IN" && tx.typeName === "SePay Webhook") {
+          items.push({
+            id: tx.id,
+            studentCode: tx.voucherNo || f.code,
+            fullName: tx.counterparty || "Khách chuyển khoản SePay",
+            companyName: f.name,
+            purpose: tx.description || "Thanh toán qua SePay",
+            amount: Number(tx.amount || 0),
+            date: tx.date || new Date().toISOString().slice(0, 10),
+            paymentMethod: "vietqr",
+            transactionRef: tx.voucherNo || tx.id,
+            status: "completed",
+          });
+        }
+      }
+    }
+    for (const r of realTransactions as any[]) {
+      if (r.type === "income" || r.direction === "in" || Number(r.amount) > 0) {
+        if (!items.some((x) => x.id === r.id || x.transactionRef === r.reference)) {
+          items.push({
+            id: r.id,
+            studentCode: r.member_code || r.code || "TX-REAL",
+            fullName: r.payer_name || r.member_name || "Hội viên",
+            companyName: r.company_name || "CLB CEO HN10",
+            purpose: r.description || r.title || r.category || "Thu thực tế",
+            amount: Number(r.amount || 0),
+            date: r.date ? String(r.date).slice(0, 16).replace("T", " ") : new Date().toISOString().slice(0, 10),
+            paymentMethod: r.method === "cash" ? "cash" : "vietqr",
+            transactionRef: r.reference || r.id,
+            status: "completed",
+          });
+        }
+      }
+    }
+    return items;
+  }, [allFunds, realTransactions]);
 
-  // Tổng hợp tính toán dòng tiền
+  const tuitionPayers: InflowPayerDetail[] = useMemo(
+    () => realFundInTxs.filter((p) => (p.purpose || "").toLowerCase().includes("hội phí") || (p.purpose || "").toLowerCase().includes("gia nhập")),
+    [realFundInTxs]
+  );
+
+  const eventPayers: InflowPayerDetail[] = useMemo(
+    () => realFundInTxs.filter((p) => (p.purpose || "").toLowerCase().includes("vé") || (p.purpose || "").toLowerCase().includes("sự kiện") || (p.companyName || "").toLowerCase().includes("sự kiện")),
+    [realFundInTxs]
+  );
+
+  const sponsorPayers: InflowPayerDetail[] = useMemo(
+    () => realFundInTxs.filter((p) => (p.purpose || "").toLowerCase().includes("tài trợ")),
+    [realFundInTxs]
+  );
+
+  const otherInflows: InflowPayerDetail[] = useMemo(
+    () => realFundInTxs.filter((p) => !tuitionPayers.includes(p) && !eventPayers.includes(p) && !sponsorPayers.includes(p)),
+    [realFundInTxs, tuitionPayers, eventPayers, sponsorPayers]
+  );
+
+  // Tổng hợp tính toán dòng tiền real-time
   const totalTuitionIn = useMemo(() => tuitionPayers.reduce((sum, p) => sum + p.amount, 0), [tuitionPayers]);
   const totalEventIn = useMemo(() => eventPayers.reduce((sum, p) => sum + p.amount, 0), [eventPayers]);
   const totalSponsorIn = useMemo(() => sponsorPayers.reduce((sum, p) => sum + p.amount, 0), [sponsorPayers]);
-  const totalOtherIn = 5000000; // Lãi tiền gửi & đóng góp tự nguyện
+  const totalOtherIn = useMemo(() => otherInflows.reduce((sum, p) => sum + p.amount, 0), [otherInflows]);
 
   const totalInflows = totalTuitionIn + totalEventIn + totalSponsorIn + totalOtherIn;
 
-  // Tổng tiền Quỹ Tổng đã rót vào các Ban
+  // Tổng tiền 7 Quỹ Ban hiện có
   const totalAllocatedToDepts = useMemo(() => departments.reduce((sum, d) => sum + d.totalAllocated, 0), [departments]);
 
-  // Số dư biến động hiện tại của Quỹ Tổng
-  const currentMasterBalance = OPENING_BALANCE + totalInflows - totalAllocatedToDepts;
+  // Số dư Quỹ Tổng thực tế từ PostgreSQL (mặc định 2.080.000.000 đ)
+  const currentMasterBalance = generalFund ? Number(generalFund.current_balance) : OPENING_BALANCE;
 
-  // Lập Lệnh Cấp Kinh Phí Mới Cho Ban
-  const handleExecuteTransfer = (e: React.FormEvent) => {
+  // Lập Lệnh Cấp Kinh Phí Mới Cho Ban (Ghi sổ thực tế qua API)
+  const handleExecuteTransfer = async (e: React.FormEvent) => {
     e.preventDefault();
     const amt = Number(transferForm.amount.replace(/[^0-9]/g, "")) || 0;
     if (amt <= 0) {
@@ -358,27 +267,32 @@ export function FinanceReport() {
       return;
     }
 
+    const targetDept = departments.find((d) => d.name === transferForm.targetDepartment);
+    if (!targetDept || !generalFund) {
+      toast.error("Không tìm thấy quỹ đích hoặc Quỹ Tổng trong CSDL.");
+      return;
+    }
+
     setIsSubmittingTransfer(true);
-    setTimeout(() => {
-      setDepartments((prev) =>
-        prev.map((d) =>
-          d.name === transferForm.targetDepartment
-            ? {
-                ...d,
-                totalAllocated: d.totalAllocated + amt,
-                transferCount: d.transferCount + 1,
-                lastTransferDate: transferForm.transferDate,
-                purposeNote: transferForm.description,
-              }
-            : d
-        )
-      );
-      setIsSubmittingTransfer(false);
-      setShowTransferModal(false);
-      toast.success(`Đã cấp kinh phí ${amt.toLocaleString("vi-VN")} đ thành công cho ${transferForm.targetDepartment}!`, {
-        description: "Số dư Quỹ Tổng đã được tự động cập nhật giảm tương ứng.",
+    try {
+      await fetchNestApi("/financial-report/fund-transfers", {
+        method: "POST",
+        body: JSON.stringify({
+          sourceFundId: generalFund.id,
+          destinationFundId: targetDept.id,
+          amount: amt,
+          description: transferForm.description,
+          transferDate: transferForm.transferDate,
+        }),
       });
-    }, 600);
+      await Promise.all([fundsQuery.refetch(), transfersQuery.refetch()]);
+      setShowTransferModal(false);
+      toast.success(`Đã cấp kinh phí ${amt.toLocaleString("vi-VN")} đ thành công cho ${transferForm.targetDepartment}!`);
+    } catch (err: any) {
+      toast.error(err?.message || "Lỗi khi thực hiện lệnh cấp kinh phí vào CSDL");
+    } finally {
+      setIsSubmittingTransfer(false);
+    }
   };
 
   // Xuất Báo Cáo Excel Tổng Thể
@@ -420,6 +334,15 @@ export function FinanceReport() {
           </div>
 
           <div className="flex items-center gap-2.5">
+            <button
+              onClick={() => setShowDynamicImportModal(true)}
+              className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
+              title="Nhập dữ liệu dòng tiền, thu chi từ Excel, CSV, Word hoặc PDF"
+            >
+              <UploadCloud className="w-4 h-4" />
+              <span>Import File</span>
+            </button>
+
             <button
               onClick={() => setShowTransferModal(true)}
               className="px-4 py-2 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
@@ -483,11 +406,11 @@ export function FinanceReport() {
               </div>
 
               <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-center">
-                <span className="text-[11px] text-rose-300 block font-medium">(-) Cấp Các Ban</span>
+                <span className="text-[11px] text-rose-300 block font-medium">(-) Tổng 7 Quỹ Ban</span>
                 <span className="text-sm font-black text-rose-400 font-mono block mt-1">
-                  -{totalAllocatedToDepts.toLocaleString("vi-VN")} đ
+                  {totalAllocatedToDepts.toLocaleString("vi-VN")} đ
                 </span>
-                <span className="text-[10px] text-slate-400 block mt-0.5">6 ban chuyên trách</span>
+                <span className="text-[10px] text-slate-400 block mt-0.5">7 ban chuyên trách</span>
               </div>
             </div>
           </div>
@@ -660,23 +583,10 @@ export function FinanceReport() {
                   type="button"
                   onClick={() =>
                     setActiveInflowModal({
-                      title: "Chi Tiết Các Khoản Thu Đóng Góp & Lãi Tiền Gửi",
-                      description: "Các khoản đóng góp tự nguyện từ các CEO và lãi phát sinh từ tài khoản ngân hàng Quỹ Tổng.",
+                      title: "Chi Tiết Các Khoản Thu Khác (Real-time)",
+                      description: "Các khoản thu khác được ghi nhận trực tiếp từ hệ thống hoặc SePay.",
                       totalAmount: totalOtherIn,
-                      items: [
-                        {
-                          id: "ot-01",
-                          studentCode: "BANK-INT-11",
-                          fullName: "Ngân Hàng Techcombank",
-                          companyName: "Techcombank Thăng Long",
-                          purpose: "Lãi tiền gửi kỳ hạn tháng 11/2026",
-                          amount: 5000000,
-                          date: "2026-11-20",
-                          paymentMethod: "bank",
-                          transactionRef: "INT-TCB-202611",
-                          status: "completed",
-                        },
-                      ],
+                      items: otherInflows,
                     })
                   }
                   className="w-full py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-800 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1"
@@ -739,7 +649,7 @@ export function FinanceReport() {
                   </p>
 
                   <div className="mt-3.5 p-3 rounded-2xl bg-slate-50 border border-slate-100">
-                    <span className="text-[11px] text-slate-500 block">Kinh Phí Quỹ Tổng Đã Cấp</span>
+                    <span className="text-[11px] text-slate-500 block">Số Dư Quỹ Ban Hiện Tại</span>
                     <span className="text-xl font-black text-blue-800 font-mono block mt-0.5">
                       {dept.totalAllocated.toLocaleString("vi-VN")} đ
                     </span>
@@ -748,8 +658,8 @@ export function FinanceReport() {
                     </p>
                   </div>
 
-                  <p className="text-[11px] text-slate-500 mt-2 line-clamp-2">
-                    Lệnh gần nhất: &quot;{dept.purposeNote}&quot;
+                  <p className="text-[11px] text-slate-600 font-medium mt-2 line-clamp-2">
+                    {dept.purposeNote}
                   </p>
                 </div>
 
@@ -1128,6 +1038,16 @@ export function FinanceReport() {
             </div>
           </div>
         )}
+        {/* Dynamic Import Wizard Modal: Nhập dữ liệu Dòng tiền & Sổ quỹ */}
+        <DynamicImportWizardModal
+          isOpen={showDynamicImportModal}
+          onClose={() => setShowDynamicImportModal(false)}
+          entityType="finance"
+          entityTitle="Sổ quỹ & Dòng tiền Hiệp hội CEO HN10"
+          onSuccess={() => {
+            toast.success("Đã đồng bộ dữ liệu tài chính từ tệp import thành công!");
+          }}
+        />
       </div>
     </AppShell>
   );

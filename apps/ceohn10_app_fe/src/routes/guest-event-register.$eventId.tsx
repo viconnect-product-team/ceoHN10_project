@@ -27,6 +27,8 @@ import {
   Heart,
   Share2,
   Compass,
+  Loader2,
+  RefreshCw,
 } from "lucide-react";
 import { fetchNestApi } from "@/lib/api-client";
 import { toast } from "sonner";
@@ -130,6 +132,11 @@ function StandaloneGuestEventRegistrationPage() {
   const [showVietQrModal, setShowVietQrModal] = useState(false);
   const [hasConfirmedPayment, setHasConfirmedPayment] = useState(false);
 
+  // ── SEPAY REALTIME AUTO-POLLING STATUS ───────────────────────────────────
+  const [paymentConfirmedLive, setPaymentConfirmedLive] = useState(false);
+  const [confirmedTicketDetails, setConfirmedTicketDetails] = useState<any>(null);
+  const [isCheckingPayment, setIsCheckingPayment] = useState(false);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const handleHashChange = () => {
@@ -227,6 +234,56 @@ function StandaloneGuestEventRegistrationPage() {
     const reg = Number(event.registered || event.registeredCount || event.attendeesCount || 0);
     return cap > 0 && reg >= cap;
   })();
+
+  // ── AUTO-POLLING SEPAY KHI ĐÃ CÓ MÃ ĐĂNG KÝ VÉ CÓ PHÍ ──────────────────
+  useEffect(() => {
+    if (!result?.registrationId || isFree || paymentConfirmedLive) return;
+
+    const regId = result.registrationId;
+    let intervalId: any = null;
+    let pollCount = 0;
+    const maxPolls = 120; // 120 x 3s = 6 phút auto-check
+
+    const checkPaymentStatus = async (isManual = false) => {
+      if (isManual) setIsCheckingPayment(true);
+      pollCount++;
+      if (pollCount > maxPolls && !isManual) {
+        if (intervalId) clearInterval(intervalId);
+        return;
+      }
+      try {
+        const res = await fetchNestApi<{ found: boolean; ticket: any }>(
+          `/events/ticket-status/${encodeURIComponent(regId)}`
+        );
+        if (res?.found && res?.ticket) {
+          const st = String(res.ticket.paymentStatus || "").toLowerCase();
+          const mainSt = String(res.ticket.status || "").toLowerCase();
+          if (st === "paid" || mainSt === "confirmed") {
+            setPaymentConfirmedLive(true);
+            setConfirmedTicketDetails(res.ticket);
+            toast.success("🎉 Ting ting! Hệ thống đã nhận được thanh toán từ SePay! Vé E-Ticket của Quý khách đã được kích hoạt thành công!");
+            if (intervalId) clearInterval(intervalId);
+          } else if (isManual) {
+            toast.info("Giao dịch đang được SePay và Ngân hàng xử lý, hệ thống vẫn đang tự động kiểm tra mỗi 3 giây...");
+          }
+        }
+      } catch {
+        // bỏ qua lỗi mạng tạm thời
+      } finally {
+        if (isManual) setIsCheckingPayment(false);
+      }
+    };
+
+    const timer = setTimeout(() => {
+      void checkPaymentStatus();
+      intervalId = setInterval(() => void checkPaymentStatus(), 3000);
+    }, 2000);
+
+    return () => {
+      clearTimeout(timer);
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [result?.registrationId, isFree, paymentConfirmedLive]);
 
   const bankAccount = (event as any).bank_account || (event as any).bankAccount || "0983101010";
   const bankName = (event as any).bank_name || (event as any).bankName || "MB Bank (Ngân Hàng Quân Đội)";
@@ -751,8 +808,8 @@ function StandaloneGuestEventRegistrationPage() {
               </div>
             </div>
 
-            {/* SỰ KIỆN CÓ PHÍ -> SEPAY VIETQR */}
-            {isPaid ? (
+            {/* SỰ KIỆN CÓ PHÍ NHƯNG CHƯA THANH TOÁN -> SEPAY VIETQR */}
+            {(isPaid && !paymentConfirmedLive) ? (
               <div className="rounded-2xl border-2 border-[#003B95]/30 bg-slate-50/70 p-5 space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-200 pb-3">
                   <div className="flex items-center gap-2 text-sm font-bold text-[#003B95]">
@@ -762,6 +819,46 @@ function StandaloneGuestEventRegistrationPage() {
                   <span className="text-xs bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full font-bold">
                     Khớp Lệnh Tự Động 24/7
                   </span>
+                </div>
+
+                {/* AUTO-POLLING STATUS BADGE */}
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-2.5 flex items-center justify-between gap-2 text-xs text-blue-900">
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 text-blue-600 animate-spin shrink-0" />
+                    <span className="font-medium">Hệ thống đang tự động kiểm tra giao dịch mỗi 3 giây...</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!result?.registrationId) return;
+                      setIsCheckingPayment(true);
+                      try {
+                        const res = await fetchNestApi<{ found: boolean; ticket: any }>(
+                          `/events/ticket-status/${encodeURIComponent(result.registrationId)}`
+                        );
+                        if (res?.found && res?.ticket) {
+                          const st = String(res.ticket.paymentStatus || "").toLowerCase();
+                          const mainSt = String(res.ticket.status || "").toLowerCase();
+                          if (st === "paid" || mainSt === "confirmed") {
+                            setPaymentConfirmedLive(true);
+                            setConfirmedTicketDetails(res.ticket);
+                            toast.success("🎉 Ting ting! Hệ thống đã nhận được thanh toán từ SePay! Vé E-Ticket của Quý khách đã được kích hoạt thành công!");
+                          } else {
+                            toast.info("Giao dịch đang được SePay và Ngân hàng xử lý, vui lòng chờ trong giây lát...");
+                          }
+                        }
+                      } catch {
+                        toast.error("Không thể kết nối máy chủ kiểm tra giao dịch.");
+                      } finally {
+                        setIsCheckingPayment(false);
+                      }
+                    }}
+                    disabled={isCheckingPayment}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 bg-white border border-blue-300 text-blue-800 font-bold rounded-lg shadow-2xs hover:bg-blue-100 transition shrink-0 cursor-pointer disabled:opacity-50"
+                  >
+                    <RefreshCw className={`w-3 h-3 ${isCheckingPayment ? "animate-spin" : ""}`} />
+                    Kiểm tra ngay
+                  </button>
                 </div>
 
                 <div className="text-center">
@@ -852,15 +949,21 @@ function StandaloneGuestEventRegistrationPage() {
                 </div>
               </div>
             ) : (
-              /* SỰ KIỆN MIỄN PHÍ -> VÉ THAM DỰ E-TICKET */
-              <div className="rounded-2xl border-2 border-emerald-500/30 bg-emerald-50/40 p-5 space-y-4">
+              /* SỰ KIỆN MIỄN PHÍ HOẶC ĐÃ THANH TOÁN THÀNH CÔNG QUA SEPAY -> VÉ THAM DỰ E-TICKET */
+              <div className="rounded-2xl border-2 border-emerald-500/30 bg-emerald-50/40 p-5 space-y-4 animate-in fade-in zoom-in-95 duration-300">
+                {paymentConfirmedLive && (
+                  <div className="bg-gradient-to-r from-emerald-600 to-teal-700 text-white font-black px-4 py-3 rounded-2xl text-center text-sm shadow-md flex items-center justify-center gap-2 border border-emerald-400">
+                    <Sparkles className="w-5 h-5 text-amber-300 shrink-0 animate-pulse" />
+                    <span>TING TING! XÁC NHẬN ĐÃ NHẬN THANH TOÁN TỰ ĐỘNG THÀNH CÔNG TỪ SEPAY!</span>
+                  </div>
+                )}
                 <div className="flex items-center justify-between border-b border-emerald-200/60 pb-3">
                   <div className="flex items-center gap-2 text-sm font-bold text-emerald-900">
                     <QrCode className="w-4 h-4 text-emerald-600" />
                     VÉ ĐIỆN TỬ CHECK-IN (E-TICKET)
                   </div>
                   <span className="text-xs bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full font-bold">
-                    Vé Miễn Phí
+                    {paymentConfirmedLive ? "Đã Thanh Toán" : isPaid ? "Đã Xác Nhận" : "Vé Miễn Phí"}
                   </span>
                 </div>
 

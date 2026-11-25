@@ -27,6 +27,7 @@ import {
   UserPlus,
   ShieldCheck,
   Mail,
+  UploadCloud,
 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/dashboard/AppShell";
@@ -34,6 +35,9 @@ import { CrudModal, type CrudField, type CrudValues } from "@/components/dashboa
 import { MemberAccountModal } from "@/components/dashboard/MemberAccountModal";
 import { DynamicSchemaEditorModal } from "@/components/dynamic-form/DynamicSchemaEditorModal";
 import type { DynamicFieldDef } from "@/components/dynamic-form/DynamicFieldRenderer";
+import { DynamicImportWizardModal } from "@/components/dynamic-import/DynamicImportWizardModal";
+import { DynamicDetailViewModal } from "@/components/dynamic-form/DynamicDetailViewModal";
+import { DynamicTableColumnsConfig } from "@/components/dynamic-form/DynamicTableColumnsConfig";
 import { EmptyState, NoSearchResult, ListSkeleton } from "@/components/dashboard/StateKit";
 import { useT, type TKey } from "@/lib/i18n";
 import { useRole, PERMISSIONS } from "@/hooks/use-role";
@@ -88,17 +92,19 @@ const STATUSES: MemberStatus[] = ["active", "pending", "expired"];
 export function getMemberDepartment(m: any): string {
   const d = m?.department || m?.boardWish || m?.board || "";
   const s = String(d).toLowerCase().trim();
-  if (s.includes("quản trị") || s.includes("điều hành") || s.includes("công nghệ")) return "Ban Quản trị";
-  if (s.includes("thư ký") || s.includes("điều phối")) return "Ban Thư ký";
-  if (s.includes("truyền thông") || s.includes("sự kiện")) return "Ban Truyền thông";
-  if (s.includes("xúc tiến") || s.includes("thương mại") || s.includes("b2b")) return "Ban Xúc tiến";
-  if (s.includes("thành viên") && !s.includes("Học viên") && !s.includes("ceo")) return "Ban Thành viên";
-  if (s.includes("thiện nguyện") || s.includes("tài chính") || s.includes("an sinh")) return "Ban Thiện nguyện";
-  if (d && d !== "—" && d !== "undefined" && d !== "null") return String(d);
-  if (m?.industry === "ind.it") return "Ban Quản trị";
-  if (m?.industry === "ind.finance") return "Ban Thiện nguyện";
-  if (m?.industry === "ind.trade") return "Ban Xúc tiến";
-  return "Ban Thành viên";
+  if (s.includes("công nghệ") || s.includes("kỹ thuật") || s.includes("cntt") || s === "bcn") return "Ban Công nghệ";
+  if (s.includes("truyền thông") || s === "btt") return "Ban Truyền thông";
+  if (s.includes("tài chính") || s.includes("tài trợ") || s === "btc") return "Ban Tài chính";
+  if (s.includes("sự kiện") || s.includes("hậu cần") || s === "bsk") return "Ban Sự kiện & Hậu cần";
+  if (s.includes("đối ngoại") || s.includes("giao thương") || s.includes("b2b") || s === "bdn") return "Ban Đối ngoại & Giao thương";
+  if (s.includes("gắn kết") || s.includes("đời sống") || s.includes("gan ket") || s === "bds") return "Ban Gắn kết & Đời sống";
+  if (s.includes("học tập") || s.includes("đào tạo")) return "Ban Học tập";
+  if (s.includes("thiện nguyện")) return "Ban Thiện nguyện";
+  if (d && d !== "—" && d !== "undefined" && d !== "null" && String(d).trim().length > 0) return String(d);
+  if (m?.industry === "ind.it") return "Ban Công nghệ";
+  if (m?.industry === "ind.finance") return "Ban Tài chính";
+  if (m?.industry === "ind.trade") return "Ban Đối ngoại & Giao thương";
+  return "Học viên CEO HN10";
 }
 
 /* ----------------------------- badges ----------------------------- */
@@ -415,6 +421,9 @@ function MembersPage() {
   const [submitting, setSubmitting] = useState(false);
   const [accountFor, setAccountFor] = useState<Member | null>(null);
   const [showDynamicSchemaModal, setShowDynamicSchemaModal] = useState(false);
+  const [showDynamicImportModal, setShowDynamicImportModal] = useState(false);
+  const [detailRecord, setDetailRecord] = useState<Member | null>(null);
+  const [visibleDynamicCols, setVisibleDynamicCols] = useState<string[]>([]);
 
   // Dynamic schema fields query for Ban Công Nghệ
   const schemaQuery = useQuery({
@@ -430,6 +439,69 @@ function MembersPage() {
   });
 
   const dynamicFields: DynamicFieldDef[] = schemaQuery.data || [];
+
+  // Lọc các trường động tùy biến không thuộc tập trường chuẩn cốt lõi và tự động gom cả các trường từ customData của các bản ghi đã import
+  const customDynamicFieldDefs = useMemo(() => {
+    const standardKeys = new Set([
+      "code",
+      "name",
+      "phone",
+      "email",
+      "contact",
+      "level",
+      "region",
+      "status",
+      "paymentStatus",
+      "feePaid",
+      "address",
+      "about",
+      "department",
+    ]);
+    const list: DynamicFieldDef[] = [...dynamicFields.filter((df) => {
+      const k = df.field_name || (df as any).field_key;
+      return !standardKeys.has(k);
+    })];
+    const existingKeys = new Set(list.map((df) => df.field_name || (df as any).field_key));
+
+    members.forEach((m) => {
+      const custom = (m as any).customData || (m as any).custom_data;
+      if (custom && typeof custom === "object") {
+        Object.keys(custom).forEach((k) => {
+          if (!standardKeys.has(k) && !existingKeys.has(k)) {
+            existingKeys.add(k);
+            list.push({
+              id: `auto_${k}`,
+              field_name: k,
+              field_label: k.replace(/_/g, " "),
+              field_type: "text",
+              is_required: false,
+              is_enabled: true,
+              order_index: 99,
+            } as DynamicFieldDef);
+          }
+        });
+      }
+    });
+    return list;
+  }, [dynamicFields, members]);
+
+  // Tự động kích hoạt hiển thị toàn bộ các cột mới sinh ra từ file import trên bảng
+  useEffect(() => {
+    if (customDynamicFieldDefs.length > 0) {
+      setVisibleDynamicCols((prev) => {
+        const next = new Set(prev);
+        let changed = false;
+        customDynamicFieldDefs.forEach((df) => {
+          const k = df.field_name || (df as any).field_key;
+          if (k && !next.has(k)) {
+            next.add(k);
+            changed = true;
+          }
+        });
+        return changed ? Array.from(next) : prev;
+      });
+    }
+  }, [customDynamicFieldDefs]);
 
   const fields: CrudField[] = [
     { name: "code", label: "Mã Học viên * (tự khai báo, VD: HN10-001)", type: "text", required: true },
@@ -535,6 +607,29 @@ function MembersPage() {
     setSubmitting(true);
     try {
       const pStatus = (v.paymentStatus as string) || "unpaid";
+      // Bóc tách các trường động tùy biến đưa vào customData
+      const standardKeys = new Set([
+        "code",
+        "name",
+        "contact",
+        "email",
+        "phone",
+        "level",
+        "region",
+        "status",
+        "paymentStatus",
+        "feePaid",
+        "address",
+        "about",
+        "department",
+      ]);
+      const customDataPayload: Record<string, any> = {};
+      Object.keys(v).forEach((key) => {
+        if (!standardKeys.has(key)) {
+          customDataPayload[key] = v[key];
+        }
+      });
+
       const payload = {
         code: v.code ? String(v.code).trim().toUpperCase() : undefined,
         name: String(v.name || "").trim(),
@@ -549,6 +644,7 @@ function MembersPage() {
         address: v.address ? String(v.address).trim() : undefined,
         about: v.about ? String(v.about).trim() : undefined,
         department: (v as any).department ? String((v as any).department).trim() : (editing?.department || undefined),
+        customData: customDataPayload,
       };
 
       // Client-side Form Validation
@@ -748,18 +844,22 @@ function MembersPage() {
     }
   };
 
-  const editInitial = (m: Member): CrudValues => ({
-    name: m.name,
-    contact: m.contact,
-    email: m.email,
-    phone: m.phone,
-    level: m.level,
-    region: m.region,
-    status: m.status,
-    paymentStatus: (m as any).payment_status || (m as any).paymentStatus || (m.feePaid ? "paid" : "unpaid"),
-    address: m.address,
-    about: m.about,
-  });
+  const editInitial = (m: Member): CrudValues => {
+    const custom = (m as any).customData || (m as any).custom_data || {};
+    return {
+      name: m.name,
+      contact: m.contact,
+      email: m.email,
+      phone: m.phone,
+      level: m.level,
+      region: m.region,
+      status: m.status,
+      paymentStatus: (m as any).payment_status || (m as any).paymentStatus || (m.feePaid ? "paid" : "unpaid"),
+      address: m.address,
+      about: m.about,
+      ...(typeof custom === "object" ? custom : {}),
+    };
+  };
 
   const anyFilterActive =
     !!q ||
@@ -785,14 +885,24 @@ function MembersPage() {
         if (paymentFilter === "unpaid" && isPaid) return false;
       }
       if (favOnly && !favSet.has(m.id)) return false;
-      if (
-        ql &&
-        !m.name.toLowerCase().includes(ql) &&
-        !m.code.toLowerCase().includes(ql) &&
-        !m.email.toLowerCase().includes(ql) &&
-        !m.contact.toLowerCase().includes(ql)
-      )
+      if (ql) {
+        const matchBase =
+          m.name.toLowerCase().includes(ql) ||
+          m.code.toLowerCase().includes(ql) ||
+          m.email.toLowerCase().includes(ql) ||
+          m.contact.toLowerCase().includes(ql);
+        if (matchBase) return true;
+
+        // Tìm kiếm mở rộng trên dữ liệu động JSONB customData
+        const custom = (m as any).customData || (m as any).custom_data;
+        if (custom && typeof custom === "object") {
+          const matchCustom = Object.values(custom).some(
+            (val) => val != null && String(val).toLowerCase().includes(ql)
+          );
+          if (matchCustom) return true;
+        }
         return false;
+      }
       return true;
     });
   }, [members, q, industry, region, type, status, paymentFilter, favOnly, favorites]);
@@ -854,22 +964,41 @@ function MembersPage() {
     setFavOnly(false);
   };
 
-  const memberExcelColumns = [
-    { header: "Mã Học viên", key: "code", width: 16, value: (m: Member) => m.code },
-    { header: "Họ và tên", key: "name", width: 28, value: (m: Member) => m.name },
-    { header: "Ban chuyên môn", key: "department", width: 24, value: (m: Member) => getMemberDepartment(m) },
-    { header: "Doanh nghiệp / Liên hệ", key: "contact", width: 30, value: (m: Member) => m.contact },
-    { header: "Email", key: "email", width: 26, value: (m: Member) => m.email },
-    { header: "Số điện thoại", key: "phone", width: 16, value: (m: Member) => m.phone },
-    { header: "Phân loại", key: "type", width: 16, value: (m: Member) => m.type },
-    { header: "Hạng Học viên", key: "level", width: 18, value: (m: Member) => m.level },
-    { header: "Ngành nghề", key: "industry", width: 22, value: (m: Member) => m.industry },
-    { header: "Khu vực", key: "region", width: 16, value: (m: Member) => m.region },
-    { header: "Trạng thái", key: "status", width: 16, value: (m: Member) => (m.status === "active" ? "Đang hoạt động" : "Chờ duyệt") },
-    { header: "Ngày gia nhập", key: "joinedAt", width: 16, value: (m: Member) => formatDisplayDate(m.joinedAt) },
-    { header: "Niên khóa phí", key: "feeYear", width: 14, value: (m: Member) => String(m.feeYear) },
-    { header: "Đã đóng phí", key: "feePaid", width: 16, value: (m: Member) => (m.feePaid ? "Đã nộp" : "Chưa nộp") },
-  ];
+  const memberExcelColumns = useMemo(() => {
+    const baseCols = [
+      { header: "Mã Học viên", key: "code", width: 16, value: (m: Member) => m.code },
+      { header: "Họ và tên", key: "name", width: 28, value: (m: Member) => m.name },
+      { header: "Ban chuyên môn", key: "department", width: 24, value: (m: Member) => getMemberDepartment(m) },
+      { header: "Doanh nghiệp / Liên hệ", key: "contact", width: 30, value: (m: Member) => m.contact },
+      { header: "Email", key: "email", width: 26, value: (m: Member) => m.email },
+      { header: "Số điện thoại", key: "phone", width: 16, value: (m: Member) => m.phone },
+      { header: "Phân loại", key: "type", width: 16, value: (m: Member) => m.type },
+      { header: "Hạng Học viên", key: "level", width: 18, value: (m: Member) => m.level },
+      { header: "Ngành nghề", key: "industry", width: 22, value: (m: Member) => m.industry },
+      { header: "Khu vực", key: "region", width: 16, value: (m: Member) => m.region },
+      { header: "Trạng thái", key: "status", width: 16, value: (m: Member) => (m.status === "active" ? "Đang hoạt động" : "Chờ duyệt") },
+      { header: "Ngày gia nhập", key: "joinedAt", width: 16, value: (m: Member) => formatDisplayDate(m.joinedAt) },
+      { header: "Niên khóa phí", key: "feeYear", width: 14, value: (m: Member) => String(m.feeYear) },
+      { header: "Đã đóng phí", key: "feePaid", width: 16, value: (m: Member) => (m.feePaid ? "Đã nộp" : "Chưa nộp") },
+    ];
+
+    // Tự động bổ sung các trường động tùy biến vào file xuất Excel
+    const dynamicCols = customDynamicFieldDefs.map((df) => {
+      const key = df.field_name || (df as any).field_key;
+      return {
+        header: df.field_label || key,
+        key: `custom_${key}`,
+        width: 22,
+        value: (m: Member) => {
+          const custom = (m as any).customData || (m as any).custom_data || {};
+          const val = custom[key];
+          return val != null ? String(val) : "—";
+        },
+      };
+    });
+
+    return [...baseCols, ...dynamicCols];
+  }, [customDynamicFieldDefs]);
 
   const handleExport = () => {
     exportToExcel<Member>({
@@ -999,6 +1128,15 @@ function MembersPage() {
           <PermissionGuard action="MEM_ADD">
             <button
               type="button"
+              onClick={() => setShowDynamicImportModal(true)}
+              className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 cursor-pointer transition-colors"
+              title="Import danh sách học viên từ Excel, CSV, Word, PDF và tự động sinh cột theo trường trong file"
+            >
+              <UploadCloud className="h-4 w-4" />
+              <span>Import File</span>
+            </button>
+            <button
+              type="button"
               onClick={() => setShowInviteModal(true)}
               className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-700 to-indigo-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:from-blue-800 hover:to-indigo-800 cursor-pointer transition-colors"
               title="Gửi link form đăng ký thông tin vào email cho học viên mới"
@@ -1014,6 +1152,12 @@ function MembersPage() {
               <span>Thêm Học viên</span>
             </button>
           </PermissionGuard>
+
+          <DynamicTableColumnsConfig
+            dynamicFields={customDynamicFieldDefs}
+            visibleColumns={visibleDynamicCols}
+            onChangeVisibleColumns={setVisibleDynamicCols}
+          />
 
           <PermissionGuard action="MEM_EXPORT">
             <button
@@ -1035,6 +1179,15 @@ function MembersPage() {
               <span>Cấu hình trường động (Ban Công Nghệ)</span>
             </button>
           </PermissionGuard>
+
+          <Link
+            to="/departments"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/40 px-3.5 py-2 text-xs font-bold text-amber-800 dark:text-amber-300 shadow-xs hover:bg-amber-100 dark:hover:bg-amber-900/60 cursor-pointer transition"
+            title="Quản lý và chỉnh sửa tên 6 Ban chuyên môn"
+          >
+            <Building2 className="h-4 w-4" />
+            <span>Chỉnh sửa tên Ban</span>
+          </Link>
         </div>
       </div>
 
@@ -1506,7 +1659,19 @@ function MembersPage() {
                   <th className="px-4 py-3 text-left border-r border-b border-slate-200 dark:border-slate-800 font-bold uppercase tracking-wider text-muted-foreground whitespace-nowrap min-w-[170px]">
                     Tài khoản
                   </th>
-                  <th className="sticky right-0 z-20 min-w-[140px] bg-blue-50/90 dark:bg-blue-950/90 px-4 py-3 text-right border-l border-b border-slate-200 dark:border-slate-800 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)]">{t("tbl.actions")}</th>
+                  {/* Cột dữ liệu động tùy biến từ Dynamic Import & Schema */}
+                  {visibleDynamicCols.map((colKey) => {
+                    const df = customDynamicFieldDefs.find((f) => (f.field_name || (f as any).field_key) === colKey);
+                    return (
+                      <th
+                        key={colKey}
+                        className="px-4 py-3 text-left border-r border-b border-slate-200 dark:border-slate-800 font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400 bg-blue-50/40 dark:bg-blue-950/20 whitespace-nowrap min-w-[160px]"
+                      >
+                        {df?.field_label || colKey}
+                      </th>
+                    );
+                  })}
+                  <th className="sticky right-0 z-20 min-w-[160px] bg-blue-50/90 dark:bg-blue-950/90 px-4 py-3 text-center font-bold uppercase tracking-wider border-l border-b border-slate-200 dark:border-slate-800 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)]">THAO TÁC</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-xs">
@@ -1593,64 +1758,67 @@ function MembersPage() {
                         )}
                       </div>
                     </td>
-                    <td className="sticky right-0 z-10 min-w-[140px] bg-card group-hover:bg-muted/70 px-4 py-3.5 text-right border-l border-b border-slate-200 dark:border-slate-800 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)] transition-colors">
-                      <div className="inline-flex items-center gap-1.5">
+                    {/* Render các giá trị của cột dữ liệu động tùy biến */}
+                    {visibleDynamicCols.map((colKey) => {
+                      const custom = (m as any).customData || (m as any).custom_data || {};
+                      const rawVal = custom[colKey];
+                      const valStr = rawVal != null ? String(rawVal) : "—";
+                      return (
+                        <td
+                          key={colKey}
+                          className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap text-slate-800 dark:text-slate-200 bg-blue-50/10 dark:bg-blue-950/10"
+                        >
+                          <TruncatedText text={valStr} maxWidth="max-w-[200px]" />
+                        </td>
+                      );
+                    })}
+                    <td className="sticky right-0 z-10 min-w-[160px] bg-card group-hover:bg-muted/70 px-4 py-3.5 text-center border-l border-b border-slate-200 dark:border-slate-800 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)] transition-colors">
+                      <div className="inline-flex items-center justify-center gap-1.5">
                         {m.status === "pending" && canApprove && (
                           <button
                             onClick={() => handleApproveAndSendCredentials(m)}
-                            title="Ban Thành Viên thẩm định: Phê duyệt hồ sơ & Gửi email tài khoản"
-                            className="inline-flex items-center gap-1 rounded-lg bg-[#003B95] hover:bg-[#002B70] text-white px-2.5 py-1.5 text-xs font-black shadow-sm transition-all whitespace-nowrap cursor-pointer"
+                            title="Phê duyệt hồ sơ & Gửi email cấp tài khoản App CEOHN10"
+                            className="w-8 h-8 rounded-lg inline-flex items-center justify-center bg-[#003B95] hover:bg-[#002B70] text-white shadow-xs transition-all cursor-pointer"
                           >
-                            <CheckCircle2 className="h-3.5 w-3.5 text-slate-950" />
-                            <span>Duyệt & Gửi Email</span>
+                            <CheckCircle2 className="h-4 w-4" />
                           </button>
                         )}
-                        {m.status === "pending" && !canApprove && (
-                          <span
-                            title="Hồ sơ đang chờ Ban Thành Viên kiểm duyệt"
-                            className="inline-flex items-center gap-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 px-2 py-1 text-[11px] font-semibold whitespace-nowrap"
-                          >
-                            <span>Chờ BTV duyệt</span>
-                          </span>
-                        )}
-                        <Link
-                          to="/members/$memberId"
-                          params={{ memberId: m.id }}
-                          search={REVIEW_SEARCH_RESET}
-                          onClick={() => pushRecent(m.id)}
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-semibold text-foreground hover:bg-muted"
+                        <button
+                          type="button"
+                          onClick={() => setDetailRecord(m)}
+                          title="Xem chi tiết học viên"
+                          className="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-border bg-background text-primary hover:bg-primary/10 cursor-pointer transition-colors"
                         >
-                          <Eye className="h-3.5 w-3.5" />
-                          {t("tbl.view")}
-                        </Link>
+                          <Eye className="h-4 w-4" />
+                        </button>
                         {canEdit && (
                           <button
                             onClick={() => setEditing(m)}
                             aria-label={t("common.edit")}
-                            title={t("common.edit")}
-                            className="inline-flex items-center justify-center rounded-lg border border-border bg-background p-1.5 text-foreground hover:border-primary/50 hover:bg-primary/5 hover:text-primary cursor-pointer transition-colors"
+                            title="Chỉnh sửa thông tin học viên"
+                            className="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-border bg-background text-blue-600 hover:border-blue-300 hover:bg-blue-50 cursor-pointer transition-colors"
                           >
-                            <Pencil className="h-3.5 w-3.5" />
+                            <Pencil className="h-4 w-4" />
                           </button>
                         )}
                         {canAccount && (
                           <button
                             onClick={() => setAccountFor(m)}
                             aria-label={t("macct.manage")}
-                            title={t("macct.manage")}
-                            className="inline-flex items-center justify-center rounded-lg border border-border bg-background p-1.5 text-foreground hover:bg-muted cursor-pointer transition-colors"
+                            title="Quản lý tài khoản App CEOHN10"
+                            className="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-border bg-background text-amber-600 hover:border-amber-300 hover:bg-amber-50 cursor-pointer transition-colors"
                           >
-                            <UserCog className="h-3.5 w-3.5" />
+                            <UserCog className="h-4 w-4" />
                           </button>
                         )}
                         {canDelete && (
                           <button
                             onClick={() => setDeleting(m)}
                             aria-label={t("common.delete")}
-                            title={t("common.delete")}
-                            className="inline-flex items-center justify-center rounded-lg border border-border bg-background p-1.5 text-destructive hover:bg-destructive/10 cursor-pointer transition-colors"
+                            title="Xóa học viên"
+                            className="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-border bg-background text-destructive hover:border-rose-300 hover:bg-destructive/10 cursor-pointer transition-colors"
                           >
-                            <Trash2 className="h-3.5 w-3.5" />
+                            <Trash2 className="h-4 w-4" />
                           </button>
                         )}
                       </div>
@@ -1801,6 +1969,33 @@ function MembersPage() {
         entityTitle="Hồ sơ Học viên CEO HN10"
         fields={dynamicFields}
         onFieldsUpdated={() => schemaQuery.refetch()}
+      />
+
+      {/* Dynamic Import Wizard Modal: Nhập dữ liệu 6 bước thông minh */}
+      <DynamicImportWizardModal
+        isOpen={showDynamicImportModal}
+        onClose={() => setShowDynamicImportModal(false)}
+        entityType="member"
+        entityTitle="Học viên CLB Doanh Nhân CEO HN10"
+        onSuccess={(res) => {
+          if (res?.newFieldKeys && res.newFieldKeys.length > 0) {
+            setVisibleDynamicCols((prev) => Array.from(new Set([...prev, ...res.newFieldKeys])));
+          }
+          setView("table");
+          qc.invalidateQueries({ queryKey: ["members"] });
+          schemaQuery.refetch();
+          refetch();
+        }}
+      />
+
+      {/* Modal xem chi tiết bản ghi linh hoạt chuẩn Dynamic Data */}
+      <DynamicDetailViewModal
+        isOpen={!!detailRecord}
+        onClose={() => setDetailRecord(null)}
+        title={`Hồ sơ chi tiết: ${detailRecord?.name || ""}`}
+        subtitle={`Mã học viên: ${detailRecord?.code || "—"} · Ban: ${detailRecord ? getMemberDepartment(detailRecord) : "—"}`}
+        record={detailRecord}
+        dynamicFields={dynamicFields}
       />
 
       {accountFor && (

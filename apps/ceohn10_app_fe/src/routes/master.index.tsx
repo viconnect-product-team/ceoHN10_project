@@ -49,6 +49,7 @@ import {
   EyeOff,
   Trash2,
   PlusCircle,
+  Pencil,
 } from "lucide-react";
 import { TableActionsGroup } from "@/components/common";
 import {
@@ -57,6 +58,11 @@ import {
   getActiveSystemTenant,
   setActiveSystemTenant,
   GRANULAR_PERMISSION_CATEGORIES,
+  getCustomDepartments,
+  saveCustomDepartments,
+  INITIAL_DEPARTMENTS,
+  dispatchPermissionSyncEvent,
+  type DepartmentItem,
 } from "@/lib/rbac-permission-helpers";
 import { fetchNestApi } from "@/lib/api-client";
 import { isValidEmail } from "@/lib/validation";
@@ -109,14 +115,18 @@ function MasterAdminPortal() {
   const isMasterAdmin = isSuperPlatformAdmin || isCeoHn10Admin;
   const canManageAccounts = isSuperPlatformAdmin || isCeoHn10Admin;
 
-  const [activeTab, setActiveTab] = useState<"overview" | "accounts" | "settings">(() => {
+  const [activeTab, setActiveTab] = useState<"overview" | "accounts" | "settings" | "departments">(() => {
     if (typeof window !== "undefined") {
       const sp = new URLSearchParams(window.location.search);
       const tab = sp.get("tab");
-      if (tab === "accounts" || tab === "settings") return tab;
+      if (tab === "accounts" || tab === "settings" || tab === "departments") return tab;
     }
     return "overview";
   });
+  const [departmentsList, setDepartmentsList] = useState<DepartmentItem[]>(() => getCustomDepartments());
+  const [deptEditing, setDeptEditing] = useState<DepartmentItem | null>(null);
+  const [deptForm, setDeptForm] = useState({ code: "", name: "", description: "", color: "blue" });
+  const [deptModalOpen, setDeptModalOpen] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // State dự án đang quản trị (ceohn10)
@@ -482,6 +492,19 @@ function MasterAdminPortal() {
       toast.success(`Đã đặt lại mật khẩu cho ${email} thành: ${newPass}`);
     } catch (err: any) {
       toast.error(err?.message || "Lỗi khi đặt lại mật khẩu");
+    }
+  };
+
+  const handleDeleteUser = async (userId: string, displayName: string) => {
+    if (!window.confirm(`Bạn có chắc muốn xóa tài khoản "${displayName}" khỏi hệ thống?`)) return;
+    try {
+      await fetchNestApi(`/users/${userId}`, {
+        method: "DELETE",
+      });
+      toast.success(`Đã xóa tài khoản ${displayName}`);
+      accountsQ.refetch();
+    } catch (err: any) {
+      toast.error(err?.message || "Lỗi khi xóa tài khoản");
     }
   };
 
@@ -991,6 +1014,26 @@ function MasterAdminPortal() {
                 </div>
               </div>
             </button>
+
+            <button
+              onClick={() => {
+                setActiveTab("departments");
+                setMobileSidebarOpen(false);
+              }}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer text-left ${
+                activeTab === "departments"
+                  ? "bg-[#002B70] text-white shadow-sm"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+              }`}
+            >
+              <Building2 className={`w-4 h-4 shrink-0 ${activeTab === "departments" ? "text-amber-400" : "text-slate-400"}`} />
+              <div className="min-w-0">
+                <div className="truncate">[4. QUẢN LÝ BAN CHUYÊN MÔN]</div>
+                <div className={`text-[10px] truncate ${activeTab === "departments" ? "text-slate-200" : "text-slate-400"}`}>
+                  7 Ban chuyên trách &amp; đổi tên
+                </div>
+              </div>
+            </button>
           </div>
 
           {/* Quick Jump Links to Apps */}
@@ -1396,9 +1439,13 @@ function MasterAdminPortal() {
                   { key: "all", label: "Tất cả vai trò" },
                   { key: "platform_admin", label: "Platform Admin" },
                   { key: "admin", label: "Admin Tổ Chức" },
-                  { key: "class_officer", label: "Ban Cán Sự Lớp" },
-                  { key: "dept_head", label: "Trưởng Ban" },
-                  { key: "member", label: "Hội Viên" },
+                  { key: "lop_truong", label: "Lớp Trưởng" },
+                  { key: "lop_pho", label: "Lớp Phó" },
+                  { key: "truong_team", label: "Trưởng Team" },
+                  { key: "pho_team", label: "Phó Team" },
+                  { key: "truong_ban_chuyen_trach", label: "Trưởng Ban Chuyên Trách" },
+                  { key: "giang_vien", label: "Giảng Viên" },
+                  { key: "member", label: "Học Viên" },
                 ].map((f) => (
                   <button
                     key={f.key}
@@ -1427,7 +1474,7 @@ function MasterAdminPortal() {
                     <th className="px-4 py-3">Phạm vi dữ liệu</th>
                     <th className="px-4 py-3">Ban / Đơn vị</th>
                     <th className="px-4 py-3 text-center">Trạng thái</th>
-                    <th className="px-4 py-3 text-right">Thao tác</th>
+                    <th className="px-4 py-3 text-center">THAO TÁC</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 bg-white">
@@ -1454,8 +1501,12 @@ function MasterAdminPortal() {
                         }
                         if (accountRoleFilter === "platform_admin") return isSuper || acc.role === "platform_admin";
                         if (accountRoleFilter === "admin") return acc.role === "admin" && !isSuper;
-                        if (accountRoleFilter === "class_officer") return acc.role === "lop_truong" || acc.role === "lop_pho";
-                        if (accountRoleFilter === "dept_head") return (acc.role || "").includes("truong_ban") || (acc.role || "").includes("ban_");
+                        if (accountRoleFilter === "lop_truong") return acc.role === "lop_truong";
+                        if (accountRoleFilter === "lop_pho") return acc.role === "lop_pho";
+                        if (accountRoleFilter === "truong_team") return acc.role === "truong_team";
+                        if (accountRoleFilter === "pho_team") return acc.role === "pho_team";
+                        if (accountRoleFilter === "truong_ban_chuyen_trach") return acc.role === "truong_ban_chuyen_trach" || (acc.role || "").includes("truong_ban");
+                        if (accountRoleFilter === "giang_vien") return acc.role === "giang_vien";
                         if (accountRoleFilter === "member") return acc.role === "member" || acc.role === "hoi_vien" || !acc.role;
                         return true;
                       });
@@ -1508,13 +1559,25 @@ function MasterAdminPortal() {
                               <span className="px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
                                 Lớp Phó
                               </span>
-                            ) : roleCode.includes("truong_ban") ? (
+                            ) : roleCode === "truong_team" ? (
+                              <span className="px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-orange-100 text-orange-800 border border-orange-200">
+                                Trưởng Team
+                              </span>
+                            ) : roleCode === "pho_team" ? (
+                              <span className="px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-orange-50 text-orange-800 border border-orange-200">
+                                Phó Team
+                              </span>
+                            ) : roleCode === "truong_ban_chuyen_trach" || roleCode.includes("truong_ban") ? (
                               <span className="px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
                                 Trưởng Ban
                               </span>
+                            ) : roleCode === "giang_vien" ? (
+                              <span className="px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">
+                                Giảng Viên
+                              </span>
                             ) : (
                               <span className="px-2 py-0.5 rounded-md text-[10.5px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
-                                Hội Viên
+                                Học Viên
                               </span>
                             )}
                           </td>
@@ -1538,7 +1601,7 @@ function MasterAdminPortal() {
                             )}
                           </td>
                           <td className="px-4 py-3 text-slate-700 font-medium">
-                            {acc.department || "Ban Điều Hành"}
+                            {acc.department || "Ban Công nghệ"}
                           </td>
                           <td className="px-4 py-3 text-center">
                             {isActive ? (
@@ -1551,43 +1614,53 @@ function MasterAdminPortal() {
                               </span>
                             )}
                           </td>
-                          <td className="px-4 py-3 text-right">
-                            <TableActionsGroup maxVisible={3}>
+                          <td className="px-4 py-3 text-center">
+                            <div className="inline-flex items-center justify-center gap-1.5">
                               {canManageAccounts && (
                                 <button
                                   type="button"
                                   onClick={() => handleOpenEditRbac(acc)}
-                                  className="px-2.5 py-1 rounded-md text-[11px] font-bold text-[#002B70] bg-blue-50 hover:bg-blue-100 transition cursor-pointer"
-                                  title="Chỉnh sửa vai trò & phạm vi dữ liệu"
+                                  className="w-8 h-8 rounded-lg inline-flex items-center justify-center text-blue-600 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 transition cursor-pointer"
+                                  title="Phân quyền & Chỉnh sửa chức vụ"
                                 >
-                                  Phân quyền
+                                  <Pencil className="w-3.5 h-3.5" />
                                 </button>
                               )}
                               {canManageAccounts && !isSuper && (
                                 <button
                                   type="button"
                                   onClick={() => handleResetUserPassword(acc.id, acc.email)}
-                                  className="px-2.5 py-1 rounded-md text-[11px] font-medium text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition cursor-pointer"
+                                  className="w-8 h-8 rounded-lg inline-flex items-center justify-center text-amber-600 hover:bg-amber-50 border border-slate-200 hover:border-amber-300 transition cursor-pointer"
                                   title="Đặt lại mật khẩu"
                                 >
-                                  Đặt lại MK
+                                  <KeyRound className="w-3.5 h-3.5" />
                                 </button>
                               )}
                               {canManageAccounts && !isSuper && (
                                 <button
                                   type="button"
                                   onClick={() => handleToggleUserStatus(acc.id, acc.status)}
-                                  className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition cursor-pointer ${
+                                  className={`w-8 h-8 rounded-lg inline-flex items-center justify-center border border-slate-200 transition cursor-pointer ${
                                     isActive
-                                      ? "text-rose-600 bg-rose-50 hover:bg-rose-100"
-                                      : "text-emerald-700 bg-emerald-50 hover:bg-emerald-100"
+                                      ? "text-rose-600 hover:bg-rose-50 hover:border-rose-300"
+                                      : "text-emerald-700 hover:bg-emerald-50 hover:border-emerald-300"
                                   }`}
                                   title={isActive ? "Khóa tài khoản" : "Mở khóa tài khoản"}
                                 >
-                                  {isActive ? "Khóa" : "Mở"}
+                                  {isActive ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
                                 </button>
                               )}
-                            </TableActionsGroup>
+                              {canManageAccounts && !isSuper && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteUser(acc.id, acc.name || acc.username)}
+                                  className="w-8 h-8 rounded-lg inline-flex items-center justify-center text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-300 transition cursor-pointer"
+                                  title="Xóa tài khoản người dùng"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       );
@@ -1596,6 +1669,201 @@ function MasterAdminPortal() {
                 </tbody>
               </table>
             </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB 4: [4. QUẢN LÝ BAN CHUYÊN MÔN]                                        */}
+        {/* ========================================================================= */}
+        {activeTab === "departments" && (
+          <div className="space-y-6">
+            <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <div className="text-[11px] font-bold uppercase tracking-wider text-amber-600">
+                  Cơ Cấu Tổ Chức Nền Tảng
+                </div>
+                <h2 className="text-lg font-black text-[#002B70] mt-0.5">
+                  Quản Lý Ban Chuyên Môn CEO HN10
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Quản lý danh sách 7 Ban chuyên trách chuẩn, chỉnh sửa tên ban và đồng bộ trực tiếp sang CRM &amp; App.
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    saveCustomDepartments(INITIAL_DEPARTMENTS);
+                    setDepartmentsList(INITIAL_DEPARTMENTS);
+                    dispatchPermissionSyncEvent();
+                    toast.success("Đã khôi phục đúng 7 Ban chuyên trách chuẩn CEO HN10!");
+                  }}
+                  className="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-semibold text-slate-700 cursor-pointer transition"
+                >
+                  Khôi phục 7 Ban chuẩn
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDeptEditing(null);
+                    setDeptForm({ code: "", name: "", description: "", color: "blue" });
+                    setDeptModalOpen(true);
+                  }}
+                  className="px-3.5 py-2 rounded-xl bg-[#002B70] hover:bg-[#003B95] text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs transition"
+                >
+                  <Plus className="w-4 h-4" /> Thêm Ban Mới
+                </button>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead className="bg-slate-50 text-slate-600 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                    <tr>
+                      <th className="py-3 px-4 w-12 text-center">STT</th>
+                      <th className="py-3 px-4">Mã Ban</th>
+                      <th className="py-3 px-4">Tên Ban Chuyên Môn</th>
+                      <th className="py-3 px-4">Mô Tả Chức Năng</th>
+                      <th className="py-3 px-4 text-center">Thao Tác</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {departmentsList.map((dept, idx) => (
+                      <tr key={dept.id} className="hover:bg-slate-50/70 transition">
+                        <td className="py-3 px-4 text-center font-mono text-slate-400 font-bold">{idx + 1}</td>
+                        <td className="py-3 px-4 font-mono font-bold text-[#002B70]">{dept.code}</td>
+                        <td className="py-3 px-4 font-bold text-slate-900">{dept.name}</td>
+                        <td className="py-3 px-4 text-slate-600">{dept.description || "—"}</td>
+                        <td className="py-3 px-4 text-center">
+                          <div className="inline-flex items-center justify-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setDeptEditing(dept);
+                                setDeptForm({
+                                  code: dept.code,
+                                  name: dept.name,
+                                  description: dept.description || "",
+                                  color: dept.color || "blue",
+                                });
+                                setDeptModalOpen(true);
+                              }}
+                              className="w-8 h-8 rounded-lg inline-flex items-center justify-center text-blue-600 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 transition cursor-pointer"
+                              title="Chỉnh sửa tên ban"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const next = departmentsList.filter((d) => d.id !== dept.id);
+                                saveCustomDepartments(next);
+                                setDepartmentsList(next);
+                                dispatchPermissionSyncEvent();
+                                toast.success(`Đã xóa ban "${dept.name}"`);
+                              }}
+                              className="w-8 h-8 rounded-lg inline-flex items-center justify-center text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-300 transition cursor-pointer"
+                              title="Xóa ban"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {deptModalOpen && (
+              <Dialog open={deptModalOpen} onOpenChange={setDeptModalOpen}>
+                <DialogContent className="max-w-md bg-white text-slate-900">
+                  <DialogHeader>
+                    <DialogTitle className="text-base font-bold text-[#002B70]">
+                      {deptEditing ? "Chỉnh sửa Ban chuyên môn" : "Thêm Ban chuyên môn mới"}
+                    </DialogTitle>
+                    <DialogDescription className="text-xs text-slate-500">
+                      Thay đổi sẽ đồng bộ sang phân quyền và danh sách ban toàn hệ thống.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-3 text-xs">
+                    <div>
+                      <Label className="text-xs font-bold">Mã Ban (VD: BCN, BTT...)</Label>
+                      <Input
+                        value={deptForm.code}
+                        onChange={(e) => setDeptForm({ ...deptForm, code: e.target.value.toUpperCase() })}
+                        placeholder="BCN"
+                        className="mt-1 h-9 text-xs font-mono"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs font-bold">Tên Ban Chuyên Môn</Label>
+                      <Input
+                        value={deptForm.name}
+                        onChange={(e) => setDeptForm({ ...deptForm, name: e.target.value })}
+                        placeholder="Ban Công nghệ"
+                        className="mt-1 h-9 text-xs"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs font-bold">Mô Tả</Label>
+                      <Input
+                        value={deptForm.description}
+                        onChange={(e) => setDeptForm({ ...deptForm, description: e.target.value })}
+                        placeholder="Mô tả chức năng nhiệm vụ..."
+                        className="mt-1 h-9 text-xs"
+                      />
+                    </div>
+                    <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                      <Button type="button" variant="outline" size="sm" onClick={() => setDeptModalOpen(false)}>
+                        Hủy
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="bg-[#002B70] text-white"
+                        onClick={() => {
+                          if (!deptForm.name.trim() || !deptForm.code.trim()) {
+                            toast.error("Vui lòng nhập đầy đủ Mã ban và Tên ban");
+                            return;
+                          }
+                          let next: DepartmentItem[];
+                          if (deptEditing) {
+                            next = departmentsList.map((d) =>
+                              d.id === deptEditing.id
+                                ? { ...d, code: deptForm.code.trim(), name: deptForm.name.trim(), description: deptForm.description.trim() }
+                                : d
+                            );
+                            toast.success(`Đã cập nhật tên ban thành "${deptForm.name.trim()}"`);
+                          } else {
+                            next = [
+                              ...departmentsList,
+                              {
+                                id: `dept_${Date.now()}`,
+                                code: deptForm.code.trim(),
+                                name: deptForm.name.trim(),
+                                description: deptForm.description.trim(),
+                                color: deptForm.color,
+                                isCore: false,
+                              },
+                            ];
+                            toast.success(`Đã thêm ban "${deptForm.name.trim()}"`);
+                          }
+                          saveCustomDepartments(next);
+                          setDepartmentsList(next);
+                          dispatchPermissionSyncEvent();
+                          setDeptModalOpen(false);
+                        }}
+                      >
+                        Lưu Thay Đổi
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
         )}
 

@@ -438,38 +438,85 @@ export default function ProfileScreen() {
     }
   };
 
-  // Cài đặt ứng dụng nhanh 1 chạm (PWA Native Prompt / Hướng dẫn iOS Safari & Android Chrome)
+  // Cài đặt ứng dụng tự động 1 chạm cho cả iOS và Android (không mở popup hướng dẫn)
   const handleFastInstallApp = async () => {
+    if (typeof window === "undefined") return;
+
     // 1. Kiểm tra nếu đã cài đặt chạy dạng App độc lập (Standalone PWA hoặc Capacitor)
     const isStandalone =
-      typeof window !== "undefined" &&
-      (window.matchMedia("(display-mode: standalone)").matches ||
-        (window.navigator as any).standalone === true);
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (window.navigator as any).standalone === true;
 
     if (isStandalone) {
-      toast.success("Ứng dụng CEO HN10 đã được cài đặt và đang chạy sẵn sàng trên thiết bị của bạn!");
+      toast.success("Ứng dụng CEO HN10 đã được cài đặt trên thiết bị của bạn!");
       return;
     }
 
-    // 2. Nếu có prompt PWA từ trình duyệt (Android Chrome/Edge/Samsung Internet): Kích hoạt hộp thoại cài đặt ngay lập tức!
+    // 2. Android / Chrome / Edge: Kích hoạt cài đặt PWA 1 chạm trực tiếp
     const p = (window as any).__pwaInstallPrompt;
     if (p && typeof p.prompt === "function") {
       try {
         await p.prompt();
         const choice = await p.userChoice;
         if (choice?.outcome === "accepted") {
-          toast.success("Ứng dụng đang được tự động cài đặt lên màn hình chính!");
+          toast.success("Đang tự động cài đặt App CEO HN10 lên màn hình chính!");
           (window as any).__pwaInstallPrompt = null;
-          return;
         }
+        return;
       } catch (err) {
         console.warn("Fast install prompt error:", err);
       }
     }
 
-    // 3. Mở bảng điều khiển cài đặt ứng dụng chuyên biệt hỗ trợ cả iPhone (iOS) và Android
-    window.dispatchEvent(new CustomEvent("open-install-prompt"));
-    window.dispatchEvent(new CustomEvent("open-ios-install-guide"));
+    // 3. iOS (iPhone / iPad): Tự động tải Apple WebClip (.mobileconfig) 1 chạm để thêm trực tiếp ra màn hình chính
+    const ua = window.navigator.userAgent || "";
+    const isIos = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    if (isIos) {
+      const appUrl = `${window.location.origin}/association`;
+      const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>PayloadContent</key>
+  <array>
+    <dict>
+      <key>FullScreen</key><true/>
+      <key>IsRemovable</key><true/>
+      <key>Label</key><string>CEO HN10</string>
+      <key>PayloadDescription</key><string>Cài đặt App CEO HN10 lên màn hình chính</string>
+      <key>PayloadDisplayName</key><string>CEO HN10 App</string>
+      <key>PayloadIdentifier</key><string>com.ceohn10.app.webclip</string>
+      <key>PayloadType</key><string>com.apple.webClip.managed</string>
+      <key>PayloadUUID</key><string>2B9C3A8C-D8D2-48BD-A7EA-81E75C5E218E</string>
+      <key>PayloadVersion</key><integer>1</integer>
+      <key>Precomposed</key><true/>
+      <key>URL</key><string>${appUrl}</string>
+    </dict>
+  </array>
+  <key>PayloadDisplayName</key><string>Cài Đặt App CEO HN10</string>
+  <key>PayloadIdentifier</key><string>com.ceohn10.app.profile</string>
+  <key>PayloadOrganization</key><string>CLB Doanh Nhân CEO HN10</string>
+  <key>PayloadRemovalDisallowed</key><false/>
+  <key>PayloadType</key><string>Configuration</string>
+  <key>PayloadUUID</key><string>9E5B2D6F-4A3C-4E1B-8D7F-3A1C2E5B7D9E</string>
+  <key>PayloadVersion</key><integer>1</integer>
+</dict>
+</plist>`;
+      const blob = new Blob([xml], { type: "application/x-apple-aspen-config" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "ceohn10.mobileconfig";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 3000);
+      toast.success("Đang tải cấu hình cài App CEO HN10 cho iPhone! Vui lòng bấm Cho phép để hoàn tất.");
+      return;
+    }
+
+    // 4. Fallback trên Chrome Android / Desktop nếu chưa bắt được beforeinstallprompt
+    toast.info("Trình duyệt đang sẵn sàng: Bấm biểu tượng Cài đặt trên thanh địa chỉ hoặc Menu (⋮) → Cài đặt ứng dụng.");
   };
 
   // Đăng xuất phiên an toàn
@@ -2249,56 +2296,30 @@ export default function ProfileScreen() {
                 </div>
               </div>
 
-              {/* 3.4. Đầu mục: Cài đặt ứng dụng PWA / Mobile App */}
-              <div className="rounded-2xl bg-white dark:bg-[#0F172A] border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-2xs">
+              {/* 3.4. Nút Cài đặt App CEO HN10 1 chạm (Hỗ trợ cả iOS & Android, bấm 1 lần cài ngay) */}
+              <div className="rounded-2xl bg-white dark:bg-[#0F172A] border border-slate-200/80 dark:border-slate-800 p-4 shadow-2xs">
                 <button
                   type="button"
-                  onClick={() => toggleSection("install_app")}
-                  className="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition cursor-pointer"
+                  onClick={handleFastInstallApp}
+                  className="w-full p-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-950 flex items-center justify-between transition active:scale-[0.98] cursor-pointer shadow-sm"
                 >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="size-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-400 grid place-items-center shrink-0">
-                      <Smartphone className="size-4" />
+                  <div className="flex items-center gap-3 min-w-0 text-left">
+                    <div className="size-9 rounded-xl bg-white/15 dark:bg-slate-900/10 grid place-items-center shrink-0">
+                      <Smartphone className="size-4.5" />
                     </div>
-                    <div>
-                      <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">
-                        Cài đặt ứng dụng PWA / Mobile App
-                      </h4>
-                      <p className="text-[10px] text-slate-700 dark:text-slate-200 font-medium line-clamp-1">
-                        Cài ứng dụng lên màn hình chính điện thoại
-                      </p>
+                    <div className="min-w-0">
+                      <span className="text-xs font-extrabold uppercase tracking-wider block truncate">
+                        Cài Đặt App CEO HN10 Lên Màn Hình
+                      </span>
+                      <span className="text-[10.5px] opacity-80 block truncate">
+                        Bấm 1 chạm tự động cài đặt cho cả iPhone (iOS) &amp; Android
+                      </span>
                     </div>
                   </div>
-                  <ChevronDown
-                    className={`size-4 text-slate-400 transition-transform duration-200 shrink-0 ${expandedSections["install_app"] ? "rotate-180 text-slate-900 dark:text-slate-400" : ""
-                      }`}
-                  />
+                  <span className="px-2.5 py-1 rounded-lg bg-emerald-500 text-white text-[10px] font-bold shrink-0">
+                    Cài Ngay
+                  </span>
                 </button>
-
-                {expandedSections["install_app"] && (
-                  <div className="px-4 pb-4 pt-1 border-t border-slate-100 dark:border-slate-800/80 space-y-2.5 animate-in fade-in duration-150">
-                    <button
-                      type="button"
-                      onClick={handleFastInstallApp}
-                      className="w-full p-3 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-300/80 dark:border-blue-800/60 flex items-center justify-between hover:brightness-105 transition cursor-pointer text-left"
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="size-8 rounded-xl bg-slate-900 text-white grid place-items-center shrink-0 shadow-xs">
-                          <Smartphone className="size-4" />
-                        </div>
-                        <div className="min-w-0">
-                          <span className="text-xs font-bold text-slate-900 dark:text-slate-200 block truncate">
-                            Cài đặt ứng dụng lên màn hình chính
-                          </span>
-                          <span className="text-[10.5px] text-slate-900 dark:text-slate-300 block line-clamp-1">
-                            Tải file APK Android hoặc ghim Icon App lên iOS Safari
-                          </span>
-                        </div>
-                      </div>
-                      <ChevronRight className="size-4 text-slate-800 dark:text-slate-400 shrink-0" />
-                    </button>
-                  </div>
-                )}
               </div>
 
               {/* 3.5. Đầu mục: Hỗ trợ Ban Thư Ký & Hướng dẫn sử dụng App */}

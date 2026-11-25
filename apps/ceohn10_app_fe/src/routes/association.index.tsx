@@ -40,6 +40,7 @@ import {
   Bell,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/lib/theme";
 import { fetchNestApi, resolveMediaUrl } from "@/lib/api-client";
 import { AssociationMemberQrModal } from "@/components/member/AssociationMemberQrModal";
 import { isPrivilegedAdminOrPresident, isMediaDepartmentMember } from "@/lib/checkin-gatekeeper-auth";
@@ -142,6 +143,8 @@ interface ClassComment {
 
 export function CeoHn10StudentAppScreen() {
   const { user } = useAuth();
+  const { theme } = useTheme();
+  const isLight = theme === "light";
   const navigate = useNavigate();
 
   // Active main tab: "home" (Bento & Slider), "classes", "events", "connect"
@@ -175,69 +178,55 @@ export function CeoHn10StudentAppScreen() {
     return isMediaDepartmentMember(user) || isPrivilegedAdminOrPresident(user);
   }, [user]);
 
-  // Hành trình học tập & sự kiện CEO HN10 (Timeline Milestone Stations)
+  // Hành trình học tập & sự kiện CEO HN10 (4 Chặng chính thức)
   const [journeyMilestones, setJourneyMilestones] = useState<JourneyMilestone[]>([
     {
       id: "jrn-01",
       stepNumber: 1,
-      title: "Lễ Khai Giảng & Ra Mắt Lớp Doanh Nhân CEO HN10",
+      title: "Chặng 1: Lễ Khai Giảng CEO HN10",
       category: "gala",
-      date: "15/11/2026",
+      date: "05/12/2026",
       time: "08:30 - 12:00",
-      location: "Trung Tâm Hội Nghị Quốc Gia",
-      status: "completed",
-      badge: "Khai Giảng",
-      scoreOrTag: "Đã Điểm Danh 100%",
+      location: "Hà Nội",
+      status: "in_progress",
+      badge: "Chặng 1 · Sắp tới",
+      scoreOrTag: "05/12/2026",
     },
     {
       id: "jrn-02",
       stepNumber: 2,
-      title: "Chuyên Đề 1: Tái Cấu Trúc Tài Chính & Quản Trị Dòng Tiền 2026",
-      category: "class",
-      date: "05/12/2026",
-      time: "08:30 - 12:00",
-      location: "Khách Sạn Daewoo Hà Nội",
-      status: "in_progress",
-      badge: "Chuyên Đề 01",
-      scoreOrTag: "Đang Học · MOD-FIN-01",
-      referenceId: "cls-01",
+      title: "Chặng 2: Dạ Tiệc Year End Party 2026",
+      category: "gala",
+      date: "Cuối năm 2026",
+      time: "18:00 - 22:00",
+      location: "Khách sạn Melia Hà Nội",
+      status: "upcoming",
+      badge: "Chặng 2",
+      scoreOrTag: "Year End Party",
     },
     {
       id: "jrn-03",
       stepNumber: 3,
-      title: "Chương Trình Giao Thương & Cafe Connect B2B Nhóm 2",
-      category: "b2b_meeting",
-      date: "12/12/2026",
-      time: "14:00 - 17:00",
-      location: "Trụ Sở Hiệp Hội HanoiBA",
+      title: "Chặng 3: Team Building & Kết Nối Giao Thương",
+      category: "event",
+      date: "Dự kiến 2027",
+      time: "Cả ngày",
+      location: "Khu nghỉ dưỡng",
       status: "upcoming",
-      badge: "Kết Nối B2B",
-      scoreOrTag: "Đã Đăng Ký",
+      badge: "Chặng 3",
+      scoreOrTag: "Team Building",
     },
     {
       id: "jrn-04",
       stepNumber: 4,
-      title: "Chuyên Đề 2: Nghệ Thuật Đàm Phán & Giao Thương Chiến Lược B2B",
-      category: "class",
-      date: "19/12/2026",
-      time: "08:30 - 12:00",
-      location: "Hội Trường HanoiBA, 38 Bà Triệu",
-      status: "upcoming",
-      badge: "Chuyên Đề 02",
-      scoreOrTag: "Sắp Tới · MOD-NEG-02",
-      referenceId: "cls-02",
-    },
-    {
-      id: "jrn-05",
-      stepNumber: 5,
-      title: "Dạ Tiệc Gala Doanh Nhân & Trao Chứng Chỉ Tốt Nghiệp CEO HN10",
+      title: "Chặng 4: Lễ Bế Giảng & Trao Chứng Chỉ CEO HN10",
       category: "gala",
-      date: "26/12/2026",
+      date: "Dự kiến 2027",
       time: "18:00 - 21:30",
-      location: "Khách Sạn Melia Hà Nội",
+      location: "Hà Nội",
       status: "upcoming",
-      badge: "Dạ Khúc CEO",
-      scoreOrTag: "Mở Vé VIP",
+      badge: "Chặng 4",
+      scoreOrTag: "Bế Giảng",
     },
   ]);
 
@@ -596,46 +585,40 @@ export function CeoHn10StudentAppScreen() {
 
   return (
     <div className="w-full min-h-screen bg-slate-50 flex flex-col pb-28 text-slate-900 font-sans">
-      {/* ── 1. TOP HEADER TỐI GIẢN (CHỈ CÓ LOGO CEO HN10 CÙNG ICON THÔNG BÁO VÀ TIN NHẮN) ── */}
-      <header className="sticky top-0 z-30 bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-xs">
-        {/* Bên trái: Logo CEO HN10 */}
+      {/* ── 1. TOP HEADER TỐI GIẢN (CHỈ CÓ LOGO CEO HN10, THÔNG BÁO & AVATAR) ── */}
+      <header className="sticky top-0 z-30 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between shadow-xs">
+        {/* Bên trái: Logo CEO HN10 (Theme sáng màu đen, theme tối màu trắng, không nền) */}
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center text-white font-black text-xs shadow-xs tracking-wider">
-            HN10
-          </div>
+          <img
+            src={isLight ? "/hn10-logo.png" : "/hn10-logo-2.png"}
+            alt="CEO HN10"
+            className="h-9 w-11 shrink-0 object-contain bg-transparent"
+          />
           <div>
-            <h1 className="text-xs font-black text-slate-900 tracking-tight leading-tight">
+            <h1 className="text-xs font-black text-slate-900 dark:text-white tracking-tight leading-tight">
               CLB DOANH NHÂN CEO HN10
             </h1>
-            <p className="text-[10px] text-slate-500 font-medium">
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
               Hiệp Hội HanoiBA · {profile?.name || "Học Viên"}
             </p>
           </div>
         </div>
 
-        {/* Bên phải: Icon Thông báo, Tin nhắn & Avatar Cá Nhân */}
+        {/* Bên phải: Icon Thông báo & Avatar Cá Nhân (Đã bỏ icon nhắn tin theo yêu cầu) */}
         <div className="flex items-center gap-2">
           <Link
             to="/association/notifications"
-            className="relative p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition cursor-pointer"
+            className="relative p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
             title="Thông báo"
           >
             <Bell className="w-5 h-5" />
             <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-600 ring-2 ring-white" />
           </Link>
 
-          <Link
-            to="/association/messages"
-            className="relative p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition cursor-pointer"
-            title="Tin nhắn"
-          >
-            <MessageSquare className="w-5 h-5" />
-          </Link>
-
           {/* Avatar dẫn trực tiếp vào màn Cá Nhân */}
           <Link
             to="/association/profile"
-            className="flex items-center gap-1 pl-1 border-l border-slate-200 cursor-pointer group"
+            className="flex items-center gap-1 pl-1 border-l border-slate-200 dark:border-slate-800 cursor-pointer group"
             title="Hồ sơ cá nhân & Thẻ hội viên"
           >
             <div className="w-8 h-8 rounded-full overflow-hidden border border-slate-300 ring-2 ring-slate-100 group-hover:ring-slate-900 transition">
@@ -692,120 +675,9 @@ export function CeoHn10StudentAppScreen() {
                         <Calendar className="w-3.5 h-3.5 text-slate-900" />
                         <span>Lịch Hoạt Động</span>
                       </Link>
-                      <button
-                        type="button"
-                        onClick={() => setQrModalOpen(true)}
-                        className="px-3 py-1.5 rounded-xl bg-white/20 backdrop-blur-md hover:bg-white/30 text-white text-xs font-bold border border-white/30 transition flex items-center gap-1 active:scale-95 cursor-pointer"
-                      >
-                        <ScanLine className="w-3.5 h-3.5" />
-                        <span>Quét QR Kết Nối</span>
-                      </button>
                     </div>
                   </div>
                 </div>
-              </div>
-            </section>
-
-            {/* ── BENTO GRID 4 KHỐI ĐIỀU HÀNH (ÍT CHỮ, HÌNH ẢNH & ĐIỀU HƯỚNG MƯỢT) ── */}
-            <section className="space-y-2.5">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Tính Năng Cốt Lõi
-                </h3>
-                <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-200">
-                  ● 4 Phân Hệ
-                </span>
-              </div>
-
-              {/* Lưới Bento 4 Khối */}
-              <div className="grid grid-cols-2 gap-3">
-                {/* Bento 1: HOẠT ĐỘNG (Sự kiện, Lớp học, Cuộc họp) */}
-                <Link
-                  to="/association/events"
-                  className="rounded-3xl p-3.5 bg-white border border-slate-200 shadow-2xs hover:border-slate-400 hover:shadow-xs transition-all flex flex-col justify-between group active:scale-98"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="p-2 rounded-2xl bg-slate-100 text-slate-900 border border-slate-200">
-                      <Calendar className="w-4 h-4" />
-                    </span>
-                    <span className="text-[10px] font-bold bg-slate-100 px-2 py-0.5 rounded-full text-slate-800 border border-slate-200">
-                      Hoạt Động
-                    </span>
-                  </div>
-                  <div className="mt-3">
-                    <h4 className="text-xs font-bold text-slate-900 leading-tight">Sự Kiện &amp; Lớp Học</h4>
-                    <p className="text-[10px] text-slate-500 mt-0.5">Lớp 30 chuyên đề &amp; họp</p>
-                    <div className="mt-1.5 text-[10px] font-bold text-slate-800 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                      Khám phá <ArrowRight className="w-3 h-3" />
-                    </div>
-                  </div>
-                </Link>
-
-                {/* Bento 2: GẮN KẾT (Đăng bài cơ hội & Nhắn tin B2B) */}
-                <Link
-                  to="/association/connect"
-                  className="rounded-3xl p-3.5 bg-white border border-slate-200 shadow-2xs hover:border-slate-400 hover:shadow-xs transition-all flex flex-col justify-between group active:scale-98"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="p-2 rounded-2xl bg-slate-100 text-slate-900 border border-slate-200">
-                      <Users className="w-4 h-4" />
-                    </span>
-                    <span className="text-[10px] font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
-                      Giao Thương
-                    </span>
-                  </div>
-                  <div className="mt-3">
-                    <h4 className="text-xs font-bold text-slate-900 leading-tight">Gắn Kết &amp; Cơ Hội</h4>
-                    <p className="text-[10px] text-slate-500 mt-0.5">Đăng bài &amp; kết nối 1-on-1</p>
-                    <div className="mt-1.5 text-[10px] font-bold text-slate-800 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                      Trao đổi <ArrowRight className="w-3 h-3" />
-                    </div>
-                  </div>
-                </Link>
-
-                {/* Bento 3: QUÉT QR KẾT NỐI (Camera 1 Chạm) */}
-                <div
-                  onClick={() => setQrModalOpen(true)}
-                  className="rounded-3xl p-3.5 bg-white border border-slate-200 shadow-2xs hover:border-slate-400 hover:shadow-xs transition-all cursor-pointer flex flex-col justify-between group active:scale-98"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="p-2 rounded-2xl bg-slate-100 text-slate-900 border border-slate-200">
-                      <QrCode className="w-4 h-4" />
-                    </span>
-                    <span className="text-[10px] font-bold bg-slate-100 px-2 py-0.5 rounded-full text-slate-800 border border-slate-200">
-                      1 Chạm
-                    </span>
-                  </div>
-                  <div className="mt-3">
-                    <h4 className="text-xs font-bold text-slate-900 leading-tight">Quét QR Kết Nối</h4>
-                    <p className="text-[10px] text-slate-500 mt-0.5">Quét thẻ nhận diện đối tác</p>
-                    <div className="mt-1.5 text-[10px] font-bold text-slate-800 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                      Mở camera quét <ArrowRight className="w-3 h-3" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Bento 4: MÀN CÁ NHÂN & DANH THIẾP SỐ */}
-                <Link
-                  to="/association/profile"
-                  className="rounded-3xl p-3.5 bg-white border border-slate-200 shadow-2xs hover:border-slate-400 hover:shadow-xs transition-all flex flex-col justify-between group active:scale-98"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="p-2 rounded-2xl bg-slate-100 text-slate-900 border border-slate-200">
-                      <User className="w-4 h-4" />
-                    </span>
-                    <span className="text-[10px] font-bold bg-slate-100 px-2 py-0.5 rounded-full text-slate-800 border border-slate-200">
-                      Hồ Sơ
-                    </span>
-                  </div>
-                  <div className="mt-3">
-                    <h4 className="text-xs font-bold text-slate-900 leading-tight">Hồ Sơ Cá Nhân</h4>
-                    <p className="text-[10px] text-slate-500 mt-0.5">Thẻ số VIP &amp; Cài đặt</p>
-                    <div className="mt-1.5 text-[10px] font-bold text-slate-800 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                      Xem hồ sơ <ArrowRight className="w-3 h-3" />
-                    </div>
-                  </div>
-                </Link>
               </div>
             </section>
 
@@ -918,12 +790,11 @@ export function CeoHn10StudentAppScreen() {
                 </span>
               </div>
 
-              {/* 1. KHỐI VÒNG TRÒN ĐỒNG HỒ CIRCULAR GAUGE % */}
+              {/* 1. KHỐI VÒNG TRÒN ĐỒNG HỒ CIRCULAR GAUGE % (30 BUỔI HỌC) */}
               <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-2xs flex items-center gap-5">
                 {/* SVG Circular Gauge */}
                 <div className="relative w-24 h-24 shrink-0 flex items-center justify-center">
                   <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                    {/* Background track circle */}
                     <circle
                       cx="50"
                       cy="50"
@@ -932,7 +803,6 @@ export function CeoHn10StudentAppScreen() {
                       strokeWidth="8"
                       fill="transparent"
                     />
-                    {/* Progress stroke: 82% (Xanh #1D4ED8) */}
                     <circle
                       cx="50"
                       cy="50"
@@ -940,31 +810,31 @@ export function CeoHn10StudentAppScreen() {
                       stroke="#1D4ED8"
                       strokeWidth="8"
                       strokeDasharray={251.2}
-                      strokeDashoffset={251.2 * (1 - 0.82)}
+                      strokeDashoffset={251.2}
                       strokeLinecap="round"
                       fill="transparent"
                     />
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                    <span className="text-lg font-black text-red-600 leading-tight">82%</span>
-                    <span className="text-[9px] font-bold text-slate-500 uppercase">Tín Chỉ</span>
+                    <span className="text-base font-black text-slate-900 leading-tight">0/30</span>
+                    <span className="text-[9px] font-bold text-slate-500 uppercase">Buổi Học</span>
                   </div>
                 </div>
 
                 <div className="flex-1 space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-bold text-slate-900">Tiêu Chuẩn Tốt Nghiệp CEO HN10</h4>
-                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                      ✓ Đạt Chuẩn
+                    <h4 className="text-xs font-bold text-slate-900">Tiêu Chí Tốt Nghiệp CEO HN10</h4>
+                    <span className="text-[10px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
+                      30 Buổi Học
                     </span>
                   </div>
                   <p className="text-[11px] text-slate-600 leading-relaxed">
-                    Đã hoàn thành <b>4/5 chuyên đề trọng tâm</b> và tham gia đầy đủ các phiên kết nối giao thương B2B.
+                    Chương trình gồm <b>30 buổi học</b>. Hiện tại chưa có lịch học cụ thể từ CRM.
                   </p>
-                  <div className="flex items-center gap-3 pt-1 text-[11px] font-semibold text-slate-700">
-                    <span>Điểm danh: <b className="text-blue-700">100%</b></span>
+                  <div className="flex items-center gap-3 pt-1 text-[11px] font-semibold text-slate-500">
+                    <span>Đã tham gia: <b className="text-slate-700">—</b></span>
                     <span>•</span>
-                    <span>Xếp loại: <b className="text-red-600">Xuất Sắc</b></span>
+                    <span>Lịch học: <b className="text-slate-700">Chưa cập nhật</b></span>
                   </div>
                 </div>
               </div>

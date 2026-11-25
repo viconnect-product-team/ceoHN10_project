@@ -74,8 +74,24 @@ export class EventsService extends BaseService implements OnModuleInit {
       ALTER TABLE public.events ADD COLUMN IF NOT EXISTS expected_attendees integer DEFAULT 1;
       ALTER TABLE public.events ADD COLUMN IF NOT EXISTS ticket_fee numeric DEFAULT 0;
       ALTER TABLE public.events ADD COLUMN IF NOT EXISTS fund_type text DEFAULT 'general';
-      ALTER TABLE public.events ADD COLUMN IF NOT EXISTS parts jsonb DEFAULT '["Tọa đàm", "Tiệc Gala Dinner"]'::jsonb;
+      ALTER TABLE public.events ADD COLUMN IF NOT EXISTS venue_name text DEFAULT '';
+      ALTER TABLE public.events ADD COLUMN IF NOT EXISTS parts jsonb DEFAULT '[]'::jsonb;
       ALTER TABLE public.events ADD COLUMN IF NOT EXISTS form_config jsonb DEFAULT '{}'::jsonb;
+
+      CREATE TABLE IF NOT EXISTS public.event_invitation_guests (
+        id text PRIMARY KEY,
+        event_id text NOT NULL,
+        slug text NOT NULL,
+        full_name text NOT NULL,
+        title text DEFAULT '',
+        company text DEFAULT '',
+        email text DEFAULT '',
+        phone text DEFAULT '',
+        source text DEFAULT 'import',
+        sent_at timestamp with time zone,
+        created_at timestamp with time zone DEFAULT now(),
+        UNIQUE(event_id, slug)
+      );
 
       ALTER TABLE public.event_registrations ADD COLUMN IF NOT EXISTS is_walkin boolean DEFAULT false;
       ALTER TABLE public.event_registrations ADD COLUMN IF NOT EXISTS registration_origin text DEFAULT 'pre_registered';
@@ -317,6 +333,8 @@ export class EventsService extends BaseService implements OnModuleInit {
       start_date: dateStr,
       location: r.location ?? '',
       venue: r.location ?? '',
+      venueName: r.venue_name ?? '',
+      parts: parseJsonArraySafe(r.parts),
       capacity: r.capacity ?? 0,
       registered: r.registered ?? 0,
       status,
@@ -404,6 +422,11 @@ export class EventsService extends BaseService implements OnModuleInit {
       paymentAmount: Number(r.payment_amount ?? 0),
       paymentDeadline: r.payment_deadline,
       reminderCount: Number(r.reminder_count ?? 0),
+      ticketCount: Number(r.ticket_count ?? 1),
+      company: r.company ?? '',
+      note: r.note ?? '',
+      attendedParts: parseJsonArraySafe(r.attended_parts),
+      dynamicData: r.dynamic_data || {},
       qrPayload: r.qr_payload ?? '',
       checkedInAt: r.checked_in_at
         ? r.checked_in_at instanceof Date
@@ -833,6 +856,11 @@ export class EventsService extends BaseService implements OnModuleInit {
     const agendaJson = JSON.stringify(
       Array.isArray(rawAgenda) ? rawAgenda : [],
     );
+    const rawParts = (data as any).parts !== undefined ? (data as any).parts : [];
+    const partsJson = JSON.stringify(
+      Array.isArray(rawParts) ? rawParts : [],
+    );
+    const venueName = (data as any).venueName ? String((data as any).venueName).trim() : '';
     const checkinQr = data.checkinQr ? String(data.checkinQr).trim() : null;
     const department = data.department ? String(data.department).trim() : 'ban_su_kien';
     const category = data.category ? String(data.category).trim() : 'su_kien_clb';
@@ -840,7 +868,7 @@ export class EventsService extends BaseService implements OnModuleInit {
     try {
       await this.prisma.$executeRaw`
         INSERT INTO public.events (
-          id, name, tagline, department, category, date, location, capacity, registered, status, type, qr_fields, association_id, image, banner, ticket_price, fee, description, photo_gallery_url, qr_scanners, sponsors, start_time, end_time, agenda, checkin_qr, created_at, updated_at
+          id, name, tagline, department, category, date, location, venue_name, parts, capacity, registered, status, type, qr_fields, association_id, image, banner, ticket_price, fee, description, photo_gallery_url, qr_scanners, sponsors, start_time, end_time, agenda, checkin_qr, created_at, updated_at
         ) VALUES (
           ${eventId},
           ${data.name},
@@ -849,6 +877,8 @@ export class EventsService extends BaseService implements OnModuleInit {
           ${category},
           ${safeDate}::date,
           ${data.location ?? ''},
+          ${venueName},
+          ${partsJson}::jsonb,
           ${safeCapacity},
           0,
           ${data.status ?? 'upcoming'},
@@ -1139,6 +1169,14 @@ export class EventsService extends BaseService implements OnModuleInit {
     const agendaJson = JSON.stringify(
       Array.isArray(rawAgenda) ? rawAgenda : rawAgenda ? [rawAgenda] : [],
     );
+    const rawParts = (data as any).parts !== undefined ? (data as any).parts : current.parts;
+    const partsJson = JSON.stringify(
+      Array.isArray(rawParts) ? rawParts : parseJsonArraySafe(rawParts),
+    );
+    const venueName =
+      (data as any).venueName !== undefined
+        ? String((data as any).venueName || '').trim()
+        : (current.venue_name ?? '');
     const checkinQr =
       data.checkinQr !== undefined
         ? data.checkinQr
@@ -1163,6 +1201,8 @@ export class EventsService extends BaseService implements OnModuleInit {
           category = ${category},
           date = ${safeDate}::date,
           location = ${location},
+          venue_name = ${venueName},
+          parts = ${partsJson}::jsonb,
           capacity = ${safeCapacity},
           type = ${type},
           status = ${status},
@@ -1424,24 +1464,18 @@ export class EventsService extends BaseService implements OnModuleInit {
   async listMyEvents(userId: string) {
     const isGuest = !userId || userId === 'guest' || !userId.match(/^[0-9a-f-]{36}$/i);
     const assocId = !isGuest ? await this.getAssociationIdForUser(userId).catch(() => null) : null;
+    const effectiveAssocId = assocId || '00000000-0000-4000-8000-000000000001';
 
     let [events, me] = await Promise.all([
-      assocId
-        ? this.prisma.$queryRaw<any[]>`
-            SELECT e.*, a.name as association_name, a.logo_url as association_logo
-            FROM public.events e
-            LEFT JOIN public.associations a ON e.association_id = a.id
-            WHERE e.association_id = ${assocId}::uuid
-               OR e.association_id = '00000000-0000-4000-8000-000000000001'::uuid
-               OR e.association_id = 'c1983000-0000-4000-8000-000000001983'::uuid
-            ORDER BY (e.date >= CURRENT_DATE) DESC, e.date ASC
-          `.catch(() => [])
-        : this.prisma.$queryRaw<any[]>`
-            SELECT e.*, a.name as association_name, a.logo_url as association_logo
-            FROM public.events e
-            LEFT JOIN public.associations a ON e.association_id = a.id
-            ORDER BY (e.date >= CURRENT_DATE) DESC, e.date ASC
-          `.catch(() => []),
+      this.prisma.$queryRaw<any[]>`
+        SELECT e.*, a.name as association_name, a.logo_url as association_logo
+        FROM public.events e
+        LEFT JOIN public.associations a ON e.association_id = a.id
+        WHERE e.association_id = ${effectiveAssocId}::uuid
+          AND e.name IS NOT NULL
+          AND TRIM(e.name) != ''
+        ORDER BY (e.date >= CURRENT_DATE) DESC, e.date ASC
+      `.catch(() => []),
       !isGuest
         ? this.prisma.$queryRaw<any[]>`
             SELECT code, email, phone FROM public.members WHERE user_id = ${userId}::uuid LIMIT 1
@@ -1454,6 +1488,9 @@ export class EventsService extends BaseService implements OnModuleInit {
         SELECT e.*, a.name as association_name, a.logo_url as association_logo
         FROM public.events e
         LEFT JOIN public.associations a ON e.association_id = a.id
+        WHERE e.association_id = '00000000-0000-4000-8000-000000000001'::uuid
+          AND e.name IS NOT NULL
+          AND TRIM(e.name) != ''
         ORDER BY (e.date >= CURRENT_DATE) DESC, e.date ASC
       `.catch(() => []);
     }
@@ -6599,5 +6636,299 @@ export class EventsService extends BaseService implements OnModuleInit {
     }
 
     return { ok: true, deliveredCount, recipients };
+  }
+
+  // ==================== INVITATION GUESTS & PUBLIC RSVP (UC-INV-01..06) ====================
+
+  private slugifyGuestName(name: string): string {
+    return String(name || 'khach-moi')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'khach-moi';
+  }
+
+  async getInvitationGuests(eventId: string) {
+    const rows = await this.prisma.$queryRaw<any[]>`
+      SELECT * FROM public.event_invitation_guests
+      WHERE event_id = ${eventId}
+      ORDER BY created_at DESC
+    `.catch(() => []);
+    return rows.map((r) => ({
+      id: r.id,
+      eventId: r.event_id,
+      slug: r.slug,
+      fullName: r.full_name,
+      title: r.title || '',
+      company: r.company || '',
+      email: r.email || '',
+      phone: r.phone || '',
+      source: r.source || 'import',
+      sentAt: r.sent_at,
+      createdAt: r.created_at,
+    }));
+  }
+
+  async saveInvitationGuests(eventId: string, guests: any[]) {
+    const list = Array.isArray(guests) ? guests : [];
+    const saved: any[] = [];
+    for (const g of list) {
+      const fullName = String(g.fullName || g.name || '').trim();
+      if (!fullName) continue;
+      const baseSlug = g.slug ? String(g.slug).trim().toLowerCase() : this.slugifyGuestName(fullName);
+      const id = `INV-${eventId}-${baseSlug}`.slice(0, 120);
+      await this.prisma.$executeRaw`
+        INSERT INTO public.event_invitation_guests (
+          id, event_id, slug, full_name, title, company, email, phone, source, created_at
+        ) VALUES (
+          ${id}, ${eventId}, ${baseSlug}, ${fullName}, ${String(g.title || '')}, ${String(g.company || '')},
+          ${String(g.email || '')}, ${String(g.phone || '')}, ${String(g.source || 'import')}, now()
+        )
+        ON CONFLICT (event_id, slug) DO UPDATE SET
+          full_name = EXCLUDED.full_name,
+          title = EXCLUDED.title,
+          company = EXCLUDED.company,
+          email = EXCLUDED.email,
+          phone = EXCLUDED.phone
+      `.catch(() => {});
+      saved.push({
+        id,
+        eventId,
+        slug: baseSlug,
+        fullName,
+        title: String(g.title || ''),
+        company: String(g.company || ''),
+        email: String(g.email || ''),
+        phone: String(g.phone || ''),
+      });
+    }
+    return { ok: true, count: saved.length, guests: saved };
+  }
+
+  async getPublicInvitation(eventId: string, slug?: string) {
+    const evRows = await this.prisma.$queryRaw<any[]>`
+      SELECT e.*, a.name as association_name, a.logo_url as association_logo
+      FROM public.events e
+      LEFT JOIN public.associations a ON e.association_id = a.id
+      WHERE e.id = ${eventId}
+      LIMIT 1
+    `.catch(() => []);
+    if (evRows.length === 0) {
+      throw new NotFoundException('Không tìm thấy sự kiện');
+    }
+    const event = this.mapEventRow(evRows[0]);
+    const tickets = await this.prisma.$queryRaw<any[]>`
+      SELECT * FROM public.event_ticket_types WHERE event_id = ${eventId} ORDER BY sort_order ASC, price ASC
+    `.catch(() => []);
+
+    let guest: any = null;
+    if (slug && slug.trim()) {
+      const cleanSlug = slug.trim().toLowerCase();
+      const gRows = await this.prisma.$queryRaw<any[]>`
+        SELECT * FROM public.event_invitation_guests
+        WHERE event_id = ${eventId} AND LOWER(slug) = ${cleanSlug}
+        LIMIT 1
+      `.catch(() => []);
+      if (gRows.length > 0) {
+        const g = gRows[0];
+        guest = {
+          id: g.id,
+          slug: g.slug,
+          fullName: g.full_name,
+          title: g.title || '',
+          company: g.company || '',
+          email: g.email || '',
+          phone: g.phone || '',
+        };
+      }
+    }
+
+    // Lấy cấu hình SePay từ Master Admin để hiển thị VietQR khi có phí
+    let sepayConfig = {
+      bankName: 'MBBank',
+      accountNumber: '888809012026',
+      accountHolder: 'CLB DOANH NHAN CEO HN10',
+      prefixEvent: 'CEO1983_EVT',
+    };
+    try {
+      const cfgRows = await this.prisma.$queryRaw<any[]>`
+        SELECT value FROM public.master_system_settings WHERE key = 'sepay_integration_config' LIMIT 1
+      `.catch(() => []);
+      if (cfgRows.length > 0 && cfgRows[0]?.value) {
+        const val = typeof cfgRows[0].value === 'string' ? JSON.parse(cfgRows[0].value) : cfgRows[0].value;
+        sepayConfig = {
+          bankName: val.bank_brand_name || val.bankName || sepayConfig.bankName,
+          accountNumber: val.account_number || val.accountNumber || sepayConfig.accountNumber,
+          accountHolder: val.account_owner || val.account_holder || val.accountHolder || sepayConfig.accountHolder,
+          prefixEvent: val.prefix_event || val.prefixEvent || sepayConfig.prefixEvent,
+        };
+      }
+    } catch {}
+
+    return {
+      event,
+      tickets: tickets.map((t) => this.mapTicketRow(t)),
+      guest,
+      sepayConfig,
+    };
+  }
+
+  async getRegistrationPaymentStatus(regId: string) {
+    const rows = await this.prisma.$queryRaw<any[]>`
+      SELECT id, status, payment_status, payment_amount, attended_parts
+      FROM public.event_registrations
+      WHERE id = ${regId}
+      LIMIT 1
+    `.catch(() => []);
+    if (rows.length === 0) return { found: false };
+    const r = rows[0];
+    return {
+      found: true,
+      id: r.id,
+      status: r.status,
+      paymentStatus: r.payment_status,
+      paymentAmount: Number(r.payment_amount || 0),
+      attendedParts: parseJsonArraySafe(r.attended_parts),
+    };
+  }
+
+  async submitPublicRsvp(eventId: string, body: any) {
+    const evRows = await this.prisma.$queryRaw<any[]>`
+      SELECT * FROM public.events WHERE id = ${eventId} LIMIT 1
+    `.catch(() => []);
+    if (evRows.length === 0) {
+      throw new NotFoundException('Không tìm thấy sự kiện');
+    }
+    const ev = evRows[0];
+    const eventTitle = ev.name || 'Sự kiện CLB CEO HN10';
+
+    const attendMode: 'single_part' | 'full' | 'declined' = body.attendMode || 'full';
+    const fullName = String(body.fullName || 'Khách mời').trim();
+    const title = String(body.title || '').trim();
+    const company = String(body.company || '').trim();
+    const email = String(body.email || '').trim();
+    const phone = String(body.phone || '').trim();
+    const selectedPartNames: string[] = Array.isArray(body.selectedPartNames) ? body.selectedPartNames : [];
+    const attendeeCount = Math.max(1, Number(body.attendeeCount || 1));
+    const attendees = Array.isArray(body.attendees) ? body.attendees : [];
+    const totalFee = Math.max(0, Number(body.totalFee || 0));
+    const regId = `REG-${Date.now().toString().slice(-6)}-${Math.floor(100 + Math.random() * 899)}`;
+
+    if (attendMode === 'declined') {
+      await this.prisma.$executeRaw`
+        INSERT INTO public.event_registrations (
+          id, event_id, member_name, company, email, phone, ticket_type, ticket_count,
+          status, payment_status, payment_amount, attended_parts, dynamic_data, note, created_at, updated_at
+        ) VALUES (
+          ${regId}, ${eventId}, ${fullName}, ${company}, ${email}, ${phone},
+          'Khách mời từ chối', 0, 'declined', 'none', 0, '[]'::jsonb,
+          ${JSON.stringify({ title, company, attendMode: 'declined', declinedAt: new Date().toISOString() })}::jsonb,
+          ${String(body.note || 'Khách mời phản hồi không thể tham dự từ thư mời')}, now(), now()
+        )
+      `;
+
+      // Bắn thông báo real-time tới CRM & ghi activity_log (UC-INV-06)
+      await this.prisma.$executeRaw`
+        INSERT INTO public.activity_log (id, action, target, target_type, actor_email, association_id, created_at)
+        VALUES (gen_random_uuid(), 'Khách mời từ chối tham dự sự kiện', ${`${fullName}${company ? ` (${company})` : ''} đã từ chối tham dự "${eventTitle}"`}, 'event', ${email || 'guest@ceohn10.vn'}, ${ev.association_id}::uuid, now())
+      `.catch(() => {});
+
+      const adminUsers = await this.prisma.$queryRaw<any[]>`
+        SELECT DISTINCT user_id FROM public.user_roles WHERE role::text IN ('platform_admin', 'admin') LIMIT 10
+      `.catch(() => []);
+      for (const adm of adminUsers) {
+        if (!adm.user_id) continue;
+        await this.prisma.$executeRawUnsafe(`
+          INSERT INTO public.business_notifications (
+            id, recipient_user_id, source_domain, source_record_id, event_kind, notification_kind,
+            title_key, body_key, safe_display_data, priority, status, dedupe_key, app_scope, target_app, created_at, updated_at
+          ) VALUES (
+            gen_random_uuid(), $1::uuid, 'event', $2, 'event_rsvp_declined', 'rsvp_declined',
+            $3, $4, $5::jsonb, 'normal', 'delivered', $6, 'crm', 'crm', NOW(), NOW()
+          )
+        `,
+          adm.user_id,
+          regId,
+          `Khách mời từ chối tham dự: ${fullName}`,
+          `${fullName}${company ? ` (${company})` : ''} đã phản hồi không thể tham dự sự kiện "${eventTitle}".`,
+          JSON.stringify({ eventId, regId, fullName, company, targetRoute: `/events/${eventId}` }),
+          `rsvp-decline-${regId}`,
+        ).catch(() => {});
+      }
+
+      return {
+        ok: true,
+        regId,
+        attendMode: 'declined',
+        message: 'Đã ghi nhận phản hồi từ chối của Quý khách và thông báo tới Ban Tổ Chức.',
+      };
+    }
+
+    // Trường hợp tham dự 1 phần hoặc toàn bộ (UC-INV-04, UC-INV-05)
+    const partsLabel =
+      attendMode === 'full'
+        ? `Tham dự toàn bộ (${selectedPartNames.join(' + ') || 'Lễ + Tiệc'})`
+        : `Chỉ dự: ${selectedPartNames.join(', ') || '1 phần'}`;
+
+    const paymentStatus = totalFee > 0 ? 'pending' : 'free';
+    const regStatus = totalFee > 0 ? 'pending' : 'confirmed';
+    const dynamicPayload = {
+      title,
+      company,
+      attendMode,
+      selectedPartNames,
+      attendees,
+      source: 'public_invitation_rsvp',
+    };
+
+    await this.prisma.$executeRaw`
+      INSERT INTO public.event_registrations (
+        id, event_id, member_name, company, email, phone, ticket_type, ticket_count,
+        status, payment_status, payment_amount, attended_parts, dynamic_data, note, created_at, updated_at
+      ) VALUES (
+        ${regId}, ${eventId}, ${fullName}, ${company}, ${email}, ${phone},
+        ${partsLabel}, ${attendeeCount}, ${regStatus}, ${paymentStatus}, ${totalFee},
+        ${JSON.stringify(selectedPartNames)}::jsonb,
+        ${JSON.stringify(dynamicPayload)}::jsonb,
+        ${partsLabel}, now(), now()
+      )
+    `;
+
+    await this.prisma.$executeRaw`
+      UPDATE public.events SET registered = COALESCE(registered, 0) + ${attendeeCount}, updated_at = now()
+      WHERE id = ${eventId}
+    `.catch(() => {});
+
+    await this.prisma.$executeRaw`
+      INSERT INTO public.activity_log (id, action, target, target_type, actor_email, association_id, created_at)
+      VALUES (gen_random_uuid(), 'Xác nhận tham dự từ Thư mời', ${`${fullName} (${attendeeCount} người) — ${partsLabel} tại "${eventTitle}"`}, 'event', ${email || 'guest@ceohn10.vn'}, ${ev.association_id}::uuid, now())
+    `.catch(() => {});
+
+    let vietQrUrl = '';
+    let transferContent = '';
+    let bankInfo: any = null;
+    if (totalFee > 0) {
+      const pubInfo = await this.getPublicInvitation(eventId);
+      const cfg = pubInfo.sepayConfig;
+      const bankShort = cfg.bankName.toUpperCase().includes('MB') ? 'MB' : cfg.bankName;
+      transferContent = `${cfg.prefixEvent}_${regId}`;
+      vietQrUrl = `https://img.vietqr.io/image/${bankShort}-${cfg.accountNumber}-compact2.png?amount=${totalFee}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(cfg.accountHolder)}`;
+      bankInfo = cfg;
+    }
+
+    return {
+      ok: true,
+      regId,
+      attendMode,
+      partsLabel,
+      attendeeCount,
+      totalFee,
+      paymentStatus,
+      vietQrUrl,
+      transferContent,
+      bankInfo,
+    };
   }
 }

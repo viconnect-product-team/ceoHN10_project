@@ -138,7 +138,7 @@ function CrmAdminAuthPage() {
     try {
       const res = await fetchNestApi("/auth/login", {
         method: "POST",
-        body: JSON.stringify({ email: email.trim(), password }),
+        body: JSON.stringify({ email: email.trim(), password, portal: "crm" }),
       });
       if (!res?.access_token) {
         throw new Error("Đăng nhập không thành công. Vui lòng kiểm tra lại tài khoản và mật khẩu.");

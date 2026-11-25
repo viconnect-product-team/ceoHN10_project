@@ -108,13 +108,15 @@ const AVAILABLE_COLORS = [
 
 function getDeptIcon(name: string, code: string) {
   const s = (name + " " + code).toLowerCase();
-  if (s.includes("điều hành") || s.includes("bdh")) return Shield;
-  if (s.includes("thư ký") || s.includes("btk")) return Calendar;
-  if (s.includes("thành viên") || s.includes("btv")) return Users;
-  if (s.includes("xúc tiến") || s.includes("bxt") || s.includes("thương mại")) return Briefcase;
+  if (s.includes("công nghệ") || s.includes("bcn") || s.includes("kỹ thuật")) return Shield;
   if (s.includes("truyền thông") || s.includes("btt")) return Megaphone;
-  if (s.includes("tài chính") || s.includes("btc")) return Coins;
+  if (s.includes("tài chính") || s.includes("btc") || s.includes("ngân sách")) return Coins;
+  if (s.includes("sự kiện") || s.includes("hậu cần") || s.includes("bsk")) return Calendar;
+  if (s.includes("đối ngoại") || s.includes("giao thương") || s.includes("bdn") || s.includes("b2b")) return Briefcase;
+  if (s.includes("gắn kết") || s.includes("đời sống") || s.includes("bds") || s.includes("gan ket")) return HeartHandshake;
+  if (s.includes("học tập") || s.includes("đào tạo")) return Users;
   if (s.includes("thiện nguyện") || s.includes("btn") || s.includes("từ thiện")) return HeartHandshake;
+  if (s.includes("điều hành") || s.includes("bdh")) return Shield;
   return Building2;
 }
 
@@ -127,23 +129,26 @@ function matchesDept(m: any, d: DepartmentItem): boolean {
   if (mDept === dName || mDept === dCode || mDept === d.id.toLowerCase()) return true;
 
   // Normalized keywords matching for core departments
-  if (dCode === "bdh" || dName.includes("điều hành")) {
-    return mDept.includes("điều hành") || mDept.includes("quản trị") || mDept === "bdh" || mDept === "dieu_hanh";
-  }
-  if (dCode === "btk" || dName.includes("thư ký")) {
-    return mDept.includes("thư ký") || mDept === "btk" || mDept === "thu_ky";
-  }
-  if (dCode === "btv" || dName.includes("thành viên")) {
-    return (mDept.includes("thành viên") && !mDept.includes("Học viên")) || mDept.includes("phát triển Học viên");
-  }
-  if (dCode === "bxt" || dName.includes("xúc tiến") || dName.includes("thương mại")) {
-    return mDept.includes("xúc tiến") || mDept.includes("thương mại") || mDept.includes("đầu tư b2b") || mDept === "bxt" || mDept === "xuc_tien";
+  if (dCode === "bcn" || dName.includes("công nghệ")) {
+    return mDept.includes("công nghệ") || mDept.includes("kỹ thuật") || mDept.includes("cntt") || mDept === "bcn" || mDept === "cong_nghe";
   }
   if (dCode === "btt" || dName.includes("truyền thông")) {
     return mDept.includes("truyền thông") || mDept === "btt" || mDept === "truyen_thong";
   }
   if (dCode === "btc" || dName.includes("tài chính")) {
-    return mDept.includes("tài chính") || mDept === "btc" || mDept === "tai_chinh";
+    return mDept.includes("tài chính") || mDept.includes("tài trợ") || mDept === "btc" || mDept === "tai_chinh";
+  }
+  if (dCode === "bsk" || dName.includes("sự kiện") || dName.includes("hậu cần")) {
+    return mDept.includes("sự kiện") || mDept.includes("hậu cần") || mDept === "bsk" || mDept === "su_kien";
+  }
+  if (dCode === "bdn" || dName.includes("đối ngoại") || dName.includes("giao thương")) {
+    return mDept.includes("đối ngoại") || mDept.includes("giao thương") || mDept.includes("b2b") || mDept === "bdn" || mDept === "doi_ngoai";
+  }
+  if (dCode === "bds" || dName.includes("gắn kết") || dName.includes("đời sống")) {
+    return mDept.includes("gắn kết") || mDept.includes("đời sống") || mDept.includes("gan ket") || mDept === "bds" || mDept === "doi_song";
+  }
+  if (dCode === "bht" || dName.includes("học tập")) {
+    return mDept.includes("học tập") || mDept.includes("đào tạo") || mDept === "bht";
   }
   if (dCode === "btn" || dName.includes("thiện nguyện")) {
     return mDept.includes("thiện nguyện") || mDept.includes("từ thiện") || mDept === "btn" || mDept === "thien_nguyen";
@@ -335,11 +340,11 @@ function DepartmentsPage() {
   };
 
   const handleResetDefaults = () => {
-    if (!window.confirm("Khôi phục danh sách ban về mặc định (6 ban chuyên môn cốt lõi)?")) return;
+    if (!window.confirm("Khôi phục danh sách ban về mặc định (7 ban chuyên trách)?")) return;
     setDepartments(INITIAL_DEPARTMENTS);
     saveCustomDepartments(INITIAL_DEPARTMENTS);
     dispatchPermissionSyncEvent();
-    toast.info("Đã khôi phục danh sách ban về mặc định.");
+    toast.info("Đã khôi phục danh sách ban về mặc định 7 ban chuyên trách.");
   };
 
   const filteredDepartments = useMemo(() => {

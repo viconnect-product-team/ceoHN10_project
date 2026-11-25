@@ -426,18 +426,25 @@ export class PaymentService {
         }
       }
 
-      // Cập nhật số dư Quỹ tương ứng nếu có
-      if (targetFundId) {
+      // Cập nhật số dư Quỹ Ban Sự kiện & Hậu cần khi thanh toán phí vé sự kiện qua SePay
+      let eventFundId: string | undefined = targetFundId || undefined;
+      if (!eventFundId) {
+        const eventFund = await this.prisma.financial_funds.findFirst({
+          where: { code: 'FUND_BAN_SU_KIEN_HAU_CAN' },
+        }).catch(() => null);
+        eventFundId = eventFund?.id || undefined;
+      }
+      if (eventFundId) {
         await this.prisma.$executeRawUnsafe(`
           UPDATE public.financial_funds SET current_balance = current_balance + $1, updated_at = NOW()
           WHERE id = $2::uuid
-        `, transferAmount, targetFundId).catch(() => {});
+        `, transferAmount, eventFundId).catch(() => {});
       }
 
       if (eventId) {
         await this.prisma.sepay_webhook_events.update({
           where: { id: eventId },
-          data: { status: 'POSTED', matched_order_id: regId },
+          data: { status: 'POSTED', matched_order_id: regId, fund_id: eventFundId },
         }).catch(() => {});
       }
 

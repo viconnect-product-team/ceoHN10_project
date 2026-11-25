@@ -10,6 +10,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { isPrivilegedAdminOrPresident, isMediaDepartmentMember } from "@/lib/checkin-gatekeeper-auth";
 import { useT } from "@/lib/i18n";
+import { useTheme } from "@/lib/theme";
 import { useRole } from "@/hooks/use-role";
 import { useSidebarLabels } from "@/hooks/use-sidebar-labels";
 import { Link, useRouterState } from "@tanstack/react-router";
@@ -21,6 +22,7 @@ import { resolveMediaUrl } from "@/lib/api-client";
 import {
   LayoutDashboard,
   Users,
+  Building2,
   Tags,
   RefreshCw,
   Calendar,
@@ -86,6 +88,7 @@ const crmOverview: Item[] = [
   { key: "nav.dashboard", icon: LayoutDashboard, to: "/", label: "Tổng quan" },
   { key: "nav.aiAssistant" as TKey, icon: Sparkles, to: "/ai-assistant", label: "Trợ lý AI" },
   { key: "nav.members", icon: Users, to: "/members", label: "Học viên" },
+  { key: "nav.departments" as TKey, icon: Building2, to: "/departments", label: "Ban chuyên môn" },
 ];
 
 // 2. Nhóm SỰ KIỆN
@@ -663,17 +666,9 @@ export function Sidebar({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const { theme } = useTheme();
   const brandName = overrideBrandName || activeAssoc?.name || t("brand.name");
-  const rawAssocLogo = activeAssoc?.logoUrl
-    ? resolveMediaUrl(activeAssoc.logoUrl) || activeAssoc.logoUrl
-    : null;
-  const brandLogo =
-    (overrideBrandLogo && !overrideBrandLogo.includes("image 6.png")
-      ? resolveMediaUrl(overrideBrandLogo) || overrideBrandLogo
-      : null) ||
-    (rawAssocLogo && !rawAssocLogo.includes("image 6.png")
-      ? rawAssocLogo
-      : "/app-icon.png");
+  const brandLogo = theme === "light" ? "/hn10-logo.png" : "/hn10-logo-2.png";
 
   // Collapse only applies to the desktop sidebar; the mobile drawer is always full.
   const [collapsed, setCollapsed] = useState(false);
@@ -752,11 +747,11 @@ export function Sidebar({
           }`}
       >
         <img
-          src={brandLogo || "/app-icon.png"}
+          src={brandLogo}
           alt={brandName}
-          className="h-10 w-10 shrink-0 rounded-xl object-contain bg-white/10 p-0.5 border border-sidebar-border/40 shadow-xs"
+          className="h-10 w-12 shrink-0 object-contain bg-transparent p-0 border-0 shadow-none"
           onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = "/app-icon.png";
+            (e.currentTarget as HTMLImageElement).src = "/hn10-logo-2.png";
           }}
         />
         {!isCollapsed && (

@@ -118,6 +118,7 @@ import { Route as MCheckinRouteImport } from './routes/m.checkin'
 import { Route as MCardRouteImport } from './routes/m.card'
 import { Route as MBusinessCardsRouteImport } from './routes/m.business-cards'
 import { Route as LandingSlugRouteImport } from './routes/landing.$slug'
+import { Route as InvitationEventIdRouteImport } from './routes/invitation.$eventId'
 import { Route as HSlugRouteImport } from './routes/h.$slug'
 import { Route as GuestVotingPollIdRouteImport } from './routes/guest-voting.$pollId'
 import { Route as GuestEventRegisterEventIdRouteImport } from './routes/guest-event-register.$eventId'
@@ -814,6 +815,11 @@ const LandingSlugRoute = LandingSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => LandingRoute,
+} as any)
+const InvitationEventIdRoute = InvitationEventIdRouteImport.update({
+  id: '/invitation/$eventId',
+  path: '/invitation/$eventId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const HSlugRoute = HSlugRouteImport.update({
   id: '/h/$slug',
@@ -1752,6 +1758,7 @@ export interface FileRoutesByFullPath {
   '/guest-event-register/$eventId': typeof GuestEventRegisterEventIdRoute
   '/guest-voting/$pollId': typeof GuestVotingPollIdRoute
   '/h/$slug': typeof HSlugRoute
+  '/invitation/$eventId': typeof InvitationEventIdRoute
   '/landing/$slug': typeof LandingSlugRoute
   '/m/business-cards': typeof MBusinessCardsRoute
   '/m/card': typeof MCardRoute
@@ -1989,6 +1996,7 @@ export interface FileRoutesByTo {
   '/guest-event-register/$eventId': typeof GuestEventRegisterEventIdRoute
   '/guest-voting/$pollId': typeof GuestVotingPollIdRoute
   '/h/$slug': typeof HSlugRoute
+  '/invitation/$eventId': typeof InvitationEventIdRoute
   '/landing/$slug': typeof LandingSlugRoute
   '/m/business-cards': typeof MBusinessCardsRoute
   '/m/card': typeof MCardRoute
@@ -2244,6 +2252,7 @@ export interface FileRoutesById {
   '/guest-event-register/$eventId': typeof GuestEventRegisterEventIdRoute
   '/guest-voting/$pollId': typeof GuestVotingPollIdRoute
   '/h/$slug': typeof HSlugRoute
+  '/invitation/$eventId': typeof InvitationEventIdRoute
   '/landing/$slug': typeof LandingSlugRoute
   '/m/business-cards': typeof MBusinessCardsRoute
   '/m/card': typeof MCardRoute
@@ -2507,6 +2516,7 @@ export interface FileRouteTypes {
     | '/guest-event-register/$eventId'
     | '/guest-voting/$pollId'
     | '/h/$slug'
+    | '/invitation/$eventId'
     | '/landing/$slug'
     | '/m/business-cards'
     | '/m/card'
@@ -2744,6 +2754,7 @@ export interface FileRouteTypes {
     | '/guest-event-register/$eventId'
     | '/guest-voting/$pollId'
     | '/h/$slug'
+    | '/invitation/$eventId'
     | '/landing/$slug'
     | '/m/business-cards'
     | '/m/card'
@@ -2998,6 +3009,7 @@ export interface FileRouteTypes {
     | '/guest-event-register/$eventId'
     | '/guest-voting/$pollId'
     | '/h/$slug'
+    | '/invitation/$eventId'
     | '/landing/$slug'
     | '/m/business-cards'
     | '/m/card'
@@ -3204,6 +3216,7 @@ export interface RootRouteChildren {
   GuestEventRegisterEventIdRoute: typeof GuestEventRegisterEventIdRoute
   GuestVotingPollIdRoute: typeof GuestVotingPollIdRoute
   HSlugRoute: typeof HSlugRoute
+  InvitationEventIdRoute: typeof InvitationEventIdRoute
   MembersMemberIdRoute: typeof MembersMemberIdRoute
   PlatformAdminsRoute: typeof PlatformAdminsRoute
   PlatformAiAuditRoute: typeof PlatformAiAuditRoute
@@ -3992,6 +4005,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/landing/$slug'
       preLoaderRoute: typeof LandingSlugRouteImport
       parentRoute: typeof LandingRoute
+    }
+    '/invitation/$eventId': {
+      id: '/invitation/$eventId'
+      path: '/invitation/$eventId'
+      fullPath: '/invitation/$eventId'
+      preLoaderRoute: typeof InvitationEventIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/h/$slug': {
       id: '/h/$slug'
@@ -5815,6 +5835,7 @@ const rootRouteChildren: RootRouteChildren = {
   GuestEventRegisterEventIdRoute: GuestEventRegisterEventIdRoute,
   GuestVotingPollIdRoute: GuestVotingPollIdRoute,
   HSlugRoute: HSlugRoute,
+  InvitationEventIdRoute: InvitationEventIdRoute,
   MembersMemberIdRoute: MembersMemberIdRoute,
   PlatformAdminsRoute: PlatformAdminsRoute,
   PlatformAiAuditRoute: PlatformAiAuditRoute,

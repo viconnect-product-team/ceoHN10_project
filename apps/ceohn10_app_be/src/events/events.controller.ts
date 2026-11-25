@@ -633,4 +633,45 @@ export class EventsController {
   ) {
     return this.eventsService.performTicketCheckin(ticketCode, method || 'guest_self_scan');
   }
+
+  // UC-INV-02: Lấy & lưu danh sách khách mời cá nhân hóa theo sự kiện
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/invitation-guests')
+  async getInvitationGuests(@Param('id') id: string) {
+    return this.eventsService.getInvitationGuests(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/invitation-guests')
+  async saveInvitationGuests(
+    @Param('id') id: string,
+    @Body('guests') guests: any[],
+  ) {
+    return this.eventsService.saveInvitationGuests(id, guests);
+  }
+
+  // UC-INV-03..06: Xem thư mời cá nhân hóa công khai & RSVP không cần đăng nhập
+  @UseGuards(OptionalJwtAuthGuard)
+  @Get(':id/public-invitation')
+  async getPublicInvitation(
+    @Param('id') id: string,
+    @Query('slug') slug?: string,
+  ) {
+    return this.eventsService.getPublicInvitation(id, slug);
+  }
+
+  @UseGuards(OptionalJwtAuthGuard)
+  @Post(':id/public-rsvp')
+  async submitPublicRsvp(
+    @Param('id') id: string,
+    @Body() body: any,
+  ) {
+    return this.eventsService.submitPublicRsvp(id, body);
+  }
+
+  @UseGuards(OptionalJwtAuthGuard)
+  @Get('registrations/:regId/status')
+  async getRegistrationPaymentStatus(@Param('regId') regId: string) {
+    return this.eventsService.getRegistrationPaymentStatus(regId);
+  }
 }

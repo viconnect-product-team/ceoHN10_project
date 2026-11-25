@@ -31,6 +31,7 @@ import {
   GripVertical,
 } from "lucide-react";
 import { toast } from "sonner";
+import { fetchNestApi } from "@/lib/api-client";
 
 export type SeatInfo = {
   id: string;
@@ -118,10 +119,19 @@ export type SeatOccupant = {
   title?: string;
 };
 
+export type EventTicketInfo = {
+  id?: string;
+  name: string;
+  price?: number;
+  quantity?: number;
+  description?: string;
+};
+
 type Props = {
   eventId?: string;
   currentSeat?: string;
   occupiedSeats?: Record<string, SeatOccupant>;
+  tickets?: EventTicketInfo[];
   onSelectSeat: (seatLabel: string) => void;
   onMoveSeat?: (fromSeat: string, toSeat: string, occupant: SeatOccupant) => void;
   initialMode?: "dynamic" | "cinema" | "zones" | "banquet";
@@ -246,14 +256,197 @@ const BANQUET_TABLES: BanquetTable[] = [
   { id: "T8", name: "Bàn 08 - Nhà Tài Trợ Đồng Hành (Chữ nhật)", shape: "rect", seatsCount: 8, isVip: false },
 ];
 
+/**
+ * Thuật toán sinh tự động sơ đồ chỗ ngồi đúng số lượng và loại ghế theo hạng vé sự kiện
+ */
+export function buildSeatingLayoutFromTickets(tickets: EventTicketInfo[]): {
+  dynamicSeats: DynamicSeat[];
+  dynamicZones: DynamicZone[];
+  cinemaRows: CinemaRowConfig[];
+  seatingZones: SeatingZone[];
+  banquetTables: BanquetTable[];
+} {
+  if (!tickets || tickets.length === 0) {
+    return {
+      dynamicSeats: DEFAULT_DYNAMIC_SEATS,
+      dynamicZones: DEFAULT_DYNAMIC_ZONES,
+      cinemaRows: CINEMA_ROWS,
+      seatingZones: DEFAULT_SEATING_ZONES,
+      banquetTables: BANQUET_TABLES,
+    };
+  }
+
+  const dynamicSeats: DynamicSeat[] = [];
+  const dynamicZones: DynamicZone[] = [];
+  const cinemaRows: CinemaRowConfig[] = [];
+  const seatingZones: SeatingZone[] = [];
+  const banquetTables: BanquetTable[] = [];
+
+  let currentY = 95;
+  const SEATS_PER_ROW = 8;
+  const SEAT_STEP_X = 125;
+  const SEAT_STEP_Y = 110;
+  const START_X = 30;
+
+  const ZONE_COLORS: Array<"amber" | "blue" | "purple" | "emerald" | "rose"> = [
+    "amber",
+    "blue",
+    "purple",
+    "emerald",
+    "rose",
+  ];
+
+  const ROW_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let globalRowIdx = 0;
+  let tableIdx = 1;
+
+  tickets.forEach((tk, tierIdx) => {
+    const rawName = tk.name?.trim() || `Hạng vé ${tierIdx + 1}`;
+    const lower = rawName.toLowerCase();
+    const isVip =
+      lower.includes("vip") ||
+      lower.includes("vvip") ||
+      lower.includes("chủ tọa") ||
+      lower.includes("lãnh đạo") ||
+      lower.includes("khách quý");
+
+    const category: "vip" | "standard" = isVip ? "vip" : "standard";
+
+    let qty = parseInt(String(tk.quantity || "").replace(/\D/g, ""), 10);
+    if (!qty || qty <= 0) {
+      qty = isVip ? 10 : 20;
+    }
+
+    let prefix = "STD";
+    if (lower.includes("vvip")) prefix = "VVIP";
+    else if (lower.includes("vip")) prefix = "VIP";
+    else if (lower.includes("tiêu chuẩn") || lower.includes("standard")) prefix = "TC";
+    else if (lower.includes("doanh nhân") || lower.includes("business")) prefix = "DN";
+    else if (lower.includes("khách mời") || lower.includes("guest")) prefix = "KM";
+    else if (lower.includes("học viên") || lower.includes("hội viên") || lower.includes("member")) prefix = "HV";
+    else {
+      const words = rawName.split(/\s+/).filter(Boolean);
+      prefix = words.map((w) => w[0]?.toUpperCase()).join("").slice(0, 3) || `T${tierIdx + 1}`;
+    }
+
+    const tierStartY = currentY;
+    const tierRowsCount = Math.ceil(qty / SEATS_PER_ROW);
+
+    // 1. Sinh Dynamic Seats
+    for (let i = 1; i <= qty; i++) {
+      const seatInTier = i - 1;
+      const rowInTier = Math.floor(seatInTier / SEATS_PER_ROW);
+      const colInTier = seatInTier % SEATS_PER_ROW;
+
+      const posX = START_X + colInTier * SEAT_STEP_X;
+      const posY = tierStartY + rowInTier * SEAT_STEP_Y;
+      const seatCode = `${prefix}-${String(i).padStart(2, "0")}`;
+
+      dynamicSeats.push({
+        id: seatCode,
+        label: `Ghế ${seatCode} (${rawName})`,
+        category,
+        x: posX,
+        y: posY,
+      });
+    }
+
+    // 2. Sinh Dynamic Zone bao bọc hạng vé này
+    const zoneHeight = Math.max(160, tierRowsCount * SEAT_STEP_Y + 40);
+    dynamicZones.push({
+      id: `zone-${prefix.toLowerCase()}-${tierIdx}`,
+      name: `Khu Vực ${rawName} (${qty} ghế)`,
+      x: 20,
+      y: tierStartY - 20,
+      width: 1040,
+      height: zoneHeight,
+      color: ZONE_COLORS[tierIdx % ZONE_COLORS.length],
+    });
+
+    currentY += tierRowsCount * SEAT_STEP_Y + 70;
+
+    // 3. Sinh Cinema Rows (Hội Trường)
+    const CINEMA_ROW_SIZE = isVip ? 10 : 12;
+    const cinemaRowNeeded = Math.ceil(qty / CINEMA_ROW_SIZE);
+    let remainingSeats = qty;
+
+    for (let r = 0; r < cinemaRowNeeded; r++) {
+      const letter = ROW_LETTERS[globalRowIdx % ROW_LETTERS.length] || `R${globalRowIdx + 1}`;
+      globalRowIdx++;
+      const count = Math.min(remainingSeats, CINEMA_ROW_SIZE);
+      remainingSeats -= count;
+
+      cinemaRows.push({
+        id: `row-${letter}`,
+        rowLetter: letter,
+        name: `Hàng ${letter} - ${rawName}`,
+        category,
+        seatsCount: count,
+      });
+    }
+
+    // 4. Sinh Seating Zone (Ma trận khối)
+    seatingZones.push({
+      id: `Z-${prefix}`,
+      name: `Khu ${rawName} (${tierRowsCount}x${SEATS_PER_ROW})`,
+      shape: "rect",
+      rowsCount: tierRowsCount,
+      colsCount: Math.min(qty, SEATS_PER_ROW),
+      isVip,
+    });
+
+    // 5. Sinh Banquet Tables (Bàn Tiệc Gala)
+    const tablesCount = Math.ceil(qty / 10);
+    for (let tb = 1; tb <= tablesCount; tb++) {
+      const tNumStr = String(tableIdx).padStart(2, "0");
+      const isLastTable = tb === tablesCount;
+      const seatsThisTable = isLastTable && qty % 10 !== 0 ? qty % 10 : 10;
+
+      banquetTables.push({
+        id: `T${tableIdx}`,
+        name: `Bàn ${tNumStr} - ${rawName}`,
+        shape: "round",
+        seatsCount: seatsThisTable,
+        isVip,
+      });
+      tableIdx++;
+    }
+  });
+
+  return {
+    dynamicSeats,
+    dynamicZones,
+    cinemaRows,
+    seatingZones,
+    banquetTables,
+  };
+}
+
 export function CinemaSeatingMap({
   eventId = "default",
   currentSeat = "",
   occupiedSeats = {},
+  tickets = [],
   onSelectSeat,
   onMoveSeat,
   initialMode = "dynamic",
 }: Props) {
+  const [activeTickets, setActiveTickets] = useState<EventTicketInfo[]>(() => tickets || []);
+
+  useEffect(() => {
+    if (tickets && tickets.length > 0) {
+      setActiveTickets(tickets);
+    } else if (eventId && eventId !== "default" && eventId !== "all") {
+      void fetchNestApi<any[]>(`/events/${encodeURIComponent(eventId)}/tickets`)
+        .then((tks) => {
+          if (Array.isArray(tks) && tks.length > 0) {
+            setActiveTickets(tks);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [eventId, tickets]);
+
   const [mode, setMode] = useState<"dynamic" | "cinema" | "zones" | "banquet">(initialMode);
   const [selectedSeat, setSelectedSeat] = useState<string>(currentSeat);
   const [searchQuery, setSearchQuery] = useState("");
@@ -374,23 +567,92 @@ export function CinemaSeatingMap({
   const [newTableIsVip, setNewTableIsVip] = useState(false);
   const [newTableSeatsCount, setNewTableSeatsCount] = useState(10);
 
-  // Sync when eventId changes
+  // Sync when eventId or activeTickets changes
   useEffect(() => {
     try {
       const savedDynamic = localStorage.getItem(`ceohn10_dynamic_seats_${eventId || "default"}`);
-      setDynamicSeats(savedDynamic ? JSON.parse(savedDynamic) : DEFAULT_DYNAMIC_SEATS);
+      if (savedDynamic) {
+        setDynamicSeats(JSON.parse(savedDynamic));
+      } else if (activeTickets && activeTickets.length > 0) {
+        const layout = buildSeatingLayoutFromTickets(activeTickets);
+        setDynamicSeats(layout.dynamicSeats);
+        localStorage.setItem(`ceohn10_dynamic_seats_${eventId || "default"}`, JSON.stringify(layout.dynamicSeats));
+      } else {
+        setDynamicSeats(DEFAULT_DYNAMIC_SEATS);
+      }
+
       const savedDynamicZones = localStorage.getItem(`ceohn10_dynamic_zones_${eventId || "default"}`);
-      setDynamicZones(savedDynamicZones ? JSON.parse(savedDynamicZones) : DEFAULT_DYNAMIC_ZONES);
+      if (savedDynamicZones) {
+        setDynamicZones(JSON.parse(savedDynamicZones));
+      } else if (activeTickets && activeTickets.length > 0) {
+        const layout = buildSeatingLayoutFromTickets(activeTickets);
+        setDynamicZones(layout.dynamicZones);
+        localStorage.setItem(`ceohn10_dynamic_zones_${eventId || "default"}`, JSON.stringify(layout.dynamicZones));
+      } else {
+        setDynamicZones(DEFAULT_DYNAMIC_ZONES);
+      }
+
       const savedRows = localStorage.getItem(`ceohn10_cinema_rows_${eventId || "default"}`);
-      setCinemaRows(savedRows ? JSON.parse(savedRows) : CINEMA_ROWS);
+      if (savedRows) {
+        setCinemaRows(JSON.parse(savedRows));
+      } else if (activeTickets && activeTickets.length > 0) {
+        const layout = buildSeatingLayoutFromTickets(activeTickets);
+        setCinemaRows(layout.cinemaRows);
+        localStorage.setItem(`ceohn10_cinema_rows_${eventId || "default"}`, JSON.stringify(layout.cinemaRows));
+      } else {
+        setCinemaRows(CINEMA_ROWS);
+      }
+
       const savedZones = localStorage.getItem(`ceohn10_seating_zones_${eventId || "default"}`);
-      setSeatingZones(savedZones ? JSON.parse(savedZones) : DEFAULT_SEATING_ZONES);
+      if (savedZones) {
+        setSeatingZones(JSON.parse(savedZones));
+      } else if (activeTickets && activeTickets.length > 0) {
+        const layout = buildSeatingLayoutFromTickets(activeTickets);
+        setSeatingZones(layout.seatingZones);
+        localStorage.setItem(`ceohn10_seating_zones_${eventId || "default"}`, JSON.stringify(layout.seatingZones));
+      } else {
+        setSeatingZones(DEFAULT_SEATING_ZONES);
+      }
+
       const savedTables = localStorage.getItem(`ceohn10_banquet_tables_${eventId || "default"}`);
-      setBanquetTables(savedTables ? JSON.parse(savedTables) : BANQUET_TABLES);
+      if (savedTables) {
+        setBanquetTables(JSON.parse(savedTables));
+      } else if (activeTickets && activeTickets.length > 0) {
+        const layout = buildSeatingLayoutFromTickets(activeTickets);
+        setBanquetTables(layout.banquetTables);
+        localStorage.setItem(`ceohn10_banquet_tables_${eventId || "default"}`, JSON.stringify(layout.banquetTables));
+      } else {
+        setBanquetTables(BANQUET_TABLES);
+      }
+
       const savedStage = localStorage.getItem(`ceohn10_stage_seats_${eventId || "default"}`);
       setStageSeatsCount(savedStage ? Number(savedStage) || 6 : 6);
     } catch { }
-  }, [eventId]);
+  }, [eventId, activeTickets]);
+
+  const handleSyncFromTickets = () => {
+    if (!activeTickets || activeTickets.length === 0) {
+      toast.info("Sự kiện này chưa có khai báo loại vé chi tiết, đang hiển thị cấu hình mặc định.");
+      return;
+    }
+    const layout = buildSeatingLayoutFromTickets(activeTickets);
+    setDynamicSeats(layout.dynamicSeats);
+    setDynamicZones(layout.dynamicZones);
+    setCinemaRows(layout.cinemaRows);
+    setSeatingZones(layout.seatingZones);
+    setBanquetTables(layout.banquetTables);
+
+    try {
+      localStorage.setItem(`ceohn10_dynamic_seats_${eventId || "default"}`, JSON.stringify(layout.dynamicSeats));
+      localStorage.setItem(`ceohn10_dynamic_zones_${eventId || "default"}`, JSON.stringify(layout.dynamicZones));
+      localStorage.setItem(`ceohn10_cinema_rows_${eventId || "default"}`, JSON.stringify(layout.cinemaRows));
+      localStorage.setItem(`ceohn10_seating_zones_${eventId || "default"}`, JSON.stringify(layout.seatingZones));
+      localStorage.setItem(`ceohn10_banquet_tables_${eventId || "default"}`, JSON.stringify(layout.banquetTables));
+    } catch { }
+
+    const totalSeats = layout.dynamicSeats.length;
+    toast.success(`Đã tự động khởi tạo lại ${totalSeats} ghế đúng theo ${activeTickets.length} hạng vé sự kiện!`);
+  };
 
   const saveDynamicSeats = (newSeats: DynamicSeat[]) => {
     setDynamicSeats(newSeats);
@@ -1004,6 +1266,43 @@ export function CinemaSeatingMap({
 
   return (
     <div className="w-full rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col font-sans">
+      {/* ── BANNER KHAI BÁO HẠNG VÉ SỰ KIỆN & ĐỒNG BỘ SƠ ĐỒ CHỖ ── */}
+      {activeTickets && activeTickets.length > 0 && (
+        <div className="px-3.5 py-2.5 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-blue-500/10 border-b border-amber-200/60 dark:border-amber-800/60 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="font-bold text-amber-900 dark:text-amber-200 flex items-center gap-1">
+              <Ticket className="size-3.5 text-amber-600 shrink-0" />
+              <span>Hạng vé sự kiện ({activeTickets.length} hạng):</span>
+            </span>
+            {activeTickets.map((tk, idx) => {
+              const q = parseInt(String(tk.quantity || "").replace(/\D/g, ""), 10) || (tk.name.toLowerCase().includes("vip") ? 10 : 20);
+              const isVip = tk.name.toLowerCase().includes("vip");
+              return (
+                <span
+                  key={idx}
+                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-bold text-[11px] shadow-2xs ${
+                    isVip
+                      ? "bg-amber-100 text-amber-900 border border-amber-300 dark:bg-amber-950/80 dark:text-amber-300 dark:border-amber-700"
+                      : "bg-blue-100 text-blue-900 border border-blue-300 dark:bg-blue-950/80 dark:text-blue-300 dark:border-blue-700"
+                  }`}
+                >
+                  {isVip ? "👑" : "🎫"} {tk.name}: <span className="underline">{q} ghế</span>
+                </span>
+              );
+            })}
+          </div>
+          <button
+            type="button"
+            onClick={handleSyncFromTickets}
+            className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-xs transition cursor-pointer shrink-0"
+            title="Tự động đồng bộ và sinh lại đúng số ghế, loại ghế theo hạng vé đã khai báo"
+          >
+            <RotateCcw className="size-3.5" />
+            <span>Đồng bộ theo hạng vé</span>
+          </button>
+        </div>
+      )}
+
       {/* ── TOP HEADER & ACTIONS ── */}
       <div className="p-3.5 sm:p-4 bg-slate-50/80 dark:bg-slate-950/60 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">

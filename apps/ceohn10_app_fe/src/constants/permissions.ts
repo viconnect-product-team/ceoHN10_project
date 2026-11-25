@@ -4,62 +4,75 @@
  */
 
 export const SRS_ROLES = {
-  QUAN_TRI: "quan_tri",
-  CHU_TICH: "chu_tich",
+  PLATFORM_ADMIN: "platform_admin",
   ADMIN: "admin",
-  BAN_DIEU_HANH: "ban_dieu_hanh",
-  TONG_THU_KY: "tong_thu_ky",
-  BAN_THU_KY: "ban_thu_ky",
-  TRUONG_BAN_TRUYEN_THONG: "truong_ban_truyen_thong",
-  TRUONG_BAN_THANH_VIEN: "truong_ban_thanh_vien",
-  TRUONG_BAN_XUC_TIEN: "truong_ban_xuc_tien",
-  TRUONG_BAN_TAI_CHINH: "truong_ban_tai_chinh",
-  TRUONG_BAN_THIEN_NGUYEN: "truong_ban_thien_nguyen",
-  TRUONG_BAN_DIEU_HANH: "truong_ban_dieu_hanh",
+  LOP_TRUONG: "lop_truong",
+  LOP_PHO: "lop_pho",
+  TRUONG_TEAM: "truong_team",
+  PHO_TEAM: "pho_team",
+  TRUONG_BAN_CHUYEN_TRACH: "truong_ban_chuyen_trach",
+  GIANG_VIEN: "giang_vien",
   MEMBER: "member",
   // Backward compatibility aliases
+  QUAN_TRI: "platform_admin",
+  CHU_TICH: "lop_truong",
+  PHO_CHU_TICH: "lop_pho",
+  BAN_DIEU_HANH: "lop_pho",
+  TONG_THU_KY: "truong_ban_chuyen_trach",
+  BAN_THU_KY: "truong_ban_chuyen_trach",
+  TRUONG_BAN_TRUYEN_THONG: "truong_ban_chuyen_trach",
+  TRUONG_BAN_THANH_VIEN: "truong_ban_chuyen_trach",
+  TRUONG_BAN_XUC_TIEN: "truong_ban_chuyen_trach",
+  TRUONG_BAN_TAI_CHINH: "truong_ban_chuyen_trach",
+  TRUONG_BAN_THIEN_NGUYEN: "truong_ban_chuyen_trach",
+  TRUONG_BAN_DIEU_HANH: "lop_pho",
   ADM: "admin",
-  BQT: "ban_dieu_hanh",
-  BTK: "ban_thu_ky",
-  BTT: "truong_ban_truyen_thong",
-  BXT: "truong_ban_xuc_tien",
-  BTV: "truong_ban_thanh_vien",
-  BTN: "truong_ban_thien_nguyen",
-  BTC: "truong_ban_tai_chinh",
+  BQT: "lop_pho",
+  BTK: "truong_ban_chuyen_trach",
+  BTT: "truong_ban_chuyen_trach",
+  BXT: "truong_ban_chuyen_trach",
+  BTV: "truong_ban_chuyen_trach",
+  BTN: "truong_ban_chuyen_trach",
+  BTC: "truong_ban_chuyen_trach",
   HVT: "member",
 } as const;
 
 export const STANDARD_ROLES = [
-  "Quản trị",
-  "Chủ tịch",
+  "Platform Admin",
   "Admin",
-  "Ban Điều Hành",
-  "Tổng thư ký",
-  "Trưởng ban Truyền thông",
-  "Trưởng ban Thành viên",
-  "Trưởng ban Xúc tiến",
-  "Trưởng ban Tài chính",
-  "Trưởng ban Thiện nguyện",
-  "Ban Thư ký",
-  "Thành viên",
+  "Lớp trưởng",
+  "Lớp phó",
+  "Trưởng team",
+  "Phó team",
+  "Trưởng ban chuyên trách",
+  "Giảng viên",
+  "Học viên",
 ] as const;
 
 export const STANDARD_5_ROLES = STANDARD_ROLES;
 
 export const STANDARD_7_COMMITTEES = [
-  "Ban Thành viên",
-  "Ban xúc tiến",
-  "Ban thiện nguyện",
-  "Ban truyền thông",
-  "Ban thư ký",
-  "Ban điều hành",
-  "Ban tài chính",
-  "Học viên ceohn10",
+  "Ban Công nghệ",
+  "Ban Truyền thông",
+  "Ban Tài chính",
+  "Ban Sự kiện & Hậu cần",
+  "Ban Đối ngoại & Giao thương",
+  "Ban Gắn kết & Đời sống",
+  "Ban Thiện nguyện",
 ] as const;
 
 export type SrsRole =
-  | "chu_tich"
+  | "platform_admin"
   | "admin"
+  | "lop_truong"
+  | "lop_pho"
+  | "truong_team"
+  | "pho_team"
+  | "truong_ban_chuyen_trach"
+  | "giang_vien"
+  | "member"
+  // Legacy aliases for typing compatibility
+  | "chu_tich"
   | "quan_tri"
   | "ban_dieu_hanh"
   | "tong_thu_ky"
@@ -70,7 +83,6 @@ export type SrsRole =
   | "truong_ban_tai_chinh"
   | "truong_ban_thien_nguyen"
   | "truong_ban_dieu_hanh"
-  | "member"
   | "ADM"
   | "BQT"
   | "BTK"

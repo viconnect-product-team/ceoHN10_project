@@ -7,8 +7,9 @@
 export const BRAND_ASSETS = {
   // Logo nhận diện thương hiệu
   logoSquare: '/ceohn10-logo.png',
-  logoHeader: '/brand-header-logo.png',
-  logoFavicon: '/favicon.ico',
+  logoSidebar: '/hn10-logo-2.png',
+  logoHeader: '/hn10-logo-2.png',
+  logoFavicon: '/ceohn10-favicon.png',
   logoWhite: '/ceohn10-logo-white.png',
 
   // Fallback avatars theo phong cách doanh nhân

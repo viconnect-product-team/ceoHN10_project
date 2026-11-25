@@ -628,6 +628,16 @@ export class MembersService {
           : null,
       isLocationSharing: r.is_location_sharing ?? true,
       lastLocationUpdated: r.last_location_updated_at || null,
+      customData: r.custom_data
+        ? typeof r.custom_data === 'string'
+          ? (() => { try { return JSON.parse(r.custom_data); } catch { return {}; } })()
+          : r.custom_data
+        : {},
+      custom_data: r.custom_data
+        ? typeof r.custom_data === 'string'
+          ? (() => { try { return JSON.parse(r.custom_data); } catch { return {}; } })()
+          : r.custom_data
+        : {},
       createdAt: r.created_at,
       updatedAt: r.updated_at,
     };
@@ -1698,13 +1708,30 @@ export class MembersService {
       }
     }
 
+    // Trích xuất custom_data từ dynamic fields
+    const standardKeys = new Set([
+      'name', 'contact', 'email', 'phone', 'type', 'level', 'industry', 'region', 'status',
+      'address', 'website', 'taxCode', 'tax_code', 'employees', 'about', 'associationId',
+      'executiveRole', 'department', 'code', 'avatar', 'coverUrl', 'feePaid', 'feeYear',
+      'paymentStatus', 'companyName', 'company', 'customData', 'custom_data'
+    ]);
+    const customFieldsObj: Record<string, any> = {
+      ...(data.customData || (data as any).custom_data || {}),
+    };
+    for (const [k, v] of Object.entries(data)) {
+      if (!standardKeys.has(k) && v !== undefined) {
+        customFieldsObj[k] = v;
+      }
+    }
+    const customJsonStr = JSON.stringify(customFieldsObj);
+
     // Insert into public.members. The DB trigger trg_set_member_code will automatically
     // assign the sequential code (e.g. HV-00000x or PREFIX-00000x) if code is empty!
     await this.prisma.$executeRaw`
       INSERT INTO public.members (
         id, code, name, contact, email, phone, type, level, industry, region, status,
         joined_at, fee_year, fee_paid, address, website, tax_code, employees, about,
-        executive_role, department,
+        executive_role, department, custom_data,
         association_id, created_at, updated_at
       ) VALUES (
         ${id},
@@ -1728,6 +1755,7 @@ export class MembersService {
         ${data.about ?? ''},
         'member',
         'Học viên ceohn10',
+        ${customJsonStr}::jsonb,
         ${assocId}::uuid,
         now(),
         now()
@@ -1752,6 +1780,104 @@ export class MembersService {
         now()
       )
     `.catch(() => null);
+
+    // Tự động khởi tạo tài khoản App-Only (chỉ vào App CEOHN10, không vào CRM) và đồng bộ lên Quản lý tài khoản
+    if (cleanEmail && cleanEmail.includes('@')) {
+      try {
+        const existingUser = await this.prisma.vione_users
+          .findFirst({
+            where: {
+              OR: [{ email: cleanEmail }, { username: cleanEmail }],
+            },
+          })
+          .catch(() => null);
+
+        const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+        const passwordRaw = `CEOHN10@${randomSuffix}`;
+        const hashedPassword = await bcrypt.hash(passwordRaw, 10);
+        let assignedUserId = existingUser?.id;
+
+        if (!assignedUserId) {
+          assignedUserId = crypto.randomUUID();
+          await this.prisma.vione_users
+            .create({
+              data: {
+                id: assignedUserId,
+                username: cleanEmail,
+                email: cleanEmail,
+                name: data.name,
+                password: hashedPassword,
+                email_verified: true,
+                created_at: new Date(),
+                updated_at: new Date(),
+              },
+            })
+            .catch(() => null);
+
+          await this.prisma.$executeRaw`
+            INSERT INTO public.user_roles (user_id, role)
+            VALUES (${assignedUserId}::uuid, 'member'::public.app_role)
+            ON CONFLICT DO NOTHING
+          `.catch(() => null);
+
+          await this.prisma.$executeRaw`
+            INSERT INTO public.user_profiles (
+              user_id, display_name, company_name, onboarding_status, must_change_password, account_status, created_at, updated_at
+            ) VALUES (
+              ${assignedUserId}::uuid,
+              ${data.name},
+              ${data.contact || 'CLB Doanh Nhân CEO HN10'},
+              'new',
+              true,
+              'active',
+              NOW(),
+              NOW()
+            )
+            ON CONFLICT (user_id) DO NOTHING
+          `.catch(() => null);
+
+          await this.prisma.$executeRaw`
+            INSERT INTO auth.users (id, email, role)
+            VALUES (${assignedUserId}::uuid, ${cleanEmail}, 'authenticated')
+            ON CONFLICT (id) DO NOTHING
+          `.catch(() => null);
+        }
+
+        if (assignedUserId) {
+          const appOnlySettings = JSON.stringify({
+            targetSystem: 'app_only',
+            canAccessCrm: false,
+          });
+          await this.prisma.$executeRaw`
+            UPDATE public.members
+            SET user_id = ${assignedUserId}::uuid,
+                executive_role = 'member',
+                department = COALESCE(NULLIF(${data.department || ''}, ''), 'Ban Gắn kết & Đời sống'),
+                card_visibility_settings = ${appOnlySettings}::jsonb
+            WHERE id = ${id}
+          `.catch(() => null);
+
+          const createdMem = await this.getMemberById(userId, id).catch(() => null);
+          const portalUrl = process.env.APP_URL
+            ? `${process.env.APP_URL.replace(/\/$/, '')}/association/login`
+            : 'https://ceohn10.viconnect.vn/association/login';
+
+          void this.mailService
+            .sendRegistrationAccountEmail({
+              to: cleanEmail,
+              fullName: data.name,
+              username: cleanEmail,
+              passwordRaw,
+              companyName: data.contact || data.name,
+              memberCode: createdMem?.code || id,
+              portalUrl,
+            })
+            .catch(() => null);
+        }
+      } catch (e: any) {
+        this.logger.warn(`Auto App-Only account creation on createMember: ${e?.message}`);
+      }
+    }
 
     return this.getMemberById(userId, id);
   }
@@ -1907,6 +2033,23 @@ export class MembersService {
       finalFeePaid = true;
     }
 
+    // Trích xuất custom_data từ dynamic fields
+    const standardKeys = new Set([
+      'name', 'contact', 'email', 'phone', 'type', 'level', 'industry', 'region', 'status',
+      'address', 'website', 'taxCode', 'tax_code', 'employees', 'about', 'associationId',
+      'executiveRole', 'department', 'code', 'avatar', 'coverUrl', 'feePaid', 'feeYear',
+      'paymentStatus', 'companyName', 'company', 'customData', 'custom_data'
+    ]);
+    const customFieldsObj: Record<string, any> = {
+      ...(data.customData || (data as any).custom_data || {}),
+    };
+    for (const [k, v] of Object.entries(data)) {
+      if (!standardKeys.has(k) && v !== undefined) {
+        customFieldsObj[k] = v;
+      }
+    }
+    const customJsonStr = JSON.stringify(customFieldsObj);
+
     await this.prisma.$executeRaw`
       UPDATE public.members SET
         name = ${name},
@@ -1926,6 +2069,7 @@ export class MembersService {
         fee_paid = ${finalFeePaid},
         fee_year = ${feeYear},
         payment_status = ${paymentStatus},
+        custom_data = COALESCE(custom_data, '{}'::jsonb) || ${customJsonStr}::jsonb,
         updated_at = now()
       WHERE id = ${current.id}
     `;
@@ -2192,8 +2336,7 @@ export class MembersService {
       WHERE id::text = ${cleanId} 
          OR code = ${cleanId} 
          OR user_id::text = ${cleanId} 
-         OR LOWER(email) = LOWER(${cleanId}) 
-         OR LOWER(contact_email) = LOWER(${cleanId})
+         OR LOWER(email) = LOWER(${cleanId})
       LIMIT 1
     `.catch(() => []);
 

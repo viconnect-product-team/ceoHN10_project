@@ -34,6 +34,8 @@ import { EVENT_TYPE_TEMPLATES, type EventTypeKey } from "@/lib/event-type-templa
 import { EventQrStaffSelector } from "@/components/events/EventQrStaffSelector";
 import { EventSponsorPackageSelector } from "@/components/events/EventSponsorPackageSelector";
 import { parseEventDocument, type ParsedEventData } from "@/lib/event-doc-parser";
+import { buildSeatingLayoutFromTickets } from "@/components/dashboard/CinemaSeatingMap";
+import { EventPartsEditor, createDefaultCeoHn10Parts, type EventPartConfig } from "@/components/events/EventPartsEditor";
 
 type EventType = EventItem["type"];
 type EventStatus = EventItem["status"];
@@ -52,6 +54,8 @@ type Info = {
   startTime?: string;
   endTime?: string;
   location: string;
+  venueName?: string;
+  parts?: EventPartConfig[];
   capacity: string;
   type: EventType;
   status: EventStatus;
@@ -134,6 +138,8 @@ function EventWizardDialog({
     isFixed: false,
     recurrenceRule: "Hàng tháng",
     isPaid: false,
+    venueName: "",
+    parts: createDefaultCeoHn10Parts(),
   });
   const [tickets, setTickets] = useState<TicketDraft[]>([]);
   const [qrFields, setQrFields] = useState<QrField[]>(["registration_code"]);
@@ -273,6 +279,8 @@ function EventWizardDialog({
           endTime: (info.endTime || "11:30").trim(),
           time: `${(info.startTime || "08:30").trim()} - ${(info.endTime || "11:30").trim()}`,
           location: info.location.trim(),
+          venueName: (info.venueName || "").trim(),
+          parts: Array.isArray(info.parts) ? info.parts : [],
           address: info.location.trim(),
           capacity: Number(info.capacity) || 0,
           type: info.type,
@@ -300,10 +308,27 @@ function EventWizardDialog({
         }),
       });
       const createdEv = res?.event || (res as unknown as EventItem);
+      if (createdEv?.id && tickets.length > 0) {
+        try {
+          const layout = buildSeatingLayoutFromTickets(
+            tickets.map((tk) => ({
+              name: tk.name.trim(),
+              quantity: parseInt(String(tk.quantity).replace(/\D/g, ""), 10) || 0,
+              price: parseVndNumber(tk.price),
+              description: tk.description.trim(),
+            }))
+          );
+          localStorage.setItem(`ceohn10_dynamic_seats_${createdEv.id}`, JSON.stringify(layout.dynamicSeats));
+          localStorage.setItem(`ceohn10_dynamic_zones_${createdEv.id}`, JSON.stringify(layout.dynamicZones));
+          localStorage.setItem(`ceohn10_cinema_rows_${createdEv.id}`, JSON.stringify(layout.cinemaRows));
+          localStorage.setItem(`ceohn10_seating_zones_${createdEv.id}`, JSON.stringify(layout.seatingZones));
+          localStorage.setItem(`ceohn10_banquet_tables_${createdEv.id}`, JSON.stringify(layout.banquetTables));
+        } catch {}
+      }
       setCreatedEvent(createdEv);
       onCreated(createdEv);
       setStep(3);
-      toast.success("Khởi tạo sự kiện thành công! Bạn có thể đăng ký đại biểu tham dự ngay dưới đây.");
+      toast.success("Khởi tạo sự kiện thành công! Sơ đồ chỗ ngồi đã được tự động khởi tạo đúng theo các hạng vé.");
     } catch (err: any) {
       console.error("[EventWizard] Create error:", err);
       toast.error(err?.message || t("ewz.error"));
@@ -1038,6 +1063,14 @@ function InfoStep({
           </div>
         </div>
       </div>
+
+      {/* Cấu hình các phần chương trình & phí từng phần (UC-INV-01) */}
+      <EventPartsEditor
+        venueName={info.venueName || ""}
+        onChangeVenueName={(v) => setInfo({ ...info, venueName: v })}
+        parts={Array.isArray(info.parts) ? info.parts : createDefaultCeoHn10Parts()}
+        onChangeParts={(nextParts) => setInfo({ ...info, parts: nextParts })}
+      />
 
       {/* Mô tả / Nội dung chi tiết sự kiện */}
       <div>
