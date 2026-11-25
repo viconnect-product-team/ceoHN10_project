@@ -29,6 +29,7 @@ import { PaymentModule } from './payment/payment.module';
 import { SyndicationModule } from './syndication/syndication.module';
 import { LandingModule } from './landing/landing.module';
 import { SuppliesModule } from './supplies/supplies.module';
+import { DynamicImportModule } from './dynamic-import/dynamic-import.module';
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import { SuppliesModule } from './supplies/supplies.module';
     SyndicationModule,
     LandingModule,
     SuppliesModule,
+    DynamicImportModule,
   ],
   controllers: [AppController],
   providers: [AppService],

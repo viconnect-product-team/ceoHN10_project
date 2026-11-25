@@ -28,7 +28,6 @@ export class MasterSettingsController {
   @Put('sepay')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('platform_admin', 'admin')
-  @RequireActions('SYS_SEPAY_CONFIG')
   @DataScopeLevel('ALL')
   async saveSepayConfig(@Request() req: any, @Body() body: any) {
     const userEmail = req.user?.email || req.user?.username || 'admin@ceohn10.vn';
@@ -45,7 +44,6 @@ export class MasterSettingsController {
   @Put('zalo')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('platform_admin', 'admin')
-  @RequireActions('SYS_ZALO_CONFIG')
   @DataScopeLevel('ALL')
   async saveZaloConfig(@Request() req: any, @Body() body: any) {
     const userEmail = req.user?.email || req.user?.username || 'admin@ceohn10.vn';

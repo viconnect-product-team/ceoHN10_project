@@ -210,13 +210,13 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
     try {
       // 1. Ưu tiên đọc từ master_system_settings
       const masterRow = await this.prisma.$queryRawUnsafe<any[]>(`
-        SELECT setting_value FROM public.master_system_settings WHERE setting_key = 'zalo_oa_integration_config' LIMIT 1
+        SELECT value FROM public.master_system_settings WHERE key = 'zalo_oa_integration_config' LIMIT 1
       `).catch(() => []);
 
-      if (masterRow.length > 0 && masterRow[0]?.setting_value) {
-        const parsed = typeof masterRow[0].setting_value === 'string'
-          ? JSON.parse(masterRow[0].setting_value)
-          : masterRow[0].setting_value;
+      if (masterRow.length > 0 && masterRow[0]?.value) {
+        const parsed = typeof masterRow[0].value === 'string'
+          ? JSON.parse(masterRow[0].value)
+          : masterRow[0].value;
         return {
           ...defaultConfig,
           appId: parsed.app_id || parsed.appId || defaultConfig.appId,
@@ -344,9 +344,9 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
 
       // Đồng bộ sang master_system_settings
       await this.prisma.$executeRawUnsafe(
-        `INSERT INTO public.master_system_settings (id, setting_key, setting_value, updated_at)
-         VALUES (gen_random_uuid(), 'zalo_oa_integration_config', $1::jsonb, NOW())
-         ON CONFLICT (setting_key) DO UPDATE SET setting_value = EXCLUDED.setting_value, updated_at = NOW()`,
+        `INSERT INTO public.master_system_settings (key, value, category, description, updated_at)
+         VALUES ('zalo_oa_integration_config', $1::jsonb, 'social_integration', 'Cấu hình Zalo OA', NOW())
+         ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()`,
         JSON.stringify(persistedConfig),
       ).catch(() => {});
       return {

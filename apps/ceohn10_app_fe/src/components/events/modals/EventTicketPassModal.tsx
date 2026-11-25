@@ -19,6 +19,10 @@ export interface EventTicketPassModalProps {
     attendeePosition?: string;
     seatAssignment?: string;
     qrUrl: string;
+    isCheckedIn?: boolean;
+    checkedInAt?: string;
+    isCheckedOut?: boolean;
+    checkedOutAt?: string;
   } | null;
   onClose: () => void;
 }
@@ -56,6 +60,24 @@ export const EventTicketPassModal: React.FC<EventTicketPassModalProps> = ({
             />
             <div className="text-[12px] font-mono font-black text-[#003B95] mt-2">
               MÃ VÉ: {ticketPassModal.ticketCode}
+            </div>
+            {/* Trạng thái Check-in & Check-out vé */}
+            <div className="mt-2 flex justify-center">
+              {ticketPassModal.isCheckedOut ? (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-indigo-100 text-indigo-800 dark:bg-indigo-950/80 dark:text-indigo-300 border border-indigo-300">
+                  <span>🏁 Đã Check-out (Ra về)</span>
+                  {ticketPassModal.checkedOutAt && <span className="opacity-80 font-normal">• {ticketPassModal.checkedOutAt}</span>}
+                </span>
+              ) : ticketPassModal.isCheckedIn ? (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-300">
+                  <span>🟢 Đã Check-in vào cửa</span>
+                  {ticketPassModal.checkedInAt && <span className="opacity-80 font-normal">• {ticketPassModal.checkedInAt}</span>}
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border border-amber-300">
+                  <span>🎟️ Vé hợp lệ • Chưa Check-in</span>
+                </span>
+              )}
             </div>
           </div>
 

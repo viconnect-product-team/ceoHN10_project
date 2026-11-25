@@ -7,7 +7,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
-import { AuthGuard } from '../auth/auth.guard';
+import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
 import {
   CheckinAttendeeDto,
   RecordMemberCheckinDto,
@@ -15,7 +15,7 @@ import {
 } from './dto';
 
 @Controller('checkin')
-@UseGuards(AuthGuard)
+@UseGuards(OptionalJwtAuthGuard)
 export class CheckinController {
   constructor(private readonly eventsService: EventsService) {}
 
@@ -41,6 +41,11 @@ export class CheckinController {
   @Post('undo')
   async undoCheckIn(@Body() body: CheckinAttendeeDto) {
     return this.eventsService.undoCheckInAttendee(body.attendeeId);
+  }
+
+  @Post('checkout')
+  async checkOut(@Body() body: CheckinAttendeeDto) {
+    return this.eventsService.performTicketCheckout(body.attendeeId);
   }
 
   @Post('record')

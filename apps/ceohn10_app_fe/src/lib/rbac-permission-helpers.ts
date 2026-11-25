@@ -3,7 +3,7 @@
  * Ma trận phân quyền 5 vai trò cốt lõi: Quản trị, Admin, Tổng thư ký, Trưởng ban, Thành viên
  */
 
-export const RBAC_MATRIX_STORAGE_KEY = "ceohn10_rbac_tree_matrix_v7_sidebar_menu";
+export const RBAC_MATRIX_STORAGE_KEY = "ceohn10_rbac_tree_matrix_v8_clean_9roles";
 
 export interface SystemTenantDef {
   key: string;
@@ -23,8 +23,8 @@ export const SYSTEM_TENANTS: SystemTenantDef[] = [
     shortName: "CEO HN10",
     code: "CEOHN10",
     brandName: "CLB Doanh Nhân CEO HN10 (HanoiBA)",
-    brandLogo: "/app-icon.png",
-    description: "Cổng Quản trị Doanh Trí, Lớp học 30 chuyên đề, Sự kiện & Hội viên CEO HN10",
+    brandLogo: "/hn10-logo-2.png",
+    description: "Cổng Quản trị Doanh Trí, Lớp học 30 chuyên đề, Sự kiện & Học viên CEO HN10",
     enabledModules: [
       "classes",
       "events",
@@ -77,15 +77,17 @@ export function isModuleEnabledForTenant(moduleKey: string, tenantKey?: string):
 }
 
 export type SystemRoleKey =
-  | "admin_platform"
-  | "lop_truong"
+  | "platform_admin"
   | "admin"
+  | "lop_truong"
   | "lop_pho"
   | "truong_team"
   | "pho_team"
   | "truong_ban_chuyen_trach"
+  | "giang_vien"
   | "member"
-  // Aliases tương thích ngược
+  // Legacy aliases mapped
+  | "admin_platform"
   | "quan_tri"
   | "chu_tich"
   | "pho_chu_tich"
@@ -102,18 +104,11 @@ export interface SystemRoleDef {
 
 export const SYSTEM_5_ROLES: SystemRoleDef[] = [
   {
-    key: "admin_platform",
-    name: "Admin Platform",
-    shortName: "Admin Platform",
+    key: "platform_admin",
+    name: "Platform Admin",
+    shortName: "Platform Admin",
     color: "text-indigo-700 bg-indigo-50 border-indigo-200 dark:bg-indigo-950/50 dark:text-indigo-300 dark:border-indigo-800",
     desc: "Quản trị viên nền tảng tối cao, toàn quyền hệ thống & phân quyền cao nhất",
-  },
-  {
-    key: "lop_truong",
-    name: "Lớp trưởng",
-    shortName: "Lớp trưởng",
-    color: "text-amber-800 bg-amber-100 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-700",
-    desc: "Lớp trưởng CEO HN10 - Điều hành và phê duyệt tối cao toàn lớp",
   },
   {
     key: "admin",
@@ -121,6 +116,13 @@ export const SYSTEM_5_ROLES: SystemRoleDef[] = [
     shortName: "Admin",
     color: "text-purple-700 bg-purple-50 border-purple-200 dark:bg-purple-950/50 dark:text-purple-300 dark:border-purple-800",
     desc: "Quản trị viên vận hành hệ thống CRM & CSDL",
+  },
+  {
+    key: "lop_truong",
+    name: "Lớp trưởng",
+    shortName: "Lớp trưởng",
+    color: "text-amber-800 bg-amber-100 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-700",
+    desc: "Lớp trưởng Ban Cán sự CEO HN10 - Điều hành và phê duyệt tối cao",
   },
   {
     key: "lop_pho",
@@ -148,26 +150,34 @@ export const SYSTEM_5_ROLES: SystemRoleDef[] = [
     name: "Trưởng ban chuyên trách",
     shortName: "Trưởng ban",
     color: "text-emerald-700 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800",
-    desc: "Các Trưởng ban chuyên trách: Đào tạo, Sự kiện, Tài chính, Truyền thông, B2B, Gắn kết",
+    desc: "Trưởng các Ban: Công nghệ, Truyền thông, Tài chính, Sự kiện & Hậu cần, Đối ngoại & Giao thương, Gắn kết & Đời sống, Thiện nguyện",
+  },
+  {
+    key: "giang_vien",
+    name: "Giảng viên",
+    shortName: "Giảng viên",
+    color: "text-orange-700 bg-orange-50 border-orange-200 dark:bg-orange-950/50 dark:text-orange-300 dark:border-orange-800",
+    desc: "Giảng viên / Chuyên gia giảng dạy các chuyên đề CEO HN10 (Chỉ vào App CEOHN10)",
   },
   {
     key: "member",
     name: "Học viên",
     shortName: "Học viên",
     color: "text-slate-700 bg-slate-50 border-slate-200 dark:bg-slate-900/50 dark:text-slate-300 dark:border-slate-800",
-    desc: "Học viên sinh hoạt chính thức của lớp",
+    desc: "Học viên sinh hoạt chính thức của lớp (Chỉ vào App CEOHN10)",
   },
 ];
 
 export const ROLE_OPTIONS = [
-  { value: "admin_platform", label: "Admin Platform (Quản trị nền tảng)" },
+  { value: "platform_admin", label: "Platform Admin (Quản trị nền tảng)" },
+  { value: "admin", label: "Admin (Quản trị viên CRM)" },
   { value: "lop_truong", label: "Lớp trưởng" },
-  { value: "admin", label: "Admin (Quản trị viên)" },
   { value: "lop_pho", label: "Lớp phó" },
   { value: "truong_team", label: "Trưởng team" },
   { value: "pho_team", label: "Phó team" },
   { value: "truong_ban_chuyen_trach", label: "Trưởng ban chuyên trách" },
-  { value: "member", label: "Học viên" },
+  { value: "giang_vien", label: "Giảng viên" },
+  { value: "member", label: "Học viên (App CEOHN10)" },
 ];
 
 export interface DepartmentItem {
@@ -183,17 +193,16 @@ export interface DepartmentItem {
 }
 
 export const INITIAL_DEPARTMENTS: DepartmentItem[] = [
-  { id: "dept_ht", name: "Ban Học tập", code: "BHT", leaderName: "Lớp Phó Học Tập Lâm Thời", description: "Tổ chức học tập, chia sẻ kiến thức, đào tạo kỹ năng doanh nhân", color: "blue", isCore: true },
-  { id: "dept_sk", name: "Ban Sự kiện & Hậu cần", code: "BSK", leaderName: "Lớp Phó Sự Kiện & Hậu Cần Lâm Thời", description: "Lên kế hoạch, tổ chức sự kiện, chuẩn bị hậu cần lớp", color: "purple", isCore: true },
-  { id: "dept_tc", name: "Ban Tài chính & Tài trợ", code: "BTC", leaderName: "Lớp Phó Tài Chính Tài Trợ Lâm Thời", description: "Quản lý ngân sách lớp, thu chi, vận động tài trợ", color: "yellow", isCore: true },
-  { id: "dept_tt", name: "Ban Truyền thông", code: "BTT", leaderName: "Lớp Phó Truyền Thông Lâm Thời", description: "Truyền thông nội bộ và đối ngoại, xây dựng hình ảnh lớp", color: "rose", isCore: true },
-  { id: "dept_cn", name: "Ban Công nghệ", code: "BCN", leaderName: "Lớp Phó Công Nghệ Lâm Thời", description: "Ứng dụng chuyển đổi số, hỗ trợ kỹ thuật và công nghệ thông tin", color: "indigo", isCore: true },
-  { id: "dept_dn", name: "Ban Đối ngoại & Giao thương", code: "BDN", leaderName: "Lớp Phó Đối Ngoại & Giao Thương Lâm Thời", description: "Kết nối giao thương B2B, hợp tác đối ngoại, phát triển cơ hội", color: "emerald", isCore: true },
-  { id: "dept_ds", name: "Ban Đời sống & Gắn kết thành viên", code: "BDS", leaderName: "Lớp Phó Đời Sống & Gắn Kết Thành Viên Lâm Thời", description: "Chăm lo đời sống thành viên, tổ chức sinh nhật, gắn kết tập thể", color: "amber", isCore: true },
-  { id: "dept_tn", name: "Ban Thiện Nguyện", code: "BTN", leaderName: "Trưởng Ban Thiện Nguyện", description: "Tổ chức các hoạt động an sinh xã hội, gây quỹ và chương trình thiện nguyện vì cộng đồng", color: "teal", isCore: true },
+  { id: "dept_cn", name: "Ban Công nghệ", code: "BCN", leaderName: "Trưởng Ban Công Nghệ", description: "Ứng dụng chuyển đổi số, hỗ trợ kỹ thuật và công nghệ thông tin", color: "indigo", isCore: true },
+  { id: "dept_tt", name: "Ban Truyền thông", code: "BTT", leaderName: "Trưởng Ban Truyền Thông", description: "Truyền thông nội bộ và đối ngoại, xây dựng hình ảnh lớp", color: "rose", isCore: true },
+  { id: "dept_tc", name: "Ban Tài chính", code: "BTC", leaderName: "Trưởng Ban Tài Chính", description: "Quản lý ngân sách lớp, thu chi, vận động tài trợ", color: "yellow", isCore: true },
+  { id: "dept_sk", name: "Ban Sự kiện & Hậu cần", code: "BSK", leaderName: "Trưởng Ban Sự Kiện & Hậu Cần", description: "Lên kế hoạch, tổ chức sự kiện, chuẩn bị hậu cần lớp", color: "purple", isCore: true },
+  { id: "dept_dn", name: "Ban Đối ngoại & Giao thương", code: "BDN", leaderName: "Trưởng Ban Đối Ngoại & Giao Thương", description: "Kết nối giao thương B2B, hợp tác đối ngoại, phát triển cơ hội", color: "emerald", isCore: true },
+  { id: "dept_ds", name: "Ban Gắn kết & Đời sống", code: "BDS", leaderName: "Trưởng Ban Gắn Kết & Đời Sống", description: "Chăm lo đời sống thành viên, tổ chức sinh nhật, gắn kết tập thể", color: "amber", isCore: true },
+  { id: "dept_tn", name: "Ban Thiện nguyện", code: "BTN", leaderName: "Trưởng Ban Thiện Nguyện", description: "Hoạt động an sinh xã hội, gây quỹ và thiện nguyện", color: "teal", isCore: true },
 ];
 
-export const DEPARTMENTS_STORAGE_KEY = "ceohn10_departments_v2";
+export const DEPARTMENTS_STORAGE_KEY = "ceohn10_departments_v4";
 
 export function getCustomDepartments(): DepartmentItem[] {
   if (typeof window === "undefined") return INITIAL_DEPARTMENTS;
@@ -216,77 +225,70 @@ export function saveCustomDepartments(list: DepartmentItem[]) {
 }
 
 export const DEPARTMENT_OPTIONS = [
-  "Ban Học tập",
-  "Ban Sự kiện & Hậu cần",
-  "Ban Tài chính & Tài trợ",
-  "Ban Truyền thông",
   "Ban Công nghệ",
+  "Ban Truyền thông",
+  "Ban Tài chính",
+  "Ban Sự kiện & Hậu cần",
   "Ban Đối ngoại & Giao thương",
-  "Ban Đời sống & Gắn kết thành viên",
-  "Ban Thiện Nguyện",
-  "Học viên ceohn10",
+  "Ban Gắn kết & Đời sống",
+  "Ban Thiện nguyện",
 ];
 
 export function normalizeRole(r?: string): SystemRoleKey {
   if (!r) return "member";
   const s = r.toLowerCase().trim();
 
-  // 1. Quản trị nền tảng, Lớp trưởng, Lớp phó, Trưởng/Phó team, Admin
-  if (s === "admin_platform" || s === "platform_admin" || s === "superadmin" || s.includes("hệ thống") || s === "quản trị" || s === "quan_tri") return "admin_platform";
-  if (s === "lop_truong" || s === "chu_tich" || s === "president" || s.includes("chủ tịch") || s.includes("lớp trưởng")) return "lop_truong";
-  if (s === "lop_pho" || s === "pho_chu_tich" || s.includes("phó chủ tịch") || s.includes("lớp phó")) return "lop_pho";
-  if (s === "truong_team" || s.startsWith("truong_team_") || s.includes("trưởng team") || s.includes("trưởng nhóm")) return "truong_team";
-  if (s === "pho_team" || s.startsWith("pho_team_") || s.includes("phó team") || s.includes("phó nhóm")) return "pho_team";
+  // 1. Quản trị nền tảng
+  if (s === "platform_admin" || s === "admin_platform" || s === "superadmin" || s.includes("hệ thống") || s === "quản trị" || s === "quan_tri") return "platform_admin";
+  // 2. Admin CRM
   if (s === "admin" || s === "adm") return "admin";
-  if (s === "tong_thu_ky" || s === "ttk" || s.includes("tổng thư ký") || s === "ban_thu_ky" || s === "thu_ky" || s === "btk") return "admin";
-
-  // 2. Trưởng ban chuyên trách (Tất cả các ban chuyên môn)
+  // 3. Lớp trưởng (thay thế hoàn toàn chủ tịch cũ)
+  if (s === "lop_truong" || s === "chu_tich" || s === "president" || s.includes("chủ tịch") || s.includes("lớp trưởng")) return "lop_truong";
+  // 4. Lớp phó (thay thế phó chủ tịch cũ)
+  if (s === "lop_pho" || s === "pho_chu_tich" || s.includes("phó chủ tịch") || s.includes("lớp phó")) return "lop_pho";
+  // 5. Trưởng team
+  if (s === "truong_team" || s.startsWith("truong_team_") || s.includes("trưởng team") || s.includes("trưởng nhóm")) return "truong_team";
+  // 6. Phó team
+  if (s === "pho_team" || s.startsWith("pho_team_") || s.includes("phó team") || s.includes("phó nhóm")) return "pho_team";
+  // 7. Giảng viên
+  if (s === "giang_vien" || s === "instructor" || s.includes("giảng viên") || s.includes("chuyên gia")) return "giang_vien";
+  // 8. Trưởng ban chuyên trách (thuộc 7 ban: Công nghệ, Truyền thông, Tài chính, Sự kiện & Hậu cần, Đối ngoại & Giao thương, Gắn kết & Đời sống, Thiện nguyện)
   if (
     s === "truong_ban_chuyen_trach" ||
     s.startsWith("truong_ban_") ||
     s.startsWith("tb_") ||
     s.includes("trưởng ban") ||
-    s.includes("tbdh") ||
+    s === "tong_thu_ky" || s === "ban_thu_ky" || s === "thu_ky" || s === "btk" ||
     s.includes("btt") ||
-    s.includes("btv") ||
-    s.includes("bxt") ||
     s.includes("btc") ||
+    s.includes("bsk") ||
+    s.includes("bdn") ||
+    s.includes("bds") ||
+    s.includes("bcn") ||
     s.includes("btn")
   ) {
     return "truong_ban_chuyen_trach";
   }
 
+  // 9. Học viên
   return "member";
 }
 
 export function normalizeDept(d?: string): string {
   if (!d) return "Học viên ceohn10";
   const s = d.toLowerCase().trim();
-  if (s.includes("tài chính") || s.includes("kế toán") || s.includes("ngân quỹ")) return "Ban Tài chính";
-  if (s.includes("thành viên") && !s.includes("Học viên") && !s.includes("ceo")) return "Ban Thành viên";
-  if (s.includes("xúc tiến") || s.includes("thương mại") || s.includes("b2b")) return "Ban Xúc tiến";
-  if (s.includes("thiện nguyện") || s.includes("tấm lòng") || s.includes("an sinh")) return "Ban Thiện nguyện";
-  if (s.includes("truyền thông") || s.includes("marketing") || s.includes("báo chí")) return "Ban Truyền thông";
-  if (s.includes("thư ký")) return "Ban Thư Ký";
-  if (s.includes("điều hành") || s.includes("quản trị") || s.includes("bqt")) return "Ban Điều Hành";
+  if (s.includes("công nghệ") || s.includes("bcn") || s.includes("kỹ thuật") || s.includes("it")) return "Ban Công nghệ";
+  if (s.includes("truyền thông") || s.includes("marketing") || s.includes("báo chí") || s.includes("btt")) return "Ban Truyền thông";
+  if (s.includes("tài chính") || s.includes("kế toán") || s.includes("ngân quỹ") || s.includes("btc")) return "Ban Tài chính";
+  if (s.includes("sự kiện") || s.includes("hậu cần") || s.includes("bsk")) return "Ban Sự kiện & Hậu cần";
+  if (s.includes("đối ngoại") || s.includes("giao thương") || s.includes("b2b") || s.includes("xúc tiến") || s.includes("bdn")) return "Ban Đối ngoại & Giao thương";
+  if (s.includes("gắn kết") || s.includes("đời sống") || s.includes("thành viên") || s.includes("bds")) return "Ban Gắn kết & Đời sống";
+  if (s.includes("thiện nguyện") || s.includes("an sinh") || s.includes("từ thiện") || s.includes("btn")) return "Ban Thiện nguyện";
   return "Học viên ceohn10";
 }
 
 export function getAllDynamicRoleOptions(customDepts?: DepartmentItem[]): { value: string; label: string; desc?: string }[] {
-  const depts = customDepts || (typeof window !== "undefined" ? getCustomDepartments() : INITIAL_DEPARTMENTS);
-  const base = [...ROLE_OPTIONS];
-  depts.forEach((d) => {
-    if (!d.isCore) {
-      const leaderKey = `truong_ban_${d.code.toLowerCase().replace(/[^a-z0-9_]/g, "_")}`;
-      if (!base.some((r) => r.value === leaderKey)) {
-        base.push({
-          value: leaderKey,
-          label: d.headTitle || `Trưởng ${d.name}`,
-        });
-      }
-    }
-  });
-  return base;
+  return [...ROLE_OPTIONS];
 }
 
 export function getRolesForDepartment(
@@ -296,81 +298,35 @@ export function getRolesForDepartment(
 ): { value: string; label: string; desc?: string }[] {
   const norm = normalizeDept(deptName);
   const depts = customDepts || (typeof window !== "undefined" ? getCustomDepartments() : INITIAL_DEPARTMENTS);
-  const matchedCustom = depts.find(
+  const matched = depts.find(
     (d) =>
       d.name.toLowerCase() === deptName.toLowerCase() ||
       d.code.toLowerCase() === deptName.toLowerCase() ||
       deptName.toLowerCase().includes(d.name.toLowerCase())
   );
 
-  let roles: { value: string; label: string; desc?: string }[] = [];
+  const roles: { value: string; label: string; desc?: string }[] = [
+    { value: "platform_admin", label: "Platform Admin", desc: "Quản trị viên nền tảng tối cao" },
+    { value: "admin", label: "Admin", desc: "Quản trị viên vận hành hệ thống CRM" },
+    { value: "lop_truong", label: "Lớp trưởng", desc: "Lớp trưởng điều hành chung" },
+    { value: "lop_pho", label: "Lớp phó", desc: "Lớp phó phụ trách chuyên môn" },
+    { value: "truong_team", label: "Trưởng team", desc: "Trưởng nhóm học viên" },
+    { value: "pho_team", label: "Phó team", desc: "Phó nhóm học viên" },
+    { value: "truong_ban_chuyen_trach", label: `Trưởng ban chuyên trách (${matched?.name || norm})`, desc: `Lãnh đạo chuyên trách ${matched?.name || norm}` },
+    { value: "giang_vien", label: "Giảng viên", desc: "Giảng viên đào tạo (Chỉ vào App CEOHN10)" },
+    { value: "member", label: "Học viên", desc: `Học viên trực thuộc ${matched?.name || norm} (Chỉ vào App CEOHN10)` },
+  ];
 
-  if (norm === "Ban Điều Hành" || deptName.toLowerCase().includes("điều hành") || deptName.toLowerCase().includes("quản trị")) {
-    roles = [
-      { value: "quan_tri", label: "Quản trị", desc: "Toàn quyền quản trị hệ thống" },
-      { value: "chu_tich", label: "Lớp Trưởng (Chủ tịch)", desc: "Lớp Trưởng Lâm thời CEO HN10 / Điều hành & phê duyệt tối cao" },
-      { value: "pho_chu_tich", label: "Lớp Phó (Phó Chủ tịch)", desc: "Lớp Phó Lâm thời CEO HN10 / Phụ trách ban chuyên môn" },
-      { value: "truong_ban_dieu_hanh", label: "Trưởng ban Điều hành", desc: "Điều hành quản lý nội bộ" },
-      { value: "admin", label: "Admin", desc: "Quản trị viên kỹ thuật & dữ liệu" },
-      { value: "thanh_vien_ban_dieu_hanh", label: "Thành viên ban điều hành", desc: "Thành viên Ban Điều Hành" },
-    ];
-  } else if (norm === "Ban Thư Ký" || deptName.toLowerCase().includes("thư ký")) {
-    roles = [
-      { value: "tong_thu_ky", label: "Tổng thư ký", desc: "Điều phối thư ký & văn phòng" },
-      { value: "thanh_vien_ban_su_kien", label: "Thành viên Ban Sự Kiện", desc: "Phụ trách sự kiện & thư ký" },
-      { value: "member", label: "Thành viên", desc: "Thành viên Ban thư ký" },
-    ];
-  } else if (norm === "Ban Thành viên" || deptName.toLowerCase().includes("thành viên")) {
-    roles = [
-      { value: "truong_ban_thanh_vien", label: "Trưởng ban Thành viên", desc: "Lãnh đạo Ban phát triển Học viên" },
-      { value: "thanh_vien_ban_thanh_vien", label: "Thành viên Ban Thành Viên", desc: "Chuyên trách thẩm định & chăm sóc Học viên" },
-      { value: "member", label: "Thành viên", desc: "Học viên" },
-    ];
-  } else if (norm === "Ban Xúc tiến" || deptName.toLowerCase().includes("xúc tiến")) {
-    roles = [
-      { value: "truong_ban_xuc_tien", label: "Trưởng ban Xúc tiến", desc: "Lãnh đạo Ban Xúc tiến thương mại" },
-      { value: "thanh_vien_ban_xuc_tien", label: "Thành viên Ban Xúc Tiến TM", desc: "Chuyên trách kết nối giao thương B2B" },
-      { value: "member", label: "Thành viên", desc: "Học viên" },
-    ];
-  } else if (norm === "Ban Truyền thông" || deptName.toLowerCase().includes("truyền thông")) {
-    roles = [
-      { value: "truong_ban_truyen_thong", label: "Trưởng ban Truyền thông", desc: "Lãnh đạo Ban Truyền thông & thương hiệu" },
-      { value: "thanh_vien_ban_truyen_thong", label: "Thành viên Ban Truyền Thông", desc: "Chuyên trách tin tức & hình ảnh sự kiện" },
-      { value: "member", label: "Thành viên", desc: "Học viên" },
-    ];
-  } else if (norm === "Ban Tài chính" || deptName.toLowerCase().includes("tài chính")) {
-    roles = [
-      { value: "truong_ban_tai_chinh", label: "Trưởng ban Tài chính", desc: "Lãnh đạo Ban Tài chính & ngân sách" },
-      { value: "thanh_vien_ban_tai_chinh", label: "Thành viên Ban Tài Chính", desc: "Chuyên trách thu chi & kế toán quỹ" },
-      { value: "member", label: "Thành viên", desc: "Học viên" },
-    ];
-  } else if (norm === "Ban Thiện nguyện" || deptName.toLowerCase().includes("thiện nguyện")) {
-    roles = [
-      { value: "truong_ban_thien_nguyen", label: "Trưởng ban Thiện nguyện", desc: "Lãnh đạo Ban Hoạt động thiện nguyện" },
-      { value: "thanh_vien_ban_thien_nguyen", label: "Thành viên Ban Thiện Nguyện", desc: "Chuyên trách hoạt động an sinh xã hội" },
-      { value: "member", label: "Thành viên", desc: "Học viên" },
-    ];
-  } else if (matchedCustom) {
-    const leaderKey = `truong_ban_${matchedCustom.code.toLowerCase().replace(/[^a-z0-9_]/g, "_")}`;
-    const leaderTitle = matchedCustom.headTitle || `Trưởng ${matchedCustom.name}`;
-    roles = [
-      { value: leaderKey, label: leaderTitle, desc: `Lãnh đạo ban ${matchedCustom.name}` },
-      { value: "member", label: "Thành viên", desc: `Học viên ban ${matchedCustom.name}` },
-    ];
-  } else {
-    roles = [
-      { value: "member", label: "Học viên", desc: "Học viên chính thức (App CEO HN10)" },
-    ];
-  }
-
-  // Ensure currentRole is preserved if already set
   if (currentRole && !roles.some((r) => r.value === currentRole)) {
-    const matchingRoleDef = ROLE_OPTIONS.find((r) => r.value === currentRole);
-    roles.unshift({
-      value: currentRole,
-      label: matchingRoleDef?.label || currentRole,
-      desc: "Vai trò hiện tại của tài khoản",
-    });
+    const normRole = normalizeRole(currentRole);
+    const matchingRoleDef = ROLE_OPTIONS.find((r) => r.value === normRole);
+    if (matchingRoleDef && !roles.some((r) => r.value === matchingRoleDef.value)) {
+      roles.unshift({
+        value: matchingRoleDef.value,
+        label: matchingRoleDef.label,
+        desc: "Vai trò hiện tại của tài khoản",
+      });
+    }
   }
 
   return roles;
@@ -536,18 +492,17 @@ export function isActionAllowedForRole(
 export function getDynamicDepartmentOptions(): string[] {
   const custom = typeof window !== "undefined" ? getCustomDepartments() : INITIAL_DEPARTMENTS;
   const list = [
-    "Ban Học tập",
-    "Ban Sự kiện & Hậu cần",
-    "Ban Tài chính & Tài trợ",
-    "Ban Truyền thông",
     "Ban Công nghệ",
+    "Ban Truyền thông",
+    "Ban Tài chính",
+    "Ban Sự kiện & Hậu cần",
     "Ban Đối ngoại & Giao thương",
-    "Ban Đời sống & Gắn kết thành viên",
+    "Ban Gắn kết & Đời sống",
+    "Ban Thiện nguyện",
   ];
   custom.forEach((c) => {
     if (!list.includes(c.name)) list.push(c.name);
   });
-  if (!list.includes("Học viên ceohn10")) list.push("Học viên ceohn10");
   return list;
 }
 

@@ -39,10 +39,34 @@ export function EventLivePhotoGalleryModal({
   const [photos, setPhotos] = useState<EventPhoto[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [sharingGallery, setSharingGallery] = useState(false);
   const [previewPhoto, setPreviewPhoto] = useState<EventPhoto | null>(null);
 
   const cameraInputRef = useRef<HTMLInputElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // UC-EVT-08: Gửi link kho ảnh trực tiếp cho các đại biểu tham gia sự kiện
+  const handleShareGallery = async () => {
+    if (!eventId) return;
+    setSharingGallery(true);
+    try {
+      const res = await fetchNestApi<any>(`/events/${eventId}/share-gallery`, {
+        method: "POST",
+        body: JSON.stringify({
+          customMessage: `Kho ảnh trực tiếp sự kiện "${eventName}" đã được cập nhật khoảnh khắc mới. Mời Quý Anh/Chị bấm vào link để xem và tải ảnh!`,
+        }),
+      });
+      if (res && res.ok) {
+        toast.success(`Đã gửi link kho ảnh trực tiếp tới email và Zalo OA cho ${res.sentCount || "tất cả"} đại biểu!`);
+      } else {
+        toast.error(res?.message || "Không thể gửi thông báo lúc này");
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Lỗi khi gửi link kho ảnh");
+    } finally {
+      setSharingGallery(false);
+    }
+  };
 
   // Load photos of this specific event
   const loadPhotos = async () => {
@@ -197,6 +221,21 @@ export function EventLivePhotoGalleryModal({
                 )}
                 <span>{uploading ? "Đang Lưu Ảnh..." : "Tải Ảnh Lên"}</span>
               </button>
+              {/* Nút 3: Gửi link kho ảnh cho đại biểu (UC-EVT-08) */}
+              <button
+                type="button"
+                disabled={sharingGallery || photos.length === 0}
+                onClick={handleShareGallery}
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white text-xs font-bold shadow-md transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                title="Gửi email và Zalo OA kèm đường link xem kho ảnh cho tất cả đại biểu tham dự"
+              >
+                {sharingGallery ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <ExternalLink className="h-4 w-4" />
+                )}
+                <span>{sharingGallery ? "Đang Gửi Link..." : "Gửi Link Ảnh (Email/Zalo)"}</span>
+              </button>
             </div>
           )}
         </div>
@@ -240,6 +279,21 @@ export function EventLivePhotoGalleryModal({
                   </div>
                 </div>
               ))}
+              {/* Nút 3: Gửi link kho ảnh cho đại biểu (UC-EVT-08) */}
+              <button
+                type="button"
+                disabled={sharingGallery || photos.length === 0}
+                onClick={handleShareGallery}
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white text-xs font-bold shadow-md transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                title="Gửi email và Zalo OA kèm đường link xem kho ảnh cho tất cả đại biểu tham dự"
+              >
+                {sharingGallery ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <ExternalLink className="h-4 w-4" />
+                )}
+                <span>{sharingGallery ? "Đang Gửi Link..." : "Gửi Link Ảnh (Email/Zalo)"}</span>
+              </button>
             </div>
           )}
         </div>

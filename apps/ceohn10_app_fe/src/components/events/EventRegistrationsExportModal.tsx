@@ -16,10 +16,15 @@ import {
   Tag,
   Building,
   Check,
+  Send,
+  Mail,
+  UserCheck,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { exportToExcel, type ExcelColumn } from "@/lib/excel-export";
 import { type EventItem, type Registration } from "@/lib/events.functions";
+import { fetchNestApi } from "@/lib/api-client";
 
 export type ExportCategory =
   | "all"
@@ -76,6 +81,29 @@ export function EventRegistrationsExportModal({
 }: EventRegistrationsExportModalProps) {
   const [selectedCategory, setSelectedCategory] = useState<ExportCategory>("all");
   const [exporting, setExporting] = useState<string | null>(null);
+
+  // UC-EVT-10: Gửi báo cáo qua Email / Zalo OA cho nhiều tài khoản chọn trước
+  const [showSendModal, setShowSendModal] = useState(false);
+  const [sendingReport, setSendingReport] = useState(false);
+  const [selectedRecipientAccounts, setSelectedRecipientAccounts] = useState<string[]>([
+    "loptruong@ceohn10.vn",
+    "loppho_taichinh@ceohn10.vn",
+  ]);
+  const [customRecipientInput, setCustomRecipientInput] = useState("");
+
+  const PRECONFIGURED_ACCOUNTS = [
+    { id: "loptruong@ceohn10.vn", label: "Lớp trưởng (Ban Điều Hành Cao Nhất)", role: "Lớp trưởng" },
+    { id: "loppho_taichinh@ceohn10.vn", label: "Lớp phó (Phụ Trách Tài Chính & Quỹ Lớp)", role: "Lớp phó" },
+    { id: "truong_ban_sukien@ceohn10.vn", label: "Trưởng Ban Sự Kiện & Hậu Cần", role: "Trưởng Ban" },
+    { id: "truong_ban_truyenthong@ceohn10.vn", label: "Trưởng Ban Truyền Thông", role: "Trưởng Ban" },
+    { id: "truong_ban_congnghe@ceohn10.vn", label: "Trưởng Ban Công Nghệ", role: "Trưởng Ban" },
+  ];
+
+  const handleToggleRecipient = (accId: string) => {
+    setSelectedRecipientAccounts((prev) =>
+      prev.includes(accId) ? prev.filter((id) => id !== accId) : [...prev, accId]
+    );
+  };
 
   // Phân loại danh sách theo sự kiện hiện tại (nếu chọn sự kiện cụ thể)
   const scopedRegistrations = useMemo(() => {
@@ -595,12 +623,12 @@ export function EventRegistrationsExportModal({
               <br/><br/><br/><br/>
             </td>
             <td>
-              <strong>TRƯỞNG BAN THƯ KÝ</strong><br/>
+              <strong>LỚP PHÓ (PHỤ TRÁCH TÀI CHÍNH)</strong><br/>
               <span style="font-size: 8.5pt; font-style: italic;">(Ký, ghi rõ họ tên)</span>
               <br/><br/><br/><br/>
             </td>
             <td>
-              <strong>TRƯỞNG BAN TỔ CHỨC SỰ KIỆN</strong><br/>
+              <strong>LỚP TRƯỞNG / TRƯỞNG BAN SỰ KIỆN HẬU CẦN</strong><br/>
               <span style="font-size: 8.5pt; font-style: italic;">(Ký, đóng dấu)</span>
               <br/><br/><br/><br/>
             </td>
@@ -628,6 +656,56 @@ export function EventRegistrationsExportModal({
       toast.error("Lỗi khi tạo bản in PDF: " + (err?.message || ""));
     } finally {
       setExporting(null);
+    }
+  };
+
+  // UC-EVT-10: Gửi báo cáo sự kiện qua Email / Zalo OA cho nhiều tài khoản
+  const handleSendReport = async () => {
+    const extraEmails = customRecipientInput
+      .split(/[,;\s]+/)
+      .map((e) => e.trim())
+      .filter((e) => e.includes("@"));
+    const allRecipients = Array.from(new Set([...selectedRecipientAccounts, ...extraEmails]));
+
+    if (allRecipients.length === 0) {
+      toast.warning("Vui lòng chọn hoặc nhập ít nhất một email tài khoản nhận báo cáo!");
+      return;
+    }
+
+    setSendingReport(true);
+    try {
+      const eId = activeEvent?.id || "latest";
+      const totalPaidAmount = filteredData
+        .filter((r) => r.paymentStatus === "paid")
+        .reduce((sum, r) => sum + Number(r.paymentAmount || 0), 0);
+
+      const res = await fetchNestApi<any>(`/events/${eId}/send-report`, {
+        method: "POST",
+        body: JSON.stringify({
+          recipients: allRecipients,
+          category: activeCategoryMeta.title,
+          format: "Tất cả định dạng (Excel, CSV, PDF)",
+          reportSummary: {
+            total: scopedRegistrations.length,
+            checkedIn: scopedRegistrations.filter((r) => r.status === "attended" || Boolean(r.checkedInAt)).length,
+            late: scopedRegistrations.filter((r) => isLateAttendee(r, activeEvent)).length,
+            onTime: scopedRegistrations.filter((r) => !isLateAttendee(r, activeEvent)).length,
+            unpaid: scopedRegistrations.filter((r) => r.paymentStatus !== "paid").length,
+            paidAmount: totalPaidAmount,
+          },
+        }),
+      });
+
+      if (res && res.ok) {
+        toast.success(`Đã gửi báo cáo danh mục "${activeCategoryMeta.title}" thành công tới ${res.deliveredCount || allRecipients.length} tài khoản qua Email & Zalo OA!`);
+        setShowSendModal(false);
+      } else {
+        toast.error(res?.message || "Không thể gửi báo cáo lúc này");
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Lỗi khi gửi báo cáo");
+    } finally {
+      setSendingReport(false);
     }
   };
 
@@ -827,7 +905,19 @@ export function EventRegistrationsExportModal({
           <div className="text-xs text-slate-600 font-medium text-center sm:text-left">
             Danh mục: <strong>"{activeCategoryMeta.title}"</strong> ({filteredData.length} đại biểu tham dự)
           </div>
-          <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+          <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto justify-end">
+            {/* Nút gửi báo cáo trực tiếp (UC-EVT-10) */}
+            <button
+              type="button"
+              onClick={() => setShowSendModal(true)}
+              disabled={filteredData.length === 0}
+              className="py-2 px-3.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#002B70] font-bold text-xs flex items-center gap-1.5 border border-blue-200 transition cursor-pointer disabled:opacity-50"
+              title="Gửi báo cáo số liệu và danh sách đại biểu qua Email và Zalo OA cho nhiều tài khoản chọn trước"
+            >
+              <Send className="w-3.5 h-3.5" />
+              <span>Gửi Báo Cáo (Email/Zalo)</span>
+            </button>
+
             <button
               type="button"
               onClick={onClose}
@@ -848,6 +938,117 @@ export function EventRegistrationsExportModal({
           </div>
         </div>
       </div>
+
+      {/* Sub-modal: Chọn tài khoản để gửi báo cáo qua Email / Zalo OA (UC-EVT-10) */}
+      {showSendModal && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in">
+          <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl border border-slate-200 p-5 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-blue-100 text-[#002B70] flex items-center justify-center">
+                  <Mail className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-black text-slate-900">GỬI BÁO CÁO QUA EMAIL / ZALO OA</h4>
+                  <p className="text-[11px] text-slate-500">Danh mục: {activeCategoryMeta.title}</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowSendModal(false)}
+                className="p-1 rounded-full text-slate-400 hover:bg-slate-100 transition"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-2.5">
+              <label className="text-xs font-bold text-slate-700 block">
+                Chọn các tài khoản Ban Cán Sự & Trưởng Ban nhận báo cáo:
+              </label>
+              <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                {PRECONFIGURED_ACCOUNTS.map((acc) => {
+                  const isChecked = selectedRecipientAccounts.includes(acc.id);
+                  return (
+                    <div
+                      key={acc.id}
+                      onClick={() => handleToggleRecipient(acc.id)}
+                      className={`flex items-center justify-between p-2 rounded-xl border text-xs cursor-pointer transition select-none ${
+                        isChecked
+                          ? "bg-blue-50 border-blue-300 text-blue-900 font-semibold"
+                          : "border-slate-200 hover:bg-slate-50 text-slate-700"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 truncate">
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => {}}
+                          className="w-3.5 h-3.5 rounded text-[#002B70] pointer-events-none"
+                        />
+                        <span className="truncate">{acc.label}</span>
+                      </div>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 shrink-0 font-medium">
+                        {acc.role}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div>
+                <label className="text-[11px] font-bold text-slate-600 block mb-1">
+                  Nhập thêm email khác (cách nhau bởi dấu phẩy):
+                </label>
+                <input
+                  type="text"
+                  placeholder="vi_du@ceohn10.vn, doanhtri@gmail.com..."
+                  value={customRecipientInput}
+                  onChange={(e) => setCustomRecipientInput(e.target.value)}
+                  className="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-200 bg-slate-50 focus:bg-white outline-none focus:border-[#002B70]"
+                />
+              </div>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-1">
+              <div className="font-bold text-slate-800">Tóm tắt nội dung sẽ gửi:</div>
+              <div className="text-[11px] text-slate-600 flex justify-between">
+                <span>Số đại biểu trong báo cáo:</span>
+                <strong className="text-slate-800">{filteredData.length} người</strong>
+              </div>
+              <div className="text-[11px] text-slate-600 flex justify-between">
+                <span>Số tài khoản sẽ nhận:</span>
+                <strong className="text-[#002B70]">
+                  {selectedRecipientAccounts.length + (customRecipientInput.trim() ? 1 : 0)} tài khoản
+                </strong>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setShowSendModal(false)}
+                className="py-1.5 px-3 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-600 text-xs font-semibold cursor-pointer"
+              >
+                Hủy
+              </button>
+              <button
+                type="button"
+                disabled={sendingReport}
+                onClick={handleSendReport}
+                className="py-1.5 px-4 rounded-xl bg-[#002B70] hover:bg-blue-950 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs cursor-pointer disabled:opacity-50"
+              >
+                {sendingReport ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Send className="w-3.5 h-3.5" />
+                )}
+                <span>{sendingReport ? "Đang Gửi..." : "Xác Nhận Gửi"}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -3,6 +3,17 @@ import { PrismaService } from '../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
 import { ZaloService } from '../zalo/zalo.service';
 
+export interface FeeCategoryItem {
+  id: string;
+  name: string;
+  prefix: string;
+  target_fund_name?: string;
+  action_type?: string;
+  action_label?: string;
+  description?: string;
+  is_active?: boolean;
+}
+
 export interface SePayConfig {
   bankName: string;
   accountNumber: string;
@@ -11,6 +22,12 @@ export interface SePayConfig {
   webhookSecret?: string;
   prefixEvent: string;
   prefixFee: string;
+  prefixJoin?: string;
+  prefixCourse?: string;
+  prefixSponsor?: string;
+  prefixCharity?: string;
+  prefixB2B?: string;
+  feeCategories?: FeeCategoryItem[];
   autoActivate: boolean;
 }
 
@@ -31,14 +48,14 @@ export class PaymentService {
     try {
       // 1. Ưu tiên đọc từ master_system_settings
       const masterRows = await this.prisma.$queryRawUnsafe<any[]>(`
-        SELECT setting_value FROM public.master_system_settings 
-        WHERE setting_key = 'sepay_integration_config' LIMIT 1
+        SELECT value FROM public.master_system_settings 
+        WHERE key = 'sepay_integration_config' LIMIT 1
       `).catch(() => []);
 
-      if (masterRows.length > 0 && masterRows[0]?.setting_value) {
-        const val = typeof masterRows[0].setting_value === 'string'
-          ? JSON.parse(masterRows[0].setting_value)
-          : masterRows[0].setting_value;
+      if (masterRows.length > 0 && masterRows[0]?.value) {
+        const val = typeof masterRows[0].value === 'string'
+          ? JSON.parse(masterRows[0].value)
+          : masterRows[0].value;
         const bankAcc = (val.bank_accounts && val.bank_accounts[0]) || {};
         return {
           bankName: val.bank_brand_name || bankAcc.bank_brand_name || process.env.SEPAY_BANK_NAME || '',
@@ -46,8 +63,14 @@ export class PaymentService {
           accountHolder: val.account_name || bankAcc.account_name || process.env.SEPAY_ACCOUNT_HOLDER || '',
           apiToken: val.api_token || process.env.SEPAY_API_TOKEN || '',
           webhookSecret: val.webhook_token || process.env.SEPAY_WEBHOOK_SECRET || '',
-          prefixEvent: val.prefix_syntax?.event || 'CEOHN10_SK',
+          prefixEvent: val.prefix_syntax?.event || 'CEO1983_EVT',
           prefixFee: val.prefix_syntax?.membership || 'CEOHN10_HP',
+          prefixJoin: val.prefix_syntax?.joining || 'CEOHN10_GN',
+          prefixCourse: val.prefix_syntax?.course || 'CEOHN10_LH',
+          prefixSponsor: val.prefix_syntax?.sponsor || 'CEOHN10_TT',
+          prefixCharity: val.prefix_syntax?.charity || 'CEOHN10_TN',
+          prefixB2B: val.prefix_syntax?.b2b || 'CEOHN10_B2B',
+          feeCategories: val.fee_categories || [],
           autoActivate: val.is_enabled ?? true,
         };
       }
@@ -65,7 +88,7 @@ export class PaymentService {
           accountHolder: dbConfig.accountHolder || process.env.SEPAY_ACCOUNT_HOLDER || '',
           apiToken: dbConfig.apiToken || process.env.SEPAY_API_TOKEN || '',
           webhookSecret: dbConfig.webhookSecret || process.env.SEPAY_WEBHOOK_SECRET || '',
-          prefixEvent: dbConfig.prefixEvent || 'CEOHN10_SK',
+          prefixEvent: dbConfig.prefixEvent || 'CEO1983_EVT',
           prefixFee: dbConfig.prefixFee || 'CEOHN10_HP',
           autoActivate: dbConfig.autoActivate !== false,
         };
@@ -77,7 +100,7 @@ export class PaymentService {
         accountHolder: process.env.SEPAY_ACCOUNT_HOLDER || '',
         apiToken: process.env.SEPAY_API_TOKEN || '',
         webhookSecret: process.env.SEPAY_WEBHOOK_SECRET || '',
-        prefixEvent: 'CEOHN10_SK',
+        prefixEvent: 'CEO1983_EVT',
         prefixFee: 'CEOHN10_HP',
         autoActivate: true,
       };
@@ -88,7 +111,7 @@ export class PaymentService {
         accountHolder: process.env.SEPAY_ACCOUNT_HOLDER || '',
         apiToken: process.env.SEPAY_API_TOKEN || '',
         webhookSecret: process.env.SEPAY_WEBHOOK_SECRET || '',
-        prefixEvent: 'CEOHN10_SK',
+        prefixEvent: 'CEO1983_EVT',
         prefixFee: 'CEOHN10_HP',
         autoActivate: true,
       };
@@ -110,7 +133,15 @@ export class PaymentService {
 
     const config = await this.getSepayConfig();
     const memo = `${params.type === 'event' ? config.prefixEvent : config.prefixFee}_${params.orderId}`.replace(/[^A-Za-z0-9_]/g, '');
-    const bankShort = (config.bankName || 'MB').toUpperCase().includes('MB') ? 'MB' : (config.bankName || 'MB');
+    let bankShort = (config.bankName || 'VPB').trim();
+    const upperBank = bankShort.toUpperCase();
+    if (upperBank.includes('VPB') || upperBank.includes('VPBANK')) bankShort = 'VPB';
+    else if (upperBank.includes('MB')) bankShort = 'MB';
+    else if (upperBank.includes('VCB') || upperBank.includes('VIETCOM')) bankShort = 'VCB';
+    else if (upperBank.includes('TCB') || upperBank.includes('TECHCOM')) bankShort = 'TCB';
+    else if (upperBank.includes('ACB')) bankShort = 'ACB';
+    else if (upperBank.includes('BIDV')) bankShort = 'BIDV';
+    else if (upperBank.includes('AGRI') || upperBank.includes('VBA')) bankShort = 'VBA';
 
     const qrImageUrl = (config.accountNumber && config.bankName)
       ? `https://img.vietqr.io/image/${bankShort}-${config.accountNumber}-compact2.png?amount=${params.amount}&addInfo=${encodeURIComponent(memo)}&accountName=${encodeURIComponent(config.accountHolder)}`
@@ -222,9 +253,12 @@ export class PaymentService {
       (process.env.NODE_ENV !== 'production' && (!signatureHeader || signatureHeader === 'mock-sepay-secret'));
 
     if (!isLocalSim && config.webhookSecret && config.webhookSecret.trim().length > 0) {
-      if (signatureHeader.startsWith('Apikey ') || signatureHeader.startsWith('Bearer ')) {
+      const lowerSig = signatureHeader.toLowerCase();
+      if (lowerSig.startsWith('apikey ') || lowerSig.startsWith('bearer ')) {
         const token = signatureHeader.split(' ')[1]?.trim();
         isAuthenticated = token === config.webhookSecret.trim();
+      } else if (signatureHeader.trim() === config.webhookSecret.trim()) {
+        isAuthenticated = true;
       } else if (options?.rawBody && signatureHeader) {
         const crypto = await import('crypto');
         const computedSignature = crypto
@@ -317,26 +351,32 @@ export class PaymentService {
     const upperContent = content.toUpperCase();
 
     // 6. Xử lý nghiệp vụ theo loại giao dịch
-    // A. Khớp vé sự kiện: CEOHN10_SK_[REG_ID]
-    if (upperContent.includes(config.prefixEvent)) {
-      const match = upperContent.match(new RegExp(`${config.prefixEvent}_([A-Z0-9]+)`, 'i'));
-      if (match && match[1]) {
-        const regId = match[1];
-        await this.prisma.$executeRawUnsafe(`
-          UPDATE public.event_registrations 
-          SET payment_status = 'paid', payment_amount = $1, updated_at = NOW()
-          WHERE id = $2 OR UPPER(member_code) = UPPER($2)
-        `, transferAmount, regId).catch(() => {});
+    // A. Khớp vé sự kiện: CEO1983_EVT_[REG_ID], CEOHN10_SK_[REG_ID], EV[REG_ID]
+    const eventMatch =
+      upperContent.match(/CEO1983_EVT_([A-Z0-9-]+)/i) ||
+      upperContent.match(new RegExp(`${config.prefixEvent}_([A-Z0-9-]+)`, 'i')) ||
+      upperContent.match(/CEOHN10_([A-Z0-9-]+)/i) ||
+      upperContent.match(/EVT_([A-Z0-9-]+)/i) ||
+      upperContent.match(/(?:^|[^A-Z0-9])EV([A-Z0-9-]+)/i);
 
-        // Ghi nhận vào sổ quỹ CRM
-        const regRows = await this.prisma.$queryRawUnsafe<any[]>(`
-          SELECT r.*, e.name as event_name FROM public.event_registrations r
-          LEFT JOIN public.events e ON e.id = r.event_id
-          WHERE r.id = $1 LIMIT 1
-        `, regId).catch(() => []);
+    if (eventMatch && eventMatch[1]) {
+      const regId = eventMatch[1];
+      await this.prisma.$executeRawUnsafe(`
+        UPDATE public.event_registrations 
+        SET payment_status = 'paid', status = 'confirmed', payment_amount = $1, paid_at = NOW(), updated_at = NOW()
+        WHERE id = $2 OR UPPER(member_code) = UPPER($2) OR note ILIKE '%' || $2 || '%'
+      `, transferAmount, regId).catch(() => {});
 
-        if (regRows.length > 0) {
-          const reg = regRows[0];
+      // Ghi nhận vào sổ quỹ CRM
+      const regRows = await this.prisma.$queryRawUnsafe<any[]>(`
+        SELECT r.*, e.name as event_name, e.date as event_date, e.location as event_location, e.time as event_time 
+        FROM public.event_registrations r
+        LEFT JOIN public.events e ON e.id = r.event_id
+        WHERE r.id = $1 OR UPPER(r.member_code) = UPPER($1) OR r.note ILIKE '%' || $1 || '%'
+      `, regId).catch(() => []);
+
+      if (regRows.length > 0) {
+        for (const reg of regRows) {
           await this.prisma.$executeRawUnsafe(`
             INSERT INTO public.income_records (
               id, category, title, amount, date, payer_name, payment_method, status, event_id, notes, created_at, updated_at
@@ -345,33 +385,73 @@ export class PaymentService {
             )
           `,
             `Thu tiền vé sự kiện ${reg.event_name || ''} - ${reg.member_name || ''} (Mã vé: ${reg.id})`,
-            transferAmount,
+            reg.payment_amount || transferAmount,
             reg.member_name || 'Khách tham dự',
             reg.event_id || null,
             `Thanh toán tự động qua SePay (GD: ${gatewayId} - TK: ${bankAccountNumber})`,
           ).catch(() => {});
-        }
 
-        // Cập nhật số dư Quỹ tương ứng nếu có
-        if (targetFundId) {
-          await this.prisma.$executeRawUnsafe(`
-            UPDATE public.financial_funds SET current_balance = current_balance + $1, updated_at = NOW()
-            WHERE id = $2::uuid
-          `, transferAmount, targetFundId).catch(() => {});
-        }
+          // Phát hành vé điện tử & gửi email kèm mã QR Check-in ngay khi nhận Webhook SePay (UC-EVT-02, UC-EVT-04)
+          if (reg.email && reg.email.includes('@')) {
+            const checkinQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(reg.id)}`;
+            this.mailService.sendEventPaymentSuccessEmail({
+              to: reg.email,
+              fullName: reg.member_name || 'Quý Hội viên / Đại biểu',
+              phone: reg.phone || '',
+              company: reg.company || '',
+              eventTitle: reg.event_name || 'Sự kiện CLB CEO HN10',
+              eventDate: reg.event_date ? (reg.event_date instanceof Date ? reg.event_date.toLocaleDateString('vi-VN') : String(reg.event_date).slice(0, 10)) : 'Sắp diễn ra',
+              eventTime: reg.event_time || '08:30 - 12:00',
+              eventLocation: reg.event_location || 'Hà Nội',
+              registrationId: reg.id,
+              ticketType: reg.ticket_type || 'Vé Tiêu Chuẩn',
+              ticketCount: reg.ticket_count || 1,
+              luckyNumber: reg.lucky_number,
+              amountPaid: Number(reg.payment_amount || transferAmount),
+              paymentMethod: 'Chuyển khoản SePay (Tự động)',
+              qrCodeUrl: checkinQrUrl,
+            }).catch((err) => {
+              this.logger.warn(`[SePay Webhook] Lỗi gửi email vé cho ${reg.email}: ${err?.message}`);
+            });
+          }
 
-        if (eventId) {
-          await this.prisma.sepay_webhook_events.update({
-            where: { id: eventId },
-            data: { status: 'POSTED', matched_order_id: regId },
-          }).catch(() => {});
+          if (reg.phone && this.zaloService) {
+            this.zaloService.sendAutoNotification({
+              recipientPhone: reg.phone,
+              recipientName: reg.member_name || 'Quý Anh/Chị',
+              title: `Xác nhận thanh toán vé: ${reg.event_name || 'Sự kiện CEO HN10'}`,
+              content: `Kính gửi Anh/Chị ${reg.member_name || 'Đại biểu'},\nBan Tổ Chức CLB Doanh Nhân CEO HN10 đã nhận được thanh toán thành công phí vé tham dự sự kiện "${reg.event_name || 'Sự kiện'}".\n- Mã vé: ${reg.id}\n- Số may mắn Lucky Draw: #${reg.lucky_number || '0000'}\n- Số tiền: ${Number(transferAmount).toLocaleString('vi-VN')} đ\nVé điện tử và mã QR check-in đã được gửi tới email của Anh/Chị. Trân trọng!`,
+            }).catch(() => {});
+          }
         }
-
-        return { success: true, status: 'POSTED', matched: 'event', regId };
       }
+
+      // Cập nhật số dư Quỹ Ban Sự kiện & Hậu cần khi thanh toán phí vé sự kiện qua SePay
+      let eventFundId: string | undefined = targetFundId || undefined;
+      if (!eventFundId) {
+        const eventFund = await this.prisma.financial_funds.findFirst({
+          where: { code: 'FUND_BAN_SU_KIEN_HAU_CAN' },
+        }).catch(() => null);
+        eventFundId = eventFund?.id || undefined;
+      }
+      if (eventFundId) {
+        await this.prisma.$executeRawUnsafe(`
+          UPDATE public.financial_funds SET current_balance = current_balance + $1, updated_at = NOW()
+          WHERE id = $2::uuid
+        `, transferAmount, eventFundId).catch(() => {});
+      }
+
+      if (eventId) {
+        await this.prisma.sepay_webhook_events.update({
+          where: { id: eventId },
+          data: { status: 'POSTED', matched_order_id: regId, fund_id: eventFundId },
+        }).catch(() => {});
+      }
+
+      return { success: true, status: 'POSTED', matched: 'event', regId };
     }
 
-    // B. Khớp hội phí: CEOHN10_HP_[INV_ID]
+    // B. Khớp hội phí thường niên: CEOHN10_HP_[INV_ID]
     if (upperContent.includes(config.prefixFee)) {
       const match = upperContent.match(new RegExp(`${config.prefixFee}_([A-Z0-9]+)`, 'i'));
       if (match && match[1]) {
@@ -397,6 +477,227 @@ export class PaymentService {
         }
 
         return { success: true, status: 'POSTED', matched: 'fee', invId };
+      }
+    }
+
+    // C. Khớp phí gia nhập CLB / Kết nạp hội viên mới: CEOHN10_GN_[MEMBER_ID/PHONE/CODE]
+    const joinPrefix = config.prefixJoin || 'CEOHN10_GN';
+    if (upperContent.includes(joinPrefix)) {
+      const matchJoin = upperContent.match(new RegExp(`${joinPrefix}_([A-Z0-9-]+)`, 'i'));
+      if (matchJoin && matchJoin[1]) {
+        const memKey = matchJoin[1];
+        await this.prisma.$executeRawUnsafe(`
+          UPDATE public.members 
+          SET level = 'OFFICIAL', type = 'OFFICIAL', status = 'active'
+          WHERE id = $1 OR UPPER(code) = UPPER($1) OR phone = $1
+        `, memKey).catch(() => {});
+
+        // Ghi nhận sổ quỹ
+        await this.prisma.$executeRawUnsafe(`
+          INSERT INTO public.income_records (
+            id, category, title, amount, date, payer_name, payment_method, status, notes, created_at, updated_at
+          ) VALUES (
+            gen_random_uuid(), 'Phí gia nhập CLB', $1, $2, NOW(), $3, 'Chuyển khoản SePay', 'completed', $4, NOW(), NOW()
+          )
+        `,
+          `Thu phí gia nhập CLB CEO HN10 - HV: ${memKey}`,
+          transferAmount,
+          memKey,
+          `Thanh toán phí gia nhập qua SePay (GD: ${gatewayId} - TK: ${bankAccountNumber})`,
+        ).catch(() => {});
+
+        // Quỹ Tổng tiếp nhận
+        const mainFund = await this.prisma.financial_funds.findFirst({
+          where: { name: { contains: 'Tổng', mode: 'insensitive' } },
+        });
+        const fundToCredit = targetFundId || mainFund?.id;
+        if (fundToCredit) {
+          await this.prisma.$executeRawUnsafe(`
+            UPDATE public.financial_funds SET current_balance = current_balance + $1, updated_at = NOW()
+            WHERE id = $2::uuid
+          `, transferAmount, fundToCredit).catch(() => {});
+        }
+
+        if (eventId) {
+          await this.prisma.sepay_webhook_events.update({
+            where: { id: eventId },
+            data: { status: 'POSTED', matched_order_id: memKey },
+          }).catch(() => {});
+        }
+
+        return { success: true, status: 'POSTED', matched: 'joining_fee', memKey };
+      }
+    }
+
+    // D. Khớp học phí khóa học / 30 chuyên đề: CEOHN10_LH_[CLASS_ID]_[MEMBER_ID]
+    const coursePrefix = config.prefixCourse || 'CEOHN10_LH';
+    if (upperContent.includes(coursePrefix)) {
+      const matchCourse = upperContent.match(new RegExp(`${coursePrefix}_([A-Z0-9-]+)`, 'i'));
+      if (matchCourse && matchCourse[1]) {
+        const courseRef = matchCourse[1];
+        await this.prisma.$executeRawUnsafe(`
+          INSERT INTO public.income_records (
+            id, category, title, amount, date, payer_name, payment_method, status, notes, created_at, updated_at
+          ) VALUES (
+            gen_random_uuid(), 'Học phí đào tạo', $1, $2, NOW(), $3, 'Chuyển khoản SePay', 'completed', $4, NOW(), NOW()
+          )
+        `,
+          `Thu học phí 30 chuyên đề CEO HN10 - Ref: ${courseRef}`,
+          transferAmount,
+          courseRef,
+          `Thanh toán học phí qua SePay (GD: ${gatewayId} - TK: ${bankAccountNumber})`,
+        ).catch(() => {});
+
+        const eduFund = await this.prisma.financial_funds.findFirst({
+          where: { name: { contains: 'Học tập', mode: 'insensitive' } },
+        });
+        const fundToCredit = targetFundId || eduFund?.id;
+        if (fundToCredit) {
+          await this.prisma.$executeRawUnsafe(`
+            UPDATE public.financial_funds SET current_balance = current_balance + $1, updated_at = NOW()
+            WHERE id = $2::uuid
+          `, transferAmount, fundToCredit).catch(() => {});
+        }
+
+        if (eventId) {
+          await this.prisma.sepay_webhook_events.update({
+            where: { id: eventId },
+            data: { status: 'POSTED', matched_order_id: courseRef },
+          }).catch(() => {});
+        }
+
+        return { success: true, status: 'POSTED', matched: 'course_fee', courseRef };
+      }
+    }
+
+    // E. Khớp kinh phí tài trợ: CEOHN10_TT_[SPONSOR_ID]
+    const sponsorPrefix = config.prefixSponsor || 'CEOHN10_TT';
+    if (upperContent.includes(sponsorPrefix)) {
+      const matchSponsor = upperContent.match(new RegExp(`${sponsorPrefix}_([A-Z0-9-]+)`, 'i'));
+      if (matchSponsor && matchSponsor[1]) {
+        const spRef = matchSponsor[1];
+        await this.prisma.$executeRawUnsafe(`
+          INSERT INTO public.income_records (
+            id, category, title, amount, date, payer_name, payment_method, status, notes, created_at, updated_at
+          ) VALUES (
+            gen_random_uuid(), 'Kinh phí tài trợ', $1, $2, NOW(), $3, 'Chuyển khoản SePay', 'completed', $4, NOW(), NOW()
+          )
+        `,
+          `Thu kinh phí tài trợ CLB CEO HN10 - Sponsor: ${spRef}`,
+          transferAmount,
+          spRef,
+          `Thanh toán tài trợ qua SePay (GD: ${gatewayId} - TK: ${bankAccountNumber})`,
+        ).catch(() => {});
+
+        const spFund = await this.prisma.financial_funds.findFirst({
+          where: { name: { contains: 'Tài trợ', mode: 'insensitive' } },
+        });
+        const fundToCredit = targetFundId || spFund?.id;
+        if (fundToCredit) {
+          await this.prisma.$executeRawUnsafe(`
+            UPDATE public.financial_funds SET current_balance = current_balance + $1, updated_at = NOW()
+            WHERE id = $2::uuid
+          `, transferAmount, fundToCredit).catch(() => {});
+        }
+
+        if (eventId) {
+          await this.prisma.sepay_webhook_events.update({
+            where: { id: eventId },
+            data: { status: 'POSTED', matched_order_id: spRef },
+          }).catch(() => {});
+        }
+
+        return { success: true, status: 'POSTED', matched: 'sponsorship', spRef };
+      }
+    }
+
+    // F. Khớp đóng góp thiện nguyện: CEOHN10_TN_[REF]
+    const charityPrefix = config.prefixCharity || 'CEOHN10_TN';
+    if (upperContent.includes(charityPrefix)) {
+      const matchCharity = upperContent.match(new RegExp(`${charityPrefix}_([A-Z0-9-]+)`, 'i'));
+      if (matchCharity && matchCharity[1]) {
+        const chRef = matchCharity[1];
+        await this.prisma.$executeRawUnsafe(`
+          INSERT INTO public.income_records (
+            id, category, title, amount, date, payer_name, payment_method, status, notes, created_at, updated_at
+          ) VALUES (
+            gen_random_uuid(), 'Ủng hộ thiện nguyện', $1, $2, NOW(), $3, 'Chuyển khoản SePay', 'completed', $4, NOW(), NOW()
+          )
+        `,
+          `Đóng góp Quỹ Thiện nguyện CLB CEO HN10 - Ref: ${chRef}`,
+          transferAmount,
+          chRef,
+          `Ủng hộ thiện nguyện qua SePay (GD: ${gatewayId} - TK: ${bankAccountNumber})`,
+        ).catch(() => {});
+
+        const chFund = await this.prisma.financial_funds.findFirst({
+          where: { name: { contains: 'Thiện nguyện', mode: 'insensitive' } },
+        });
+        const fundToCredit = targetFundId || chFund?.id;
+        if (fundToCredit) {
+          await this.prisma.$executeRawUnsafe(`
+            UPDATE public.financial_funds SET current_balance = current_balance + $1, updated_at = NOW()
+            WHERE id = $2::uuid
+          `, transferAmount, fundToCredit).catch(() => {});
+        }
+
+        if (eventId) {
+          await this.prisma.sepay_webhook_events.update({
+            where: { id: eventId },
+            data: { status: 'POSTED', matched_order_id: chRef },
+          }).catch(() => {});
+        }
+
+        return { success: true, status: 'POSTED', matched: 'charity', chRef };
+      }
+    }
+
+    // G. Duyệt qua bất kỳ danh mục phí phát sinh nào khác trong config.feeCategories
+    if (config.feeCategories && Array.isArray(config.feeCategories)) {
+      for (const cat of config.feeCategories) {
+        if (!cat.is_active || !cat.prefix) continue;
+        const catPrefix = cat.prefix.trim().toUpperCase();
+        if (upperContent.includes(catPrefix)) {
+          const customMatch = upperContent.match(new RegExp(`${catPrefix}_([A-Z0-9-]+)`, 'i'));
+          const customRef = (customMatch && customMatch[1]) || gatewayId;
+
+          await this.prisma.$executeRawUnsafe(`
+            INSERT INTO public.income_records (
+              id, category, title, amount, date, payer_name, payment_method, status, notes, created_at, updated_at
+            ) VALUES (
+              gen_random_uuid(), $1, $2, $3, NOW(), $4, 'Chuyển khoản SePay', 'completed', $5, NOW(), NOW()
+            )
+          `,
+            cat.name || 'Khoản thu khác',
+            `Thu ${cat.name || 'phí'} - Ref: ${customRef}`,
+            transferAmount,
+            customRef,
+            `Thanh toán qua SePay (GD: ${gatewayId} - TK: ${bankAccountNumber})`,
+          ).catch(() => {});
+
+          let dynFund: any = null;
+          if (cat.target_fund_name) {
+            dynFund = await this.prisma.financial_funds.findFirst({
+              where: { name: { contains: cat.target_fund_name.split(' ')[0] || '', mode: 'insensitive' } },
+            });
+          }
+          const fundToCredit = targetFundId || dynFund?.id;
+          if (fundToCredit) {
+            await this.prisma.$executeRawUnsafe(`
+              UPDATE public.financial_funds SET current_balance = current_balance + $1, updated_at = NOW()
+              WHERE id = $2::uuid
+            `, transferAmount, fundToCredit).catch(() => {});
+          }
+
+          if (eventId) {
+            await this.prisma.sepay_webhook_events.update({
+              where: { id: eventId },
+              data: { status: 'POSTED', matched_order_id: customRef },
+            }).catch(() => {});
+          }
+
+          return { success: true, status: 'POSTED', matched: cat.id || 'custom_fee', customRef };
+        }
       }
     }
 

@@ -112,18 +112,16 @@ export interface CommitteeRole {
 }
 
 export const COMMITTEES: CommitteeRole[] = [
-  { key: "dieu_hanh", name: "Ban Điều Hành", shortName: "Ban Điều Hành", color: "text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800" },
-  { key: "thu_ky", name: "Ban Thư Ký", shortName: "Ban Thư Ký", color: "text-purple-700 bg-purple-50 border-purple-200 dark:bg-purple-950/50 dark:text-purple-300 dark:border-purple-800" },
-  { key: "tai_chinh", name: "Ban Tài Chính", shortName: "Ban Tài Chính", color: "text-yellow-700 bg-yellow-50 border-yellow-200 dark:bg-yellow-950/50 dark:text-yellow-300 dark:border-yellow-800" },
-  { key: "su_kien", name: "Ban Sự Kiện & Hậu Cần", shortName: "Ban Sự Kiện", color: "text-rose-700 bg-rose-50 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800" },
-  { key: "dao_tao", name: "Ban Đào Tạo & Phát Triển", shortName: "Ban Đào Tạo", color: "text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800" },
-  { key: "thien_nguyen", name: "Ban Thiện Nguyện & Đời Sống", shortName: "Ban Thiện Nguyện", color: "text-teal-700 bg-teal-50 border-teal-200 dark:bg-teal-950/50 dark:text-teal-300 dark:border-teal-800" },
-  { key: "truyen_thong", name: "Ban Truyền Thông", shortName: "Ban Truyền Thông", color: "text-rose-700 bg-rose-50 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800" },
-  { key: "xuc_tien", name: "Ban B2B & Xúc Tiến Thương Mại", shortName: "Ban B2B", color: "text-amber-700 bg-amber-50 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800" },
-  { key: "thanh_vien", name: "Ban Thành Viên", shortName: "Ban Thành Viên", color: "text-emerald-700 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800" },
+  { key: "cong_nghe", name: "Ban Công nghệ", shortName: "Ban Công nghệ", color: "text-indigo-700 bg-indigo-50 border-indigo-200 dark:bg-indigo-950/50 dark:text-indigo-300 dark:border-indigo-800" },
+  { key: "truyen_thong", name: "Ban Truyền thông", shortName: "Ban Truyền thông", color: "text-rose-700 bg-rose-50 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800" },
+  { key: "tai_chinh", name: "Ban Tài chính", shortName: "Ban Tài chính", color: "text-yellow-700 bg-yellow-50 border-yellow-200 dark:bg-yellow-950/50 dark:text-yellow-300 dark:border-yellow-800" },
+  { key: "su_kien", name: "Ban Sự kiện & Hậu cần", shortName: "Ban Sự kiện & Hậu cần", color: "text-purple-700 bg-purple-50 border-purple-200 dark:bg-purple-950/50 dark:text-purple-300 dark:border-purple-800" },
+  { key: "doi_ngoai", name: "Ban Đối ngoại & Giao thương", shortName: "Ban Đối ngoại & Giao thương", color: "text-emerald-700 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800" },
+  { key: "gan_ket", name: "Ban Gắn kết & Đời sống", shortName: "Ban Gắn kết & Đời sống", color: "text-amber-700 bg-amber-50 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800" },
+  { key: "thien_nguyen", name: "Ban Thiện nguyện", shortName: "Ban Thiện nguyện", color: "text-teal-700 bg-teal-50 border-teal-200 dark:bg-teal-950/50 dark:text-teal-300 dark:border-teal-800" },
 ];
 
-// ── HỆ THỐNG ROLE: CHỦ TỊCH -> ADMIN -> BAN ĐIỀU HÀNH -> TỔNG THƯ KÝ -> TRƯỞNG BAN ──
+// ── HỆ THỐNG 9 VAI TRÒ CHUẨN CEO HN10 ──
 export interface SystemRole {
   key: string;
   name: string;
@@ -133,34 +131,19 @@ export interface SystemRole {
 }
 
 export const SYSTEM_ROLES: SystemRole[] = [
-  { key: "admin_platform", name: "Admin Platform", shortName: "Admin Platform", color: "text-indigo-700 bg-indigo-50 border-indigo-200 dark:bg-indigo-950/50 dark:text-indigo-300 dark:border-indigo-800", desc: "Quản trị viên nền tảng tối cao (Admin platform)" },
-  { key: "lop_truong", name: "Lớp trưởng", shortName: "Lớp trưởng", color: "text-amber-800 bg-amber-100 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-700", desc: "Lớp trưởng CEO HN10 - Điều hành và phê duyệt tối cao toàn lớp" },
+  { key: "platform_admin", name: "Platform Admin", shortName: "Platform Admin", color: "text-indigo-700 bg-indigo-50 border-indigo-200 dark:bg-indigo-950/50 dark:text-indigo-300 dark:border-indigo-800", desc: "Quản trị viên nền tảng tối cao (Platform Admin)" },
   { key: "admin", name: "Admin", shortName: "Admin", color: "text-purple-700 bg-purple-50 border-purple-200 dark:bg-purple-950/50 dark:text-purple-300 dark:border-purple-800", desc: "Quản trị viên vận hành hệ thống CRM" },
+  { key: "lop_truong", name: "Lớp trưởng", shortName: "Lớp trưởng", color: "text-amber-800 bg-amber-100 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-700", desc: "Lớp trưởng CEO HN10 - Điều hành và phê duyệt tối cao toàn lớp" },
   { key: "lop_pho", name: "Lớp phó", shortName: "Lớp phó", color: "text-blue-800 bg-blue-100 border-blue-300 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-700", desc: "Lớp phó điều hành, phụ trách các ban chuyên môn" },
-  { key: "truong_team", name: "Trưởng team", shortName: "Trưởng team", color: "text-purple-700 bg-purple-50 border-purple-200 dark:bg-purple-950/50 dark:text-purple-300 dark:border-purple-800", desc: "Trưởng các team/nhóm học viên" },
+  { key: "truong_team", name: "Trưởng team", shortName: "Trưởng team", color: "text-teal-700 bg-teal-50 border-teal-200 dark:bg-teal-950/50 dark:text-teal-300 dark:border-teal-800", desc: "Trưởng các team/nhóm học viên" },
   { key: "pho_team", name: "Phó team", shortName: "Phó team", color: "text-cyan-700 bg-cyan-50 border-cyan-200 dark:bg-cyan-950/50 dark:text-cyan-300 dark:border-cyan-800", desc: "Phó các team/nhóm học viên hỗ trợ trưởng team" },
-  { key: "truong_ban_chuyen_trach", name: "Trưởng ban chuyên trách", shortName: "Trưởng ban", color: "text-emerald-700 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800", desc: "Các Trưởng ban chuyên trách: Đào tạo, Sự kiện, Tài chính, Truyền thông, B2B, Gắn kết" },
+  { key: "truong_ban_chuyen_trach", name: "Trưởng ban chuyên trách", shortName: "Trưởng ban", color: "text-emerald-700 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800", desc: "Trưởng 7 ban chuyên trách: Công nghệ, Truyền thông, Tài chính, Sự kiện & Hậu cần, Đối ngoại & Giao thương, Gắn kết & Đời sống, Thiện nguyện" },
+  { key: "giang_vien", name: "Giảng viên", shortName: "Giảng viên", color: "text-rose-700 bg-rose-50 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800", desc: "Giảng viên đào tạo & chuyên gia huấn luyện CEO HN10" },
   { key: "member", name: "Học viên", shortName: "Học viên", color: "text-slate-700 bg-slate-50 border-slate-200 dark:bg-slate-900/50 dark:text-slate-300 dark:border-slate-800", desc: "Học viên sinh hoạt chính thức của lớp" },
 ];
 
 export function getDynamicSystemRoles(): SystemRole[] {
-  const customDepts = typeof window !== "undefined" ? getCustomDepartments() : [];
-  const baseRoles = [...SYSTEM_ROLES];
-
-  customDepts.forEach((d) => {
-    const roleKey = `truong_ban_${d.code.toLowerCase().replace(/[^a-z0-9_]/g, "_")}`;
-    if (!baseRoles.some((r) => r.key === roleKey)) {
-      baseRoles.push({
-        key: roleKey,
-        name: d.headTitle || `Trưởng ${d.name}`,
-        shortName: `Trưởng ${d.name}`,
-        color: "text-amber-700 bg-amber-50 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800",
-        desc: `Trưởng ban chuyên môn ${d.name}`,
-      });
-    }
-  });
-
-  return baseRoles;
+  return [...SYSTEM_ROLES];
 }
 
 export interface TreeAction {

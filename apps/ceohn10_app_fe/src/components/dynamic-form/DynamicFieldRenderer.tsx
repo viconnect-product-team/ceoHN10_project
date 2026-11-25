@@ -15,7 +15,19 @@ export interface DynamicFieldDef {
   id: string;
   field_name: string;
   field_label: string;
-  field_type: "text" | "textarea" | "select" | "number" | "date" | "switch" | "email" | "phone";
+  field_type:
+    | "text"
+    | "textarea"
+    | "select"
+    | "multi_select"
+    | "number"
+    | "currency"
+    | "date"
+    | "datetime"
+    | "switch"
+    | "email"
+    | "phone"
+    | "url";
   options?: (string | { label: string; value: string })[];
   placeholder?: string;
   default_value?: any;
@@ -173,6 +185,68 @@ export function DynamicFieldRenderer({
             value={value ?? ""}
             onChange={(e) => onChange(e.target.value)}
             placeholder={field.placeholder || "0912345678"}
+            disabled={disabled}
+            className="text-xs h-9"
+          />
+          {error && <p className="text-[11px] text-destructive">{error}</p>}
+        </div>
+      );
+
+    case "currency":
+      return (
+        <div className="space-y-1.5">
+          {labelWithReq}
+          <div className="relative">
+            <Input
+              id={fieldId}
+              type="text"
+              value={
+                value !== undefined && value !== null && value !== ""
+                  ? Number(String(value).replace(/[^0-9]/g, "")).toLocaleString("vi-VN")
+                  : ""
+              }
+              onChange={(e) => {
+                const rawNum = e.target.value.replace(/[^0-9]/g, "");
+                onChange(rawNum ? Number(rawNum) : "");
+              }}
+              placeholder={field.placeholder || "0 đ"}
+              disabled={disabled}
+              className="text-xs h-9 pr-8 text-right font-medium"
+            />
+            <span className="absolute right-2.5 top-2.5 text-[11px] font-semibold text-muted-foreground pointer-events-none">
+              VNĐ
+            </span>
+          </div>
+          {error && <p className="text-[11px] text-destructive">{error}</p>}
+        </div>
+      );
+
+    case "datetime":
+      return (
+        <div className="space-y-1.5">
+          {labelWithReq}
+          <Input
+            id={fieldId}
+            type="datetime-local"
+            value={value ? String(value).slice(0, 16) : ""}
+            onChange={(e) => onChange(e.target.value)}
+            disabled={disabled}
+            className="text-xs h-9"
+          />
+          {error && <p className="text-[11px] text-destructive">{error}</p>}
+        </div>
+      );
+
+    case "url":
+      return (
+        <div className="space-y-1.5">
+          {labelWithReq}
+          <Input
+            id={fieldId}
+            type="url"
+            value={value ?? ""}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={field.placeholder || "https://example.com"}
             disabled={disabled}
             className="text-xs h-9"
           />

@@ -13,6 +13,15 @@ import {
   ArrowDownLeft,
   ArrowUpRight,
   SlidersHorizontal,
+  Settings,
+  Power,
+  Lock,
+  Globe,
+  Key,
+  Wallet,
+  Save,
+  Copy,
+  ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
 import { fetchNestApi } from "@/lib/api-client";
@@ -41,6 +50,36 @@ export function FinanceBankingSepaySection({ className = "" }: { className?: str
   const [simContent, setSimContent] = useState("");
   const [simRunning, setSimRunning] = useState(false);
   const [simResult, setSimResult] = useState<any>(null);
+
+  // Dynamic Master Admin SePay Live Info (Đọc từ Master Admin /master?tab=settings)
+  const [dynamicConfig, setDynamicConfig] = useState<any>({
+    is_enabled: true,
+    bank_brand_name: "VPBank",
+    account_number: "",
+    account_name: "PHAM VAN VU",
+    api_token: "ceohn10_sepay_event_test_2026",
+    webhook_token: "ceohn10_sepay_event_test_2026",
+    webhook_url: "https://ceohn10.loca.lt/api/webhooks/sepay",
+    prefix_syntax: {
+      event: "CEO1983_EVT",
+      membership: "CEOHN10_HP",
+      course: "CEOHN10_LH",
+    },
+    auto_activation: {
+      event_ticket: true,
+      membership_fee: true,
+      course_fee: true,
+    },
+  });
+
+  const loadSepayMasterConfig = async () => {
+    try {
+      const res = await fetchNestApi<any>("/admin/master-settings/sepay");
+      if (res?.config) {
+        setDynamicConfig((prev: any) => ({ ...prev, ...res.config }));
+      }
+    } catch {}
+  };
 
   const handleSimulateWebhook = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,6 +123,7 @@ export function FinanceBankingSepaySection({ className = "" }: { className?: str
       const fList = Array.isArray(fundsRes) ? fundsRes : [];
       setFunds(fList);
       if (fList.length > 0) setFundId(fList[0].id);
+      await loadSepayMasterConfig();
     } catch (err: any) {
       toast.error(err?.message || "Lỗi tải thông tin ngân hàng & đối soát");
     } finally {
@@ -145,39 +185,68 @@ export function FinanceBankingSepaySection({ className = "" }: { className?: str
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-base font-bold text-white">Cổng Tiếp Nhận Webhook SePay Đa Tài Khoản</h3>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
-                  LIVE • READY
+                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                  dynamicConfig.is_enabled
+                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
+                    : "bg-slate-700 text-slate-400 border border-slate-600"
+                }`}>
+                  {dynamicConfig.is_enabled ? "LIVE • READY" : "PAUSED"}
                 </span>
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Endpoint Webhook: <code className="text-amber-300">POST /api/webhooks/sepay</code>
-              </p>
+              <div className="flex flex-wrap items-center gap-2 mt-1">
+                <p className="text-xs text-slate-400 flex items-center gap-1.5">
+                  <span>Endpoint Webhook:</span>
+                  <code className="text-amber-300 bg-slate-800 px-2 py-0.5 rounded font-mono">
+                    {dynamicConfig.webhook_url || "https://crm.ceohn10.viconnect.vn/api/webhooks/sepay"}
+                  </code>
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(dynamicConfig.webhook_url || "https://crm.ceohn10.viconnect.vn/api/webhooks/sepay");
+                    toast.success("Đã copy Webhook URL vào bộ nhớ tạm");
+                  }}
+                  className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
+                  title="Copy URL"
+                >
+                  <Copy className="size-3.5" />
+                </button>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-slate-300">
-            <span className="inline-flex items-center gap-1">
-              <ShieldCheck className="size-4 text-emerald-400" /> HMAC-SHA256 Verified
-            </span>
-            <span>•</span>
-            <span className="inline-flex items-center gap-1">
-              <CheckCircle2 className="size-4 text-sky-400" /> Idempotent Anti-Duplicate
-            </span>
+          <div className="flex items-center gap-2">
+            <a
+              href="/master?tab=settings"
+              className="px-3.5 py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 text-purple-300 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
+              title="Cấu hình SePay tập trung tại Cổng Quản Trị Lớn Nhất /master"
+            >
+              <Settings className="size-3.5 text-purple-400" />
+              <span>Quản Trị Cổng SePay (Master)</span>
+            </a>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
           <div className="p-3.5 rounded-xl bg-slate-800/60 border border-slate-700/60">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">Bảo Vệ Replay Attack</span>
-            <div className="font-semibold text-slate-200 mt-1">X-SePay-Timestamp &lt; 5 phút</div>
+            <span className="text-[10px] font-bold text-slate-400 uppercase">Tài Khoản Mặc Định (Master)</span>
+            <div className="font-semibold text-emerald-400 mt-1 truncate">
+              {dynamicConfig.bank_brand_name || "Chưa cấu hình"} - {dynamicConfig.account_number || "---"}
+            </div>
+            <div className="text-[11px] text-slate-300 uppercase truncate">{dynamicConfig.account_name || "CLB DOANH NHAN CEO HN10"}</div>
           </div>
           <div className="p-3.5 rounded-xl bg-slate-800/60 border border-slate-700/60">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">Khớp Quỹ Tự Động</span>
-            <div className="font-semibold text-slate-200 mt-1">Theo số tài khoản ngân hàng thụ hưởng</div>
+            <span className="text-[10px] font-bold text-slate-400 uppercase">Tiền Tố Đối Soát Tự Động</span>
+            <div className="font-semibold text-sky-300 mt-1">Vé: {dynamicConfig.prefix_syntax?.event || "CEO1983_EVT"}</div>
+            <div className="text-[11px] text-slate-300">Hội phí: {dynamicConfig.prefix_syntax?.membership || "CEOHN10_HP"}</div>
           </div>
           <div className="p-3.5 rounded-xl bg-slate-800/60 border border-slate-700/60">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">Xử Lý Giao Dịch Lạ</span>
-            <div className="font-semibold text-slate-200 mt-1">Chuyển PENDING_RECONCILIATION</div>
+            <span className="text-[10px] font-bold text-slate-400 uppercase">Xác Thực Chống Giả Mạo</span>
+            <div className="font-semibold text-slate-200 mt-1 flex items-center gap-1.5">
+              <ShieldCheck className="size-3.5 text-emerald-400" />
+              <span>HMAC-SHA256 &amp; API Key</span>
+            </div>
+            <div className="text-[11px] text-slate-400 truncate">Token: {dynamicConfig.webhook_token ? "••••••••" + String(dynamicConfig.webhook_token).slice(-4) : "Chưa cài"}</div>
           </div>
         </div>
       </div>
@@ -459,6 +528,8 @@ export function FinanceBankingSepaySection({ className = "" }: { className?: str
           </div>
         </div>
       )}
+
+
 
       {/* ── MODAL: GIẢ LẬP GIAO DỊCH SEPAY (LOCALHOST SANDBOX) ── */}
       {showSimulateModal && (

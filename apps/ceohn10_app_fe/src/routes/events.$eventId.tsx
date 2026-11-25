@@ -236,6 +236,11 @@ function EventDetailPage() {
     { name: "startTime", label: "Giờ bắt đầu (VD: 08:30)", type: "text" },
     { name: "endTime", label: "Giờ kết thúc (VD: 11:30)", type: "text" },
     { name: "location", label: t("events.col.location"), type: "text" },
+    {
+      name: "changeReason",
+      label: "Lý do thay đổi thời gian / địa điểm / hủy (Hệ thống sẽ gửi email tự động tới các đại biểu)",
+      type: "textarea",
+    },
     { name: "capacity", label: t("events.kpi.capacity"), type: "number" },
     {
       name: "qrStaff",
@@ -304,6 +309,8 @@ function EventDetailPage() {
         qrStaff: v.qrStaff || [],
         qrScanners: v.qrStaff || [],
         description: v.description || (v as any).description,
+        changeReason: (v as any).changeReason ? String((v as any).changeReason).trim() : undefined,
+        reason: (v as any).changeReason ? String((v as any).changeReason).trim() : undefined,
       };
       await fetchNestApi(`/events/${event.id}`, {
         method: "PUT",
@@ -640,6 +647,50 @@ function EventDetailPage() {
           <EventSponsors sponsors={event.sponsors as any} />
 
           <EventAttendees registrations={registrations} canManage={canManage} />
+
+          {/* Danh sách Khách mời đã từ chối tham dự (UC-INV-06) */}
+          {(() => {
+            const declinedList = registrations.filter((r: any) => r.status === "declined");
+            return (
+              <section className="rounded-2xl border border-rose-200 dark:border-rose-900/60 bg-card p-6 shadow-[var(--shadow-card)] space-y-3">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-base font-semibold text-rose-700 dark:text-rose-400 flex items-center gap-2">
+                    <XCircle className="h-4 w-4" />
+                    <span>Khách mời đã từ chối tham dự ({declinedList.length})</span>
+                  </h2>
+                  <span className="text-[11px] text-muted-foreground">
+                    Ghi nhận tự động từ Thư mời RSVP
+                  </span>
+                </div>
+                {declinedList.length === 0 ? (
+                  <p className="text-xs text-muted-foreground italic">
+                    Chưa có khách mời nào phản hồi từ chối tham dự sự kiện này.
+                  </p>
+                ) : (
+                  <div className="divide-y divide-border rounded-xl border border-border overflow-hidden">
+                    {declinedList.map((d: any) => (
+                      <div key={d.id} className="p-3 flex flex-wrap items-center justify-between gap-2 text-xs bg-rose-50/30 dark:bg-rose-950/10">
+                        <div>
+                          <div className="font-bold text-foreground">{d.memberName}</div>
+                          <div className="text-[11px] text-muted-foreground">
+                            {d.company || d.dynamicData?.company || "Khách mời"} {d.email ? `· ${d.email}` : ""}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">
+                            Từ chối tham dự
+                          </span>
+                          <div className="text-[10px] text-muted-foreground mt-0.5">
+                            {d.registeredAt || ""}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </section>
+            );
+          })()}
 
           <LiveActivityMediaSection activityType="event" activityId={event.id} activityTitle={(event as any).title || event.name} canPushToFeed={canManage} />
 

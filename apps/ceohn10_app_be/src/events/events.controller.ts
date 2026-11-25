@@ -85,10 +85,11 @@ export class EventsController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(OptionalJwtAuthGuard)
   @Get('my-events')
   async listMyEvents(@Request() req: any) {
-    return this.eventsService.listMyEvents(req.user.id);
+    const userId = req.user?.id || 'guest';
+    return this.eventsService.listMyEvents(userId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -448,8 +449,20 @@ export class EventsController {
   }
 
   @Post('ticket-checkout')
-  async performTicketCheckout(@Body('ticketCode') ticketCode: string) {
-    return this.eventsService.performTicketCheckout(ticketCode);
+  async performTicketCheckout(
+    @Body('ticketCode') ticketCode?: string,
+    @Body('registrationId') registrationId?: string,
+    @Body('attendeeId') attendeeId?: string,
+    @Body('code') code?: string,
+    @Body() body?: any,
+  ) {
+    const raw = ticketCode || registrationId || attendeeId || code || body?.ticketCode || body?.registrationId || body?.attendeeId || body?.code || (typeof body === 'string' ? body : '');
+    return this.eventsService.performTicketCheckout(raw);
+  }
+
+  @Post('registrations/:id/checkout')
+  async performRegistrationCheckout(@Param('id') id: string) {
+    return this.eventsService.performTicketCheckout(id);
   }
 
   // ── OFFLINE CHECKIN ENGINE (HỖ TRỢ KHU VỰC MẤT SÓNG / KHÔNG CÓ MẠNG) ─────────
@@ -582,5 +595,83 @@ export class EventsController {
   @Post(':id/send-post-event-recap')
   async sendPostEventRecap(@Param('id') id: string) {
     return this.eventsService.sendPostEventRecap(id);
+  }
+
+  // UC-EVT-08: Gửi link kho ảnh Live Gallery qua Email & Zalo OA cho đại biểu
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('platform_admin', 'superadmin', 'adm', 'admin', 'bqt', 'btt', 'btk', 'bxt', 'member')
+  @Post(':id/share-gallery')
+  async shareEventLiveGallery(
+    @Param('id') id: string,
+    @Body('customMessage') customMessage?: string,
+  ) {
+    return this.eventsService.shareEventLiveGallery(id, customMessage);
+  }
+
+  // UC-EVT-10: Gửi báo cáo sự kiện qua Email / Zalo OA cho nhiều tài khoản
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('platform_admin', 'superadmin', 'adm', 'admin', 'bqt', 'btt', 'btk', 'bxt', 'member')
+  @Post(':id/send-report')
+  async sendEventReport(
+    @Param('id') id: string,
+    @Body() body: {
+      recipients: string[];
+      category?: string;
+      format?: string;
+      reportSummary?: any;
+    },
+  ) {
+    return this.eventsService.sendEventReport(id, body);
+  }
+
+  // UC-EVT-05-1: Đại biểu tự check-in bằng mã vé hoặc ảnh QR (Công khai, không cần đăng nhập)
+  @Post(':id/guest-self-checkin')
+  async guestSelfCheckin(
+    @Param('id') id: string,
+    @Body('ticketCode') ticketCode: string,
+    @Body('method') method?: string,
+  ) {
+    return this.eventsService.performTicketCheckin(ticketCode, method || 'guest_self_scan');
+  }
+
+  // UC-INV-02: Lấy & lưu danh sách khách mời cá nhân hóa theo sự kiện
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/invitation-guests')
+  async getInvitationGuests(@Param('id') id: string) {
+    return this.eventsService.getInvitationGuests(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/invitation-guests')
+  async saveInvitationGuests(
+    @Param('id') id: string,
+    @Body('guests') guests: any[],
+  ) {
+    return this.eventsService.saveInvitationGuests(id, guests);
+  }
+
+  // UC-INV-03..06: Xem thư mời cá nhân hóa công khai & RSVP không cần đăng nhập
+  @UseGuards(OptionalJwtAuthGuard)
+  @Get(':id/public-invitation')
+  async getPublicInvitation(
+    @Param('id') id: string,
+    @Query('slug') slug?: string,
+  ) {
+    return this.eventsService.getPublicInvitation(id, slug);
+  }
+
+  @UseGuards(OptionalJwtAuthGuard)
+  @Post(':id/public-rsvp')
+  async submitPublicRsvp(
+    @Param('id') id: string,
+    @Body() body: any,
+  ) {
+    return this.eventsService.submitPublicRsvp(id, body);
+  }
+
+  @UseGuards(OptionalJwtAuthGuard)
+  @Get('registrations/:regId/status')
+  async getRegistrationPaymentStatus(@Param('regId') regId: string) {
+    return this.eventsService.getRegistrationPaymentStatus(regId);
   }
 }

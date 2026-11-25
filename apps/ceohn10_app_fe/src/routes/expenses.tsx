@@ -27,6 +27,9 @@ import { FinanceExcelImportModal } from "@/components/dashboard/FinanceExcelImpo
 import { FinanceChartsSection } from "@/components/dashboard/FinanceChartsSection";
 import { FinanceViewModeTabs, type FinanceViewMode } from "@/components/dashboard/FinanceViewModeTabs";
 import { FinanceUnitTreeSection } from "@/components/dashboard/FinanceUnitTreeSection";
+import { FinanceBankingSepaySection } from "@/components/dashboard/FinanceBankingSepaySection";
+import { FinanceOpeningBalanceSection } from "@/components/dashboard/FinanceOpeningBalanceSection";
+import { FinanceTransfersSection } from "@/components/dashboard/FinanceTransfersSection";
 import type { Transaction } from "@/types/finance.types";
 import { downloadInvoiceVoucher, printOrExportExpensePdf } from "@/lib/invoice-receipt";
 import { useFmt, useT } from "@/lib/i18n";
@@ -643,6 +646,27 @@ function ExpensesPage() {
         </div>
       )}
 
+      {/* ── CHẾ ĐỘ 4: NGÂN HÀNG & SEPAY TỰ ĐỘNG (CẤU HÌNH & SANDBOX GIẢ LẬP) ── */}
+      {viewMode === "banking_sepay" && (
+        <div className="space-y-6">
+          <FinanceBankingSepaySection className="mb-6" />
+        </div>
+      )}
+
+      {/* ── CHẾ ĐỘ 5: SỐ DƯ ĐẦU KỲ (2.1 TỶ & CÁC QUỸ) ── */}
+      {viewMode === "opening_balance" && (
+        <div className="space-y-6">
+          <FinanceOpeningBalanceSection className="mb-6" />
+        </div>
+      )}
+
+      {/* ── CHẾ ĐỘ 6: ĐIỀU CHUYỂN NỘI BỘ GIỮA CÁC QUỸ ── */}
+      {viewMode === "transfers" && (
+        <div className="space-y-6">
+          <FinanceTransfersSection className="mb-6" />
+        </div>
+      )}
+
       {/* ── CHẾ ĐỘ 3: CÂY ĐƠN VỊ & SƠ ĐỒ 6 BAN CHUYÊN MÔN ── */}
       {viewMode === "unit_tree" && (
         <div className="space-y-6">
@@ -658,6 +682,27 @@ function ExpensesPage() {
               toast.success(`Đã chuyển sang bảng dữ liệu lọc theo: ${unit}`);
             }}
           />
+        </div>
+      )}
+
+      {/* ── CHẾ ĐỘ 4: NGÂN HÀNG & SEPAY TỰ ĐỘNG (CẤU HÌNH & SANDBOX GIẢ LẬP) ── */}
+      {viewMode === "banking_sepay" && (
+        <div className="space-y-6">
+          <FinanceBankingSepaySection className="mb-6" />
+        </div>
+      )}
+
+      {/* ── CHẾ ĐỘ 5: SỐ DƯ ĐẦU KỲ (2.1 TỶ & CÁC QUỸ) ── */}
+      {viewMode === "opening_balance" && (
+        <div className="space-y-6">
+          <FinanceOpeningBalanceSection className="mb-6" />
+        </div>
+      )}
+
+      {/* ── CHẾ ĐỘ 6: ĐIỀU CHUYỂN NỘI BỘ GIỮA CÁC QUỸ ── */}
+      {viewMode === "transfers" && (
+        <div className="space-y-6">
+          <FinanceTransfersSection className="mb-6" />
         </div>
       )}
 

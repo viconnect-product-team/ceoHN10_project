@@ -633,7 +633,7 @@ export class UsersRepository {
       const rows: any[] = await this.prisma
         .$queryRawUnsafe<
           any[]
-        >(`SELECT about, notes FROM public.members WHERE user_id = $1::uuid OR email = $2 OR contact_email = $2 LIMIT 1`, userId, email)
+        >(`SELECT about, notes FROM public.members WHERE user_id = $1::uuid OR LOWER(email) = LOWER($2) LIMIT 1`, userId, email)
         .catch(() => []);
       if (rows.length > 0) {
         return `${rows[0].about || ''} ${rows[0].notes || ''}`.trim();

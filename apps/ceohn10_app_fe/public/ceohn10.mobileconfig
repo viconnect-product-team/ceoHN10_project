@@ -14,13 +14,13 @@ iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAgAElE
             <key>IsRemovable</key>
             <true/>
             <key>Label</key>
-            <string>CEO 1983</string>
+            <string>CEO HN10</string>
             <key>PayloadDescription</key>
-            <string>Cài đặt ứng dụng CLB Doanh Nhân CEO 1983 lên màn hình chính</string>
+            <string>Cài đặt ứng dụng CLB Doanh Nhân CEO HN10 lên màn hình chính</string>
             <key>PayloadDisplayName</key>
-            <string>CEO 1983 WebClip</string>
+            <string>CEO HN10 WebClip</string>
             <key>PayloadIdentifier</key>
-            <string>com.ceo1983.app.webclip</string>
+            <string>com.ceohn10.app.webclip</string>
             <key>PayloadType</key>
             <string>com.apple.webClip.managed</string>
             <key>PayloadUUID</key>
@@ -30,17 +30,17 @@ iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAgAElE
             <key>Precomposed</key>
             <true/>
             <key>URL</key>
-            <string>https://14.225.217.232:5444/association</string>
+            <string>https://ceohn10.viconnect.vn/association</string>
         </dict>
     </array>
     <key>PayloadDescription</key>
-    <string>Cấu hình cài đặt ứng dụng Hiệp hội Doanh nhân CEO 1983 trực tiếp lên iPhone</string>
+    <string>Cấu hình cài đặt ứng dụng CLB Doanh Nhân CEO HN10 trực tiếp lên iPhone</string>
     <key>PayloadDisplayName</key>
-    <string>Cài Đặt App CEO 1983</string>
+    <string>Cài Đặt App CEO HN10</string>
     <key>PayloadIdentifier</key>
-    <string>com.ceo1983.app.profile</string>
+    <string>com.ceohn10.app.profile</string>
     <key>PayloadOrganization</key>
-    <string>CLB Doanh Nhân CEO 1983 (HanoiBA)</string>
+    <string>CLB Doanh Nhân CEO HN10 (HanoiBA)</string>
     <key>PayloadRemovalDisallowed</key>
     <false/>
     <key>PayloadType</key>

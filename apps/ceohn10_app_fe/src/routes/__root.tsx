@@ -48,7 +48,6 @@ function makeQueryClient() {
 import { Toaster } from "@/components/ui/sonner";
 import { VoiceNavAssistant } from "@/components/ai/VoiceNavAssistant";
 import { ViOneVoiceAssistant } from "@/components/ai/ViOneVoiceAssistant";
-import { IosInstallPrompt } from "@/components/member/IosInstallPrompt";
 import { GlobalPermissionRevokedModal } from "@/components/common/GlobalPermissionRevokedModal";
 
 import appCss from "../styles.css?url";
@@ -208,27 +207,28 @@ export const Route = createRootRoute({
         href: appCss,
       },
       { rel: "manifest", href: "/manifest.webmanifest?v=2026-10-14.1" },
-      { rel: "apple-touch-icon", href: "/apple-touch-icon.png?v=ceohn10_v4w" },
+      { rel: "apple-touch-icon", href: "/ceohn10-favicon.png?v=ceohn10_v6" },
       {
         rel: "apple-touch-icon",
         sizes: "180x180",
-        href: "/apple-touch-icon-180x180.png?v=ceohn10_v4w",
+        href: "/ceohn10-favicon.png?v=ceohn10_v6",
       },
       {
         rel: "apple-touch-icon",
         sizes: "152x152",
-        href: "/apple-touch-icon-152x152.png?v=ceohn10_v4w",
+        href: "/ceohn10-favicon.png?v=ceohn10_v6",
       },
       {
         rel: "apple-touch-icon",
         sizes: "167x167",
-        href: "/apple-touch-icon-167x167.png?v=ceohn10_v4w",
+        href: "/ceohn10-favicon.png?v=ceohn10_v6",
       },
-      { rel: "apple-touch-icon-precomposed", href: "/apple-touch-icon.png?v=ceohn10_v4w" },
-      { rel: "icon", type: "image/png", sizes: "64x64", href: "/ceohn10-favicon.png?v=ceohn10_v4w" },
-      { rel: "icon", type: "image/png", sizes: "192x192", href: "/app-icon-192.png?v=ceohn10_v4w" },
-      { rel: "icon", type: "image/png", sizes: "512x512", href: "/app-icon.png?v=ceohn10_v4w" },
-      { rel: "shortcut icon", href: "/ceohn10-favicon.png?v=ceohn10_v4w" },
+      { rel: "apple-touch-icon-precomposed", href: "/ceohn10-favicon.png?v=ceohn10_v6" },
+      { rel: "icon", type: "image/png", sizes: "32x32", href: "/ceohn10-favicon.png?v=ceohn10_v6" },
+      { rel: "icon", type: "image/png", sizes: "64x64", href: "/ceohn10-favicon.png?v=ceohn10_v6" },
+      { rel: "icon", type: "image/png", sizes: "192x192", href: "/ceohn10-favicon.png?v=ceohn10_v6" },
+      { rel: "icon", type: "image/png", sizes: "512x512", href: "/ceohn10-favicon.png?v=ceohn10_v6" },
+      { rel: "shortcut icon", href: "/ceohn10-favicon.png?v=ceohn10_v6" },
       // Web fonts for Business Card industry templates.
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
@@ -498,7 +498,7 @@ function RootComponent() {
 
   useEffect(() => {
     if (typeof document === "undefined") return;
-    const targetFavicon = "/ceohn10-favicon.png?v=ceohn10_v4w";
+    const targetFavicon = "/ceohn10-favicon.png?v=ceohn10_v6";
     const targetApple = "/apple-touch-icon.png?v=ceohn10_v4w";
 
     const iconLinks = document.querySelectorAll<HTMLLinkElement>("link[rel~='icon']");
@@ -536,7 +536,6 @@ function RootComponent() {
             <AuthGate>
               <Outlet />
             </AuthGate>
-            <IosInstallPrompt />
           </AuthProvider>
           <Toaster position="top-right" />
         </ThemeProvider>

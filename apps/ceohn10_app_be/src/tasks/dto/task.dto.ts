@@ -123,14 +123,14 @@ export interface TaskItem {
 }
 
 export const TASK_DEPARTMENTS = [
+  'Ban Công Nghệ',
+  'Ban Truyền Thông',
+  'Ban Tài Chính',
+  'Ban Sự Kiện & Hậu Cần',
+  'Ban Đối Ngoại & Giao Thương',
+  'Ban Gắn Kết & Đời Sống',
   'Ban Cán Sự Lớp',
   'Ban Học Tập',
-  'Ban Sự Kiện – Hậu Cần',
-  'Ban Tài Chính – Tài Trợ',
-  'Ban Truyền Thông',
-  'Ban Công Nghệ',
-  'Ban Đối Ngoại & Giao Thương',
-  'Ban Đời Sống & Gắn Kết',
   'Team 1',
   'Team 2',
   'Team 3',

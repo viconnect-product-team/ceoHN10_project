@@ -58,21 +58,25 @@ const SCOPE_CONFIG = {
 };
 
 const ROLE_PRESETS = [
-  { code: "ADMIN_PLATFORM", name: "Quản trị viên nền tảng", scope: "PLATFORM" },
-  { code: "ADMIN", name: "Quản trị viên tổ chức (Admin)", scope: "ORGANIZATION" },
+  { code: "PLATFORM_ADMIN", name: "Platform Admin (Quản trị nền tảng)", scope: "PLATFORM" },
+  { code: "ADMIN", name: "Admin (Quản trị viên)", scope: "ORGANIZATION" },
   { code: "LOP_TRUONG", name: "Lớp trưởng", scope: "CLASS" },
   { code: "LOP_PHO", name: "Lớp phó", scope: "CLASS" },
   { code: "TRUONG_TEAM", name: "Trưởng team", scope: "TEAM" },
   { code: "PHO_TEAM", name: "Phó team", scope: "TEAM" },
-  { code: "TRUONG_BAN_HOC_TAP", name: "Trưởng ban Học tập", scope: "COMMITTEE" },
-  { code: "TRUONG_BAN_TRUYEN_THONG", name: "Trưởng ban Truyền thông", scope: "COMMITTEE" },
-  { code: "TRUONG_BAN_SU_KIEN_HAU_CAN", name: "Trưởng ban Sự kiện & Hậu cần", scope: "COMMITTEE" },
-  { code: "TRUONG_BAN_TAI_CHINH", name: "Trưởng ban Tài chính", scope: "COMMITTEE" },
-  { code: "TRUONG_BAN_THIEN_NGUYEN", name: "Trưởng ban Thiện nguyện", scope: "COMMITTEE" },
-  { code: "TRUONG_BAN_DOI_NOI", name: "Trưởng ban Đối nội", scope: "COMMITTEE" },
-  { code: "TRUONG_BAN_DOI_SONG_XA_HOI", name: "Trưởng ban Đời sống & Xã hội", scope: "COMMITTEE" },
+  { code: "TRUONG_BAN_CHUYEN_TRACH", name: "Trưởng các ban chuyên trách (7 Ban)", scope: "COMMITTEE" },
   { code: "GIANG_VIEN", name: "Giảng viên", scope: "CLASS" },
-  { code: "HOC_VIEN", name: "Học viên", scope: "SELF" },
+  { code: "MEMBER", name: "Học viên", scope: "SELF" },
+];
+
+export const COMMITTEE_7_OPTIONS = [
+  "Ban Công nghệ",
+  "Ban Truyền thông",
+  "Ban Tài chính",
+  "Ban Sự kiện & Hậu cần",
+  "Ban Đối ngoại & Giao thương",
+  "Ban Gắn kết & Đời sống",
+  "Ban Thiện nguyện",
 ];
 
 export function ScopeRoleAssignmentSection({ className = "" }: { className?: string }) {
@@ -117,7 +121,7 @@ export function ScopeRoleAssignmentSection({ className = "" }: { className?: str
             status: "ACTIVE",
             assigned_by: "ADMIN_PLATFORM",
             created_at: new Date().toISOString(),
-            user: { id: "usr-01", name: "Chủ tịch CLB CEO HN10", email: "admin@viconnect.vn", username: "admin", member_code: "CEO-001" },
+            user: { id: "usr-01", name: "Quản trị viên CLB CEO HN10", email: "admin@viconnect.vn", username: "admin", member_code: "ADM-001" },
             role: { id: "role-admin", code: "ADMIN", name: "Quản trị viên tổ chức", scope_level: "ORGANIZATION" },
           },
           {

@@ -31,7 +31,7 @@ const quickProfileSchema = z.object({
     .string()
     .trim()
     .min(1, "Số điện thoại không được phép để trống")
-    .regex(/^(0[3|5|7|8|9])[0-9]{8}$/, "Số điện thoại không hợp lệ (cần đúng 10 số bắt đầu bằng 03, 05, 07, 08, 09)"),
+    .regex(/^(0[235789])[0-9]{8,9}$/, "Số điện thoại không hợp lệ (cần từ 10-11 số bắt đầu bằng 0)"),
 });
 
 export interface QuickProfileEditModalProps {
@@ -229,7 +229,8 @@ export function QuickProfileEditModal({
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    const result = quickProfileSchema.safeParse({ name, phone });
+    const cleanedPhone = (phone || "").replace(/[\s\.\-\(\)]/g, "").replace(/^\+84/, "0");
+    const result = quickProfileSchema.safeParse({ name, phone: cleanedPhone });
     if (!result.success) {
       const errMap: Record<string, string> = {};
       for (const issue of result.error.issues) {
@@ -261,7 +262,7 @@ export function QuickProfileEditModal({
 
       const updatedData = {
         name: name.trim(),
-        phone: phone.trim(),
+        phone: cleanedPhone,
         company: company.trim(),
         title: title.trim(),
         address: address.trim(),
@@ -284,7 +285,7 @@ export function QuickProfileEditModal({
       // 1. Sync to Nest backend API FIRST and await to guarantee persistence in PostgreSQL
       const payload = {
         name: name.trim(),
-        phone: phone.trim(),
+        phone: cleanedPhone,
         company: company.trim(),
         title: title.trim(),
         address: address.trim(),

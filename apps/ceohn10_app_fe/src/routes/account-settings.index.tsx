@@ -172,13 +172,13 @@ function AccountManagementPage() {
   const [createEmail, setCreateEmail] = useState("");
   const [createPassword, setCreatePassword] = useState("");
   const [createName, setCreateName] = useState("");
-  const [createDepartment, setCreateDepartment] = useState("Học viên ceohn10");
+  const [createDepartment, setCreateDepartment] = useState("Ban Gắn kết & Đời sống");
   const [createRole, setCreateRole] = useState("member");
   const [createStatus, setCreateStatus] = useState("active");
 
   const [editName, setEditName] = useState("");
   const [editEmail, setEditEmail] = useState("");
-  const [editDepartment, setEditDepartment] = useState("Học viên ceohn10");
+  const [editDepartment, setEditDepartment] = useState("Ban Gắn kết & Đời sống");
   const [editRole, setEditRole] = useState("member");
   const [editStatus, setEditStatus] = useState("active");
   const [adminNewPassword, setAdminNewPassword] = useState("");
@@ -196,12 +196,20 @@ function AccountManagementPage() {
   }, [editDepartment, editRole]);
 
   const getRoleBadgeLabel = (role: string) => {
+    const roleMap: Record<string, string> = {
+      platform_admin: "Platform Admin",
+      admin: "Admin",
+      lop_truong: "Lớp trưởng",
+      lop_pho: "Lớp phó",
+      truong_team: "Trưởng team",
+      pho_team: "Phó team",
+      truong_ban_chuyen_trach: "Trưởng ban chuyên trách",
+      giang_vien: "Giảng viên",
+      member: "Học viên",
+    };
+    if (roleMap[role]) return roleMap[role];
     const opt = ROLE_OPTIONS.find((r) => r.value === role);
     if (opt) return opt.label;
-    if (role === "quan_tri" || role === "platform_admin") return "Quản trị";
-    if (role === "admin" || role === "tenant_admin") return "Admin";
-    if (role === "staff") return "Nhân viên";
-    if (role === "viewer") return "Chỉ xem";
     return role.replace(/_/g, " ");
   };
 
@@ -225,26 +233,17 @@ function AccountManagementPage() {
   const canManageUsers =
     isPlatformAdmin ||
     isAdmin ||
-    isBQT ||
-    isChuTich ||
-    srsRole === "quan_tri" ||
+    srsRole === "platform_admin" ||
     srsRole === "admin" ||
-    srsRole === "chu_tich" ||
-    userRolesList?.includes("quan_tri") ||
+    srsRole === "lop_truong" ||
+    srsRole === "lop_pho" ||
+    userRolesList?.includes("platform_admin") ||
     userRolesList?.includes("admin") ||
+    account?.email === "admin@ceohn10.vn" ||
     account?.email === "admin@connect.vn" ||
     account?.email === "admin@viconnect.vn" ||
-    account?.email === "infor@viconnect.vn" ||
-    account?.email === "info@viconnect.vn" ||
-    account?.username === "admin" ||
-    account?.username === "admin@connect.vn" ||
-    account?.username === "admin@viconnect.vn" ||
-    account?.username === "infor@viconnect.vn" ||
-    account?.username === "info@viconnect.vn" ||
     (account?.roles &&
       (account.roles.includes("platform_admin") ||
-        account.roles.includes("tenant_admin") ||
-        account.roles.includes("quan_tri") ||
         account.roles.includes("admin")));
 
   // ── Load Account Data ──────────────────────────────────────────────────────
@@ -942,11 +941,16 @@ function AccountManagementPage() {
                   onChange={(e) => setRoleFilter(e.target.value)}
                   className="h-10 rounded-xl border border-border bg-background px-3 text-xs font-medium text-foreground outline-none focus:border-ring"
                 >
-                  <option value="all">Tất cả vai trò</option>
-                  <option value="platform_admin">Quản trị</option>
-                  <option value="tenant_admin">Tenant Admin</option>
-                  <option value="staff">Staff</option>
-                  <option value="viewer">Viewer</option>
+                  <option value="all">Tất cả vai trò (9 Roles)</option>
+                  <option value="platform_admin">Platform Admin</option>
+                  <option value="admin">Admin</option>
+                  <option value="lop_truong">Lớp trưởng</option>
+                  <option value="lop_pho">Lớp phó</option>
+                  <option value="truong_team">Trưởng team</option>
+                  <option value="pho_team">Phó team</option>
+                  <option value="truong_ban_chuyen_trach">Trưởng ban chuyên trách</option>
+                  <option value="giang_vien">Giảng viên</option>
+                  <option value="member">Học viên</option>
                 </select>
 
                 <select
@@ -1043,27 +1047,57 @@ function AccountManagementPage() {
                 width: 190,
                 render: (u: any) => {
                   const userRoleKey = u.executiveRole || u.roles?.[0] || "member";
-                  const isSuper = userRoleKey === "quan_tri" || userRoleKey === "platform_admin";
+                  const isSuper = userRoleKey === "platform_admin" || userRoleKey === "quan_tri";
                   const isLeader =
-                    userRoleKey === "chu_tich" ||
                     userRoleKey === "admin" ||
-                    userRoleKey.startsWith("truong_ban_") ||
-                    userRoleKey === "tong_thu_ky";
-                  const isSpecialist = userRoleKey.startsWith("thanh_vien_ban_");
+                    userRoleKey === "lop_truong" ||
+                    userRoleKey === "lop_pho" ||
+                    userRoleKey === "truong_team" ||
+                    userRoleKey === "pho_team" ||
+                    userRoleKey === "truong_ban_chuyen_trach";
 
                   return (
                     <span
                       className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-bold border ${isSuper
-                          ? "bg-red-500/10 text-red-700 border-red-500/30"
+                          ? "bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/30"
                           : isLeader
-                            ? "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30"
-                            : isSpecialist
-                              ? "bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/30"
-                              : "bg-secondary text-muted-foreground border-border"
+                            ? "bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/30"
+                            : "bg-secondary text-muted-foreground border-border"
                         }`}
                     >
                       <ShieldCheck className="h-3 w-3 shrink-0" />
                       <CeoTableEllipsis text={getRoleBadgeLabel(userRoleKey)} maxLines={1} />
+                    </span>
+                  );
+                },
+              },
+              {
+                key: "access_scope",
+                label: "Phạm vi truy cập",
+                width: 170,
+                align: "center",
+                render: (u: any) => {
+                  const hasCrm = Boolean(
+                    u.canAccessCrm ||
+                    u.can_access_crm ||
+                    u.targetSystem === "all" ||
+                    u.role === "admin" ||
+                    u.role === "platform_admin" ||
+                    u.roles?.includes("admin") ||
+                    u.roles?.includes("platform_admin") ||
+                    u.executiveRole === "lop_truong" ||
+                    u.executiveRole === "lop_pho" ||
+                    u.executiveRole === "truong_team" ||
+                    u.executiveRole === "pho_team" ||
+                    u.executiveRole === "truong_ban_chuyen_trach"
+                  );
+                  return hasCrm ? (
+                    <span className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-bold bg-blue-50 text-[#002B70] dark:bg-blue-950 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                      💻 CRM &amp; App
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-bold bg-amber-50 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                      📱 Chỉ App CEOHN10
                     </span>
                   );
                 },
@@ -1131,22 +1165,22 @@ function AccountManagementPage() {
                     <Eye className="h-4 w-4" />
                   </button>
 
-                  {/* Edit User */}
+                    {/* Edit User */}
                   <button
                     type="button"
                     onClick={() => {
                       setTargetUser(u);
                       setEditName(u.name !== "—" ? u.name : "");
                       setEditEmail(u.email || "");
-                      const initDept = u.department || "Học viên ceohn10";
+                      const initDept = u.department || "Ban Gắn kết & Đời sống";
                       const initRole = u.executiveRole || u.roles?.[0] || "member";
                       setEditDepartment(initDept);
                       setEditRole(initRole);
                       setEditStatus(u.account_status || "active");
                       setEditModalOpen(true);
                     }}
-                    className="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition cursor-pointer"
-                    title="Chỉnh sửa tài khoản"
+                    className="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-border text-blue-600 hover:bg-blue-50 transition cursor-pointer"
+                    title="Chỉnh sửa & Phân quyền tài khoản"
                   >
                     <Pencil className="h-4 w-4" />
                   </button>
@@ -1302,13 +1336,13 @@ function AccountManagementPage() {
                 </div>
 
                 <div>
-                  <label className="mb-1 block font-semibold text-foreground">Vai trò theo Ban</label>
+                  <label className="mb-1 block font-semibold text-foreground">Vai trò / Quyền hạn</label>
                   <select
                     value={createRole}
                     onChange={(e) => setCreateRole(e.target.value)}
                     className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ring font-medium"
                   >
-                    {createRoleOptions.map((r) => (
+                    {ROLE_OPTIONS.map((r) => (
                       <option key={r.value} value={r.value}>
                         {r.label}
                       </option>
@@ -1411,13 +1445,13 @@ function AccountManagementPage() {
                 </div>
 
                 <div>
-                  <label className="mb-1 block font-semibold text-foreground">Vai trò theo Ban</label>
+                  <label className="mb-1 block font-semibold text-foreground">Vai trò / Quyền hạn (Gán quyền CRM hoặc chỉ App)</label>
                   <select
                     value={editRole}
                     onChange={(e) => setEditRole(e.target.value)}
                     className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ring font-medium"
                   >
-                    {editRoleOptions.map((r) => (
+                    {ROLE_OPTIONS.map((r) => (
                       <option key={r.value} value={r.value}>
                         {r.label}
                       </option>

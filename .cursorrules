@@ -1,6 +1,53 @@
 # ==============================================================================
 # BỘ LUẬT DỰ ÁN (PROJECT RULES & AI CODEGEN STANDARDS) - CEO HN10 PROJECT
 # Vai trò: Tech Lead | Định dạng: .cursorrules
+# 25/11/2026 (v12.81) — CHUẨN HÓA 9 ROLES & 7 BAN CHUYÊN TRÁCH, TÁCH BIỆT QUYỀN APP CEOHN10 VS CRM, IMPORT FILE THEO CHỨC NĂNG TỰ SINH CỘT, ĐỒNG NHẤT CỘT THAO TÁC CĂN GIỮA & LOGO SIDEBAR KHÔNG NỀN:
+#   * [CHUẨN HÓA 9 ROLES & 7 BAN CHUYÊN TRÁCH TOÀN HỆ THỐNG]:
+#     - Xóa sạch toàn bộ role cũ (chu_tich, ban_dieu_hanh, thanh_vien_ban_*, tong_thu_ky, ban_thu_ky) và ban cũ trong code & CSDL PostgreSQL.
+#     - Chuẩn hóa đúng 9 roles: platform_admin (Platform Admin), admin (Admin), lop_truong (Lớp trưởng), lop_pho (Lớp phó), truong_team (Trưởng team), pho_team (Phó team), truong_ban_chuyen_trach (Trưởng các ban chuyên trách), giang_vien (Giảng viên), member (Học viên).
+#     - Chuẩn hóa đúng 7 ban chuyên trách: Ban Công nghệ, Ban Truyền thông, Ban Tài chính, Ban Sự kiện & Hậu cần, Ban Đối ngoại & Giao thương, Ban Gắn kết & Đời sống, Ban Thiện nguyện.
+#   * [TÁCH BIỆT ĐỘC LẬP CHỨC NĂNG HỌC VIÊN/GIẢNG VIÊN VÀ QUẢN LÝ TÀI KHOẢN (APP-ONLY DEFAULT)]:
+#     - Khi tạo mới hoặc import học viên/giảng viên và gửi mail, hệ thống chỉ cấp tài khoản có quyền đăng nhập vào App CEOHN10 (targetSystem: 'app_only', canAccessCrm: false), KHÔNG có quyền đăng nhập vào hệ thống Web CRM.
+#     - Các tài khoản học viên/giảng viên tự động đồng bộ qua API hiển thị trên bảng Quản lý tài khoản (/account-settings?tab=users và /master?tab=accounts) với badge '📱 Chỉ App CEOHN10'. Muốn vào hệ thống CRM, Platform Admin phải gán quyền CRM cho tài khoản đó hoặc tạo cấp 1 tài khoản khác tại chức năng Quản lý tài khoản.
+#   * [IMPORT FILE THEO ĐÚNG CHỨC NĂNG & TỰ ĐỘNG SINH CỘT TRÊN BẢNG]:
+#     - Mỗi chức năng chỉ có 1 nút 'Import File' duy nhất, khóa cứng thực thể theo chức năng đang mở (không hiển thị dropdown chọn hết các phân hệ).
+#     - Khi import danh sách có các trường thông tin mới, bảng giao diện tự động bắt dữ liệu từ custom_data / dynamic_data và tự động sinh tên cột (column) hiển thị ngay trên bảng.
+#   * [ĐỒNG NHẤT CỘT THAO TÁC CĂN GIỮA & BỘ ICON CHUẨN + LOGO SIDEBAR KHÔNG NỀN]:
+#     - Tiêu đề cột 'THAO TÁC' và các nút bên trong luôn căn giữa cột (text-center, justify-center), sử dụng đồng nhất bộ nút icon (Eye, Pencil, Trash2, LogIn, LogOut, QrCode, KeyRound, Lock/Unlock) xuyên suốt toàn hệ thống.
+#     - Favicon tabweb chuẩn logo CEOHN10 (/ceohn10-favicon.png); logo trên Sidebar dùng HN10 logo 2 (/hn10-logo-2.png) hoàn toàn trong suốt không có nền màu bên dưới.
+# 25/11/2026 (v12.80) — AUTO-POLLING SEPAY REAL-TIME, CHUẨN HÓA 6 BAN CHUYÊN MÔN & ĐỒNG BỘ SƠ ĐỒ XẾP CHỖ THEO HẠNG VÉ:
+#   * [SEPAY AUTO-POLLING REAL-TIME (GUEST EVENT REGISTER)]:
+#     - Màn hình đăng ký vé khách công khai (/guest-event-register/$eventId) thiết lập polling chu kỳ 3s gọi API /events/ticket-status/:registrationId.
+#     - Khi webhook SePay khớp giao dịch, tự động nảy toast chúc mừng và chuyển từ giao diện VietQR sang Vé Điện Tử E-Ticket (mã QR check-in & Lucky Draw) tức thì không cần reload F5.
+#   * [CHUẨN HÓA 6 BAN CHUYÊN MÔN & QUẢN TRỊ ĐỔI TÊN BAN]:
+#     - Chuẩn hóa danh mục 6 ban: Ban Công nghệ (BCN), Ban Truyền thông (BTT), Ban Tài chính (BTC), Ban Sự kiện & Hậu cần (BSK), Ban Đối ngoại & Giao thương (BDN), Ban Gắn kết & Đời sống (BDS).
+#     - Bổ sung menu 'Ban chuyên môn' (/departments) lên Sidebar CRM chính và nút tắt từ trang Hội viên (/members). Cung cấp đầy đủ chức năng sửa tên, đổi mã, đổi màu, gán trưởng ban, thêm ban mới hoặc khôi phục 6 ban mặc định.
+#     - Đồng bộ toàn hệ thống FE và BE (rbac-permission-helpers, members.index, tasks/dto/task.dto, features/tasks/types).
+#   * [ĐỒNG BỘ SƠ ĐỒ XẾP CHỖ THEO HẠNG VÉ SỰ KIỆN]:
+#     - Hàm buildSeatingLayoutFromTickets: Tự động phân tích danh sách các hạng vé (VIP, Standard...) và số lượng (quantity) khai báo trong sự kiện để sinh layout ghế chính xác (tọa độ X, Y, phân loại màu sắc).
+#     - Tự động sinh cấu hình ghế ngay khi EventWizard tạo sự kiện thành công; CinemaSeatingMap bổ sung banner tóm tắt hạng vé và nút 'Đồng bộ theo hạng vé'.
+# 25/11/2026 (v12.79) — NÂNG CẤP CRM THÀNH HỆ THỐNG DYNAMIC IMPORT & DYNAMIC DATA MANAGEMENT (HYBRID SCHEMA):
+#   * [DYNAMIC IMPORT ENGINE 6 BƯỚC (EXCEL, CSV, WORD, PDF)]:
+#     - Hỗ trợ đa định dạng: Excel (.xlsx, .xls), CSV (UTF-8, UTF-8 BOM), Word (.docx), PDF.
+#     - Thuật toán bóc tách bảng và biểu mẫu, tự động suy luận kiểu dữ liệu, ánh xạ trường thông minh (Vietnamese keyword matching) hoặc sinh trường mới (isCustomField).
+#     - Kiểm tra trùng lặp CSDL theo email/phone/mã, hỗ trợ 3 chính sách: Bỏ qua (skip), Cập nhật đè (update), Tạo mới (create_new).
+#     - Lưu mẫu import tái sử dụng (import_templates) theo chữ ký cấu trúc file (file_structure_signature), lưu nhật ký import_jobs và chi tiết import_errors.
+#   * [KIẾN TRÚC HYBRID DATA ARCHITECTURE & BẢO TOÀN CRUD 100%]:
+#     - Cột vật lý cốt lõi giữ nguyên 100%. Trường mới lưu vào JSONB custom_data kèm GIN index trên các bảng members, event_registrations, trainings, financial_report_rows.
+#     - Dùng chung 1 mô hình dữ liệu và validation duy nhất cho cả nhập tay và import. Tuyệt đối không tách rời 2 luồng.
+#     - Tích hợp vòng đời dữ liệu xuyên suốt 5 phân hệ: Hội viên (/members), Đăng ký sự kiện (/event-registrations), Tài chính (/finance-report), Lớp học & Giảng viên (/classes).
+#     - Xem chi tiết qua DynamicDetailViewModal, cấu hình hiển thị cột qua DynamicTableColumnsConfig, tìm kiếm mở rộng sang customData, xuất Excel tự động ghép cột động.
+#   * [CODE QUALITY & TYPE-CHECK]: Cả Backend (apps/ceohn10_app_be) và Frontend (apps/ceohn10_app_fe) đều vượt qua npx tsc --noEmit đạt exit code 0 (0 errors). Tuân thủ nghiêm ngặt Rule 0 & Rule 1: Tuyệt đối không git commit hay push tự động, không mock fake data giấu lỗi CSDL.
+# 25/11/2026 (v12.78) — HOÀN THIỆN LUỒNG CHECK-OUT VÉ SỰ KIỆN, BÓC TÁCH MÃ VÉ ĐA NGUỒN, TỐI ƯU GỌI SỰ KIỆN MOBILE APP & SỬA LỖI LƯU CẤU HÌNH SEPAY:
+#   * [LUỒNG CHECK-OUT VÉ SỰ KIỆN (PERFORM TICKET CHECK-OUT)]:
+#     - Hàm `resolveCleanTicketCode`: Tự động phân tích JSON payload từ camera quét QR, URL search params (`?ticket=...`, `?regId=...`), và chuỗi thông thường.
+#     - Hàm `performTicketCheckout`: Kiểm tra điều kiện bắt buộc (chặn chưa check-in và chặn check-out trùng lặp); cập nhật `checked_out_at = NOW()`, `status = 'checked_out'`; đồng bộ `member_checkins`; gửi email thư cảm ơn và thông báo giờ ra về cho đại biểu.
+#     - Giao diện Soát vé & Modal Check-in (`EventCheckinGatekeeperModal`): Bổ sung nút Check-out riêng cho từng đại biểu đã check-in; thẻ vé (`EventTicketPassModal`) hiển thị badge trạng thái Check-in / Check-out trực quan.
+#   * [GỌI SỰ KIỆN TRÊN MOBILE APP (ASSOCIATION.EVENTS.TSX)]:
+#     - Ưu tiên gọi trực tiếp `/events/my-events` và `/events` từ client API, cập nhật vào state `clientEvents`, xóa sạch mock static array trong `association.index.tsx` theo Strict No-Mock Law.
+#     - Loại bỏ lỗi query cột không tồn tại `member_id` trong `event_registrations`, hỗ trợ đầy đủ cả 2 association ID của CLB.
+#   * [LƯU CẤU HÌNH SEPAY MASTER ADMIN (/master)]:
+#     - Gỡ bỏ decorator `@RequireActions` không khớp, bảo vệ an toàn `savedConfig`, tuân thủ Rule 0 không fallback sang IP sập.
 # 24/11/2026 (v12.77) — ĐÓNG GÓI HỆ THỐNG UI SPECS (.agents/ui-specs/), TINH GỌN MEMORY.MD & PHÂN ĐỊNH RÕ RÀNG CƠ SỞ DỮ LIỆU LOCALHOST VS SERVER DEV:
 #   * [PHÂN ĐỊNH CƠ SỞ DỮ LIỆU CHUẨN MỰC THEO MÔI TRƯỜNG]:
 #     - Môi trường Test / Phát triển Localhost: Sử dụng CSDL `127.0.0.1:5432/ceohn10_project`.

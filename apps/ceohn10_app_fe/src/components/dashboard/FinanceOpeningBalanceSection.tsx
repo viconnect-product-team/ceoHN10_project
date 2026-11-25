@@ -71,17 +71,17 @@ export function FinanceOpeningBalanceSection({ className = "" }: { className?: s
               <span>Chính thức: Kỳ Khởi Tạo 2,1 Tỷ Đã Ghi Sổ (POSTED)</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-black tracking-tight">
-              Quản Trị Hệ Thống 8 Quỹ Chuyên Môn CEO HN10
+              Quản Trị Quỹ Tổng &amp; 7 Quỹ Ban Chuyên Trách CEO HN10
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
-              Tổng số dư khởi tạo chuyển tiếp là <strong>2.100.000.000 VNĐ</strong>. Sau khi chuyển cấp <strong>20.000.000 VNĐ</strong> kinh phí hoạt động cho <strong>Ban Công Nghệ</strong>, số dư <strong>Quỹ Tổng hiện tại là 2.080.000.000 VNĐ</strong> (2 tỷ 080 triệu đồng).
+              Số dư Quỹ Tổng hiện tại là <strong>2.080.000.000 VNĐ</strong> (2 tỷ 080 triệu đồng). <strong>Quỹ Ban Công nghệ</strong> hiển thị <strong>20.000.000 VNĐ</strong> (Kinh phí khai giảng). Các dòng tiền vé sự kiện qua SePay sẽ được ghi nhận real-time trực tiếp vào <strong>Quỹ Ban Sự kiện &amp; Hậu cần</strong>.
             </p>
             <div className="flex flex-wrap gap-2 pt-1 text-xs">
               <span className="px-2.5 py-1 rounded-lg bg-white/10 text-slate-200 border border-white/10 flex items-center gap-1.5 font-medium">
-                <ShieldCheck className="size-3.5 text-emerald-400" /> Chuẩn hạch toán 8 Quỹ độc lập
+                <ShieldCheck className="size-3.5 text-emerald-400" /> Chuẩn hạch toán 7 Quỹ Ban độc lập
               </span>
               <span className="px-2.5 py-1 rounded-lg bg-white/10 text-slate-200 border border-white/10 flex items-center gap-1.5 font-medium">
-                <History className="size-3.5 text-amber-400" /> Theo dõi Dòng Tiền Vào / Ra minh bạch
+                <History className="size-3.5 text-amber-400" /> Dòng Tiền Vào / Ra Real-time (SePay)
               </span>
             </div>
           </div>
@@ -149,10 +149,10 @@ export function FinanceOpeningBalanceSection({ className = "" }: { className?: s
           <div>
             <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <Layers className="size-5 text-[#003B95]" />
-              <span>Bảng Cân Đối &amp; Dòng Tiền Vào / Ra 8 Quỹ Chuyên Môn</span>
+              <span>Bảng Cân Đối &amp; Dòng Tiền Vào / Ra Quỹ Tổng &amp; 7 Quỹ Ban</span>
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              Mỗi ban có một quỹ riêng biệt. Ban Công Nghệ đã tiếp nhận dòng tiền 20.000.000 VNĐ từ Quỹ Tổng để phục vụ vận hành.
+              7 Quỹ Ban chuyên trách độc lập. Quỹ Ban Công nghệ hiện có 20.000.000 VNĐ (Kinh phí khai giảng). Thanh toán vé sự kiện qua SePay được ghi nhận real-time vào Quỹ Ban Sự kiện &amp; Hậu cần.
             </p>
           </div>
           <button

@@ -34,7 +34,10 @@ export function WelcomeMemberModal({ forceOpen = false, onClose }: WelcomeMember
 
     // Check if welcome popup was already shown for this user
     const userKey = user?.id ? `ceohn10_welcome_shown_${user.id}` : "ceohn10_welcome_shown";
-    const hasSeen = localStorage.getItem(userKey);
+    const hasSeen =
+      localStorage.getItem(userKey) === "true" ||
+      localStorage.getItem("ceohn10_welcome_shown") === "true" ||
+      localStorage.getItem("ceohn10_skip_intro_popups") === "true";
 
     if (!hasSeen && user) {
       // Delay slightly for smooth page entrance animation

@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { Injectable, BadRequestException, UnauthorizedException, Optional, OnModuleInit } from '@nestjs/common';
+import { Injectable, BadRequestException, UnauthorizedException, ForbiddenException, Optional, OnModuleInit } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { MailService } from '../mail/mail.service';
@@ -124,7 +124,7 @@ export class AuthService implements OnModuleInit {
     return null;
   }
 
-  async login(user: any) {
+  async login(user: any, portal?: string) {
     const details = await this.usersService.getAccountDetails(user.id);
     const isPlatformAdminUser =
       user.email === 'admin@ceohn10.vn' ||
@@ -137,7 +137,35 @@ export class AuthService implements OnModuleInit {
       ? Array.from(new Set(['platform_admin', 'admin', 'quan_tri', ...(details?.roles || [])]))
       : (details?.roles || [resolvedRole]);
     const execRole = isPlatformAdminUser ? 'platform_admin' : (details?.executive_role || details?.executiveRole || 'Học viên');
-    const department = isPlatformAdminUser ? 'Ban Quản Trị Hệ Thống' : (details?.department || 'Học viên ceohn10');
+    const department = isPlatformAdminUser ? 'Ban Quản Trị Hệ Thống' : (details?.department || 'Ban Gắn kết & Đời sống');
+
+    // ── KIỂM TRA PHÂN TÁCH CỔNG CRM vs APP CEO HN10 ─────────────────────────────
+    // Tài khoản học viên và giảng viên mặc định chỉ có quyền vào App CEOHN10.
+    // Muốn vào hệ thống Quản trị Web CRM, Platform Admin phải gán quyền CRM cho tài khoản đó.
+    if (portal === 'crm' || portal === 'admin') {
+      const allowedCrmRoles = [
+        'platform_admin',
+        'admin',
+        'lop_truong',
+        'lop_pho',
+        'truong_team',
+        'pho_team',
+        'truong_ban_chuyen_trach',
+        'quan_tri',
+      ];
+      const hasCrmRole =
+        isPlatformAdminUser ||
+        roleList.some((r: string) => allowedCrmRoles.includes(r.toLowerCase())) ||
+        allowedCrmRoles.includes(resolvedRole.toLowerCase()) ||
+        Boolean(details?.isAdmin) ||
+        Boolean(details?.can_access_crm || details?.canAccessCrm || user?.can_access_crm);
+
+      if (!hasCrmRole) {
+        throw new ForbiddenException(
+          'Tài khoản của bạn chỉ có quyền đăng nhập vào App CEOHN10. Vui lòng liên hệ Platform Admin để được phân quyền truy cập hệ thống Quản trị CRM.',
+        );
+      }
+    }
 
     const permissions = details?.permissions || [];
     const accessJti = crypto.randomUUID();

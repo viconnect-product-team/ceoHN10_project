@@ -38,6 +38,8 @@ import { EventQrStaffSelector } from "@/components/events/EventQrStaffSelector";
 import { EventFormConfigModal } from "@/components/events/EventFormConfigModal";
 import { EventQrConfigModal } from "@/components/events/EventQrConfigModal";
 import { EventLivePhotoGalleryModal } from "@/components/events/EventLivePhotoGalleryModal";
+import { EventPartsEditor, createDefaultCeoHn10Parts } from "@/components/events/EventPartsEditor";
+import { EventInvitationBuilderModal } from "@/components/events/EventInvitationBuilderModal";
 import { OmnichannelBroadcastModal } from "@/components/templates/OmnichannelBroadcastModal";
 import { useRole, PERMISSIONS } from "@/hooks/use-role";
 import { useAuth } from "@/context/AuthContext";
@@ -251,6 +253,7 @@ function EventsPage() {
     }
   };
   const [omnichannelModalOpen, setOmnichannelModalOpen] = useState(false);
+  const [invitationModalEvent, setInvitationModalEvent] = useState<EventItem | null>(null);
   const [omnichannelEventData, setOmnichannelEventData] = useState<any>({
     title: "",
     subtitle: "",
@@ -263,13 +266,17 @@ function EventsPage() {
 
   const handleOpenBroadcastModal = (e?: EventItem) => {
     const target = e || events[0];
+    if (target) {
+      setInvitationModalEvent(target);
+      return;
+    }
     setOmnichannelEventData({
-      title: target?.name || "Lễ Khai Giảng CEO HN10",
-      subtitle: target?.tagline || "CLB Doanh Nhân CEO HN10 (HanoiBA)",
-      date: target?.date ? formatDisplayDate(target.date) : "2026-11-28",
+      title: "Lễ Khai Giảng CEO HN10",
+      subtitle: "CLB Doanh Nhân CEO HN10 (HanoiBA)",
+      date: "2026-12-05",
       time: "08:30 - 12:00",
-      location: target?.location || "Trung tâm Hội nghị Quốc gia, Hà Nội",
-      posterUrl: target?.image || target?.banner || "/app-icon.png",
+      location: "Trung tâm Hội nghị Quốc gia, Hà Nội",
+      posterUrl: "/app-icon.png",
     });
     setOmnichannelModalOpen(true);
   };
@@ -289,7 +296,28 @@ function EventsPage() {
     { name: "tagline", label: "Khẩu hiệu / Thông điệp phụ trên Banner (Tagline)", type: "text" },
     { name: "image", label: "Ảnh banner sự kiện", type: "image" },
     { name: "date", label: t("events.col.date"), type: "date", required: true },
+    { name: "startTime", label: "Giờ bắt đầu (VD: 08:30)", type: "text" },
+    { name: "endTime", label: "Giờ kết thúc (VD: 11:30)", type: "text" },
+    { name: "venueName", label: "Tên Hội trường / Phòng tổ chức (hiện trên Thư mời)", type: "text" },
     { name: "location", label: t("events.col.location"), type: "text" },
+    {
+      name: "parts",
+      label: "Các phần chương trình (Phần 1, Phần 2 Dự Tiệc, Phí từng phần)",
+      type: "custom",
+      render: (val: any, onChange: (v: any) => void) => (
+        <EventPartsEditor
+          venueName={String((editing as any)?.venueName || "")}
+          onChangeVenueName={() => {}}
+          parts={Array.isArray(val) && val.length > 0 ? val : createDefaultCeoHn10Parts()}
+          onChangeParts={onChange}
+        />
+      ),
+    },
+    {
+      name: "changeReason",
+      label: "Lý do thay đổi thời gian / địa điểm / hủy (Hệ thống sẽ gửi email tự động tới các đại biểu)",
+      type: "textarea",
+    },
     {
       name: "qrStaff",
       label: "Người thực hiện quét mã QR (Ban Truyền Thông)",
@@ -365,9 +393,15 @@ function EventsPage() {
         image: v.image || null,
         banner: v.image || null,
         date: dt || new Date().toISOString().slice(0, 10),
+        startTime: v.startTime ? String(v.startTime).trim() : null,
+        endTime: v.endTime ? String(v.endTime).trim() : null,
+        venueName: v.venueName ? String(v.venueName).trim() : "",
+        parts: Array.isArray(v.parts) ? v.parts : [],
         location: loc,
         capacity: v.capacity ? Number(v.capacity) : 100,
         description: v.description ? String(v.description).trim() : "",
+        changeReason: v.changeReason ? String(v.changeReason).trim() : undefined,
+        reason: v.changeReason ? String(v.changeReason).trim() : undefined,
         photoGalleryUrl: v.photoGalleryUrl ? String(v.photoGalleryUrl).trim() : "",
         department: v.department || "ban_su_kien",
         ticketPrice: v.ticketPrice !== undefined && v.ticketPrice !== "" ? Number(v.ticketPrice) : 0,
@@ -1001,8 +1035,8 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
                       width={130}
                       className="border-r border-slate-200 dark:border-slate-800"
                     />
-                    <th className="sticky right-0 z-20 min-w-[170px] bg-blue-50/90 dark:bg-blue-950/90 px-4 py-3 text-right border-l border-b border-slate-200 dark:border-slate-800 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)]">
-                      Thao tác
+                    <th className="sticky right-0 z-20 min-w-[170px] bg-blue-50/90 dark:bg-blue-950/90 px-4 py-3 text-center font-bold uppercase tracking-wider border-l border-b border-slate-200 dark:border-slate-800 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)]">
+                      THAO TÁC
                     </th>
                   </tr>
                 </thead>
@@ -1098,32 +1132,28 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
                             )}
                           </span>
                         </td>
-                        <td className="sticky right-0 z-10 min-w-[170px] bg-card group-hover:bg-muted/70 px-4 py-3.5 text-right border-l border-b border-slate-200 dark:border-slate-800 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)] transition-colors">
-                          <div className="inline-flex items-center gap-1">
-                            <button
-                              type="button"
-                              title="Gửi thư mời đa kênh (Word/Excel/Zalo/Email) cho sự kiện này"
-                              onClick={(evt) => {
-                                evt.stopPropagation();
-                                handleOpenBroadcastModal(e);
-                              }}
-                              className="inline-flex items-center gap-1 rounded-lg border border-amber-500/40 bg-amber-500/10 px-2 py-1.5 text-xs font-semibold text-amber-600 hover:bg-amber-500/20 transition cursor-pointer"
+                        <td className="sticky right-0 z-10 min-w-[170px] bg-card group-hover:bg-muted/70 px-4 py-3.5 text-center border-l border-b border-slate-200 dark:border-slate-800 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)] transition-colors">
+                          <div className="inline-flex items-center justify-center gap-1.5">
+                            <Link
+                              to="/events/$eventId"
+                              params={{ eventId: e.id }}
+                              title="Xem chi tiết sự kiện"
+                              className="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-border bg-background text-primary hover:bg-primary/10 transition"
                             >
-                              <Mail className="h-3.5 w-3.5" />
-                              <span className="hidden xl:inline text-[11px]">Thư mời</span>
-                            </button>
-                            <button
-                              type="button"
-                              title="Bắn chi tiết sự kiện kèm Poster & QR xuống Mạng lưới"
-                              onClick={(evt) => {
-                                evt.stopPropagation();
-                                handleBroadcastEventToFeed(e);
-                              }}
-                              className="inline-flex items-center gap-1 rounded-lg border border-blue-500/40 bg-blue-500/10 px-2 py-1.5 text-xs font-semibold text-blue-600 hover:bg-blue-500/20 transition"
-                            >
-                              <Send className="h-3.5 w-3.5" />
-                              <span className="hidden xl:inline text-[11px]">Bắn Mạng Lưới</span>
-                            </button>
+                              <Eye className="h-4 w-4" />
+                            </Link>
+                            {can(PERMISSIONS.EVENT_EDIT) && (
+                              <button
+                                onClick={() => {
+                                  setEditing(e);
+                                  setOpen(true);
+                                }}
+                                title="Chỉnh sửa sự kiện"
+                                className="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-border bg-background text-blue-600 hover:bg-blue-50 transition cursor-pointer"
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </button>
+                            )}
                             {canScanEventQr(user, e) && (
                               <button
                                 type="button"
@@ -1132,123 +1162,30 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
                                   evt.stopPropagation();
                                   setQrGatekeeperEvent(e);
                                 }}
-                                className="inline-flex items-center gap-1 rounded-lg border border-amber-500/40 bg-amber-500/10 px-2 py-1.5 text-xs font-semibold text-amber-600 hover:bg-amber-500/20 transition"
+                                className="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-amber-500/40 bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 transition cursor-pointer"
                               >
-                                <QrCode className="h-3.5 w-3.5" />
-                                <span className="hidden xl:inline text-[11px]">QR Gate</span>
+                                <QrCode className="h-4 w-4" />
                               </button>
                             )}
                             <button
                               type="button"
-                              title="Khai báo vật dụng hỗ trợ sự kiện - Ban Hậu Cần & Sự Kiện"
+                              title="Gửi thư mời đa kênh (Word/Excel/Zalo/Email)"
                               onClick={(evt) => {
                                 evt.stopPropagation();
-                                setSelectedSupplyEvent(e);
+                                handleOpenBroadcastModal(e);
                               }}
-                              className="inline-flex items-center gap-1 rounded-lg border border-indigo-500/40 bg-indigo-500/10 px-2 py-1.5 text-xs font-semibold text-indigo-600 hover:bg-indigo-500/20 transition"
+                              className="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-amber-500/40 bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 transition cursor-pointer"
                             >
-                              <Package className="h-3.5 w-3.5" />
-                              <span className="hidden xl:inline text-[11px]">Hậu cần</span>
+                              <Mail className="h-4 w-4" />
                             </button>
-                            <button
-                              type="button"
-                              title="Cấu hình biểu mẫu đăng ký & check-in (Form Builder)"
-                              onClick={(evt) => {
-                                evt.stopPropagation();
-                                setFormConfigEvent(e);
-                              }}
-                              className="inline-flex items-center gap-1 rounded-lg border border-blue-500/40 bg-blue-500/10 px-2 py-1.5 text-xs font-semibold text-blue-600 hover:bg-blue-500/20 transition cursor-pointer"
-                            >
-                              <Sliders className="h-3.5 w-3.5" />
-                              <span className="hidden xl:inline text-[11px]">Form Builder</span>
-                            </button>
-                            <button
-                              type="button"
-                              title="Cấu hình danh sách Mã QR đính kèm sự kiện (Đăng ký, Checkin, SePay, Gallery, Survey)"
-                              onClick={(evt) => {
-                                evt.stopPropagation();
-                                setQrConfigEvent(e);
-                              }}
-                              className="inline-flex items-center gap-1 rounded-lg border border-purple-500/40 bg-purple-500/10 px-2 py-1.5 text-xs font-semibold text-purple-600 hover:bg-purple-500/20 transition cursor-pointer"
-                            >
-                              <QrCode className="h-3.5 w-3.5" />
-                              <span className="hidden xl:inline text-[11px]">Mã QR ({((e as any).qrConfigs || []).length || "Đính kèm"})</span>
-                            </button>
-                            <button
-                              type="button"
-                              title="Chụp ảnh trực tiếp & Album ảnh sự kiện (Tự động đồng bộ Tài liệu)"
-                              onClick={(evt) => {
-                                evt.stopPropagation();
-                                setLivePhotoEvent(e);
-                              }}
-                              className="inline-flex items-center gap-1 rounded-lg border border-rose-500/40 bg-rose-500/10 px-2 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-500/20 transition cursor-pointer"
-                            >
-                              <Camera className="h-3.5 w-3.5" />
-                              <span className="hidden xl:inline text-[11px]">Chụp ảnh</span>
-                            </button>
-                            {e.status === "completed" && (
-                              <button
-                                type="button"
-                                title="Gửi email và Zalo OA tổng kết kèm link album ảnh và nút đánh giá cho người đã check-in"
-                                onClick={(evt) => {
-                                  evt.stopPropagation();
-                                  handleSendPostEventRecap(e.id, e.name);
-                                }}
-                                className="inline-flex items-center gap-1 rounded-lg border border-purple-500/40 bg-purple-500/10 px-2 py-1.5 text-xs font-semibold text-purple-600 hover:bg-purple-500/20 transition cursor-pointer"
-                              >
-                                <Send className="h-3.5 w-3.5" />
-                                <span className="hidden xl:inline text-[11px]">Gửi Recap</span>
-                              </button>
-                            )}
-                            <button
-                              type="button"
-                              title="Đánh giá & phản hồi sự kiện"
-                              onClick={(evt) => {
-                                evt.stopPropagation();
-                                setFeedbackModalEvent(e);
-                              }}
-                              className="inline-flex items-center gap-1 rounded-lg border border-amber-500/40 bg-amber-500/10 px-2 py-1.5 text-xs font-semibold text-amber-600 hover:bg-amber-500/20 transition"
-                            >
-                              <MessageSquare className="h-3.5 w-3.5" />
-                              <span className="hidden xl:inline text-[11px]">Đánh giá</span>
-                            </button>
-                            <button
-                              type="button"
-                              title="Tư liệu & media sự kiện - Tự động đồng bộ Quản lý tài liệu"
-                              onClick={(evt) => {
-                                evt.stopPropagation();
-                                setMediaModalEvent(e);
-                              }}
-                              className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-2 py-1.5 text-xs font-semibold text-emerald-600 hover:bg-emerald-500/20 transition"
-                            >
-                              <Camera className="h-3.5 w-3.5" />
-                              <span className="hidden xl:inline text-[11px]">Ảnh/Media</span>
-                            </button>
-                            <Link
-                              to="/events/$eventId"
-                              params={{ eventId: e.id }}
-                              className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
-                            >
-                              <Eye className="h-3.5 w-3.5" />
-                            </Link>
-                            {can(PERMISSIONS.EVENT_EDIT) && (
-                              <button
-                                onClick={() => {
-                                  setEditing(e);
-                                  setOpen(true);
-                                }}
-                                className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
-                              >
-                                <Pencil className="h-3.5 w-3.5" />
-                              </button>
-                            )}
                             {can(PERMISSIONS.EVENT_DELETE) && (
                               <button
                                 onClick={() => onDelete(e)}
                                 disabled={deletingId === e.id}
-                                className="inline-flex items-center gap-1 rounded-lg border border-destructive/20 bg-background px-2.5 py-1.5 text-xs font-medium text-destructive hover:bg-destructive/10 disabled:opacity-50"
+                                title="Xóa sự kiện"
+                                className="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-destructive/20 bg-background text-destructive hover:bg-destructive/10 disabled:opacity-50 transition cursor-pointer"
                               >
-                                <Trash2 className="h-3.5 w-3.5" />
+                                <Trash2 className="h-4 w-4" />
                               </button>
                             )}
                           </div>
@@ -1416,6 +1353,12 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
           onClose={() => setOmnichannelModalOpen(false)}
           invitationData={omnichannelEventData}
           onSuccess={() => router.invalidate()}
+        />
+
+        <EventInvitationBuilderModal
+          open={!!invitationModalEvent}
+          event={invitationModalEvent}
+          onClose={() => setInvitationModalEvent(null)}
         />
       </div>
     </AppShell>

@@ -18,6 +18,7 @@ import {
   ExternalLink,
   Globe,
   Sparkles,
+  LogOut,
 } from "lucide-react";
 import { QrCanvas } from "@/components/member/QrCanvas";
 import { toast } from "sonner";
@@ -124,6 +125,8 @@ export function EventCheckinGatekeeperModal({
               luckyNumber: r.luckyNumber || "#1983",
               checkedIn: Boolean(r.checkedInAt),
               checkedInAt: r.checkedInAt,
+              checkedOut: Boolean(r.checkedOutAt),
+              checkedOutAt: r.checkedOutAt,
             }))
           );
         }
@@ -219,7 +222,64 @@ export function EventCheckinGatekeeperModal({
     toast.success(`Đã thêm ${newAtt.memberName} vào danh sách tham gia sự kiện!`);
   };
 
-  const handleToggleCheckin = (id: string) => {
+  const [checkingOutId, setCheckingOutId] = useState<string | null>(null);
+
+  const handlePerformCheckout = async (attendeeId: string) => {
+    setCheckingOutId(attendeeId);
+    try {
+      const res = await fetchNestApi<any>("/events/ticket-checkout", {
+        method: "POST",
+        body: { attendeeId, ticketCode: attendeeId },
+      });
+      if (res?.ok) {
+        const outTime = res.checkedOutAt || new Date().toLocaleTimeString("vi-VN");
+        setAttendees((prev) =>
+          prev.map((a) =>
+            a.id === attendeeId
+              ? { ...a, checkedOut: true, checkedOutAt: outTime }
+              : a
+          )
+        );
+        toast.success(res.message || "Đại biểu đã Check-out ra về thành công!");
+      } else {
+        toast.error(res?.message || "Không thể thực hiện Check-out!");
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Lỗi kết nối khi thực hiện Check-out!");
+    } finally {
+      setCheckingOutId(null);
+    }
+  };
+
+  const handleToggleCheckin = async (id: string) => {
+    const target = attendees.find((a) => a.id === id);
+    if (!target) return;
+
+    if (!target.checkedIn) {
+      try {
+        const res = await fetchNestApi<any>("/events/ticket-checkin", {
+          method: "POST",
+          body: { ticketCode: id },
+        });
+        if (res?.ok || res?.checkedInAt) {
+          const inTime = res.checkedInAt || new Date().toLocaleTimeString("vi-VN");
+          setAttendees((prev) =>
+            prev.map((a) => (a.id === id ? { ...a, checkedIn: true, checkedInAt: inTime } : a))
+          );
+          toast.success(res.message || "Check-in thành công!");
+          return;
+        } else if (res?.alreadyCheckedIn) {
+          toast.info(res.message || "Vé này đã được check-in trước đó!");
+          setAttendees((prev) =>
+            prev.map((a) => (a.id === id ? { ...a, checkedIn: true, checkedInAt: res.checkedInAt } : a))
+          );
+          return;
+        }
+      } catch (err: any) {
+        toast.error(err?.message || "Lỗi khi gọi API Check-in");
+      }
+    }
+
     const updated = attendees.map((a) => {
       if (a.id === id) {
         const nextState = !a.checkedIn;
@@ -227,6 +287,8 @@ export function EventCheckinGatekeeperModal({
           ...a,
           checkedIn: nextState,
           checkedInAt: nextState ? new Date().toLocaleTimeString("vi-VN") : null,
+          checkedOut: false,
+          checkedOutAt: null,
         };
       }
       return a;
@@ -805,13 +867,15 @@ export function EventCheckinGatekeeperModal({
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0">
+                      {/* Nút Check-in */}
                       <button
                         type="button"
                         onClick={() => handleToggleCheckin(a.id)}
-                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${a.checkedIn
+                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                          a.checkedIn
                             ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300"
                             : "bg-secondary text-muted-foreground hover:text-foreground border border-border"
-                          }`}
+                        }`}
                       >
                         {a.checkedIn ? (
                           <>
@@ -825,6 +889,29 @@ export function EventCheckinGatekeeperModal({
                           </>
                         )}
                       </button>
+
+                      {/* Trạng thái / Nút Check-out (Ra về) */}
+                      {a.checkedOut ? (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300 border border-indigo-300">
+                          <LogOut className="h-3.5 w-3.5 text-indigo-600" />
+                          <span>Đã Check-out ({a.checkedOutAt || "Ra về"})</span>
+                        </span>
+                      ) : a.checkedIn ? (
+                        <button
+                          type="button"
+                          onClick={() => handlePerformCheckout(a.id)}
+                          disabled={checkingOutId === a.id}
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300 border border-indigo-200 transition cursor-pointer disabled:opacity-50"
+                          title="Soát vé ra về và gửi thư cảm ơn cho đại biểu"
+                        >
+                          {checkingOutId === a.id ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <LogOut className="h-3.5 w-3.5 text-indigo-600" />
+                          )}
+                          <span>Check-out</span>
+                        </button>
+                      ) : null}
                     </div>
                   </div>
                 ))}

@@ -194,32 +194,28 @@ export function computeUserRbacEvaluation(
 
   const allowedRoutes = new Set<string>(['/', '/ai-assistant', '/classes', '/finance-report']);
 
-  // Map department sang committeeKey
+  // Map department sang committeeKey thuộc đúng 7 Ban chuyên trách
   let committeeKey = '';
-  if (dept.includes('sự kiện') || dept.includes('su_kien')) committeeKey = 'su_kien';
-  else if (dept.includes('đào tạo') || dept.includes('dao_tao') || dept.includes('học tập')) committeeKey = 'dao_tao';
+  if (dept.includes('công nghệ') || dept.includes('cong_nghe')) committeeKey = 'cong_nghe';
   else if (dept.includes('truyền thông') || dept.includes('truyen_thong')) committeeKey = 'truyen_thong';
-  else if (dept.includes('thành viên') || dept.includes('thanh_vien')) committeeKey = 'thanh_vien';
-  else if (dept.includes('xúc tiến') || dept.includes('xuc_tien') || dept.includes('thương mại')) committeeKey = 'xuc_tien';
   else if (dept.includes('tài chính') || dept.includes('tai_chinh')) committeeKey = 'tai_chinh';
+  else if (dept.includes('sự kiện') || dept.includes('su_kien') || dept.includes('hậu cần')) committeeKey = 'su_kien';
+  else if (dept.includes('đối ngoại') || dept.includes('giao thương') || dept.includes('xúc tiến') || dept.includes('doi_ngoai')) committeeKey = 'doi_ngoai';
+  else if (dept.includes('gắn kết') || dept.includes('đời sống') || dept.includes('gan_ket') || dept.includes('thành viên')) committeeKey = 'gan_ket';
   else if (dept.includes('thiện nguyện') || dept.includes('thien_nguyen')) committeeKey = 'thien_nguyen';
-  else if (dept.includes('điều hành') || dept.includes('dieu_hanh')) committeeKey = 'dieu_hanh';
-  else if (dept.includes('thư ký') || dept.includes('thu_ky')) committeeKey = 'thu_ky';
 
   const isSuperAdmin =
-    normRole === 'quan_tri' ||
     normRole === 'platform_admin' ||
-    normRole === 'superadmin' ||
-    normRole === 'adm';
+    normRole === 'quan_tri';
 
   const isEffectiveAdmin =
     isAdmin ||
     isSuperAdmin ||
     normRole === 'admin' ||
-    normRole === 'chu_tich' ||
-    isPresident ||
+    normRole === 'lop_truong' ||
+    normRole === 'lop_pho' ||
     rList.includes('admin') ||
-    rList.includes('quan_tri');
+    rList.includes('platform_admin');
 
   // Trích xuất cây ma trận từ app_settings
   const categories =
@@ -498,7 +494,7 @@ export class UsersService implements OnModuleInit {
           'admin@ceohn10.vn',
           '0988888888',
           'CLB Doanh Nhân CEO HN10',
-          'Ban Điều Hành',
+          'Ban Công nghệ',
           'platform_admin',
           'active',
           'c1983000-0000-4000-8000-000000001983'::uuid,
@@ -592,8 +588,8 @@ export class UsersService implements OnModuleInit {
           'admin@connect.vn',
           '0988870888',
           'Công ty CP Giải Pháp Viconnect',
-          'Ban Điều Hành',
-          'quan_tri',
+          'Ban Công nghệ',
+          'admin',
           'active',
           'c1983000-0000-4000-8000-000000001983'::uuid,
           'company',
@@ -665,14 +661,14 @@ export class UsersService implements OnModuleInit {
       // Đảm bảo roles cho media
       await this.prisma.$executeRaw`
         INSERT INTO public.user_roles (user_id, role)
-        VALUES (${mediaUserId}::uuid, 'staff'::public.app_role)
+        VALUES (${mediaUserId}::uuid, 'admin'::public.app_role)
         ON CONFLICT DO NOTHING
       `.catch(() => { });
 
       // Đảm bảo profile cho media
       await this.prisma.$executeRaw`
         INSERT INTO public.user_profiles (user_id, display_name, company_name, professional_title)
-        VALUES (${mediaUserId}::uuid, 'Phạm Hồng Nguyên', 'CLB Doanh Nhân CEO HN10', 'Trưởng Ban Truyền Thông')
+        VALUES (${mediaUserId}::uuid, 'Phạm Hồng Nguyên', 'CLB Doanh Nhân CEO HN10', 'Trưởng Ban Truyền thông')
         ON CONFLICT (user_id) DO UPDATE SET
           display_name = EXCLUDED.display_name,
           company_name = EXCLUDED.company_name,
@@ -692,8 +688,8 @@ export class UsersService implements OnModuleInit {
           'infor@viconnect.vn',
           '0983988999',
           'CLB Doanh Nhân CEO HN10',
-          'Ban Truyền Thông',
-          'truong_ban_truyen_thong',
+          'Ban Truyền thông',
+          'truong_ban_chuyen_trach',
           'active',
           'c1983000-0000-4000-8000-000000001983'::uuid,
           'company',
@@ -1136,11 +1132,22 @@ export class UsersService implements OnModuleInit {
       let normalizedDept =
         memberRow?.department ||
         memberships?.[0]?.department ||
-        'Học viên ceohn10';
-      if (normalizedDept.toLowerCase().includes('quản trị')) {
-        normalizedDept = normalizedDept
-          .replace(/ban quản trị/gi, 'Ban Điều Hành')
-          .replace(/quản trị/gi, 'Điều Hành');
+        'Ban Gắn kết & Đời sống';
+      const rawDeptLower = normalizedDept.toLowerCase();
+      if (rawDeptLower.includes('công nghệ') || rawDeptLower.includes('cong_nghe')) {
+        normalizedDept = 'Ban Công nghệ';
+      } else if (rawDeptLower.includes('truyền thông') || rawDeptLower.includes('truyen_thong')) {
+        normalizedDept = 'Ban Truyền thông';
+      } else if (rawDeptLower.includes('tài chính') || rawDeptLower.includes('tai_chinh')) {
+        normalizedDept = 'Ban Tài chính';
+      } else if (rawDeptLower.includes('sự kiện') || rawDeptLower.includes('hậu cần') || rawDeptLower.includes('su_kien')) {
+        normalizedDept = 'Ban Sự kiện & Hậu cần';
+      } else if (rawDeptLower.includes('đối ngoại') || rawDeptLower.includes('giao thương') || rawDeptLower.includes('xúc tiến') || rawDeptLower.includes('b2b')) {
+        normalizedDept = 'Ban Đối ngoại & Giao thương';
+      } else if (rawDeptLower.includes('thiện nguyện') || rawDeptLower.includes('thien_nguyen')) {
+        normalizedDept = 'Ban Thiện nguyện';
+      } else {
+        normalizedDept = 'Ban Gắn kết & Đời sống';
       }
 
       let primaryRole = 'member';
@@ -1151,222 +1158,37 @@ export class UsersService implements OnModuleInit {
         (memberRow?.executive_role
           ? String(memberRow.executive_role).toLowerCase().trim()
           : '') || fallbackExec;
-      const dept = normalizedDept.toLowerCase();
       const userEmail = (user.email || user.username || '').toLowerCase();
 
-      // Check if user has an explicit role assigned in memberRow or in roleList
-      const isExplicitPresident =
-        exec.includes('chủ tịch') ||
-        exec.includes('president') ||
-        exec === 'chu_tich' ||
-        roleList.includes('chu_tich') ||
-        roleList.includes('president');
-
-      const isExplicitGeneralSecretary =
-        !isExplicitPresident &&
-        (exec === 'tong_thu_ky' ||
-          (exec.includes('thư ký') && exec.includes('tổng')) ||
-          roleList.includes('tong_thu_ky'));
-
-      const isExplicitExecutive =
-        !isExplicitPresident &&
-        !isExplicitGeneralSecretary &&
-        (exec === 'ban_dieu_hanh' ||
-          exec === 'truong_ban_dieu_hanh' ||
-          exec === 'pho_chu_tich' ||
-          exec === 'vice_president' ||
-          exec.includes('phó chủ tịch') ||
-          (exec.includes('điều hành') && !exec.includes('Học viên')) ||
-          roleList.includes('ban_dieu_hanh'));
-
-      const hasSpecificSpecialistRole =
-        exec.startsWith('truong_ban_') ||
-        exec.startsWith('thanh_vien_ban_') ||
-        exec === 'ban_thu_ky' ||
-        exec === 'tong_thu_ky' ||
-        (exec.includes('thư ký') && !exec.includes('Học viên'));
-
-      const isExplicitAdmin =
-        !isExplicitPresident &&
-        !isExplicitGeneralSecretary &&
-        !isExplicitExecutive &&
-        !hasSpecificSpecialistRole &&
-        (exec === 'admin' ||
-          exec === 'quan_tri' ||
-          exec === 'platform_admin' ||
-          exec === 'superadmin' ||
-          exec.includes('quản trị') ||
-          roleList.includes('admin') ||
-          roleList.includes('quan_tri') ||
-          roleList.includes('platform_admin') ||
-          roleList.includes('superadmin') ||
-          isAssocAdmin);
-
-      let isExplicitDeptLeader = false;
-      let matchedDeptLeaderRole = '';
-      if (
-        !isExplicitPresident &&
-        !isExplicitGeneralSecretary &&
-        !isExplicitExecutive &&
-        !isExplicitAdmin
-      ) {
-        if (exec.includes('truyền thông') || dept.includes('truyền thông')) {
-          if (
-            exec.startsWith('truong_ban_') ||
-            exec.includes('trưởng ban') ||
-            exec.includes('phó ban') ||
-            roleList.includes('truong_ban_truyen_thong')
-          ) {
-            matchedDeptLeaderRole = 'truong_ban_truyen_thong';
-            isExplicitDeptLeader = true;
-          }
-        } else if (
-          exec.includes('thành viên') ||
-          (dept.includes('thành viên') && !dept.includes('Học viên'))
-        ) {
-          if (
-            exec.startsWith('truong_ban_') ||
-            exec.includes('trưởng ban') ||
-            exec.includes('phó ban') ||
-            roleList.includes('truong_ban_thanh_vien')
-          ) {
-            matchedDeptLeaderRole = 'truong_ban_thanh_vien';
-            isExplicitDeptLeader = true;
-          }
-        } else if (exec.includes('xúc tiến') || dept.includes('xúc tiến')) {
-          if (
-            exec.startsWith('truong_ban_') ||
-            exec.includes('trưởng ban') ||
-            exec.includes('phó ban') ||
-            roleList.includes('truong_ban_xuc_tien')
-          ) {
-            matchedDeptLeaderRole = 'truong_ban_xuc_tien';
-            isExplicitDeptLeader = true;
-          }
-        } else if (exec.includes('tài chính') || dept.includes('tài chính')) {
-          if (
-            exec.startsWith('truong_ban_') ||
-            exec.includes('trưởng ban') ||
-            exec.includes('phó ban') ||
-            roleList.includes('truong_ban_tai_chinh')
-          ) {
-            matchedDeptLeaderRole = 'truong_ban_tai_chinh';
-            isExplicitDeptLeader = true;
-          }
-        } else if (
-          exec.includes('thiện nguyện') ||
-          dept.includes('thiện nguyện')
-        ) {
-          if (
-            exec.startsWith('truong_ban_') ||
-            exec.includes('trưởng ban') ||
-            exec.includes('phó ban') ||
-            roleList.includes('truong_ban_thien_nguyen')
-          ) {
-            matchedDeptLeaderRole = 'truong_ban_thien_nguyen';
-            isExplicitDeptLeader = true;
-          }
-        } else if (exec.startsWith('truong_ban_')) {
-          matchedDeptLeaderRole = exec;
-          isExplicitDeptLeader = true;
-        }
-      }
-
-      const isExplicitSecretary =
-        !isExplicitPresident &&
-        !isExplicitGeneralSecretary &&
-        !isExplicitExecutive &&
-        !isExplicitAdmin &&
-        !isExplicitDeptLeader &&
-        (exec === 'ban_thu_ky' ||
-          exec.includes('thư ký') ||
-          roleList.includes('ban_thu_ky') ||
-          roleList.includes('btk'));
-
-      const isExplicitMemberSpecialist =
-        !isExplicitPresident &&
-        !isExplicitGeneralSecretary &&
-        !isExplicitExecutive &&
-        !isExplicitAdmin &&
-        !isExplicitDeptLeader &&
-        !isExplicitSecretary &&
-        exec.startsWith('thanh_vien_ban_');
-
-      if (isExplicitPresident) {
-        primaryRole = 'chu_tich';
-        if (!roleList.includes('chu_tich')) roleList.push('chu_tich');
-        if (!roleList.includes('president')) roleList.push('president');
+      // Chuẩn hóa về đúng 9 Roles chính thức của CEO HN10
+      if (userEmail === 'admin@ceohn10.vn' || exec === 'platform_admin' || exec === 'quan_tri' || roleList.includes('platform_admin')) {
+        primaryRole = 'platform_admin';
+        if (!roleList.includes('platform_admin')) roleList.push('platform_admin');
         if (!roleList.includes('admin')) roleList.push('admin');
-        if (!roleList.includes('quan_tri')) roleList.push('quan_tri');
-        if (!roleList.includes('ban_dieu_hanh')) roleList.push('ban_dieu_hanh');
-        if (!roleList.includes('bqt')) roleList.push('bqt');
-      } else if (isExplicitGeneralSecretary) {
-        primaryRole = 'tong_thu_ky';
-        if (!roleList.includes('tong_thu_ky')) roleList.push('tong_thu_ky');
-        if (!roleList.includes('ban_thu_ky')) roleList.push('ban_thu_ky');
-        if (!roleList.includes('btk')) roleList.push('btk');
-        if (!roleList.includes('moderator')) roleList.push('moderator');
+      } else if (exec === 'admin' || userEmail === 'admin@connect.vn' || isAssocAdmin || roleList.includes('admin')) {
+        primaryRole = 'admin';
         if (!roleList.includes('admin')) roleList.push('admin');
-      } else if (isExplicitExecutive) {
-        primaryRole = 'ban_dieu_hanh';
-        if (!roleList.includes('ban_dieu_hanh')) roleList.push('ban_dieu_hanh');
-        if (!roleList.includes('moderator')) roleList.push('moderator');
-        if (!roleList.includes('admin')) roleList.push('admin');
-      } else if (isExplicitAdmin) {
-        primaryRole =
-          exec === 'platform_admin' || roleList.includes('platform_admin') || userEmail === 'admin@ceohn10.vn'
-            ? 'platform_admin'
-            : exec === 'quan_tri' || exec.includes('quản trị')
-              ? 'quan_tri'
-              : 'admin';
-        if (!roleList.includes('platform_admin') && (exec === 'platform_admin' || userEmail === 'admin@ceohn10.vn')) roleList.push('platform_admin');
-        if (!roleList.includes('admin')) roleList.push('admin');
-        if (!roleList.includes('quan_tri')) roleList.push('quan_tri');
-      } else if (isExplicitDeptLeader) {
-        primaryRole = matchedDeptLeaderRole;
-        if (!roleList.includes(matchedDeptLeaderRole))
-          roleList.push(matchedDeptLeaderRole);
-        if (!roleList.includes('moderator')) roleList.push('moderator');
-        if (!roleList.includes('admin')) roleList.push('admin');
-      } else if (isExplicitSecretary) {
-        primaryRole = 'ban_thu_ky';
-        if (!roleList.includes('ban_thu_ky')) roleList.push('ban_thu_ky');
-        if (!roleList.includes('btk')) roleList.push('btk');
-        if (!roleList.includes('moderator')) roleList.push('moderator');
-      } else if (isExplicitMemberSpecialist) {
-        primaryRole = exec;
-        if (!roleList.includes(exec)) roleList.push(exec);
-        if (!roleList.includes('member')) roleList.push('member');
-      } else if (exec === 'member' || exec === 'hoi_vien') {
+      } else if (exec === 'lop_truong' || exec.includes('lớp trưởng') || exec === 'chu_tich' || roleList.includes('lop_truong')) {
+        primaryRole = 'lop_truong';
+        if (!roleList.includes('lop_truong')) roleList.push('lop_truong');
+      } else if (exec === 'lop_pho' || exec.includes('lớp phó') || exec === 'ban_dieu_hanh' || exec === 'pho_chu_tich' || roleList.includes('lop_pho')) {
+        primaryRole = 'lop_pho';
+        if (!roleList.includes('lop_pho')) roleList.push('lop_pho');
+      } else if (exec === 'truong_team' || exec.includes('trưởng team') || roleList.includes('truong_team')) {
+        primaryRole = 'truong_team';
+        if (!roleList.includes('truong_team')) roleList.push('truong_team');
+      } else if (exec === 'pho_team' || exec.includes('phó team') || roleList.includes('pho_team')) {
+        primaryRole = 'pho_team';
+        if (!roleList.includes('pho_team')) roleList.push('pho_team');
+      } else if (exec === 'truong_ban_chuyen_trach' || exec.startsWith('truong_ban_') || exec.includes('trưởng ban') || exec === 'tong_thu_ky' || exec === 'ban_thu_ky' || roleList.includes('truong_ban_chuyen_trach')) {
+        primaryRole = 'truong_ban_chuyen_trach';
+        if (!roleList.includes('truong_ban_chuyen_trach')) roleList.push('truong_ban_chuyen_trach');
+      } else if (exec === 'giang_vien' || exec.includes('giảng viên') || roleList.includes('giang_vien')) {
+        primaryRole = 'giang_vien';
+        if (!roleList.includes('giang_vien')) roleList.push('giang_vien');
+      } else {
         primaryRole = 'member';
         if (!roleList.includes('member')) roleList.push('member');
-      } else {
-        // Fallback default for system root/seed accounts when no explicit member/role is assigned yet
-        const isSystemAdminUser =
-          user.id === '00000000-0000-0000-0000-000000000000' ||
-          user.id === '00000000-0000-4000-8000-000000000001' ||
-          user.id === '00000000-0000-4000-8000-000000000002' ||
-          user.username === 'admin@ceohn10.vn' ||
-          user.email === 'admin@ceohn10.vn' ||
-          userEmail === 'admin@ceohn10.vn' ||
-          user.username === 'admin@viconnect.vn' ||
-          user.email === 'admin@viconnect.vn' ||
-          userEmail === 'admin@viconnect.vn' ||
-          user.username === 'admin@connect.vn' ||
-          user.email === 'admin@connect.vn' ||
-          userEmail === 'admin@connect.vn' ||
-          userEmail === 'admin1@connect.vn';
-
-        if (isSystemAdminUser) {
-          primaryRole = userEmail === 'admin@ceohn10.vn' ? 'platform_admin' : 'admin';
-          if (userEmail === 'admin@ceohn10.vn' && !roleList.includes('platform_admin')) roleList.push('platform_admin');
-          if (!roleList.includes('admin')) roleList.push('admin');
-          if (!roleList.includes('quan_tri')) roleList.push('quan_tri');
-          if (!roleList.includes('bqt')) roleList.push('bqt');
-          if (!roleList.includes('moderator')) roleList.push('moderator');
-        } else {
-          primaryRole = 'member';
-        }
       }
 
       if (roleList.length === 0) {
@@ -1384,6 +1206,30 @@ export class UsersService implements OnModuleInit {
           user.avatar_url || profile?.avatar_url || memberRow?.avatar,
         ) || null;
 
+      const roleLabelMap: Record<string, string> = {
+        platform_admin: 'Platform Admin',
+        admin: 'Admin',
+        lop_truong: 'Lớp trưởng',
+        lop_pho: 'Lớp phó',
+        truong_team: 'Trưởng team',
+        pho_team: 'Phó team',
+        truong_ban_chuyen_trach: 'Trưởng ban chuyên trách',
+        giang_vien: 'Giảng viên',
+        member: 'Học viên',
+      };
+
+      const isCrmAuthorized =
+        primaryRole === 'platform_admin' ||
+        primaryRole === 'admin' ||
+        primaryRole === 'lop_truong' ||
+        primaryRole === 'lop_pho' ||
+        primaryRole === 'truong_team' ||
+        primaryRole === 'pho_team' ||
+        primaryRole === 'truong_ban_chuyen_trach' ||
+        roleList.includes('admin') ||
+        roleList.includes('platform_admin') ||
+        Boolean((memberRow?.card_visibility_settings as any)?.canAccessCrm);
+
       return {
         id: user.id,
         username: user.username,
@@ -1397,31 +1243,14 @@ export class UsersService implements OnModuleInit {
         has_password: !!user.password && user.password.length > 0,
         created_at: user.created_at,
         updated_at: user.updated_at,
-        executiveRole:
-          memberRow?.executive_role ||
-          (primaryRole === 'chu_tich'
-            ? 'Chủ tịch'
-            : primaryRole === 'admin'
-              ? 'Quản trị viên'
-              : primaryRole === 'ban_dieu_hanh'
-                ? 'Ban Điều Hành'
-                : 'Học viên'),
-        executive_role:
-          memberRow?.executive_role ||
-          (primaryRole === 'chu_tich'
-            ? 'Chủ tịch'
-            : primaryRole === 'admin'
-              ? 'Quản trị viên'
-              : primaryRole === 'ban_dieu_hanh'
-                ? 'Ban Điều Hành'
-                : 'Học viên'),
+        executiveRole: roleLabelMap[primaryRole] || 'Học viên',
+        executive_role: primaryRole,
         department: normalizedDept,
         memberCode: memberRow?.code || null,
         memberId: memberRow?.id || null,
-        targetSystem:
-          (memberRow?.card_visibility_settings && typeof memberRow.card_visibility_settings === 'object' && (memberRow.card_visibility_settings as any).targetSystem)
-            ? (memberRow.card_visibility_settings as any).targetSystem
-            : (userEmail === 'admin@ceohn10.vn' || userEmail === 'admin@viconnect.vn' ? 'all' : 'ceohn10'),
+        canAccessCrm: isCrmAuthorized,
+        can_access_crm: isCrmAuthorized,
+        targetSystem: isCrmAuthorized ? 'all' : 'ceohn10',
         customPermissions:
           (memberRow?.card_visibility_settings && typeof memberRow.card_visibility_settings === 'object' && Array.isArray((memberRow.card_visibility_settings as any).customPermissions))
             ? (memberRow.card_visibility_settings as any).customPermissions
@@ -1443,106 +1272,36 @@ export class UsersService implements OnModuleInit {
             account_status: profile.account_status,
           }
           : null,
-        roles: (() => {
-          const isSpecialistOrMember =
-            primaryRole.startsWith('thanh_vien_ban_') ||
-            primaryRole === 'member' ||
-            primaryRole === 'hoi_vien' ||
-            exec.startsWith('thanh_vien_ban_') ||
-            exec === 'member' ||
-            exec === 'hoi_vien';
-          if (isSpecialistOrMember) {
-            const cleaned = roleList.filter(
-              (r) =>
-                r !== 'admin' &&
-                r !== 'platform_admin' &&
-                r !== 'quan_tri' &&
-                r !== 'superadmin' &&
-                r !== 'chu_tich' &&
-                r !== 'president' &&
-                r !== 'ban_dieu_hanh' &&
-                r !== 'bqt'
-            );
-            if (!cleaned.includes(primaryRole)) cleaned.push(primaryRole);
-            return cleaned;
-          }
-          return roleList;
-        })(),
+        roles: roleList,
         role: primaryRole,
-        isPresident:
-          !(primaryRole.startsWith('thanh_vien_ban_') || primaryRole === 'member' || primaryRole === 'hoi_vien') &&
-          (primaryRole === 'chu_tich' || roleList.includes('chu_tich')),
-        isAdmin:
-          !(primaryRole.startsWith('thanh_vien_ban_') || primaryRole === 'member' || primaryRole === 'hoi_vien') &&
-          (primaryRole === 'admin' ||
-            primaryRole === 'chu_tich' ||
-            primaryRole === 'quan_tri' ||
-            primaryRole === 'platform_admin' ||
-            roleList.includes('admin') ||
-            roleList.includes('platform_admin')),
-        isExecutive:
-          !(primaryRole.startsWith('thanh_vien_ban_') || primaryRole === 'member' || primaryRole === 'hoi_vien') &&
-          (primaryRole === 'ban_dieu_hanh' ||
-            roleList.includes('ban_dieu_hanh') ||
-            roleList.includes('bqt')),
-        isGeneralSecretary:
-          !(primaryRole.startsWith('thanh_vien_ban_') || primaryRole === 'member' || primaryRole === 'hoi_vien') &&
-          (primaryRole === 'tong_thu_ky' || roleList.includes('tong_thu_ky')),
-        isDepartmentLeader:
-          !(primaryRole.startsWith('thanh_vien_ban_') || primaryRole === 'member' || primaryRole === 'hoi_vien') &&
-          primaryRole.startsWith('truong_ban_'),
-        permissions: (() => {
-          const evalRes = computeUserRbacEvaluation(
-            primaryRole,
-            (primaryRole.startsWith('thanh_vien_ban_') || primaryRole === 'member' || primaryRole === 'hoi_vien')
-              ? roleList.filter((r) => r !== 'admin' && r !== 'platform_admin' && r !== 'quan_tri')
-              : roleList,
-            normalizedDept,
-            !(primaryRole.startsWith('thanh_vien_ban_') || primaryRole === 'member' || primaryRole === 'hoi_vien') &&
-            (primaryRole === 'chu_tich' || roleList.includes('chu_tich')),
-            !(primaryRole.startsWith('thanh_vien_ban_') || primaryRole === 'member' || primaryRole === 'hoi_vien') &&
-            (primaryRole === 'admin' ||
-              primaryRole === 'chu_tich' ||
-              primaryRole === 'quan_tri' ||
-              primaryRole === 'platform_admin' ||
-              roleList.includes('admin') ||
-              roleList.includes('platform_admin')),
-            dynamicMatrix,
-          );
-          return evalRes.permissions;
-        })(),
+        isPresident: primaryRole === 'lop_truong',
+        isAdmin: isCrmAuthorized,
+        isPlatformAdmin: primaryRole === 'platform_admin',
+        isExecutive: primaryRole === 'lop_truong' || primaryRole === 'lop_pho',
+        isGeneralSecretary: false,
+        isDepartmentLeader: primaryRole === 'truong_ban_chuyen_trach',
+        permissions: computeUserRbacEvaluation(
+          primaryRole,
+          roleList,
+          normalizedDept,
+          primaryRole === 'lop_truong',
+          isCrmAuthorized,
+          dynamicMatrix,
+        ).permissions,
         permissionsHash: computeUserRbacEvaluation(
           primaryRole,
-          (primaryRole.startsWith('thanh_vien_ban_') || primaryRole === 'member' || primaryRole === 'hoi_vien')
-            ? roleList.filter((r) => r !== 'admin' && r !== 'platform_admin' && r !== 'quan_tri')
-            : roleList,
+          roleList,
           normalizedDept,
-          !(primaryRole.startsWith('thanh_vien_ban_') || primaryRole === 'member' || primaryRole === 'hoi_vien') &&
-          (primaryRole === 'chu_tich' || roleList.includes('chu_tich')),
-          !(primaryRole.startsWith('thanh_vien_ban_') || primaryRole === 'member' || primaryRole === 'hoi_vien') &&
-          (primaryRole === 'admin' ||
-            primaryRole === 'chu_tich' ||
-            primaryRole === 'quan_tri' ||
-            primaryRole === 'platform_admin' ||
-            roleList.includes('admin') ||
-            roleList.includes('platform_admin')),
+          primaryRole === 'lop_truong',
+          isCrmAuthorized,
           dynamicMatrix,
         ).permissionsHash,
         allowedRoutes: computeUserRbacEvaluation(
           primaryRole,
-          (primaryRole.startsWith('thanh_vien_ban_') || primaryRole === 'member' || primaryRole === 'hoi_vien')
-            ? roleList.filter((r) => r !== 'admin' && r !== 'platform_admin' && r !== 'quan_tri')
-            : roleList,
+          roleList,
           normalizedDept,
-          !(primaryRole.startsWith('thanh_vien_ban_') || primaryRole === 'member' || primaryRole === 'hoi_vien') &&
-          (primaryRole === 'chu_tich' || roleList.includes('chu_tich')),
-          !(primaryRole.startsWith('thanh_vien_ban_') || primaryRole === 'member' || primaryRole === 'hoi_vien') &&
-          (primaryRole === 'admin' ||
-            primaryRole === 'chu_tich' ||
-            primaryRole === 'quan_tri' ||
-            primaryRole === 'platform_admin' ||
-            roleList.includes('admin') ||
-            roleList.includes('platform_admin')),
+          primaryRole === 'lop_truong',
+          isCrmAuthorized,
           dynamicMatrix,
         ).allowedRoutes,
         permissionMatrix: dynamicMatrix,
@@ -2074,39 +1833,52 @@ export class UsersService implements OnModuleInit {
       }
 
       const rawExec = (m?.executive_role || '').toLowerCase().trim();
-      const executiveRole =
-        rawExec ||
-        (u.email === 'infor@viconnect.vn' ||
-          u.username === 'infor@viconnect.vn' ||
-          u.email === 'info@viconnect.vn' ||
-          u.username === 'info@viconnect.vn'
-          ? 'truong_ban_truyen_thong'
-          : userRoles.includes('platform_admin')
-            ? 'quan_tri'
-            : userRoles.includes('admin')
-              ? 'admin'
-              : 'member');
-      const department =
-        m?.department ||
-        (u.email === 'infor@viconnect.vn' ||
-          u.username === 'infor@viconnect.vn' ||
-          u.email === 'info@viconnect.vn' ||
-          u.username === 'info@viconnect.vn'
-          ? 'Ban Truyền Thông'
-          : 'Học viên ceohn10');
+      let executiveRole = 'member';
+      if (rawExec === 'platform_admin' || u.email === 'admin@ceohn10.vn' || userRoles.includes('platform_admin')) {
+        executiveRole = 'platform_admin';
+      } else if (rawExec === 'admin' || userRoles.includes('admin')) {
+        executiveRole = 'admin';
+      } else if (rawExec === 'lop_truong' || rawExec === 'chu_tich') {
+        executiveRole = 'lop_truong';
+      } else if (rawExec === 'lop_pho' || rawExec === 'ban_dieu_hanh' || rawExec === 'pho_chu_tich') {
+        executiveRole = 'lop_pho';
+      } else if (rawExec === 'truong_team') {
+        executiveRole = 'truong_team';
+      } else if (rawExec === 'pho_team') {
+        executiveRole = 'pho_team';
+      } else if (rawExec === 'truong_ban_chuyen_trach' || rawExec.startsWith('truong_ban_') || rawExec === 'tong_thu_ky' || rawExec === 'ban_thu_ky') {
+        executiveRole = 'truong_ban_chuyen_trach';
+      } else if (rawExec === 'giang_vien') {
+        executiveRole = 'giang_vien';
+      } else {
+        executiveRole = 'member';
+      }
 
-      const isSuper =
-        u.email === 'admin@ceohn10.vn' ||
-        u.email === 'admin@viconnect.vn' ||
-        userRoles.includes('platform_admin');
-      const mSettings =
-        m?.card_visibility_settings && typeof m.card_visibility_settings === 'object'
-          ? m.card_visibility_settings
-          : {};
-      const targetSystem =
-        mSettings.targetSystem || (isSuper ? 'all' : 'ceohn10');
-      const customPermissions = Array.isArray(mSettings.customPermissions)
-        ? mSettings.customPermissions
+      let department = m?.department || 'Ban Gắn kết & Đời sống';
+      const dLower = department.toLowerCase();
+      if (dLower.includes('công nghệ') || dLower.includes('cong_nghe')) department = 'Ban Công nghệ';
+      else if (dLower.includes('truyền thông') || dLower.includes('truyen_thong')) department = 'Ban Truyền thông';
+      else if (dLower.includes('tài chính') || dLower.includes('tai_chinh')) department = 'Ban Tài chính';
+      else if (dLower.includes('sự kiện') || dLower.includes('hậu cần') || dLower.includes('su_kien')) department = 'Ban Sự kiện & Hậu cần';
+      else if (dLower.includes('đối ngoại') || dLower.includes('giao thương') || dLower.includes('xúc tiến') || dLower.includes('b2b')) department = 'Ban Đối ngoại & Giao thương';
+      else if (dLower.includes('thiện nguyện') || dLower.includes('thien_nguyen')) department = 'Ban Thiện nguyện';
+      else department = 'Ban Gắn kết & Đời sống';
+
+      const isCrmAuthorized =
+        executiveRole === 'platform_admin' ||
+        executiveRole === 'admin' ||
+        executiveRole === 'lop_truong' ||
+        executiveRole === 'lop_pho' ||
+        executiveRole === 'truong_team' ||
+        executiveRole === 'pho_team' ||
+        executiveRole === 'truong_ban_chuyen_trach' ||
+        userRoles.includes('platform_admin') ||
+        userRoles.includes('admin') ||
+        Boolean((m?.card_visibility_settings as any)?.canAccessCrm);
+
+      const targetSystem = isCrmAuthorized ? 'all' : 'ceohn10';
+      const customPermissions = Array.isArray((m?.card_visibility_settings as any)?.customPermissions)
+        ? (m.card_visibility_settings as any).customPermissions
         : [];
 
       return {
@@ -2122,6 +1894,8 @@ export class UsersService implements OnModuleInit {
         roles: userRoles,
         executiveRole,
         department,
+        canAccessCrm: isCrmAuthorized,
+        can_access_crm: isCrmAuthorized,
         targetSystem,
         customPermissions,
         memberCode: m?.code || null,
@@ -2142,7 +1916,7 @@ export class UsersService implements OnModuleInit {
           name: 'Lê Thị Dung (Admin Viconnect)',
           email: 'admin@viconnect.vn',
           code: 'HN10-001',
-          department: 'Ban Điều Hành',
+          department: 'Ban Công nghệ',
           executive_role: 'admin',
           status: 'active',
           created_at: new Date('2026-08-18'),
@@ -2152,8 +1926,8 @@ export class UsersService implements OnModuleInit {
           name: 'Phạm Hồng Nguyên',
           email: 'infor@viconnect.vn',
           code: 'HN10-002',
-          department: 'Ban Truyền Thông',
-          executive_role: 'truong_ban_truyen_thong',
+          department: 'Ban Truyền thông',
+          executive_role: 'truong_ban_chuyen_trach',
           status: 'active',
           created_at: new Date('2026-10-20'),
         },
@@ -2162,6 +1936,8 @@ export class UsersService implements OnModuleInit {
       items = fallbackList.map((m: any, idx: number) => {
         const isLTD = m.email === 'admin@viconnect.vn' || m.code === 'HN10-001' || String(m.name || '').includes('Dung');
         const email = m.email || (isLTD ? 'admin@viconnect.vn' : 'infor@viconnect.vn');
+        const execRole = isLTD ? 'admin' : (m.executive_role || 'member');
+        const hasCrm = isLTD || ['platform_admin', 'admin', 'lop_truong', 'lop_pho', 'truong_team', 'pho_team', 'truong_ban_chuyen_trach'].includes(execRole);
         return {
           id: m.user_id || m.id || `usr-mem-${idx + 1}`,
           username: email,
@@ -2172,13 +1948,16 @@ export class UsersService implements OnModuleInit {
           account_status: m.status === 'expired' ? 'suspended' : 'active',
           company_name: m.company || m.company_name || 'CLB Doanh Nhân CEO HN10',
           professional_title: isLTD ? 'Quản Trị Viên Hệ Thống' : 'Trưởng Ban Truyền Thông',
-          roles: isLTD ? ['admin', 'platform_admin'] : ['staff', 'ban_dieu_hanh'],
-          primaryRole: isLTD ? 'admin' : 'staff',
-          department: isLTD ? 'Ban Điều Hành' : (m.department || 'Ban Truyền Thông'),
-          executiveRole: isLTD ? 'admin' : (m.executive_role || 'truong_ban_truyen_thong'),
-          targetSystem: isLTD ? 'all' : 'ceohn10',
+          roles: isLTD ? ['admin', 'platform_admin'] : [execRole],
+          role: execRole,
+          primaryRole: execRole,
+          department: isLTD ? 'Ban Công nghệ' : (m.department || 'Ban Gắn kết & Đời sống'),
+          executiveRole: execRole,
+          targetSystem: hasCrm ? 'all' : 'app_only',
+          canAccessCrm: hasCrm,
+          can_access_crm: hasCrm,
           customPermissions: [],
-          memberCode: m.code || `HN10-00${idx + 1}`,
+          memberCode: m?.code || `HN10-00${idx + 1}`,
           created_at: m.created_at || m.joined_at || new Date(),
           updated_at: m.updated_at || new Date(),
         };
@@ -2325,22 +2104,41 @@ export class UsersService implements OnModuleInit {
     `.catch(() => { });
 
     const rawRole = (data.executiveRole || (typeof data.role === 'string' ? data.role : '') || 'member').toLowerCase().trim();
-    const rawDept = (data.department || 'Học viên ceohn10').trim();
+    let cleanRole = 'member';
+    if (rawRole === 'platform_admin' || rawRole === 'quan_tri') cleanRole = 'platform_admin';
+    else if (rawRole === 'admin') cleanRole = 'admin';
+    else if (rawRole === 'lop_truong' || rawRole === 'chu_tich') cleanRole = 'lop_truong';
+    else if (rawRole === 'lop_pho' || rawRole === 'ban_dieu_hanh' || rawRole === 'pho_chu_tich') cleanRole = 'lop_pho';
+    else if (rawRole === 'truong_team') cleanRole = 'truong_team';
+    else if (rawRole === 'pho_team') cleanRole = 'pho_team';
+    else if (rawRole === 'truong_ban_chuyen_trach' || rawRole.startsWith('truong_ban_') || rawRole === 'tong_thu_ky' || rawRole === 'ban_thu_ky') cleanRole = 'truong_ban_chuyen_trach';
+    else if (rawRole === 'giang_vien') cleanRole = 'giang_vien';
+    else cleanRole = 'member';
+
+    let cleanDept = 'Ban Gắn kết & Đời sống';
+    const rawDeptLower = (data.department || '').toLowerCase();
+    if (rawDeptLower.includes('công nghệ') || rawDeptLower.includes('cong_nghe')) cleanDept = 'Ban Công nghệ';
+    else if (rawDeptLower.includes('truyền thông') || rawDeptLower.includes('truyen_thong')) cleanDept = 'Ban Truyền thông';
+    else if (rawDeptLower.includes('tài chính') || rawDeptLower.includes('tai_chinh')) cleanDept = 'Ban Tài chính';
+    else if (rawDeptLower.includes('sự kiện') || rawDeptLower.includes('hậu cần') || rawDeptLower.includes('su_kien')) cleanDept = 'Ban Sự kiện & Hậu cần';
+    else if (rawDeptLower.includes('đối ngoại') || rawDeptLower.includes('giao thương') || rawDeptLower.includes('xúc tiến') || rawDeptLower.includes('b2b')) cleanDept = 'Ban Đối ngoại & Giao thương';
+    else if (rawDeptLower.includes('thiện nguyện') || rawDeptLower.includes('thien_nguyen')) cleanDept = 'Ban Thiện nguyện';
+    else cleanDept = 'Ban Gắn kết & Đời sống';
 
     let appRoleValue: app_role = 'member';
-    if (rawRole === 'quan_tri' || rawRole === 'platform_admin') {
+    if (cleanRole === 'platform_admin') {
       appRoleValue = 'platform_admin' as app_role;
     } else if (
-      rawRole === 'chu_tich' ||
-      rawRole === 'admin' ||
-      rawRole === 'ban_dieu_hanh' ||
-      rawRole === 'tong_thu_ky' ||
-      rawRole === 'ban_thu_ky' ||
-      rawRole.startsWith('truong_ban_')
+      cleanRole === 'admin' ||
+      cleanRole === 'lop_truong' ||
+      cleanRole === 'lop_pho' ||
+      cleanRole === 'truong_team' ||
+      cleanRole === 'pho_team' ||
+      cleanRole === 'truong_ban_chuyen_trach'
     ) {
       appRoleValue = 'admin' as app_role;
-    } else if (rawRole.startsWith('thanh_vien_ban_') || rawRole === 'staff') {
-      appRoleValue = 'staff' as app_role;
+    } else {
+      appRoleValue = 'member' as app_role;
     }
 
     await this.usersRepo.createUserRole(newUser.id, appRoleValue);
@@ -2367,8 +2165,8 @@ export class UsersService implements OnModuleInit {
       newUser.id,
       assocId,
       appRoleValue,
-      rawDept,
-      rawRole,
+      cleanDept,
+      cleanRole,
     ).catch(() => { });
 
     // Đồng bộ vào bảng public.members
@@ -2382,8 +2180,19 @@ export class UsersService implements OnModuleInit {
       (data.code && data.code.trim()) ||
       `HN10-${Math.floor(100 + Math.random() * 900)}`;
 
+    const isCrmGranted =
+      cleanRole === 'platform_admin' ||
+      cleanRole === 'admin' ||
+      cleanRole === 'lop_truong' ||
+      cleanRole === 'lop_pho' ||
+      cleanRole === 'truong_team' ||
+      cleanRole === 'pho_team' ||
+      cleanRole === 'truong_ban_chuyen_trach' ||
+      Boolean(data.targetSystem === 'all');
+
     const metaSettingsStr = JSON.stringify({
-      targetSystem: data.targetSystem || 'ceohn10',
+      targetSystem: isCrmGranted ? 'all' : 'ceohn10',
+      canAccessCrm: isCrmGranted,
       customPermissions: Array.isArray(data.customPermissions) ? data.customPermissions : [],
     });
 
@@ -2394,8 +2203,8 @@ export class UsersService implements OnModuleInit {
             name = COALESCE(NULLIF(${data.name || ''}, ''), name),
             phone = COALESCE(NULLIF(${potentialPhone || data.phone || ''}, ''), phone),
             company_name = COALESCE(NULLIF(${data.companyName || ''}, ''), company_name),
-            department = COALESCE(NULLIF(${rawDept}, ''), department),
-            executive_role = COALESCE(NULLIF(${rawRole}, ''), executive_role),
+            department = COALESCE(NULLIF(${cleanDept}, ''), department),
+            executive_role = COALESCE(NULLIF(${cleanRole}, ''), executive_role),
             card_visibility_settings = ${metaSettingsStr}::jsonb,
             status = 'active',
             updated_at = NOW()
@@ -2414,8 +2223,8 @@ export class UsersService implements OnModuleInit {
           ${cleanEmail || `${username}@ceohn10.vn`},
           ${potentialPhone || data.phone || null},
           ${data.companyName ? data.companyName.trim() : 'CLB Doanh Nhân CEO HN10'},
-          ${rawDept},
-          ${rawRole},
+          ${cleanDept},
+          ${cleanRole},
           'active',
           ${assocId}::uuid,
           'company',
@@ -2502,26 +2311,54 @@ export class UsersService implements OnModuleInit {
     const rawDept = (data.department || '').trim();
 
     if (rawRole || rawDept) {
+      let cleanRole = rawRole;
+      if (rawRole === 'platform_admin' || rawRole === 'quan_tri') cleanRole = 'platform_admin';
+      else if (rawRole === 'admin') cleanRole = 'admin';
+      else if (rawRole === 'lop_truong' || rawRole === 'chu_tich') cleanRole = 'lop_truong';
+      else if (rawRole === 'lop_pho' || rawRole === 'ban_dieu_hanh' || rawRole === 'pho_chu_tich') cleanRole = 'lop_pho';
+      else if (rawRole === 'truong_team') cleanRole = 'truong_team';
+      else if (rawRole === 'pho_team') cleanRole = 'pho_team';
+      else if (rawRole === 'truong_ban_chuyen_trach' || rawRole.startsWith('truong_ban_') || rawRole === 'tong_thu_ky' || rawRole === 'ban_thu_ky') cleanRole = 'truong_ban_chuyen_trach';
+      else if (rawRole === 'giang_vien') cleanRole = 'giang_vien';
+      else if (rawRole === 'member' || rawRole === 'hoi_vien') cleanRole = 'member';
+
+      let cleanDept = rawDept;
+      const rawDeptLower = rawDept.toLowerCase();
+      if (rawDeptLower.includes('công nghệ') || rawDeptLower.includes('cong_nghe')) cleanDept = 'Ban Công nghệ';
+      else if (rawDeptLower.includes('truyền thông') || rawDeptLower.includes('truyen_thong')) cleanDept = 'Ban Truyền thông';
+      else if (rawDeptLower.includes('tài chính') || rawDeptLower.includes('tai_chinh')) cleanDept = 'Ban Tài chính';
+      else if (rawDeptLower.includes('sự kiện') || rawDeptLower.includes('hậu cần') || rawDeptLower.includes('su_kien')) cleanDept = 'Ban Sự kiện & Hậu cần';
+      else if (rawDeptLower.includes('đối ngoại') || rawDeptLower.includes('giao thương') || rawDeptLower.includes('xúc tiến') || rawDeptLower.includes('b2b')) cleanDept = 'Ban Đối ngoại & Giao thương';
+      else if (rawDeptLower.includes('thiện nguyện') || rawDeptLower.includes('thien_nguyen')) cleanDept = 'Ban Thiện nguyện';
+      else if (rawDept) cleanDept = 'Ban Gắn kết & Đời sống';
+
       let appRoleValue: app_role = 'member';
-      if (rawRole === 'quan_tri' || rawRole === 'platform_admin') {
+      if (cleanRole === 'platform_admin') {
         appRoleValue = 'platform_admin' as app_role;
       } else if (
-        rawRole === 'chu_tich' ||
-        rawRole === 'admin' ||
-        rawRole === 'ban_dieu_hanh' ||
-        rawRole === 'tong_thu_ky' ||
-        rawRole === 'ban_thu_ky' ||
-        rawRole.startsWith('truong_ban_')
+        cleanRole === 'admin' ||
+        cleanRole === 'lop_truong' ||
+        cleanRole === 'lop_pho' ||
+        cleanRole === 'truong_team' ||
+        cleanRole === 'pho_team' ||
+        cleanRole === 'truong_ban_chuyen_trach'
       ) {
         appRoleValue = 'admin' as app_role;
-      } else if (rawRole.startsWith('thanh_vien_ban_') || rawRole === 'staff') {
-        appRoleValue = 'staff' as app_role;
-      } else if (data.role && (data.role === 'admin' || data.role === 'member' || data.role === 'platform_admin' || data.role === 'tenant_admin' || data.role === 'staff')) {
-        appRoleValue = data.role as app_role;
+      } else {
+        appRoleValue = 'member' as app_role;
       }
 
       await this.usersRepo.deleteUserRoles(id);
       await this.usersRepo.createUserRole(id, appRoleValue);
+
+      const isCrmGranted =
+        cleanRole === 'platform_admin' ||
+        cleanRole === 'admin' ||
+        cleanRole === 'lop_truong' ||
+        cleanRole === 'lop_pho' ||
+        cleanRole === 'truong_team' ||
+        cleanRole === 'pho_team' ||
+        cleanRole === 'truong_ban_chuyen_trach';
 
       // Cập nhật bảng members
       await this.prisma
@@ -2532,13 +2369,19 @@ export class UsersService implements OnModuleInit {
             department = COALESCE(NULLIF($2, ''), department),
             name = COALESCE(NULLIF($3, ''), name),
             email = COALESCE(NULLIF($4, ''), email),
+            card_visibility_settings = jsonb_set(
+              COALESCE(card_visibility_settings, '{}'::jsonb),
+              '{canAccessCrm}',
+              $5::jsonb
+            ),
             updated_at = NOW()
-        WHERE user_id = $5::uuid OR id = $5::uuid OR (email IS NOT NULL AND LOWER(email) = LOWER($6))
+        WHERE user_id = $6::uuid OR id::text = $6 OR (email IS NOT NULL AND LOWER(email) = LOWER($7))
       `,
-          rawRole || null,
-          rawDept || null,
+          cleanRole || null,
+          cleanDept || null,
           data.name || null,
           data.email || null,
+          JSON.stringify(isCrmGranted),
           id,
           user.email || '',
         )
@@ -2566,8 +2409,8 @@ export class UsersService implements OnModuleInit {
         id,
         assocId,
         appRoleValue,
-        rawDept || 'Học viên ceohn10',
-        rawRole || 'member',
+        cleanDept || 'Ban Gắn kết & Đời sống',
+        cleanRole || 'member',
       ).catch(async () => {
         await this.prisma.$executeRawUnsafe(
           `
@@ -2575,8 +2418,8 @@ export class UsersService implements OnModuleInit {
           SET executive_role = $1, department = $2, updated_at = NOW()
           WHERE user_id = $3::uuid
         `,
-          rawRole || 'member',
-          rawDept || 'Học viên ceohn10',
+          cleanRole || 'member',
+          cleanDept || 'Ban Gắn kết & Đời sống',
           id,
         ).catch(() => { });
       });
@@ -2898,7 +2741,7 @@ export class UsersService implements OnModuleInit {
         if (userEmail) {
           await this.prisma
             .$executeRawUnsafe(
-              `DELETE FROM public.members WHERE user_id = $1::uuid OR id::text = $1 OR id::text = $2 OR code = $2 OR LOWER(email) = $3 OR LOWER(contact_email) = $3`,
+              `DELETE FROM public.members WHERE user_id = $1::uuid OR id::text = $1 OR id::text = $2 OR code = $2 OR LOWER(email) = $3`,
               actualId,
               cleanTargetId,
               userEmail,

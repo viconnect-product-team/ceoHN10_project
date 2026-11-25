@@ -44,6 +44,12 @@ import {
   Shield,
   Menu,
   X,
+  Copy,
+  Eye,
+  EyeOff,
+  Trash2,
+  PlusCircle,
+  Pencil,
 } from "lucide-react";
 import { TableActionsGroup } from "@/components/common";
 import {
@@ -52,6 +58,11 @@ import {
   getActiveSystemTenant,
   setActiveSystemTenant,
   GRANULAR_PERMISSION_CATEGORIES,
+  getCustomDepartments,
+  saveCustomDepartments,
+  INITIAL_DEPARTMENTS,
+  dispatchPermissionSyncEvent,
+  type DepartmentItem,
 } from "@/lib/rbac-permission-helpers";
 import { fetchNestApi } from "@/lib/api-client";
 import { isValidEmail } from "@/lib/validation";
@@ -104,14 +115,18 @@ function MasterAdminPortal() {
   const isMasterAdmin = isSuperPlatformAdmin || isCeoHn10Admin;
   const canManageAccounts = isSuperPlatformAdmin || isCeoHn10Admin;
 
-  const [activeTab, setActiveTab] = useState<"overview" | "accounts" | "settings">(() => {
+  const [activeTab, setActiveTab] = useState<"overview" | "accounts" | "settings" | "departments">(() => {
     if (typeof window !== "undefined") {
       const sp = new URLSearchParams(window.location.search);
       const tab = sp.get("tab");
-      if (tab === "accounts" || tab === "settings") return tab;
+      if (tab === "accounts" || tab === "settings" || tab === "departments") return tab;
     }
     return "overview";
   });
+  const [departmentsList, setDepartmentsList] = useState<DepartmentItem[]>(() => getCustomDepartments());
+  const [deptEditing, setDeptEditing] = useState<DepartmentItem | null>(null);
+  const [deptForm, setDeptForm] = useState({ code: "", name: "", description: "", color: "blue" });
+  const [deptModalOpen, setDeptModalOpen] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // State dự án đang quản trị (ceohn10)
@@ -169,6 +184,79 @@ function MasterAdminPortal() {
     },
   });
 
+  const DEFAULT_FEE_CATEGORIES = [
+    {
+      id: "fee_event",
+      name: "Vé tham gia sự kiện",
+      prefix: "CEO1983_EVT",
+      target_fund_name: "Quỹ Sự Kiện & Hậu Cần",
+      action_type: "event_ticket",
+      action_label: "Phát hành vé QR & gửi Email/Zalo",
+      description: "Tự động duyệt vé, tạo mã QR check-in HMAC-SHA256, gửi vé điện tử",
+      is_active: true,
+    },
+    {
+      id: "fee_joining",
+      name: "Phí gia nhập CLB (Hội viên mới)",
+      prefix: "CEOHN10_GN",
+      target_fund_name: "Quỹ Tổng CLB CEO HN10",
+      action_type: "membership_join",
+      action_label: "Duyệt hội viên mới & cấp thẻ số",
+      description: "Kích hoạt hội viên chính thức, cấp mã học viên, mở thẻ 3D/NFC",
+      is_active: true,
+    },
+    {
+      id: "fee_annual",
+      name: "Hội phí thường niên hàng năm",
+      prefix: "CEOHN10_HP",
+      target_fund_name: "Quỹ Tổng CLB CEO HN10",
+      action_type: "membership_annual",
+      action_label: "Gia hạn niên liễm & thẻ hội viên",
+      description: "Tự động gạch nợ hóa đơn hội phí, gia hạn niên hạn sử dụng thẻ",
+      is_active: true,
+    },
+    {
+      id: "fee_course",
+      name: "Học phí Khóa học / 30 Chuyên đề",
+      prefix: "CEOHN10_LH",
+      target_fund_name: "Quỹ Ban Học Tập & Đào Tạo",
+      action_type: "course_enroll",
+      action_label: "Ghi danh lớp & mở khóa bài giảng",
+      description: "Ghi danh hội viên vào lớp học, cấp quyền truy cập tài liệu đào tạo",
+      is_active: true,
+    },
+    {
+      id: "fee_sponsorship",
+      name: "Kinh phí Tài trợ CLB & Sự kiện",
+      prefix: "CEOHN10_TT",
+      target_fund_name: "Quỹ Tài Trợ & Đối Ngoại",
+      action_type: "sponsorship",
+      action_label: "Kích hoạt logo & quyền lợi Sponsor",
+      description: "Ghi nhận quyền lợi nhà tài trợ (Kim cương, Vàng, Bạc), hiển thị logo app",
+      is_active: true,
+    },
+    {
+      id: "fee_charity",
+      name: "Ủng hộ Quỹ Thiện nguyện",
+      prefix: "CEOHN10_TN",
+      target_fund_name: "Quỹ Thiện Nguyện CLB",
+      action_type: "charity",
+      action_label: "Ghi nhận đóng góp & vinh danh",
+      description: "Cộng tiền vào Quỹ Thiện nguyện, vinh danh Bảng vàng đóng góp",
+      is_active: true,
+    },
+    {
+      id: "fee_b2b",
+      name: "Phí Gian hàng B2B / Kết nối giao thương",
+      prefix: "CEOHN10_B2B",
+      target_fund_name: "Quỹ Ban Xúc Tiến Thương Mại B2B",
+      action_type: "b2b_expo",
+      action_label: "Mở gian hàng số & lịch hẹn 1-on-1",
+      description: "Cấp quyền mở gian hàng sản phẩm và đặt lịch kết nối giao thương 1-on-1",
+      is_active: true,
+    },
+  ];
+
   // Cấu hình trắng sạch mặc định (không hardcode dữ liệu giả)
   const EMPTY_SEPAY_CONFIG = {
     is_enabled: false,
@@ -184,10 +272,15 @@ function MasterAdminPortal() {
       course_fee: true,
     },
     prefix_syntax: {
+      event: "CEO1983_EVT",
+      joining: "CEOHN10_GN",
       membership: "CEOHN10_HP",
-      event: "CEOHN10_SK",
       course: "CEOHN10_LH",
+      sponsor: "CEOHN10_TT",
+      charity: "CEOHN10_TN",
+      b2b: "CEOHN10_B2B",
     },
+    fee_categories: DEFAULT_FEE_CATEGORIES,
   };
 
   const EMPTY_ZALO_CONFIG = {
@@ -402,6 +495,19 @@ function MasterAdminPortal() {
     }
   };
 
+  const handleDeleteUser = async (userId: string, displayName: string) => {
+    if (!window.confirm(`Bạn có chắc muốn xóa tài khoản "${displayName}" khỏi hệ thống?`)) return;
+    try {
+      await fetchNestApi(`/users/${userId}`, {
+        method: "DELETE",
+      });
+      toast.success(`Đã xóa tài khoản ${displayName}`);
+      accountsQ.refetch();
+    } catch (err: any) {
+      toast.error(err?.message || "Lỗi khi xóa tài khoản");
+    }
+  };
+
   // State: Tab con của [3. CÀI ĐẶT HỆ THỐNG NGOÀI & PHÂN HỆ]
   const [settingsSubTab, setSettingsSubTab] = useState<"sepay" | "zalo" | "platforms" | "matrix">("sepay");
 
@@ -447,6 +553,65 @@ function MasterAdminPortal() {
   // State: Sepay Config Editor (Đọc từ API DB thật)
   const [sepayFormData, setSepayFormData] = useState<any>(EMPTY_SEPAY_CONFIG);
   const [isSavingSepay, setIsSavingSepay] = useState(false);
+  const [showApiToken, setShowApiToken] = useState(false);
+  const [showWebhookSecret, setShowWebhookSecret] = useState(false);
+
+  // Kiểm tra thông tin bắt buộc đã nhập đủ để enable nút Lưu Cấu Hình SePay
+  const isSepayReadyToSave = Boolean(
+    sepayFormData.bank_brand_name?.trim() &&
+    sepayFormData.account_number?.trim() &&
+    sepayFormData.account_name?.trim() &&
+    sepayFormData.webhook_token?.trim()
+  );
+
+  // URL Webhook động 100% tự động nhận diện theo Domain/Subdomain thực tế (Server Dev, Subdomain, Localhost)
+  const currentOrigin =
+    typeof window !== "undefined" && window.location.origin
+      ? window.location.origin
+      : "https://crm.ceohn10.viconnect.vn";
+  const dynamicDefaultWebhookUrl = `${currentOrigin}/api/webhooks/sepay`;
+  // Nếu webhook_url trong DB là URL cũ có chứa loca.lt hoặc để trống, ưu tiên dynamicDefaultWebhookUrl theo domain hiện tại
+  const rawWebhookUrl = sepayFormData.webhook_url?.trim() || "";
+  const currentWebhookUrl =
+    rawWebhookUrl && !rawWebhookUrl.includes("loca.lt")
+      ? rawWebhookUrl
+      : dynamicDefaultWebhookUrl;
+
+  const handleAddFeeCategory = () => {
+    const newId = `fee_${Date.now()}`;
+    const newCat = {
+      id: newId,
+      name: "Khoản phí phát sinh mới",
+      prefix: "CEOHN10_PHIKHAC",
+      target_fund_name: "Quỹ Tổng CLB CEO HN10",
+      action_type: "custom",
+      action_label: "Ghi nhận vào Quỹ & sổ quỹ",
+      description: "Tự động phân bổ vào Quỹ và lưu sổ thu",
+      is_active: true,
+    };
+    setSepayFormData((prev: any) => ({
+      ...prev,
+      fee_categories: [...(prev.fee_categories || DEFAULT_FEE_CATEGORIES), newCat],
+    }));
+    toast.info("Đã thêm 1 dòng khoản phí mới. Hãy nhập tên và mã tiền tố SePay.");
+  };
+
+  const handleRemoveFeeCategory = (id: string) => {
+    setSepayFormData((prev: any) => ({
+      ...prev,
+      fee_categories: (prev.fee_categories || []).filter((c: any) => c.id !== id),
+    }));
+    toast.success("Đã xóa khoản phí khỏi danh mục");
+  };
+
+  const handleUpdateFeeCategory = (id: string, field: string, value: any) => {
+    setSepayFormData((prev: any) => ({
+      ...prev,
+      fee_categories: (prev.fee_categories || []).map((c: any) =>
+        c.id === id ? { ...c, [field]: value } : c
+      ),
+    }));
+  };
 
   // State: Zalo OA Config Editor (Đọc từ API DB thật)
   const [zaloFormData, setZaloFormData] = useState<any>(EMPTY_ZALO_CONFIG);
@@ -468,7 +633,14 @@ function MasterAdminPortal() {
 
   React.useEffect(() => {
     if (sepayQ.data) {
-      setSepayFormData((prev: any) => ({ ...EMPTY_SEPAY_CONFIG, ...prev, ...sepayQ.data }));
+      setSepayFormData((prev: any) => ({
+        ...EMPTY_SEPAY_CONFIG,
+        ...prev,
+        ...sepayQ.data,
+        fee_categories: (sepayQ.data.fee_categories && sepayQ.data.fee_categories.length > 0)
+          ? sepayQ.data.fee_categories
+          : (prev.fee_categories || DEFAULT_FEE_CATEGORIES),
+      }));
     }
   }, [sepayQ.data]);
 
@@ -594,12 +766,16 @@ function MasterAdminPortal() {
 
   const handleSaveSepay = async () => {
     setIsSavingSepay(true);
+    const payload = {
+      ...sepayFormData,
+      webhook_url: sepayFormData.webhook_url?.trim() || dynamicDefaultWebhookUrl,
+    };
     try {
       await fetchNestApi("/admin/master-settings/sepay", {
         method: "PUT",
-        body: sepayFormData,
+        body: payload,
       });
-      toast.success("Đã lưu cấu hình Sepay dynamic thành công");
+      toast.success("Đã lưu Cấu hình Cổng Thanh Toán SePay thành công!");
       sepayQ.refetch();
     } catch (err: any) {
       toast.error(err?.message || "Lỗi khi lưu cấu hình Sepay");
@@ -834,7 +1010,27 @@ function MasterAdminPortal() {
               <div className="min-w-0">
                 <div className="truncate">[3. CÀI ĐẶT HỆ THỐNG NGOÀI]</div>
                 <div className={`text-[10px] truncate ${activeTab === "settings" ? "text-slate-200" : "text-slate-400"}`}>
-                  Sepay Dynamic &amp; Tích hợp
+                  Cổng SePay &amp; Zalo OA
+                </div>
+              </div>
+            </button>
+
+            <button
+              onClick={() => {
+                setActiveTab("departments");
+                setMobileSidebarOpen(false);
+              }}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer text-left ${
+                activeTab === "departments"
+                  ? "bg-[#002B70] text-white shadow-sm"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+              }`}
+            >
+              <Building2 className={`w-4 h-4 shrink-0 ${activeTab === "departments" ? "text-amber-400" : "text-slate-400"}`} />
+              <div className="min-w-0">
+                <div className="truncate">[4. QUẢN LÝ BAN CHUYÊN MÔN]</div>
+                <div className={`text-[10px] truncate ${activeTab === "departments" ? "text-slate-200" : "text-slate-400"}`}>
+                  7 Ban chuyên trách &amp; đổi tên
                 </div>
               </div>
             </button>
@@ -911,9 +1107,9 @@ function MasterAdminPortal() {
               {activeTab === "accounts" && "Danh Sách Tài Khoản Quản Trị Được Phân Quyền"}
               {activeTab === "settings" && (
                 settingsSubTab === "sepay"
-                  ? "Cấu Hình Tích Hợp Cổng Thanh Toán Sepay Chuẩn Dynamic"
+                  ? "Cấu Hình Tích Hợp Cổng Thanh Toán SePay"
                   : settingsSubTab === "zalo"
-                  ? "Cấu Hình Tích Hợp Zalo Official Account (Zalo OA / ZBS)"
+                  ? "Cấu Hình Tích Hợp Zalo Official Account & ZBS"
                   : "Cài Đặt Hệ Thống Chi Tiết Cho Từng Hệ Thống Con"
               )}
             </h2>
@@ -945,18 +1141,6 @@ function MasterAdminPortal() {
               >
                 <UserPlus className="w-4 h-4" />
                 <span>{isSuperPlatformAdmin ? "Tạo Tài Khoản Quản Trị Mới" : "Tạo Tài Khoản Cán Sự / Ban CEO HN10"}</span>
-              </Button>
-            )}
-
-            {activeTab === "settings" && settingsSubTab === "sepay" && (
-              <Button
-                size="sm"
-                disabled={isSavingSepay}
-                onClick={handleSaveSepay}
-                className="h-9 gap-1.5 bg-[#002B70] hover:bg-[#003B95] text-white font-semibold text-xs shadow-sm"
-              >
-                <CheckCircle2 className="w-4 h-4" />
-                <span>{isSavingSepay ? "Đang lưu..." : "Lưu Cấu Hình Sepay"}</span>
               </Button>
             )}
 
@@ -1255,9 +1439,13 @@ function MasterAdminPortal() {
                   { key: "all", label: "Tất cả vai trò" },
                   { key: "platform_admin", label: "Platform Admin" },
                   { key: "admin", label: "Admin Tổ Chức" },
-                  { key: "class_officer", label: "Ban Cán Sự Lớp" },
-                  { key: "dept_head", label: "Trưởng Ban" },
-                  { key: "member", label: "Hội Viên" },
+                  { key: "lop_truong", label: "Lớp Trưởng" },
+                  { key: "lop_pho", label: "Lớp Phó" },
+                  { key: "truong_team", label: "Trưởng Team" },
+                  { key: "pho_team", label: "Phó Team" },
+                  { key: "truong_ban_chuyen_trach", label: "Trưởng Ban Chuyên Trách" },
+                  { key: "giang_vien", label: "Giảng Viên" },
+                  { key: "member", label: "Học Viên" },
                 ].map((f) => (
                   <button
                     key={f.key}
@@ -1286,7 +1474,7 @@ function MasterAdminPortal() {
                     <th className="px-4 py-3">Phạm vi dữ liệu</th>
                     <th className="px-4 py-3">Ban / Đơn vị</th>
                     <th className="px-4 py-3 text-center">Trạng thái</th>
-                    <th className="px-4 py-3 text-right">Thao tác</th>
+                    <th className="px-4 py-3 text-center">THAO TÁC</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 bg-white">
@@ -1313,8 +1501,12 @@ function MasterAdminPortal() {
                         }
                         if (accountRoleFilter === "platform_admin") return isSuper || acc.role === "platform_admin";
                         if (accountRoleFilter === "admin") return acc.role === "admin" && !isSuper;
-                        if (accountRoleFilter === "class_officer") return acc.role === "lop_truong" || acc.role === "lop_pho";
-                        if (accountRoleFilter === "dept_head") return (acc.role || "").includes("truong_ban") || (acc.role || "").includes("ban_");
+                        if (accountRoleFilter === "lop_truong") return acc.role === "lop_truong";
+                        if (accountRoleFilter === "lop_pho") return acc.role === "lop_pho";
+                        if (accountRoleFilter === "truong_team") return acc.role === "truong_team";
+                        if (accountRoleFilter === "pho_team") return acc.role === "pho_team";
+                        if (accountRoleFilter === "truong_ban_chuyen_trach") return acc.role === "truong_ban_chuyen_trach" || (acc.role || "").includes("truong_ban");
+                        if (accountRoleFilter === "giang_vien") return acc.role === "giang_vien";
                         if (accountRoleFilter === "member") return acc.role === "member" || acc.role === "hoi_vien" || !acc.role;
                         return true;
                       });
@@ -1367,13 +1559,25 @@ function MasterAdminPortal() {
                               <span className="px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
                                 Lớp Phó
                               </span>
-                            ) : roleCode.includes("truong_ban") ? (
+                            ) : roleCode === "truong_team" ? (
+                              <span className="px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-orange-100 text-orange-800 border border-orange-200">
+                                Trưởng Team
+                              </span>
+                            ) : roleCode === "pho_team" ? (
+                              <span className="px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-orange-50 text-orange-800 border border-orange-200">
+                                Phó Team
+                              </span>
+                            ) : roleCode === "truong_ban_chuyen_trach" || roleCode.includes("truong_ban") ? (
                               <span className="px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
                                 Trưởng Ban
                               </span>
+                            ) : roleCode === "giang_vien" ? (
+                              <span className="px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">
+                                Giảng Viên
+                              </span>
                             ) : (
                               <span className="px-2 py-0.5 rounded-md text-[10.5px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
-                                Hội Viên
+                                Học Viên
                               </span>
                             )}
                           </td>
@@ -1397,7 +1601,7 @@ function MasterAdminPortal() {
                             )}
                           </td>
                           <td className="px-4 py-3 text-slate-700 font-medium">
-                            {acc.department || "Ban Điều Hành"}
+                            {acc.department || "Ban Công nghệ"}
                           </td>
                           <td className="px-4 py-3 text-center">
                             {isActive ? (
@@ -1410,43 +1614,53 @@ function MasterAdminPortal() {
                               </span>
                             )}
                           </td>
-                          <td className="px-4 py-3 text-right">
-                            <TableActionsGroup maxVisible={3}>
+                          <td className="px-4 py-3 text-center">
+                            <div className="inline-flex items-center justify-center gap-1.5">
                               {canManageAccounts && (
                                 <button
                                   type="button"
                                   onClick={() => handleOpenEditRbac(acc)}
-                                  className="px-2.5 py-1 rounded-md text-[11px] font-bold text-[#002B70] bg-blue-50 hover:bg-blue-100 transition cursor-pointer"
-                                  title="Chỉnh sửa vai trò & phạm vi dữ liệu"
+                                  className="w-8 h-8 rounded-lg inline-flex items-center justify-center text-blue-600 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 transition cursor-pointer"
+                                  title="Phân quyền & Chỉnh sửa chức vụ"
                                 >
-                                  Phân quyền
+                                  <Pencil className="w-3.5 h-3.5" />
                                 </button>
                               )}
                               {canManageAccounts && !isSuper && (
                                 <button
                                   type="button"
                                   onClick={() => handleResetUserPassword(acc.id, acc.email)}
-                                  className="px-2.5 py-1 rounded-md text-[11px] font-medium text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition cursor-pointer"
+                                  className="w-8 h-8 rounded-lg inline-flex items-center justify-center text-amber-600 hover:bg-amber-50 border border-slate-200 hover:border-amber-300 transition cursor-pointer"
                                   title="Đặt lại mật khẩu"
                                 >
-                                  Đặt lại MK
+                                  <KeyRound className="w-3.5 h-3.5" />
                                 </button>
                               )}
                               {canManageAccounts && !isSuper && (
                                 <button
                                   type="button"
                                   onClick={() => handleToggleUserStatus(acc.id, acc.status)}
-                                  className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition cursor-pointer ${
+                                  className={`w-8 h-8 rounded-lg inline-flex items-center justify-center border border-slate-200 transition cursor-pointer ${
                                     isActive
-                                      ? "text-rose-600 bg-rose-50 hover:bg-rose-100"
-                                      : "text-emerald-700 bg-emerald-50 hover:bg-emerald-100"
+                                      ? "text-rose-600 hover:bg-rose-50 hover:border-rose-300"
+                                      : "text-emerald-700 hover:bg-emerald-50 hover:border-emerald-300"
                                   }`}
                                   title={isActive ? "Khóa tài khoản" : "Mở khóa tài khoản"}
                                 >
-                                  {isActive ? "Khóa" : "Mở"}
+                                  {isActive ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
                                 </button>
                               )}
-                            </TableActionsGroup>
+                              {canManageAccounts && !isSuper && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteUser(acc.id, acc.name || acc.username)}
+                                  className="w-8 h-8 rounded-lg inline-flex items-center justify-center text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-300 transition cursor-pointer"
+                                  title="Xóa tài khoản người dùng"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       );
@@ -1455,6 +1669,201 @@ function MasterAdminPortal() {
                 </tbody>
               </table>
             </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB 4: [4. QUẢN LÝ BAN CHUYÊN MÔN]                                        */}
+        {/* ========================================================================= */}
+        {activeTab === "departments" && (
+          <div className="space-y-6">
+            <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <div className="text-[11px] font-bold uppercase tracking-wider text-amber-600">
+                  Cơ Cấu Tổ Chức Nền Tảng
+                </div>
+                <h2 className="text-lg font-black text-[#002B70] mt-0.5">
+                  Quản Lý Ban Chuyên Môn CEO HN10
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Quản lý danh sách 7 Ban chuyên trách chuẩn, chỉnh sửa tên ban và đồng bộ trực tiếp sang CRM &amp; App.
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    saveCustomDepartments(INITIAL_DEPARTMENTS);
+                    setDepartmentsList(INITIAL_DEPARTMENTS);
+                    dispatchPermissionSyncEvent();
+                    toast.success("Đã khôi phục đúng 7 Ban chuyên trách chuẩn CEO HN10!");
+                  }}
+                  className="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-semibold text-slate-700 cursor-pointer transition"
+                >
+                  Khôi phục 7 Ban chuẩn
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDeptEditing(null);
+                    setDeptForm({ code: "", name: "", description: "", color: "blue" });
+                    setDeptModalOpen(true);
+                  }}
+                  className="px-3.5 py-2 rounded-xl bg-[#002B70] hover:bg-[#003B95] text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs transition"
+                >
+                  <Plus className="w-4 h-4" /> Thêm Ban Mới
+                </button>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead className="bg-slate-50 text-slate-600 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                    <tr>
+                      <th className="py-3 px-4 w-12 text-center">STT</th>
+                      <th className="py-3 px-4">Mã Ban</th>
+                      <th className="py-3 px-4">Tên Ban Chuyên Môn</th>
+                      <th className="py-3 px-4">Mô Tả Chức Năng</th>
+                      <th className="py-3 px-4 text-center">Thao Tác</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {departmentsList.map((dept, idx) => (
+                      <tr key={dept.id} className="hover:bg-slate-50/70 transition">
+                        <td className="py-3 px-4 text-center font-mono text-slate-400 font-bold">{idx + 1}</td>
+                        <td className="py-3 px-4 font-mono font-bold text-[#002B70]">{dept.code}</td>
+                        <td className="py-3 px-4 font-bold text-slate-900">{dept.name}</td>
+                        <td className="py-3 px-4 text-slate-600">{dept.description || "—"}</td>
+                        <td className="py-3 px-4 text-center">
+                          <div className="inline-flex items-center justify-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setDeptEditing(dept);
+                                setDeptForm({
+                                  code: dept.code,
+                                  name: dept.name,
+                                  description: dept.description || "",
+                                  color: dept.color || "blue",
+                                });
+                                setDeptModalOpen(true);
+                              }}
+                              className="w-8 h-8 rounded-lg inline-flex items-center justify-center text-blue-600 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 transition cursor-pointer"
+                              title="Chỉnh sửa tên ban"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const next = departmentsList.filter((d) => d.id !== dept.id);
+                                saveCustomDepartments(next);
+                                setDepartmentsList(next);
+                                dispatchPermissionSyncEvent();
+                                toast.success(`Đã xóa ban "${dept.name}"`);
+                              }}
+                              className="w-8 h-8 rounded-lg inline-flex items-center justify-center text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-300 transition cursor-pointer"
+                              title="Xóa ban"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {deptModalOpen && (
+              <Dialog open={deptModalOpen} onOpenChange={setDeptModalOpen}>
+                <DialogContent className="max-w-md bg-white text-slate-900">
+                  <DialogHeader>
+                    <DialogTitle className="text-base font-bold text-[#002B70]">
+                      {deptEditing ? "Chỉnh sửa Ban chuyên môn" : "Thêm Ban chuyên môn mới"}
+                    </DialogTitle>
+                    <DialogDescription className="text-xs text-slate-500">
+                      Thay đổi sẽ đồng bộ sang phân quyền và danh sách ban toàn hệ thống.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-3 text-xs">
+                    <div>
+                      <Label className="text-xs font-bold">Mã Ban (VD: BCN, BTT...)</Label>
+                      <Input
+                        value={deptForm.code}
+                        onChange={(e) => setDeptForm({ ...deptForm, code: e.target.value.toUpperCase() })}
+                        placeholder="BCN"
+                        className="mt-1 h-9 text-xs font-mono"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs font-bold">Tên Ban Chuyên Môn</Label>
+                      <Input
+                        value={deptForm.name}
+                        onChange={(e) => setDeptForm({ ...deptForm, name: e.target.value })}
+                        placeholder="Ban Công nghệ"
+                        className="mt-1 h-9 text-xs"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs font-bold">Mô Tả</Label>
+                      <Input
+                        value={deptForm.description}
+                        onChange={(e) => setDeptForm({ ...deptForm, description: e.target.value })}
+                        placeholder="Mô tả chức năng nhiệm vụ..."
+                        className="mt-1 h-9 text-xs"
+                      />
+                    </div>
+                    <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                      <Button type="button" variant="outline" size="sm" onClick={() => setDeptModalOpen(false)}>
+                        Hủy
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="bg-[#002B70] text-white"
+                        onClick={() => {
+                          if (!deptForm.name.trim() || !deptForm.code.trim()) {
+                            toast.error("Vui lòng nhập đầy đủ Mã ban và Tên ban");
+                            return;
+                          }
+                          let next: DepartmentItem[];
+                          if (deptEditing) {
+                            next = departmentsList.map((d) =>
+                              d.id === deptEditing.id
+                                ? { ...d, code: deptForm.code.trim(), name: deptForm.name.trim(), description: deptForm.description.trim() }
+                                : d
+                            );
+                            toast.success(`Đã cập nhật tên ban thành "${deptForm.name.trim()}"`);
+                          } else {
+                            next = [
+                              ...departmentsList,
+                              {
+                                id: `dept_${Date.now()}`,
+                                code: deptForm.code.trim(),
+                                name: deptForm.name.trim(),
+                                description: deptForm.description.trim(),
+                                color: deptForm.color,
+                                isCore: false,
+                              },
+                            ];
+                            toast.success(`Đã thêm ban "${deptForm.name.trim()}"`);
+                          }
+                          saveCustomDepartments(next);
+                          setDepartmentsList(next);
+                          dispatchPermissionSyncEvent();
+                          setDeptModalOpen(false);
+                        }}
+                      >
+                        Lưu Thay Đổi
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
         )}
 
@@ -1475,7 +1884,7 @@ function MasterAdminPortal() {
                 }`}
               >
                 <CreditCard className="w-4 h-4 text-purple-600" />
-                <span>Cổng Thanh Toán Sepay (Dynamic)</span>
+                <span>Cổng Thanh Toán SePay</span>
               </button>
 
               <button
@@ -1641,10 +2050,10 @@ function MasterAdminPortal() {
                     </div>
                     <div>
                       <h3 className="text-sm font-bold text-slate-900">
-                        Cấu Hình Tích Hợp Cổng Thanh Toán Sepay (Dynamic Master Admin)
+                        Cấu Hình Tích Hợp Cổng Thanh Toán SePay
                       </h3>
                       <p className="text-xs text-slate-500 mt-0.5">
-                        Đưa cấu hình cổng thanh toán ra bên ngoài CRM · Tự động map và kích hoạt quyền lợi hội viên, vé sự kiện, học phí
+                        Khai báo một lần tại Master Platform · Tự động áp dụng cho toàn hệ thống CLB CEO HN10 (Vé sự kiện, Hội phí, Khóa học, Quản lý Sổ Quỹ)
                       </p>
                     </div>
                   </div>
@@ -1659,19 +2068,68 @@ function MasterAdminPortal() {
                           is_enabled: !sepayFormData.is_enabled,
                         })
                       }
-                      className={`px-3 py-1 rounded-full text-xs font-bold transition flex items-center gap-1.5 ${
+                      className={`px-3 py-1 rounded-full text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
                         sepayFormData.is_enabled
-                          ? "bg-emerald-100 text-emerald-700"
-                          : "bg-slate-100 text-slate-500"
+                          ? "bg-emerald-100 text-emerald-700 border border-emerald-300"
+                          : "bg-slate-100 text-slate-500 border border-slate-200"
                       }`}
                     >
                       <Power className="w-3.5 h-3.5" />
-                      <span>{sepayFormData.is_enabled ? "Đang Bật" : "Đã Tắt"}</span>
+                      <span>{sepayFormData.is_enabled ? "Đang Bật (Hoạt động)" : "Đã Tắt (Tạm dừng)"}</span>
                     </button>
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                {/* Hướng Dẫn Nhanh Kết Nối Với my.sepay.vn */}
+                <div className="p-4 rounded-xl border border-blue-200 bg-gradient-to-r from-blue-50/70 via-indigo-50/40 to-purple-50/70 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-blue-950 uppercase tracking-wider flex items-center gap-1.5">
+                      <Globe className="w-4 h-4 text-blue-600" />
+                      Thông Số Khai Báo Webhook Trên Cổng my.sepay.vn
+                    </span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200">
+                      Webhook Chuẩn Enterprise
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                    <div className="p-2.5 rounded-lg bg-white/80 border border-blue-100 space-y-1">
+                      <span className="text-[11px] font-bold text-slate-600">URL nhận Webhook:</span>
+                      <div className="flex items-center justify-between gap-2">
+                        <code className="text-[11px] font-mono text-blue-700 truncate select-all">
+                          {currentWebhookUrl}
+                        </code>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(currentWebhookUrl);
+                            toast.success(`Đã copy Webhook URL: ${currentWebhookUrl}`);
+                          }}
+                          className="p-1 rounded hover:bg-slate-100 text-slate-500 hover:text-blue-600 transition cursor-pointer shrink-0"
+                          title="Copy URL"
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-white/80 border border-blue-100 space-y-1">
+                      <span className="text-[11px] font-bold text-slate-600">Phương thức xác thực &amp; Loại GD:</span>
+                      <div className="text-[11px] text-slate-700 font-medium">
+                        Chọn <span className="font-bold text-purple-700">API Key</span> (hoặc HMAC-SHA256) · Loại: <span className="font-bold text-emerald-700">Tiền vào</span>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-slate-600 leading-relaxed">
+                    💡 <span className="font-semibold text-slate-800">Cơ chế tự động 100%:</span> Khi lưu cấu hình tại đây, tài khoản ngân hàng sẽ được tự động đồng bộ sang toàn bộ hệ thống (CRM Thu/Chi Quỹ, Sổ quỹ, Vé sự kiện, Học phí). Hệ thống tự động nhận diện mã vé <code className="px-1 py-0.5 rounded bg-blue-100 text-blue-900 font-bold">CEO1983_EVT_[ID]</code> và phát hành vé điện tử tức thì.
+                  </p>
+                </div>
+
+                <div className="space-y-6">
+                  {/* Chống Browser Chrome Password Manager tự động Autofill Username/Password vào form SePay */}
+                  <div className="hidden" aria-hidden="true">
+                    <input type="text" name="prevent_autofill_username" tabIndex={-1} autoComplete="off" />
+                    <input type="password" name="prevent_autofill_password" tabIndex={-1} autoComplete="off" />
+                  </div>
+
                   {/* Thông tin tài khoản nhận tiền */}
                   <div className="p-4 rounded-xl border border-purple-100 bg-purple-50/40 space-y-3">
                     <h4 className="text-xs font-bold text-purple-900 uppercase tracking-wider flex items-center gap-1.5">
@@ -1682,17 +2140,23 @@ function MasterAdminPortal() {
                       <div className="space-y-1">
                         <Label className="text-[11px] text-slate-700 font-semibold">Tên Ngân Hàng</Label>
                         <Input
-                          placeholder="VD: MBBank, Vietcombank..."
+                          id="sepay_bank_brand_name"
+                          name="sepay_bank_brand_name"
+                          autoComplete="off"
+                          placeholder="VD: VPBank, MBBank, Vietcombank..."
                           value={sepayFormData.bank_brand_name || ""}
                           onChange={(e) =>
                             setSepayFormData({ ...sepayFormData, bank_brand_name: e.target.value })
                           }
-                          className="bg-white border-slate-300 text-xs h-9"
+                          className="bg-white border-slate-300 text-xs h-9 font-semibold"
                         />
                       </div>
                       <div className="space-y-1">
                         <Label className="text-[11px] text-slate-700 font-semibold">Số Tài Khoản</Label>
                         <Input
+                          id="sepay_bank_acc_number"
+                          name="sepay_bank_acc_number"
+                          autoComplete="off"
                           placeholder="VD: 100000000000"
                           value={sepayFormData.account_number || ""}
                           onChange={(e) =>
@@ -1704,7 +2168,12 @@ function MasterAdminPortal() {
                       <div className="space-y-1">
                         <Label className="text-[11px] text-slate-700 font-semibold">Tên Chủ Tài Khoản</Label>
                         <Input
-                          placeholder="VD: CLB DOANH NHAN CEO HN10"
+                          id="sepay_account_owner_name"
+                          name="sepay_bank_account_owner"
+                          autoComplete="new-password"
+                          data-lpignore="true"
+                          data-form-type="other"
+                          placeholder="VD: PHAM VAN VU hoặc CLB DOANH NHAN CEO HN10"
                           value={sepayFormData.account_name || ""}
                           onChange={(e) =>
                             setSepayFormData({ ...sepayFormData, account_name: e.target.value })
@@ -1718,108 +2187,248 @@ function MasterAdminPortal() {
                   {/* API Token & Secret */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <Label className="text-xs text-slate-700 font-semibold">Sepay API Token</Label>
-                      <Input
-                        type="password"
-                        placeholder="VD: SPY_live_xxxxxxxxxxxxxxxx"
-                        value={sepayFormData.api_token || ""}
-                        onChange={(e) =>
-                          setSepayFormData({ ...sepayFormData, api_token: e.target.value })
-                        }
-                        className="bg-white border-slate-300 text-xs h-9"
-                      />
+                      <Label className="text-xs text-slate-700 font-semibold">SePay API Token (Dùng tạo mã QR động &amp; Tra cứu GD)</Label>
+                      <div className="relative">
+                        <Input
+                          id="sepay_api_secret_token"
+                          name="sepay_api_secret_token"
+                          type={showApiToken ? "text" : "password"}
+                          autoComplete="new-password"
+                          data-lpignore="true"
+                          placeholder="VD: SPY_live_xxxxxxxxxxxxxxxx"
+                          value={sepayFormData.api_token || ""}
+                          onChange={(e) =>
+                            setSepayFormData({ ...sepayFormData, api_token: e.target.value })
+                          }
+                          className="bg-white border-slate-300 text-xs h-9 font-mono pr-10"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowApiToken(!showApiToken)}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                          title={showApiToken ? "Ẩn Token" : "Hiện Token"}
+                        >
+                          {showApiToken ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label className="text-xs text-slate-700 font-semibold">Sepay Webhook Secret Token</Label>
-                      <Input
-                        type="password"
-                        placeholder="VD: whsec_xxxxxxxxxxxxxxxx"
-                        value={sepayFormData.webhook_token || ""}
-                        onChange={(e) =>
-                          setSepayFormData({ ...sepayFormData, webhook_token: e.target.value })
-                        }
-                        className="bg-white border-slate-300 text-xs h-9"
-                      />
+                      <Label className="text-xs text-slate-700 font-semibold">SePay Webhook Secret Key / API Key (Khóa bí mật xác thực)</Label>
+                      <div className="relative">
+                        <Input
+                          id="sepay_webhook_api_key"
+                          name="sepay_webhook_api_key"
+                          type={showWebhookSecret ? "text" : "password"}
+                          autoComplete="new-password"
+                          data-lpignore="true"
+                          placeholder="VD: ceohn10_sepay_event_test_2026"
+                          value={sepayFormData.webhook_token || ""}
+                          onChange={(e) =>
+                            setSepayFormData({ ...sepayFormData, webhook_token: e.target.value })
+                          }
+                          className="bg-white border-slate-300 text-xs h-9 font-mono font-bold pr-10"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowWebhookSecret(!showWebhookSecret)}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                          title={showWebhookSecret ? "Ẩn Secret Key" : "Hiện Secret Key"}
+                        >
+                          {showWebhookSecret ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
                     </div>
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-xs text-slate-700 font-semibold">Webhook Callback Endpoint URL</Label>
+                    <div className="flex items-center justify-between">
+                      <Label className="text-xs text-slate-700 font-semibold">Webhook Callback Endpoint URL (Đường dẫn nhận thông báo biến động số dư)</Label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSepayFormData({ ...sepayFormData, webhook_url: dynamicDefaultWebhookUrl });
+                          toast.success(`Đã đặt URL Webhook theo domain hiện tại: ${dynamicDefaultWebhookUrl}`);
+                        }}
+                        className="text-[11px] font-bold text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2 py-0.5 rounded cursor-pointer transition flex items-center gap-1"
+                      >
+                        🔄 Tự động lấy URL domain hiện tại
+                      </button>
+                    </div>
                     <Input
+                      id="sepay_webhook_callback_endpoint"
+                      name="sepay_webhook_callback_endpoint"
+                      autoComplete="off"
+                      placeholder={`VD: ${dynamicDefaultWebhookUrl}`}
                       value={sepayFormData.webhook_url || ""}
                       onChange={(e) =>
                         setSepayFormData({ ...sepayFormData, webhook_url: e.target.value })
                       }
                       className="bg-white border-slate-300 text-xs h-9 font-mono text-slate-700"
                     />
+                    <p className="text-[11px] text-slate-500">
+                      Tự động trỏ theo domain/subdomain hệ thống đang chạy: <code className="text-blue-700 font-semibold">{dynamicDefaultWebhookUrl}</code> (Nếu để trống, hệ thống tự động áp dụng URL này).
+                    </p>
                   </div>
 
-                  {/* Cú pháp tiền tố chuyển khoản */}
-                  <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/70 space-y-3">
-                    <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                      Cú Pháp Tiền Tố Nhận Diện Tự Động
-                    </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <div className="space-y-1">
-                        <Label className="text-[11px] text-slate-600 font-medium">Đóng Hội phí Học viên</Label>
-                        <Input
-                          value={sepayFormData.prefix_syntax?.membership || "CEOHN10_HP"}
-                          onChange={(e) =>
-                            setSepayFormData({
-                              ...sepayFormData,
-                              prefix_syntax: {
-                                ...sepayFormData.prefix_syntax,
-                                membership: e.target.value,
-                              },
-                            })
-                          }
-                          className="bg-white border-slate-300 text-xs h-8 font-mono font-bold text-amber-700"
-                        />
+                  {/* BẢNG CẤU HÌNH ĐA KHOẢN THU & PHÍ PHÁT SINH TOÀN HỆ THỐNG (ĐỘNG 100%) */}
+                  <div className="p-4 rounded-xl border border-blue-200 bg-blue-50/30 space-y-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-blue-100 pb-3">
+                      <div>
+                        <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                          <Coins className="w-4 h-4 text-blue-700" />
+                          <span>Danh Mục Các Khoản Thu &amp; Phí Phát Sinh Toàn Hệ Thống (Động 100%)</span>
+                        </h4>
+                        <p className="text-[11px] text-slate-500 mt-0.5">
+                          Tự động nhận diện dòng tiền SePay theo Mã Tiền Tố, hạch toán đúng Quỹ đích và thực thi nghiệp vụ tự động tức thì.
+                        </p>
                       </div>
-                      <div className="space-y-1">
-                        <Label className="text-[11px] text-slate-600 font-medium">Vé Tham gia Sự kiện</Label>
-                        <Input
-                          value={sepayFormData.prefix_syntax?.event || "CEOHN10_SK"}
-                          onChange={(e) =>
-                            setSepayFormData({
-                              ...sepayFormData,
-                              prefix_syntax: {
-                                ...sepayFormData.prefix_syntax,
-                                event: e.target.value,
-                              },
-                            })
-                          }
-                          className="bg-white border-slate-300 text-xs h-8 font-mono font-bold text-[#002B70]"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-[11px] text-slate-600 font-medium">Học phí Khóa học / Lớp</Label>
-                        <Input
-                          value={sepayFormData.prefix_syntax?.course || "CEOHN10_LH"}
-                          onChange={(e) =>
-                            setSepayFormData({
-                              ...sepayFormData,
-                              prefix_syntax: {
-                                ...sepayFormData.prefix_syntax,
-                                course: e.target.value,
-                              },
-                            })
-                          }
-                          className="bg-white border-slate-300 text-xs h-8 font-mono font-bold text-emerald-700"
-                        />
-                      </div>
+                      <Button
+                        type="button"
+                        onClick={handleAddFeeCategory}
+                        className="bg-blue-600 hover:bg-blue-700 text-white text-xs h-8 px-3 gap-1.5 font-bold shadow-sm cursor-pointer"
+                      >
+                        <PlusCircle className="w-3.5 h-3.5" />
+                        <span>+ Thêm Khoản Thu / Loại Phí Mới</span>
+                      </Button>
+                    </div>
+
+                    <div className="space-y-3">
+                      {(sepayFormData.fee_categories || DEFAULT_FEE_CATEGORIES).map((cat: any, idx: number) => (
+                        <div
+                          key={cat.id || idx}
+                          className={`p-3.5 rounded-lg border transition ${
+                            cat.is_active !== false
+                              ? "bg-white border-slate-200 shadow-xs"
+                              : "bg-slate-100 border-slate-200 opacity-60"
+                          }`}
+                        >
+                          <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+                            {/* Tên khoản phí */}
+                            <div className="md:col-span-3 space-y-1">
+                              <Label className="text-[10px] text-slate-500 font-semibold uppercase">Tên Khoản Thu / Loại Phí</Label>
+                              <Input
+                                value={cat.name || ""}
+                                onChange={(e) => handleUpdateFeeCategory(cat.id, "name", e.target.value)}
+                                placeholder="VD: Vé sự kiện, Phí gia nhập..."
+                                className="bg-white border-slate-300 text-xs h-8 font-semibold"
+                              />
+                            </div>
+
+                            {/* Mã tiền tố SePay */}
+                            <div className="md:col-span-2 space-y-1">
+                              <Label className="text-[10px] text-slate-500 font-semibold uppercase">Mã Tiền Tố SePay</Label>
+                              <Input
+                                value={cat.prefix || ""}
+                                onChange={(e) =>
+                                  handleUpdateFeeCategory(cat.id, "prefix", e.target.value.toUpperCase().replace(/\s+/g, "_"))
+                                }
+                                placeholder="VD: CEOHN10_XYZ"
+                                className="bg-white border-slate-300 text-xs h-8 font-mono font-bold text-blue-900"
+                              />
+                            </div>
+
+                            {/* Quỹ đích tiếp nhận */}
+                            <div className="md:col-span-3 space-y-1">
+                              <Label className="text-[10px] text-slate-500 font-semibold uppercase">Quỹ Đích Nhận Tiền</Label>
+                              <Select
+                                value={cat.target_fund_name || "Quỹ Tổng CLB CEO HN10"}
+                                onValueChange={(val) => handleUpdateFeeCategory(cat.id, "target_fund_name", val)}
+                              >
+                                <SelectTrigger className="bg-white border-slate-300 text-xs h-8">
+                                  <SelectValue placeholder="Chọn Quỹ tiếp nhận" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="Quỹ Sự Kiện & Hậu Cần">Quỹ Sự Kiện &amp; Hậu Cần</SelectItem>
+                                  <SelectItem value="Quỹ Tổng CLB CEO HN10">Quỹ Tổng CLB CEO HN10</SelectItem>
+                                  <SelectItem value="Quỹ Ban Học Tập & Đào Tạo">Quỹ Ban Học Tập &amp; Đào Tạo</SelectItem>
+                                  <SelectItem value="Quỹ Tài Trợ & Đối Ngoại">Quỹ Tài Trợ &amp; Đối Ngoại</SelectItem>
+                                  <SelectItem value="Quỹ Thiện Nguyện CLB">Quỹ Thiện Nguyện CLB</SelectItem>
+                                  <SelectItem value="Quỹ Ban Xúc Tiến Thương Mại B2B">Quỹ Ban Xúc Tiến B2B</SelectItem>
+                                  <SelectItem value="Quỹ Vận Hành & Khác">Quỹ Vận Hành &amp; Khác</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            {/* Hành động nghiệp vụ */}
+                            <div className="md:col-span-3 space-y-1">
+                              <Label className="text-[10px] text-slate-500 font-semibold uppercase">Hành Động Nghiệp Vụ Tự Động</Label>
+                              <Select
+                                value={cat.action_type || "custom"}
+                                onValueChange={(val) => handleUpdateFeeCategory(cat.id, "action_type", val)}
+                              >
+                                <SelectTrigger className="bg-white border-slate-300 text-xs h-8">
+                                  <SelectValue placeholder="Chọn hành động" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="event_ticket">Vé Sự Kiện: Tự duyệt vé &amp; cấp QR HMAC</SelectItem>
+                                  <SelectItem value="membership_join">Phí Gia Nhập: Duyệt hội viên &amp; thẻ số 3D</SelectItem>
+                                  <SelectItem value="membership_annual">Hội Phí: Gia hạn niên liễm &amp; gạch nợ hóa đơn</SelectItem>
+                                  <SelectItem value="course_enroll">Học Phí: Ghi danh lớp &amp; mở khóa tài liệu</SelectItem>
+                                  <SelectItem value="sponsorship">Tài Trợ: Kích hoạt quyền lợi &amp; Logo App</SelectItem>
+                                  <SelectItem value="charity">Thiện Nguyện: Ghi sổ Quỹ &amp; Vinh danh</SelectItem>
+                                  <SelectItem value="b2b_expo">Gian Hàng B2B: Mở gian hàng số 1-on-1</SelectItem>
+                                  <SelectItem value="custom">Khoản Phí Khác: Tự động ghi Sổ Quỹ</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            {/* Nút bật tắt & Xóa */}
+                            <div className="md:col-span-1 flex items-center justify-end gap-1.5 pt-3 md:pt-4">
+                              <button
+                                type="button"
+                                onClick={() => handleUpdateFeeCategory(cat.id, "is_active", cat.is_active === false)}
+                                className={`text-[10px] font-bold px-2 py-1 rounded cursor-pointer transition ${
+                                  cat.is_active !== false
+                                    ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
+                                    : "bg-slate-200 text-slate-600 hover:bg-slate-300"
+                                }`}
+                                title={cat.is_active !== false ? "Đang bật (Bấm để tắt)" : "Đang tắt (Bấm để bật)"}
+                              >
+                                {cat.is_active !== false ? "Bật" : "Tắt"}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveFeeCategory(cat.id)}
+                                className="p-1 rounded text-slate-400 hover:text-red-600 hover:bg-red-50 transition cursor-pointer"
+                                title="Xóa khoản phí này"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
-                  <div className="flex justify-end pt-2">
+                  {/* Khu vực nút Lưu Cấu Hình SePay (Chỉ kích hoạt khi đã điền đủ thông tin) */}
+                  <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-xs flex flex-wrap items-center justify-between gap-3">
+                    <div className="text-xs">
+                      {!isSepayReadyToSave ? (
+                        <div className="flex items-center gap-2 text-amber-700 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200">
+                          <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                          <span>Vui lòng điền đủ <strong>Tên Ngân Hàng</strong>, <strong>Số Tài Khoản</strong>, <strong>Tên Chủ TK</strong> và <strong>Secret Key</strong> để kích hoạt nút Lưu.</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <span>Thông tin đã nhập đầy đủ hợp lệ. Sẵn sàng lưu và áp dụng tự động cho toàn hệ thống.</span>
+                        </div>
+                      )}
+                    </div>
                     <Button
+                      type="button"
                       onClick={handleSaveSepay}
-                      disabled={isSavingSepay}
-                      className="bg-[#002B70] hover:bg-[#003B95] text-white text-xs h-9 px-5 gap-2 font-bold shadow-sm"
+                      disabled={!isSepayReadyToSave || isSavingSepay}
+                      className={`text-xs h-9 px-6 gap-2 font-bold shadow-sm transition ${
+                        isSepayReadyToSave && !isSavingSepay
+                          ? "bg-[#002B70] hover:bg-[#003B95] text-white cursor-pointer"
+                          : "bg-slate-200 text-slate-400 border border-slate-300 cursor-not-allowed opacity-60"
+                      }`}
                     >
                       <CheckCircle2 className="w-4 h-4" />
-                      <span>{isSavingSepay ? "Đang lưu..." : "Lưu Cấu Hình Sepay"}</span>
+                      <span>{isSavingSepay ? "Đang lưu cấu hình..." : "Lưu Cấu Hình SePay"}</span>
                     </Button>
                   </div>
                 </div>
@@ -1836,10 +2445,10 @@ function MasterAdminPortal() {
                     </div>
                     <div>
                       <h3 className="text-sm font-bold text-slate-900">
-                        Cấu Hình Tích Hợp Zalo Official Account &amp; ZBS (Master Admin)
+                        Cấu Hình Tích Hợp Zalo Official Account &amp; ZBS
                       </h3>
                       <p className="text-xs text-slate-500 mt-0.5">
-                        Kết nối Zalo OA, tự động gửi thư mời sự kiện, nhắc lịch học, thông báo hội phí và tin ZNS
+                        Kết nối Zalo OA, tự động gửi thư mời sự kiện, mã vé QR Check-in, thông báo hội phí và chăm sóc hội viên
                       </p>
                     </div>
                   </div>

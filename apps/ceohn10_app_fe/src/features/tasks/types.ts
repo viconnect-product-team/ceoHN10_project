@@ -165,13 +165,13 @@ export interface TaskItem {
 }
 
 export const TASK_DEPARTMENTS = [
-  'Ban Học tập',
-  'Ban Sự kiện & Hậu cần',
-  'Ban Tài chính & Tài trợ',
-  'Ban Truyền thông',
   'Ban Công nghệ',
+  'Ban Truyền thông',
+  'Ban Tài chính',
+  'Ban Sự kiện & Hậu cần',
   'Ban Đối ngoại & Giao thương',
-  'Ban Đời sống & Gắn kết thành viên',
+  'Ban Gắn kết & Đời sống',
+  'Ban Học tập',
 ] as const;
 
 export const TASK_STATUS_CONFIG: Record<

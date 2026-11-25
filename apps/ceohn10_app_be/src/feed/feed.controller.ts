@@ -75,7 +75,7 @@ export class FeedController {
     });
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(OptionalJwtAuthGuard)
   @Post()
   async createPost(
     @Request() req: any,
@@ -87,13 +87,14 @@ export class FeedController {
       department?: string;
       images?: string[];
       privacy?: string;
+      sharedArticle?: any;
     },
   ) {
     const userId = req.user?.id || req.user?.sub || 'system';
     return this.feedService.createPost(userId, body);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(OptionalJwtAuthGuard)
   @Post(':id/like')
   async toggleLike(@Request() req: any, @Param('id') id: string) {
     const userId = req.user?.id || req.user?.sub || 'anonymous';
@@ -106,7 +107,7 @@ export class FeedController {
     return this.feedService.listComments(id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(OptionalJwtAuthGuard)
   @Post(':id/comments')
   async addComment(
     @Request() req: any,
