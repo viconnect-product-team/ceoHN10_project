@@ -4725,6 +4725,8 @@ export class EventsService extends BaseService implements OnModuleInit {
         created_at timestamp with time zone DEFAULT now()
       )
     `).catch(() => {});
+    await this.prisma.$executeRawUnsafe(`ALTER TABLE public.event_feedback ALTER COLUMN id TYPE TEXT USING id::text`).catch(() => {});
+    await this.prisma.$executeRawUnsafe(`ALTER TABLE public.event_feedback ALTER COLUMN event_id TYPE TEXT USING event_id::text`).catch(() => {});
     await this.prisma.$executeRawUnsafe(`ALTER TABLE public.event_feedback ADD COLUMN IF NOT EXISTS comment TEXT`).catch(() => {});
     await this.prisma.$executeRawUnsafe(`ALTER TABLE public.event_feedback ADD COLUMN IF NOT EXISTS content TEXT`).catch(() => {});
     await this.prisma.$executeRawUnsafe(`ALTER TABLE public.event_feedback ADD COLUMN IF NOT EXISTS feedback_text TEXT`).catch(() => {});

@@ -90,6 +90,7 @@ export class DocumentsRepository {
         uploaded_at TIMESTAMPTZ DEFAULT NOW()
       )
     `).catch(() => {});
+    await this.prisma.$executeRawUnsafe(`ALTER TABLE public.documents ALTER COLUMN id TYPE TEXT USING id::text`).catch(() => {});
     const ensureCols = [
       `ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS code TEXT`,
       `ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS folder_id TEXT`,

@@ -1227,57 +1227,6 @@ function StandaloneGuestEventRegistrationPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* MÃ HỌC VIÊN CLB CEO HN10 (TÙY CHỌN - TỰ ĐỘNG ĐIỀN THÔNG TIN) */}
-          <div className="bg-gradient-to-r from-blue-50/80 via-white to-amber-50/60 rounded-3xl shadow-xs border-2 border-[#003B95]/20 p-6 sm:p-7 space-y-3">
-            <div className="flex items-center justify-between">
-              <label className="block text-sm sm:text-base font-bold text-[#003B95]">
-                ✦ Bạn là Học viên CLB CEO HN10?
-              </label>
-              <span className="text-[11px] font-semibold bg-blue-100 text-[#003B95] px-2.5 py-0.5 rounded-full">
-                Không bắt buộc
-              </span>
-            </div>
-            <p className="text-xs text-slate-500">
-              Nhập mã học viên (do bạn tự khai báo, VD: <code className="font-bold text-[#003B95]">HN10-0001</code>) để hệ thống tự động điền hồ sơ đại biểu mà không cần nhập lại.
-            </p>
-            <div className="flex gap-2 pt-1">
-              <div className="relative flex-1">
-                <Tag className="w-4 h-4 text-[#003B95] absolute left-3.5 top-3.5" />
-                <input
-                  type="text"
-                  placeholder="Nhập mã học viên (VD: HN10-0001)..."
-                  value={memberCode}
-                  onChange={(e) => setMemberCode(e.target.value.toUpperCase())}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      void handleLookupMemberCode(memberCode);
-                    }
-                  }}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-blue-200 text-sm uppercase font-mono font-bold focus:outline-none focus:ring-2 focus:ring-[#003B95] bg-white transition"
-                />
-              </div>
-              <button
-                type="button"
-                disabled={isSearchingCode || !memberCode.trim()}
-                onClick={() => void handleLookupMemberCode(memberCode)}
-                className="px-4 py-2.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm disabled:opacity-50 cursor-pointer"
-              >
-                {isSearchingCode ? (
-                  <span className="animate-spin">↻</span>
-                ) : (
-                  <span>Tra cứu & Tự động điền</span>
-                )}
-              </button>
-            </div>
-            {codeLookupSuccess && (
-              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-medium text-emerald-800 flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>{codeLookupSuccess}</span>
-              </div>
-            )}
-          </div>
-
           {/* TRƯỜNG 1: HỌ VÀ TÊN */}
           <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-7 space-y-3">
             <label className="block text-sm sm:text-base font-bold text-slate-800">
