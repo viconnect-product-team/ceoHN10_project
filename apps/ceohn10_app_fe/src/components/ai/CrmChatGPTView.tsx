@@ -49,6 +49,7 @@ import { fetchNestApi } from "@/lib/api-client";
 import { ViOneAiTutorGuide } from "../common/ViOneAiTutorGuide";
 import { parseMultipleFiles, parseSingleDocument, type ParsedFileResult, type ParsedRecipientItem } from "@/lib/ai-excel-email-parser";
 import { AiExecutionStepTracker, type AgentTaskExecutionPlan } from "./AiExecutionStepTracker";
+import { AiQuickOpsDrawer } from "./AiQuickOpsDrawer";
 import {
   exportToExcel,
   formatDisplayDate,
@@ -698,6 +699,7 @@ export function CrmChatGPTView() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [liveAlert, setLiveAlert] = useState<string | null>(null);
   const [isTutorOpen, setIsTutorOpen] = useState(false);
+  const [quickOpsOpen, setQuickOpsOpen] = useState(false);
 
   // Quản lý đính kèm đa tệp (Excel / Word / PDF / CSV / Text) để AI bóc tách & tự động ra lệnh
   const [attachedFiles, setAttachedFiles] = useState<ParsedFileResult[]>([]);
@@ -1579,8 +1581,41 @@ export function CrmChatGPTView() {
                 </button>
               );
             })}
+            <button
+              type="button"
+              onClick={() => setQuickOpsOpen((v) => !v)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer border ${
+                quickOpsOpen
+                  ? "bg-[#003B95] text-white border-transparent shadow-xs"
+                  : "bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100"
+              }`}
+            >
+              <Workflow className="size-3.5 shrink-0" />
+              <span>Tác Nghiệp Nhanh (Thư mời · HV · GV · Lớp)</span>
+            </button>
           </div>
         </div>
+
+        <AiQuickOpsDrawer
+          open={quickOpsOpen}
+          onClose={() => setQuickOpsOpen(false)}
+          onLogResultToChat={(title, summary) => {
+            const newMsg: ChatMessage = {
+              id: `ai-op-${Date.now()}`,
+              role: "assistant",
+              content: `✅ **${title}**\n\n${summary}`,
+              createdAt: new Date().toISOString(),
+              persona: selectedPersona,
+            };
+            setSessions((prev) =>
+              prev.map((s) =>
+                s.id === currentSessionId
+                  ? { ...s, messages: [...s.messages, newMsg], updatedAt: new Date().toISOString() }
+                  : s
+              )
+            );
+          }}
+        />
 
         {/* Live Proactive Alert Banner (Nếu có) */}
         {liveAlert && (

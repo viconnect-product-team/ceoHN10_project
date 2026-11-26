@@ -1985,12 +1985,22 @@ export class EventsService extends BaseService implements OnModuleInit {
           accountHolder: process.env.SEPAY_ACCOUNT_HOLDER || '',
           prefixEvent: 'CEO1983_EVT',
         };
-    const bankShort = (sepayCfg.bankName || 'MB').toUpperCase().includes('MB') ? 'MB' : (sepayCfg.bankName || 'MB');
+    const bankShort = this.paymentService
+      ? this.paymentService.resolveVietQrBankBin(sepayCfg.bankName)
+      : (sepayCfg.bankName || 'MB');
     // Mã chuyển khoản chuẩn: CEO1983_EVT_[ID]
     const memo = `CEO1983_EVT_${regId}`;
     const vietQrUrl = isFree || !sepayCfg.accountNumber
       ? ''
-      : `https://img.vietqr.io/image/${bankShort}-${sepayCfg.accountNumber}-compact2.png?amount=${totalAmount}&addInfo=${encodeURIComponent(memo)}&accountName=${encodeURIComponent(sepayCfg.accountHolder)}`;
+      : this.paymentService
+      ? this.paymentService.buildVietQrUrl({
+          bankName: sepayCfg.bankName,
+          accountNumber: sepayCfg.accountNumber,
+          accountHolder: sepayCfg.accountHolder,
+          amount: totalAmount,
+          memo,
+        })
+      : `https://img.vietqr.io/image/${encodeURIComponent(bankShort)}-${encodeURIComponent(sepayCfg.accountNumber)}-compact2.png?amount=${totalAmount}&addInfo=${encodeURIComponent(memo)}&accountName=${encodeURIComponent(sepayCfg.accountHolder)}`;
 
     const driveInfo = event.photo_gallery_url
       ? `\n- Link kho ảnh sự kiện (Google Drive): ${event.photo_gallery_url}`
@@ -7303,26 +7313,16 @@ export class EventsService extends BaseService implements OnModuleInit {
       const pubInfo = await this.getPublicInvitation(eventId);
       const cfg = pubInfo.sepayConfig;
       if (cfg.accountNumber) {
-        const rawBank = String(cfg.bankName || 'MB').toUpperCase();
-        const bankShort = rawBank.includes('VPB') || rawBank.includes('VPBANK')
-          ? 'VPB'
-          : rawBank.includes('VIETCOM') || rawBank.includes('VCB')
-          ? 'VCB'
-          : rawBank.includes('TECHCOM') || rawBank.includes('TCB')
-          ? 'TCB'
-          : rawBank.includes('MB')
-          ? 'MB'
-          : rawBank.includes('ACB')
-          ? 'ACB'
-          : rawBank.includes('BIDV')
-          ? 'BIDV'
-          : rawBank.includes('VIETIN') || rawBank.includes('CTG')
-          ? 'CTG'
-          : rawBank.includes('TPB')
-          ? 'TPB'
-          : cfg.bankName;
         transferContent = `${cfg.prefixEvent}_${regId}`;
-        vietQrUrl = `https://img.vietqr.io/image/${encodeURIComponent(bankShort)}-${encodeURIComponent(cfg.accountNumber)}-compact2.png?amount=${totalFee}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(cfg.accountHolder)}`;
+        vietQrUrl = this.paymentService
+          ? this.paymentService.buildVietQrUrl({
+              bankName: cfg.bankName,
+              accountNumber: cfg.accountNumber,
+              accountHolder: cfg.accountHolder,
+              amount: totalFee,
+              memo: transferContent,
+            })
+          : `https://img.vietqr.io/image/${encodeURIComponent(cfg.bankName || 'MB')}-${encodeURIComponent(cfg.accountNumber)}-compact2.png?amount=${totalFee}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(cfg.accountHolder)}`;
       }
       bankInfo = cfg;
     }

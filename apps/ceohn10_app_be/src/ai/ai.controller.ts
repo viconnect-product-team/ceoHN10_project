@@ -15,6 +15,7 @@ import { AiCrmAnalyticsService } from './ai-crm-analytics.service';
 import { KnowledgeBaseService } from './knowledge-base.service';
 import { AiPermissionService } from './ai-permission.service';
 import { AgentCoreService } from './tools/agent-core.service';
+import { ToolRegistryService } from './tools/tool-registry.service';
 
 @Controller('ai')
 @UseGuards(JwtAuthGuard)
@@ -25,6 +26,7 @@ export class AiController {
     private readonly knowledgeBase: KnowledgeBaseService,
     private readonly aiPermission: AiPermissionService,
     private readonly agentCore: AgentCoreService,
+    private readonly toolRegistry: ToolRegistryService,
   ) {}
 
   /** GET /api/ai/live-context — Ngữ cảnh động tài khoản phiên đăng nhập */
@@ -542,5 +544,20 @@ export class AiController {
   async getAvailableAgentTools() {
     const tools = this.agentCore.getAvailableTools();
     return { ok: true, data: tools };
+  }
+
+  /** POST /api/ai/tools/execute — Thực thi trực tiếp tool AI (tạo thư mời, thêm học viên, giảng viên, lớp học) */
+  @Post('tools/execute')
+  async executeAiTool(
+    @Request() req: any,
+    @Body() body: { toolName: string; params: Record<string, any> },
+  ) {
+    return this.toolRegistry.executeTool(body.toolName, body.params || {}, {
+      userId: req?.user?.id || req?.user?.sub || 'admin',
+      userRole: req?.user?.role || 'admin',
+      userEmail: req?.user?.email,
+      userName: req?.user?.fullName || req?.user?.username,
+      approved: true,
+    });
   }
 }

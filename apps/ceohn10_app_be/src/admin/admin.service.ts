@@ -694,7 +694,8 @@ export class AdminService implements OnModuleInit {
           const invoiceAmount = Number(existing.invoice.amount || 0);
           const invoiceNo = existing.invoice.invoiceNo || id;
           const sepayCfg = await this.getSepayBankConfig();
-          const bankShort = (sepayCfg.bankName || 'MB').toUpperCase().includes('MB') ? 'MB' : (sepayCfg.bankName || 'MB');
+          const rawB = (sepayCfg.bankName || 'MB').toUpperCase();
+          const bankShort = rawB.includes('VPB') ? 'VPB' : rawB.includes('VIETCOM') || rawB.includes('VCB') ? 'VCB' : rawB.includes('TECHCOM') || rawB.includes('TCB') ? 'TCB' : rawB.includes('MB') ? 'MB' : rawB.includes('ACB') ? 'ACB' : rawB.includes('BIDV') ? 'BIDV' : rawB.includes('VIETIN') || rawB.includes('CTG') ? 'CTG' : (sepayCfg.bankName || 'MB');
           const memo = `${sepayCfg.prefixFee}_${invoiceNo}`;
           const sepayQrUrl = sepayCfg.accountNumber
             ? `https://img.vietqr.io/image/${bankShort}-${sepayCfg.accountNumber}-compact2.png?amount=${invoiceAmount}&addInfo=${encodeURIComponent(memo)}&accountName=${encodeURIComponent(sepayCfg.accountHolder)}`

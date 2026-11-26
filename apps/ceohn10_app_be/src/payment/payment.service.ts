@@ -42,6 +42,43 @@ export class PaymentService {
   ) { }
 
   /**
+   * Quy đổi tên ngân hàng sang mã chuẩn VietQR BIN (VPB, VCB, MB, TCB, ACB, BIDV, CTG...)
+   * Dùng chung cho toàn hệ thống (Vé sự kiện, Hội phí CLB, Phí gia nhập, Học phí...).
+   */
+  resolveVietQrBankBin(bankName?: string): string {
+    const raw = String(bankName || 'MB').trim().toUpperCase();
+    if (!raw) return 'MB';
+    if (raw.includes('VPB') || raw.includes('VPBANK')) return 'VPB';
+    if (raw.includes('VIETCOM') || raw.includes('VCB')) return 'VCB';
+    if (raw.includes('TECHCOM') || raw.includes('TCB')) return 'TCB';
+    if (raw.includes('MB') || raw.includes('QUAN DOI')) return 'MB';
+    if (raw.includes('ACB') || raw.includes('A CHAU')) return 'ACB';
+    if (raw.includes('BIDV')) return 'BIDV';
+    if (raw.includes('VIETIN') || raw.includes('CTG')) return 'CTG';
+    if (raw.includes('TPB') || raw.includes('TIEN PHONG')) return 'TPB';
+    if (raw.includes('SACOM') || raw.includes('STB')) return 'STB';
+    if (raw.includes('VIB')) return 'VIB';
+    if (raw.includes('MSB') || raw.includes('HANG HAI')) return 'MSB';
+    if (raw.includes('OCB') || raw.includes('PHUONG DONG')) return 'OCB';
+    if (raw.includes('SHB')) return 'SHB';
+    if (raw.includes('HDB') || raw.includes('HD BANK')) return 'HDB';
+    if (raw.includes('LPB') || raw.includes('LIENVIET') || raw.includes('LPBANK')) return 'LPB';
+    return String(bankName || 'MB').trim();
+  }
+
+  buildVietQrUrl(opts: {
+    bankName?: string;
+    accountNumber?: string;
+    accountHolder?: string;
+    amount: number;
+    memo: string;
+  }): string {
+    if (!opts.accountNumber) return '';
+    const bankBin = this.resolveVietQrBankBin(opts.bankName);
+    return `https://img.vietqr.io/image/${encodeURIComponent(bankBin)}-${encodeURIComponent(opts.accountNumber)}-compact2.png?amount=${Math.max(0, Math.round(Number(opts.amount) || 0))}&addInfo=${encodeURIComponent(opts.memo)}&accountName=${encodeURIComponent(opts.accountHolder || '')}`;
+  }
+
+  /**
    * Lấy cấu hình SePay từ database (master_system_settings / app_settings) hoặc biến môi trường bên ngoài
    */
   async getSepayConfig(): Promise<SePayConfig> {

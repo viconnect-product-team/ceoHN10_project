@@ -2324,6 +2324,263 @@ export class ToolRegistryService {
         }
       },
     });
+
+    // 10. TOOL: create_event_invitation_list (Tạo danh sách khách mời & gửi thư mời sự kiện)
+    this.registerTool({
+      definition: {
+        name: 'create_event_invitation_list',
+        displayName: 'Tạo danh sách khách mời & gửi thư mời vào sự kiện',
+        description:
+          'Lưu danh sách khách mời vào sự kiện cụ thể (eventId) và tùy chọn gửi ngay email thư mời cá nhân hóa có đường dẫn public.',
+        category: 'calendar',
+        safetyLevel: 'EXTERNAL_ACTION',
+        requiredPermission: 'AI_SEND_EMAIL',
+        parameters: {
+          type: 'object',
+          properties: {
+            eventId: { type: 'string', description: 'Mã sự kiện mục tiêu (VD: EV-...)' },
+            guests: { type: 'array', description: 'Danh sách [{ fullName, email, phone, company, title, guestType }]' },
+            sendEmail: { type: 'boolean', description: 'Có gửi ngay email thư mời không (mặc định true)' },
+          },
+          required: ['eventId', 'guests'],
+        },
+        returns: { type: 'object', description: 'Kết quả lưu danh sách & gửi thư mời' },
+      },
+      execute: async (params) => {
+        try {
+          const eventId = String(params.eventId || '').trim();
+          const guests = Array.isArray(params.guests) ? params.guests : [];
+          if (!eventId || guests.length === 0) {
+            return { success: false, toolName: 'create_event_invitation_list', error: 'Thiếu eventId hoặc danh sách khách mời.' };
+          }
+          const evRows = await this.prisma.$queryRaw<any[]>`
+            SELECT id, name, date, location, venue_name FROM public.events WHERE id = ${eventId} LIMIT 1
+          `.catch(() => []);
+          if (evRows.length === 0) {
+            return { success: false, toolName: 'create_event_invitation_list', error: `Không tìm thấy sự kiện ${eventId}` };
+          }
+          const ev = evRows[0];
+          const normalized = guests.map((g: any, idx: number) => {
+            const fullName = String(g.fullName || g.name || g.ho_ten || `Khách mời ${idx + 1}`).trim();
+            const slug = String(g.slug || fullName)
+              .toLowerCase()
+              .normalize('NFD')
+              .replace(/[\u0300-\u036f]/g, '')
+              .replace(/đ/g, 'd')
+              .replace(/[^a-z0-9]+/g, '-')
+              .replace(/^-+|-+$/g, '') || `guest-${idx + 1}`;
+            return {
+              slug,
+              fullName,
+              email: String(g.email || '').trim().toLowerCase(),
+              phone: String(g.phone || g.so_dien_thoai || '').trim(),
+              company: String(g.company || g.cong_ty || '').trim(),
+              title: String(g.title || g.chuc_vu || '').trim(),
+              guestType: g.guestType === 'other_participant' ? 'other_participant' : 'invited_guest',
+            };
+          });
+          await this.prisma.$executeRawUnsafe(
+            `UPDATE public.events SET invitation_guests = $1::jsonb, updated_at = NOW() WHERE id = $2`,
+            JSON.stringify(normalized),
+            eventId,
+          ).catch(() => {});
+
+          let sentCount = 0;
+          if (params.sendEmail !== false && this.mailService) {
+            const baseUrl = (process.env.APP_URL || 'https://crm.ceohn10.viconnect.vn').replace(/\/$/, '');
+            for (const g of normalized) {
+              if (!g.email || !g.email.includes('@')) continue;
+              const link = `${baseUrl}/invitation/${eventId}#${g.slug}`;
+              const r = await this.mailService.sendDirectEmail({
+                to: g.email,
+                subject: `[THƯ MỜI] ${ev.name} — Kính mời ${g.fullName}`,
+                html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;border:1px solid #e2e8f0;border-radius:12px;"><h2 style="color:#003B95;">Trân trọng kính mời: ${g.fullName}</h2><p>Kính mời Quý vị tham dự sự kiện <strong>${ev.name}</strong>.</p><p style="text-align:center;margin:20px 0;"><a href="${link}" style="background:#003B95;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">Mở Thư Mời &amp; Xác Nhận</a></p></div>`,
+                templateCode: 'event_invitation_ai',
+              }).catch(() => ({ ok: false }));
+              if (r?.ok) sentCount++;
+            }
+          }
+          return {
+            success: true,
+            toolName: 'create_event_invitation_list',
+            data: { eventId, eventName: ev.name, guestCount: normalized.length, sentCount },
+            auditMessage: `AI đã tạo danh sách ${normalized.length} khách mời cho "${ev.name}" và gửi ${sentCount} email thư mời.`,
+          };
+        } catch (err: any) {
+          return { success: false, toolName: 'create_event_invitation_list', error: err?.message };
+        }
+      },
+    });
+
+    // 11. TOOL: import_or_create_members (Thêm học viên mới hàng loạt hoặc đơn lẻ)
+    this.registerTool({
+      definition: {
+        name: 'import_or_create_members',
+        displayName: 'Thêm mới / Import Học viên CLB CEO HN10',
+        description: 'Thêm 1 hoặc nhiều học viên mới vào hệ thống từ thông tin chat hoặc file danh sách.',
+        category: 'contact',
+        safetyLevel: 'WRITE',
+        requiredPermission: 'AI_WRITE_ACTIONS',
+        parameters: {
+          type: 'object',
+          properties: {
+            members: { type: 'array', description: 'Danh sách [{ name, email, phone, company, title, department }]' },
+          },
+          required: ['members'],
+        },
+        returns: { type: 'object', description: 'Số học viên thêm mới / cập nhật' },
+      },
+      execute: async (params) => {
+        try {
+          const list = Array.isArray(params.members) ? params.members : [];
+          let created = 0;
+          let updated = 0;
+          const defaultAssocId = 'c1983000-0000-4000-8000-000000001983';
+          for (const item of list) {
+            const name = String(item.name || item.fullName || item.ho_ten || '').trim();
+            if (!name) continue;
+            const email = String(item.email || '').trim().toLowerCase();
+            const phone = String(item.phone || item.so_dien_thoai || '').trim();
+            const company = String(item.company || item.cong_ty || '').trim();
+            const title = String(item.title || item.chuc_vu || 'Học viên').trim();
+            const department = String(item.department || 'Ban Thành Viên').trim();
+            const existing = email
+              ? await this.prisma.$queryRaw<any[]>`SELECT id FROM public.members WHERE LOWER(email) = ${email} LIMIT 1`.catch(() => [])
+              : [];
+            if (existing.length > 0) {
+              await this.prisma.$executeRaw`
+                UPDATE public.members SET name = ${name}, contact = ${name}, company_name = ${company || null}, phone = COALESCE(NULLIF(${phone}, ''), phone), executive_role = ${title}, department = ${department}, updated_at = NOW()
+                WHERE id = ${existing[0].id}
+              `;
+              updated++;
+            } else {
+              const newId = `MB${Date.now().toString(36).toUpperCase()}${Math.floor(Math.random() * 1000)}`;
+              const code = `CEOHN10-${Math.floor(1000 + Math.random() * 9000)}`;
+              await this.prisma.$executeRaw`
+                INSERT INTO public.members (id, name, contact, company_name, email, phone, type, level, industry, status, fee_paid, fee_year, joined_at, created_at, updated_at, association_id, executive_role, department, code)
+                VALUES (${newId}, ${name}, ${name}, ${company || null}, ${email || null}, ${phone || null}, 'individual', 'Chính thức', 'Đa ngành', 'active', true, 2026, NOW()::date::text, NOW(), NOW(), ${defaultAssocId}::uuid, ${title}, ${department}, ${code})
+              `;
+              created++;
+            }
+          }
+          return {
+            success: true,
+            toolName: 'import_or_create_members',
+            data: { created, updated, total: created + updated },
+            auditMessage: `AI đã thêm mới ${created} học viên và cập nhật ${updated} học viên.`,
+          };
+        } catch (err: any) {
+          return { success: false, toolName: 'import_or_create_members', error: err?.message };
+        }
+      },
+    });
+
+    // 12. TOOL: create_lecturer (Thêm giảng viên mới)
+    this.registerTool({
+      definition: {
+        name: 'create_lecturer',
+        displayName: 'Thêm Giảng viên / Diễn giả mới',
+        description: 'Thêm mới hồ sơ Giảng viên / Diễn giả đào tạo từ chat hoặc file danh sách.',
+        category: 'contact',
+        safetyLevel: 'WRITE',
+        requiredPermission: 'AI_WRITE_ACTIONS',
+        parameters: {
+          type: 'object',
+          properties: {
+            lecturers: { type: 'array', description: 'Danh sách [{ fullName, title, company, specialty, email, phone }]' },
+          },
+          required: ['lecturers'],
+        },
+        returns: { type: 'object', description: 'Danh sách giảng viên đã thêm' },
+      },
+      execute: async (params) => {
+        try {
+          await this.prisma.$executeRawUnsafe(`
+            CREATE TABLE IF NOT EXISTS public.lecturers (
+              id TEXT PRIMARY KEY,
+              full_name TEXT NOT NULL,
+              title TEXT DEFAULT '',
+              company TEXT DEFAULT '',
+              specialty TEXT DEFAULT '',
+              email TEXT DEFAULT '',
+              phone TEXT DEFAULT '',
+              status TEXT DEFAULT 'active',
+              created_at TIMESTAMPTZ DEFAULT NOW()
+            )
+          `).catch(() => {});
+          const list = Array.isArray(params.lecturers) ? params.lecturers : [];
+          let added = 0;
+          for (const lec of list) {
+            const fullName = String(lec.fullName || lec.name || lec.ho_ten || '').trim();
+            if (!fullName) continue;
+            const id = `LEC-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 1000)}`;
+            await this.prisma.$executeRaw`
+              INSERT INTO public.lecturers (id, full_name, title, company, specialty, email, phone, status, created_at)
+              VALUES (${id}, ${fullName}, ${String(lec.title || lec.chuc_vu || 'Giảng viên')}, ${String(lec.company || lec.cong_ty || '')}, ${String(lec.specialty || 'Quản trị & Lãnh đạo')}, ${String(lec.email || '').toLowerCase()}, ${String(lec.phone || '')}, 'active', NOW())
+            `;
+            added++;
+          }
+          return {
+            success: true,
+            toolName: 'create_lecturer',
+            data: { added },
+            auditMessage: `AI đã thêm mới ${added} Giảng viên vào hệ thống đào tạo.`,
+          };
+        } catch (err: any) {
+          return { success: false, toolName: 'create_lecturer', error: err?.message };
+        }
+      },
+    });
+
+    // 13. TOOL: create_training_class (Tạo lớp học / khóa đào tạo mới)
+    this.registerTool({
+      definition: {
+        name: 'create_training_class',
+        displayName: 'Tạo Lớp học / Khóa đào tạo mới',
+        description: 'Tạo lớp học mới trên hệ thống Đào tạo CEO HN10 gắn Giảng viên, lịch học và học phí.',
+        category: 'calendar',
+        safetyLevel: 'EXTERNAL_ACTION',
+        requiredPermission: 'AI_WRITE_ACTIONS',
+        parameters: {
+          type: 'object',
+          properties: {
+            title: { type: 'string', description: 'Tên lớp học / khóa đào tạo' },
+            instructorName: { type: 'string', description: 'Tên giảng viên phụ trách' },
+            instructorTitle: { type: 'string', description: 'Chức danh giảng viên' },
+            location: { type: 'string', description: 'Địa điểm học' },
+            startTime: { type: 'string', description: 'Thời gian bắt đầu (ISO)' },
+            ticketFee: { type: 'number', description: 'Học phí (VNĐ)' },
+          },
+          required: ['title'],
+        },
+        returns: { type: 'object', description: 'Thông tin lớp học vừa tạo' },
+      },
+      execute: async (params) => {
+        try {
+          const title = String(params.title || '').trim();
+          if (!title) return { success: false, toolName: 'create_training_class', error: 'Thiếu tên lớp học.' };
+          const startDt = params.startTime && !isNaN(new Date(params.startTime).getTime()) ? new Date(params.startTime) : new Date(Date.now() + 7 * 86400000);
+          const rows = await this.prisma.$queryRawUnsafe<any[]>(
+            `INSERT INTO public.trainings (title, instructor_name, instructor_title, location, start_time, ticket_fee, status, format, created_at, updated_at)
+             VALUES ($1, $2, $3, $4, $5, $6, 'upcoming', 'offline', NOW(), NOW()) RETURNING id, title`,
+            title,
+            String(params.instructorName || 'Giảng viên CEO HN10'),
+            String(params.instructorTitle || 'Chuyên gia'),
+            String(params.location || 'Hà Nội'),
+            startDt,
+            Number(params.ticketFee || 0),
+          );
+          return {
+            success: true,
+            toolName: 'create_training_class',
+            data: rows[0] || { title },
+            auditMessage: `AI đã tạo lớp học mới "${title}".`,
+          };
+        } catch (err: any) {
+          return { success: false, toolName: 'create_training_class', error: err?.message };
+        }
+      },
+    });
   }
 
   /**
