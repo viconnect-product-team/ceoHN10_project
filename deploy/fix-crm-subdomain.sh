@@ -9,11 +9,11 @@ echo "==========================================================================
 echo " [FIX 404 NOT FOUND] THIẾT LẬP REVERSE PROXY NGINX HOST CHO CRM.CEOHN10.VICONNECT.VN"
 echo "=============================================================================="
 
-# 1. Đảm bảo thư mục chứng chỉ SSL
-mkdir -p /etc/nginx/ssl 2>/dev/null || true
+# 1. Đảm bảo thư mục chứng chỉ SSL riêng cho CEO HN10 (KHÔNG ghi đè /etc/nginx/ssl dùng chung)
+mkdir -p /etc/nginx/ssl/ceohn10 2>/dev/null || true
 if [ -f "/root/ssl-proxy/server.crt" ] && [ -f "/root/ssl-proxy/server.key" ]; then
-    cp -f /root/ssl-proxy/server.crt /etc/nginx/ssl/server.crt 2>/dev/null || true
-    cp -f /root/ssl-proxy/server.key /etc/nginx/ssl/server.key 2>/dev/null || true
+    cp -f /root/ssl-proxy/server.crt /etc/nginx/ssl/ceohn10/server.crt 2>/dev/null || true
+    cp -f /root/ssl-proxy/server.key /etc/nginx/ssl/ceohn10/server.key 2>/dev/null || true
 fi
 
 # 2. Tạo tệp cấu hình Host Nginx chính thức (/etc/nginx/conf.d/ceohn10_subdomains.conf)
@@ -44,14 +44,19 @@ server {
 
 # 2. CỔNG QUẢN TRỊ WEB CRM: https://crm.ceohn10.viconnect.vn & crm_ceohn10.viconnect.vn
 server {
-    listen 443 ssl http2;
+    listen 443 ssl;
     server_name crm.ceohn10.viconnect.vn crm_ceohn10.viconnect.vn crm.ceoHN10.viconnect.vn;
 
-    ssl_certificate /etc/nginx/ssl/server.crt;
-    ssl_certificate_key /etc/nginx/ssl/server.key;
+    ssl_certificate /etc/nginx/ssl/ceohn10/server.crt;
+    ssl_certificate_key /etc/nginx/ssl/ceohn10/server.key;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
     client_max_body_size 50M;
+    client_header_buffer_size 16k;
+    large_client_header_buffers 8 32k;
+    proxy_buffer_size 16k;
+    proxy_buffers 4 32k;
+    proxy_busy_buffers_size 64k;
 
     location = /sw.js {
         proxy_pass http://127.0.0.1:5022;
@@ -120,14 +125,19 @@ server {
 
 # 3. ỨNG DỤNG DI ĐỘNG HỌC VIÊN: https://ceohn10.viconnect.vn
 server {
-    listen 443 ssl http2;
+    listen 443 ssl;
     server_name ceohn10.viconnect.vn ceoHN10.viconnect.vn;
 
-    ssl_certificate /etc/nginx/ssl/server.crt;
-    ssl_certificate_key /etc/nginx/ssl/server.key;
+    ssl_certificate /etc/nginx/ssl/ceohn10/server.crt;
+    ssl_certificate_key /etc/nginx/ssl/ceohn10/server.key;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
     client_max_body_size 50M;
+    client_header_buffer_size 16k;
+    large_client_header_buffers 8 32k;
+    proxy_buffer_size 16k;
+    proxy_buffers 4 32k;
+    proxy_busy_buffers_size 64k;
 
     location = /sw.js {
         proxy_pass http://127.0.0.1:5020;

@@ -54,11 +54,11 @@ set +e
 
 # 5.1. Cấu hình Reverse Proxy an toàn cho Nginx Host Ubuntu (Cổng 80 & 443)
 if [ -d "/etc/nginx" ] && [ -d "/etc/nginx/conf.d" ]; then
-    echo "[Host Nginx] Kiểm tra an toàn trước khi cập nhật cấu hình Host..."
-    mkdir -p /etc/nginx/ssl 2>/dev/null || true
+    echo "[Host Nginx] Kiểm tra an toàn trước khi cập nhật cấu hình Host (KHÔNG ghi đè /etc/nginx/ssl dùng chung)..."
+    mkdir -p /etc/nginx/ssl/ceohn10 2>/dev/null || true
     if [ -f "/root/ssl-proxy/server.crt" ] && [ -f "/root/ssl-proxy/server.key" ]; then
-        cp -f /root/ssl-proxy/server.crt /etc/nginx/ssl/server.crt 2>/dev/null || true
-        cp -f /root/ssl-proxy/server.key /etc/nginx/ssl/server.key 2>/dev/null || true
+        cp -f /root/ssl-proxy/server.crt /etc/nginx/ssl/ceohn10/server.crt 2>/dev/null || true
+        cp -f /root/ssl-proxy/server.key /etc/nginx/ssl/ceohn10/server.key 2>/dev/null || true
     fi
 
     # 1. Sao lưu dự phòng file cấu hình hiện tại của DevOps
@@ -88,14 +88,19 @@ server {
 
 # 2. SUBDOMAIN WEB CRM: https://crm.ceohn10.viconnect.vn & crm_ceohn10.viconnect.vn
 server {
-    listen 443 ssl http2;
+    listen 443 ssl;
     server_name crm.ceohn10.viconnect.vn crm_ceohn10.viconnect.vn crm.ceoHN10.viconnect.vn;
 
-    ssl_certificate /etc/nginx/ssl/server.crt;
-    ssl_certificate_key /etc/nginx/ssl/server.key;
+    ssl_certificate /etc/nginx/ssl/ceohn10/server.crt;
+    ssl_certificate_key /etc/nginx/ssl/ceohn10/server.key;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
     client_max_body_size 50M;
+    client_header_buffer_size 16k;
+    large_client_header_buffers 8 32k;
+    proxy_buffer_size 16k;
+    proxy_buffers 4 32k;
+    proxy_busy_buffers_size 64k;
 
     location = /sw.js {
         proxy_pass http://127.0.0.1:5022;
@@ -164,14 +169,19 @@ server {
 
 # 3. SUBDOMAIN MOBILE APP: https://ceohn10.viconnect.vn
 server {
-    listen 443 ssl http2;
+    listen 443 ssl;
     server_name ceohn10.viconnect.vn ceoHN10.viconnect.vn;
 
-    ssl_certificate /etc/nginx/ssl/server.crt;
-    ssl_certificate_key /etc/nginx/ssl/server.key;
+    ssl_certificate /etc/nginx/ssl/ceohn10/server.crt;
+    ssl_certificate_key /etc/nginx/ssl/ceohn10/server.key;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
     client_max_body_size 50M;
+    client_header_buffer_size 16k;
+    large_client_header_buffers 8 32k;
+    proxy_buffer_size 16k;
+    proxy_buffers 4 32k;
+    proxy_busy_buffers_size 64k;
 
     location = /sw.js {
         proxy_pass http://127.0.0.1:5020;
