@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { COMMITTEE_7_OPTIONS } from "@/components/rbac/ScopeRoleAssignmentSection";
 import {
   ShieldCheck,
   Server,
@@ -430,7 +431,7 @@ function MasterAdminPortal() {
     name: "",
     role: "member",
     dataScope: "self",
-    department: "Ban Điều Hành",
+    department: "Ban Gắn kết & Đời sống",
   });
 
   const handleOpenEditRbac = (acc: any) => {
@@ -442,7 +443,9 @@ function MasterAdminPortal() {
         acc.dataScope ||
         acc.data_scope ||
         (acc.role === "platform_admin" || acc.role === "admin" ? "all" : "self"),
-      department: acc.department || "Ban Điều Hành",
+      department: COMMITTEE_7_OPTIONS.includes(acc.department)
+        ? acc.department
+        : "Ban Gắn kết & Đời sống",
     });
     setShowEditRbacModal(true);
   };
@@ -452,12 +455,13 @@ function MasterAdminPortal() {
     try {
       await fetchNestApi(`/users/${editingUser.id}`, {
         method: "PUT",
-        body: {
+        body: JSON.stringify({
           name: editRbacData.name,
           role: editRbacData.role,
+          executiveRole: editRbacData.role,
           dataScope: editRbacData.dataScope,
           department: editRbacData.department,
-        },
+        }),
       });
       toast.success(`Đã cập nhật phân quyền và phạm vi dữ liệu cho ${editingUser.name || editingUser.email}`);
       setShowEditRbacModal(false);
@@ -3173,21 +3177,14 @@ function MasterAdminPortal() {
                   </SelectTrigger>
                   <SelectContent className="bg-white border-slate-200 text-slate-800">
                     <SelectItem value="platform_admin">Platform Admin (Toàn quyền)</SelectItem>
-                    <SelectItem value="admin">Quản trị viên (Admin)</SelectItem>
-                    <SelectItem value="lop_truong">Lớp Trưởng</SelectItem>
-                    <SelectItem value="lop_pho">Lớp Phó</SelectItem>
-                    <SelectItem value="truong_team">Trưởng Team</SelectItem>
-                    <SelectItem value="pho_team">Phó Team</SelectItem>
-                    <SelectItem value="truong_ban">Trưởng Ban Chuyên Môn</SelectItem>
-                    <SelectItem value="truong_ban_hoc_tap">Trưởng Ban Học Tập</SelectItem>
-                    <SelectItem value="truong_ban_truyen_thong">Trưởng Ban Truyền Thông</SelectItem>
-                    <SelectItem value="truong_ban_su_kien_hau_can">Trưởng Ban Sự Kiện &amp; Hậu Cần</SelectItem>
-                    <SelectItem value="truong_ban_tai_chinh">Trưởng Ban Tài Chính</SelectItem>
-                    <SelectItem value="truong_ban_thien_nguyen">Trưởng Ban Thiện Nguyện</SelectItem>
-                    <SelectItem value="truong_ban_an_sinh">Trưởng Ban An Sinh &amp; Xã Hội</SelectItem>
-                    <SelectItem value="truong_ban_cong_nghe">Trưởng Ban Công Nghệ</SelectItem>
-                    <SelectItem value="giang_vien">Giảng Viên / Chuyên Gia</SelectItem>
-                    <SelectItem value="member">Học Viên / Hội Viên</SelectItem>
+                    <SelectItem value="admin">Admin (Quản trị viên)</SelectItem>
+                    <SelectItem value="lop_truong">Lớp trưởng</SelectItem>
+                    <SelectItem value="lop_pho">Lớp phó</SelectItem>
+                    <SelectItem value="truong_team">Trưởng team</SelectItem>
+                    <SelectItem value="pho_team">Phó team</SelectItem>
+                    <SelectItem value="truong_ban_chuyen_trach">Trưởng các ban chuyên trách (7 Ban)</SelectItem>
+                    <SelectItem value="giang_vien">Giảng viên / Chuyên gia</SelectItem>
+                    <SelectItem value="member">Học viên / Hội viên</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -3223,16 +3220,11 @@ function MasterAdminPortal() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-white border-slate-200 text-slate-800">
-                  <SelectItem value="Ban Điều Hành">Ban Điều Hành</SelectItem>
-                  <SelectItem value="Ban Cán Sự Lớp">Ban Cán Sự Lớp</SelectItem>
-                  <SelectItem value="Ban Học Tập">Ban Học Tập</SelectItem>
-                  <SelectItem value="Ban Sự Kiện &amp; Hậu Cần">Ban Sự Kiện &amp; Hậu Cần</SelectItem>
-                  <SelectItem value="Ban Truyền Thông">Ban Truyền Thông</SelectItem>
-                  <SelectItem value="Ban Tài Chính">Ban Tài Chính</SelectItem>
-                  <SelectItem value="Ban Thiện Nguyện">Ban Thiện Nguyện</SelectItem>
-                  <SelectItem value="Ban An Sinh &amp; Xã Hội">Ban An Sinh &amp; Xã Hội</SelectItem>
-                  <SelectItem value="Ban Công Nghệ">Ban Công Nghệ</SelectItem>
-                  <SelectItem value="Ban Thư Ký">Ban Thư Ký</SelectItem>
+                  {COMMITTEE_7_OPTIONS.map((deptName) => (
+                    <SelectItem key={deptName} value={deptName}>
+                      {deptName}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

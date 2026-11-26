@@ -16,6 +16,8 @@ import {
   Sparkles,
   UserPlus,
   Trash2,
+  Save,
+  Pencil,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
@@ -92,8 +94,44 @@ export function EventInvitationBuilderModal({
   const [fontPreset, setFontPreset] = useState<string>("'Be Vietnam Pro', 'Inter', 'Segoe UI', sans-serif");
   const [uploadingBg, setUploadingBg] = useState(false);
 
+  // Chỉnh sửa nội dung text độc lập trên Thư mời (lưu vào DB)
+  const [editingTextOpen, setEditingTextOpen] = useState(false);
+  const [savingConfig, setSavingConfig] = useState(false);
+  const [invHeading, setInvHeading] = useState("Thư mời");
+  const [invSubtitle, setInvSubtitle] = useState("TRÂN TRỌNG KÍNH MỜI");
+  const [invAttendLabel, setInvAttendLabel] = useState("TỚI DỰ");
+  const [invEventTitle, setInvEventTitle] = useState("");
+  const [invOrgName, setInvOrgName] = useState("CLB DOANH NHÂN CEO HN10");
+  const [invDateText, setInvDateText] = useState("");
+  const [invVenueName, setInvVenueName] = useState("");
+  const [invLocation, setInvLocation] = useState("");
+  const [invButtonText, setInvButtonText] = useState("✓ Xác nhận tham dự");
+  const [invMotto, setInvMotto] = useState("Hội Tụ Doanh Trí, Khẳng Định Vị Thế");
+  const [invFooterWish, setInvFooterWish] = useState("Sự hiện diện của bạn là niềm vinh hạnh của chúng tôi. Rất hân hạnh được đón tiếp!");
+  const [invProgramItems, setInvProgramItems] = useState<Array<{ time: string; title: string }>>([]);
+
   useEffect(() => {
     if (!open || !event?.id) return;
+    const dObj = event.date ? new Date(event.date) : new Date();
+    const dm = !isNaN(dObj.getTime())
+      ? `${String(dObj.getDate()).padStart(2, "0")}.${String(dObj.getMonth() + 1).padStart(2, "0")}`
+      : "05.12";
+    const yr = !isNaN(dObj.getTime()) ? String(dObj.getFullYear()) : "2026";
+    const evParts: any[] =
+      Array.isArray((event as any).parts) && (event as any).parts.length > 0
+        ? (event as any).parts
+        : [
+            { name: "Chương trình chính", items: [{ time: "08:00 - 08:30", title: "Đón khách" }, { time: "08:30 - 11:30", title: "Chương trình chính" }] },
+            { name: "Dự Tiệc", items: [{ time: "11:30", title: "Tiệc chúc mừng" }] },
+          ];
+    const defaultTimeline = evParts.flatMap((p) => (Array.isArray(p.items) ? p.items : [])).slice(0, 3);
+
+    setInvEventTitle(event.name || "");
+    setInvDateText(`${dm}.${yr}`);
+    setInvVenueName((event as any).venueName || "Hội trường");
+    setInvLocation(event.location || "Hà Nội");
+    setInvProgramItems(defaultTimeline);
+
     setLoadingGuests(true);
     fetchNestApi<InvitationGuest[]>(`/events/${event.id}/invitation-guests`)
       .then((res) => {
@@ -101,6 +139,32 @@ export function EventInvitationBuilderModal({
       })
       .catch(() => {})
       .finally(() => setLoadingGuests(false));
+
+    fetchNestApi<{ config: any }>(`/events/${event.id}/invitation-config`)
+      .then((res) => {
+        const c = res?.config;
+        if (!c) return;
+        if (c.bgThemeColor) setBgThemeColor(c.bgThemeColor);
+        if (c.textColor) setTextColor(c.textColor);
+        if (c.accentColor) setAccentColor(c.accentColor);
+        if (c.cityBgUrl) setCityBgUrl(c.cityBgUrl);
+        if (c.fontPreset) setFontPreset(c.fontPreset);
+        if (c.invHeading !== undefined) setInvHeading(c.invHeading);
+        if (c.invSubtitle !== undefined) setInvSubtitle(c.invSubtitle);
+        if (c.invAttendLabel !== undefined) setInvAttendLabel(c.invAttendLabel);
+        if (c.invEventTitle !== undefined) setInvEventTitle(c.invEventTitle);
+        if (c.invOrgName !== undefined) setInvOrgName(c.invOrgName);
+        if (c.invDateText !== undefined) setInvDateText(c.invDateText);
+        if (c.invVenueName !== undefined) setInvVenueName(c.invVenueName);
+        if (c.invLocation !== undefined) setInvLocation(c.invLocation);
+        if (c.invButtonText !== undefined) setInvButtonText(c.invButtonText);
+        if (c.invMotto !== undefined) setInvMotto(c.invMotto);
+        if (c.invFooterWish !== undefined) setInvFooterWish(c.invFooterWish);
+        if (Array.isArray(c.invProgramItems) && c.invProgramItems.length > 0) {
+          setInvProgramItems(c.invProgramItems);
+        }
+      })
+      .catch(() => {});
   }, [open, event?.id]);
 
   if (!open || !event || typeof document === "undefined") return null;
@@ -248,6 +312,41 @@ export function EventInvitationBuilderModal({
       toast.error(err?.message || "Lỗi lưu khách mời");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleSaveInvitationConfig = async () => {
+    setSavingConfig(true);
+    try {
+      await fetchNestApi(`/events/${event.id}/invitation-config`, {
+        method: "PUT",
+        body: JSON.stringify({
+          config: {
+            bgThemeColor,
+            textColor,
+            accentColor,
+            cityBgUrl,
+            fontPreset,
+            invHeading,
+            invSubtitle,
+            invAttendLabel,
+            invEventTitle,
+            invOrgName,
+            invDateText,
+            invVenueName,
+            invLocation,
+            invButtonText,
+            invMotto,
+            invFooterWish,
+            invProgramItems,
+          },
+        }),
+      });
+      toast.success("Đã lưu nội dung & giao diện Thư mời! Link thư mời của khách sẽ hiển thị đúng nội dung này.");
+    } catch (err: any) {
+      toast.error(err?.message || "Lỗi khi lưu cấu hình Thư mời");
+    } finally {
+      setSavingConfig(false);
     }
   };
 
@@ -640,6 +739,24 @@ export function EventInvitationBuilderModal({
               <div className="flex items-center gap-1.5">
                 <button
                   type="button"
+                  onClick={() => setEditingTextOpen((v) => !v)}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 cursor-pointer ${
+                    editingTextOpen ? "bg-amber-400 text-slate-950" : "bg-white/10 text-slate-200 hover:bg-white/20"
+                  }`}
+                >
+                  <Pencil className="h-3.5 w-3.5" /> {editingTextOpen ? "Đóng sửa chữ" : "Sửa nội dung chữ"}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveInvitationConfig}
+                  disabled={savingConfig}
+                  className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-[#003B95] hover:bg-[#002B70] text-white flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                >
+                  {savingConfig ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                  <span>Lưu Thư mời</span>
+                </button>
+                <button
+                  type="button"
                   onClick={() => setPreviewMode("desktop")}
                   className={`px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 cursor-pointer ${
                     previewMode === "desktop" ? "bg-white text-slate-950" : "bg-white/10 text-slate-300"
@@ -766,6 +883,140 @@ export function EventInvitationBuilderModal({
                   </label>
                 </div>
               </div>
+
+              {editingTextOpen && (
+                <div className="pt-2.5 mt-2 border-t border-white/10 space-y-2 text-[11px]">
+                  <div className="font-bold text-amber-300">
+                    Chỉnh sửa nội dung chữ trên Thư mời (Độc lập với thông tin gốc của sự kiện):
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <input
+                      type="text"
+                      value={invHeading}
+                      onChange={(e) => setInvHeading(e.target.value)}
+                      placeholder="Tiêu đề (Thư mời)"
+                      className="h-8 rounded-lg border border-white/15 bg-slate-950 px-2 text-slate-100"
+                    />
+                    <input
+                      type="text"
+                      value={invSubtitle}
+                      onChange={(e) => setInvSubtitle(e.target.value)}
+                      placeholder="Dòng kính mời"
+                      className="h-8 rounded-lg border border-white/15 bg-slate-950 px-2 text-slate-100"
+                    />
+                    <input
+                      type="text"
+                      value={invAttendLabel}
+                      onChange={(e) => setInvAttendLabel(e.target.value)}
+                      placeholder="TỚI DỰ"
+                      className="h-8 rounded-lg border border-white/15 bg-slate-950 px-2 text-slate-100"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <input
+                      type="text"
+                      value={invEventTitle}
+                      onChange={(e) => setInvEventTitle(e.target.value)}
+                      placeholder="Tên sự kiện hiển thị trên thư mời"
+                      className="h-8 rounded-lg border border-white/15 bg-slate-950 px-2 text-slate-100 font-semibold"
+                    />
+                    <input
+                      type="text"
+                      value={invOrgName}
+                      onChange={(e) => setInvOrgName(e.target.value)}
+                      placeholder="Tên CLB / Đơn vị tổ chức"
+                      className="h-8 rounded-lg border border-white/15 bg-slate-950 px-2 text-slate-100"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <input
+                      type="text"
+                      value={invDateText}
+                      onChange={(e) => setInvDateText(e.target.value)}
+                      placeholder="Ngày (VD: 05.12.2026)"
+                      className="h-8 rounded-lg border border-white/15 bg-slate-950 px-2 text-slate-100"
+                    />
+                    <input
+                      type="text"
+                      value={invVenueName}
+                      onChange={(e) => setInvVenueName(e.target.value)}
+                      placeholder="Tên hội trường"
+                      className="h-8 rounded-lg border border-white/15 bg-slate-950 px-2 text-slate-100"
+                    />
+                    <input
+                      type="text"
+                      value={invLocation}
+                      onChange={(e) => setInvLocation(e.target.value)}
+                      placeholder="Địa điểm"
+                      className="h-8 rounded-lg border border-white/15 bg-slate-950 px-2 text-slate-100"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <input
+                      type="text"
+                      value={invMotto}
+                      onChange={(e) => setInvMotto(e.target.value)}
+                      placeholder="Khẩu hiệu bên trái (Desktop)"
+                      className="h-8 rounded-lg border border-white/15 bg-slate-950 px-2 text-slate-100"
+                    />
+                    <input
+                      type="text"
+                      value={invButtonText}
+                      onChange={(e) => setInvButtonText(e.target.value)}
+                      placeholder="Chữ nút xác nhận"
+                      className="h-8 rounded-lg border border-white/15 bg-slate-950 px-2 text-slate-100"
+                    />
+                  </div>
+                  <input
+                    type="text"
+                    value={invFooterWish}
+                    onChange={(e) => setInvFooterWish(e.target.value)}
+                    placeholder="Lời chúc cuối thư mời"
+                    className="w-full h-8 rounded-lg border border-white/15 bg-slate-950 px-2 text-slate-100"
+                  />
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-slate-300">
+                      <span>Các mốc chương trình hiển thị trên thư mời:</span>
+                      <button
+                        type="button"
+                        onClick={() => setInvProgramItems((prev) => [...prev, { time: "09:00", title: "Nội dung mới" }])}
+                        className="text-amber-300 hover:underline cursor-pointer"
+                      >
+                        + Thêm mốc
+                      </button>
+                    </div>
+                    {invProgramItems.map((it, idx) => (
+                      <div key={idx} className="grid grid-cols-12 gap-1.5 items-center">
+                        <input
+                          type="text"
+                          value={it.time}
+                          onChange={(e) =>
+                            setInvProgramItems((prev) => prev.map((x, i) => (i === idx ? { ...x, time: e.target.value } : x)))
+                          }
+                          placeholder="Giờ"
+                          className="col-span-4 h-7 rounded border border-white/15 bg-slate-950 px-2 text-slate-100"
+                        />
+                        <input
+                          type="text"
+                          value={it.title}
+                          onChange={(e) =>
+                            setInvProgramItems((prev) => prev.map((x, i) => (i === idx ? { ...x, title: e.target.value } : x)))
+                          }
+                          placeholder="Nội dung"
+                          className="col-span-7 h-7 rounded border border-white/15 bg-slate-950 px-2 text-slate-100"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setInvProgramItems((prev) => prev.filter((_, i) => i !== idx))}
+                          className="col-span-1 text-rose-400 hover:text-rose-300 text-center cursor-pointer"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Khung Preview Poster */}
@@ -801,18 +1052,18 @@ export function EventInvitationBuilderModal({
                     previewMode === "desktop" ? "ml-[38%]" : "mt-28"
                   }`}
                 >
-                  <div className="font-sans italic text-2xl text-slate-100">Thư mời</div>
-                  <div className="text-[9px] uppercase tracking-[0.28em] text-slate-300">TRÂN TRỌNG KÍNH MỜI</div>
+                  <div className="font-sans italic text-2xl text-slate-100">{invHeading || "Thư mời"}</div>
+                  <div className="text-[9px] uppercase tracking-[0.28em] text-slate-300">{invSubtitle || "TRÂN TRỌNG KÍNH MỜI"}</div>
                   <div className="font-sans text-xl sm:text-2xl font-bold text-white">{activeGuest.fullName}</div>
                   <div className="text-[11px] text-slate-300">
                     {activeGuest.title}{activeGuest.company ? ` · ${activeGuest.company}` : ""}
                   </div>
-                  <div className="text-[9px] uppercase tracking-[0.25em] text-slate-400 pt-1">TỚI DỰ</div>
+                  <div className="text-[9px] uppercase tracking-[0.25em] text-slate-400 pt-1">{invAttendLabel || "TỚI DỰ"}</div>
                   <div className="font-sans text-xl font-bold uppercase tracking-wider text-white">
-                    {event.name}
+                    {invEventTitle || event.name}
                   </div>
                   <div className="px-4 py-1 rounded-full bg-white text-slate-900 text-[10px] font-extrabold uppercase tracking-wider">
-                    CLB DOANH NHÂN CEO HN10
+                    {invOrgName || "CLB DOANH NHÂN CEO HN10"}
                   </div>
 
                   {/* Khung kính */}
@@ -820,17 +1071,17 @@ export function EventInvitationBuilderModal({
                     <div className="flex items-center justify-between border-b border-white/15 pb-2">
                       <div>
                         <span className="text-slate-400 uppercase block text-[8px]">Ngày</span>
-                        <b className="text-base font-serif">{dayMonth}.{yearStr}</b>
+                        <b className="text-base font-sans">{invDateText || `${dayMonth}.${yearStr}`}</b>
                       </div>
                       <div className="text-right">
                         <span className="font-sans italic text-sm text-white block">
-                          {(event as any).venueName || "Hội trường"}
+                          {invVenueName || (event as any).venueName || "Hội trường"}
                         </span>
-                        <span className="text-slate-300 text-[9px]">{event.location || "Hà Nội"}</span>
+                        <span className="text-slate-300 text-[9px]">{invLocation || event.location || "Hà Nội"}</span>
                       </div>
                     </div>
                     <div className="grid grid-cols-3 gap-1 text-center pt-1">
-                      {timelineItems.map((it: any, i: number) => (
+                      {(invProgramItems.length > 0 ? invProgramItems : timelineItems).map((it: any, i: number) => (
                         <div key={i}>
                           <div className="font-bold text-white">{it.time}</div>
                           <div className="text-[9px] text-slate-300 truncate">{it.title}</div>
@@ -841,11 +1092,148 @@ export function EventInvitationBuilderModal({
 
                   <div className="pt-1">
                     <span className="inline-block px-5 py-1.5 rounded-full bg-white text-slate-950 font-bold text-xs shadow">
-                      ✓ Xác nhận tham dự
+                      {invButtonText || "✓ Xác nhận tham dự"}
                     </span>
                   </div>
+                  {invFooterWish && (
+                    <div className="text-[10px] italic text-slate-300 pt-0.5 max-w-xs">{invFooterWish}</div>
+                  )}
                 </div>
               </div>
+
+              {editingTextOpen && (
+                <div className="pt-2.5 mt-2 border-t border-white/10 space-y-2 text-[11px]">
+                  <div className="font-bold text-amber-300">
+                    Chỉnh sửa nội dung chữ trên Thư mời (Độc lập với thông tin gốc của sự kiện):
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <input
+                      type="text"
+                      value={invHeading}
+                      onChange={(e) => setInvHeading(e.target.value)}
+                      placeholder="Tiêu đề (Thư mời)"
+                      className="h-8 rounded-lg border border-white/15 bg-slate-950 px-2 text-slate-100"
+                    />
+                    <input
+                      type="text"
+                      value={invSubtitle}
+                      onChange={(e) => setInvSubtitle(e.target.value)}
+                      placeholder="Dòng kính mời"
+                      className="h-8 rounded-lg border border-white/15 bg-slate-950 px-2 text-slate-100"
+                    />
+                    <input
+                      type="text"
+                      value={invAttendLabel}
+                      onChange={(e) => setInvAttendLabel(e.target.value)}
+                      placeholder="TỚI DỰ"
+                      className="h-8 rounded-lg border border-white/15 bg-slate-950 px-2 text-slate-100"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <input
+                      type="text"
+                      value={invEventTitle}
+                      onChange={(e) => setInvEventTitle(e.target.value)}
+                      placeholder="Tên sự kiện hiển thị trên thư mời"
+                      className="h-8 rounded-lg border border-white/15 bg-slate-950 px-2 text-slate-100 font-semibold"
+                    />
+                    <input
+                      type="text"
+                      value={invOrgName}
+                      onChange={(e) => setInvOrgName(e.target.value)}
+                      placeholder="Tên CLB / Đơn vị tổ chức"
+                      className="h-8 rounded-lg border border-white/15 bg-slate-950 px-2 text-slate-100"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <input
+                      type="text"
+                      value={invDateText}
+                      onChange={(e) => setInvDateText(e.target.value)}
+                      placeholder="Ngày (VD: 05.12.2026)"
+                      className="h-8 rounded-lg border border-white/15 bg-slate-950 px-2 text-slate-100"
+                    />
+                    <input
+                      type="text"
+                      value={invVenueName}
+                      onChange={(e) => setInvVenueName(e.target.value)}
+                      placeholder="Tên hội trường"
+                      className="h-8 rounded-lg border border-white/15 bg-slate-950 px-2 text-slate-100"
+                    />
+                    <input
+                      type="text"
+                      value={invLocation}
+                      onChange={(e) => setInvLocation(e.target.value)}
+                      placeholder="Địa điểm"
+                      className="h-8 rounded-lg border border-white/15 bg-slate-950 px-2 text-slate-100"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <input
+                      type="text"
+                      value={invMotto}
+                      onChange={(e) => setInvMotto(e.target.value)}
+                      placeholder="Khẩu hiệu bên trái (Desktop)"
+                      className="h-8 rounded-lg border border-white/15 bg-slate-950 px-2 text-slate-100"
+                    />
+                    <input
+                      type="text"
+                      value={invButtonText}
+                      onChange={(e) => setInvButtonText(e.target.value)}
+                      placeholder="Chữ nút xác nhận"
+                      className="h-8 rounded-lg border border-white/15 bg-slate-950 px-2 text-slate-100"
+                    />
+                  </div>
+                  <input
+                    type="text"
+                    value={invFooterWish}
+                    onChange={(e) => setInvFooterWish(e.target.value)}
+                    placeholder="Lời chúc cuối thư mời"
+                    className="w-full h-8 rounded-lg border border-white/15 bg-slate-950 px-2 text-slate-100"
+                  />
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-slate-300">
+                      <span>Các mốc chương trình hiển thị trên thư mời:</span>
+                      <button
+                        type="button"
+                        onClick={() => setInvProgramItems((prev) => [...prev, { time: "09:00", title: "Nội dung mới" }])}
+                        className="text-amber-300 hover:underline cursor-pointer"
+                      >
+                        + Thêm mốc
+                      </button>
+                    </div>
+                    {invProgramItems.map((it, idx) => (
+                      <div key={idx} className="grid grid-cols-12 gap-1.5 items-center">
+                        <input
+                          type="text"
+                          value={it.time}
+                          onChange={(e) =>
+                            setInvProgramItems((prev) => prev.map((x, i) => (i === idx ? { ...x, time: e.target.value } : x)))
+                          }
+                          placeholder="Giờ"
+                          className="col-span-4 h-7 rounded border border-white/15 bg-slate-950 px-2 text-slate-100"
+                        />
+                        <input
+                          type="text"
+                          value={it.title}
+                          onChange={(e) =>
+                            setInvProgramItems((prev) => prev.map((x, i) => (i === idx ? { ...x, title: e.target.value } : x)))
+                          }
+                          placeholder="Nội dung"
+                          className="col-span-7 h-7 rounded border border-white/15 bg-slate-950 px-2 text-slate-100"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setInvProgramItems((prev) => prev.filter((_, i) => i !== idx))}
+                          className="col-span-1 text-rose-400 hover:text-rose-300 text-center cursor-pointer"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

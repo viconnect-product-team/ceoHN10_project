@@ -26,7 +26,6 @@ import { toast } from "sonner";
 import { getQrUrl } from "@/lib/qr";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { EventCountdownBanner } from "@/components/events/EventCountdownTimer";
-import { EventPosterModal } from "@/components/events/EventPosterModal";
 import { EventHistoryRecapModal } from "./EventHistoryRecapModal";
 import { LiveActivityMediaSection } from "@/components/common/LiveActivityMediaSection";
 import { isEventFull } from "@/lib/member-app.functions";
@@ -84,7 +83,6 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
   onOpenRegister,
   busy,
 }) => {
-  const [posterOpen, setPosterOpen] = React.useState(false);
   const [historyRecapOpen, setHistoryRecapOpen] = React.useState(false);
 
   const isPastEvent = React.useMemo(() => {
@@ -562,16 +560,6 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
 
         {/* Sticky Action Buttons Footer */}
         <div className="shrink-0 p-3 sm:p-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center gap-2 z-20">
-          <button
-            type="button"
-            onClick={() => setPosterOpen(true)}
-            className="w-full sm:w-auto py-2.5 px-3 rounded-xl border border-amber-500/40 bg-gradient-to-r from-amber-500/15 via-yellow-500/10 to-amber-500/15 text-amber-900 dark:text-amber-200 text-xs font-bold transition hover:brightness-110 flex items-center justify-center gap-1.5 cursor-pointer text-center shrink-0 shadow-2xs"
-            title="Xem & Tải Poster Sự Kiện"
-          >
-            <Sparkles className="h-4 w-4 text-amber-500" />
-            <span>Xem Poster</span>
-          </button>
-
           {selectedAgenda.zaloLink ? (
             <a
               href={selectedAgenda.zaloLink}
@@ -632,12 +620,6 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
           )}
         </div>
       </DialogContent>
-
-      <EventPosterModal
-        open={posterOpen}
-        onClose={() => setPosterOpen(false)}
-        event={selectedEvent}
-      />
 
       <EventHistoryRecapModal
         open={historyRecapOpen}

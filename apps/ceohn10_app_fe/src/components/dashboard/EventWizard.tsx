@@ -978,7 +978,7 @@ function InfoStep({
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className={(info.parts?.length || 0) > 0 ? "grid grid-cols-1 gap-3" : "grid grid-cols-2 gap-3"}>
         <div>
           <label className={labelCls} htmlFor="ewz-date">
             {t("ewz.field.date")} (dd/mm/yyyy) <span className="text-destructive font-bold">*</span>
@@ -999,36 +999,31 @@ function InfoStep({
             </p>
           )}
         </div>
-        <div>
-          <label className={labelCls} htmlFor="ewz-capacity">
-            {(info.parts?.length || 0) > 0 ? "Tổng sức chứa (tự tính theo từng phần)" : t("ewz.field.capacity")}{" "}
-            <span className="text-destructive font-bold">*</span>
-          </label>
-          <input
-            id="ewz-capacity"
-            type="number"
-            min={0}
-            readOnly={(info.parts?.length || 0) > 0}
-            className={`${inputCls} ${(info.parts?.length || 0) > 0 ? "bg-muted font-bold cursor-not-allowed" : ""} ${errors.capacity ? "border-destructive ring-1 ring-destructive/30" : ""}`}
-            placeholder="Ví dụ: 100 chỗ ngồi"
-            value={
-              (info.parts?.length || 0) > 0
-                ? String((info.parts || []).reduce((s, p) => s + (Number(p.capacity) || 0), 0))
-                : info.capacity
-            }
-            onFocus={(e) => e.currentTarget.select()}
-            onChange={(e) => {
-              if ((info.parts?.length || 0) > 0) return;
-              setInfo({ ...info, capacity: e.target.value });
-              if (errors.capacity) setErrors((prev) => ({ ...prev, capacity: "" }));
-            }}
-          />
-          {errors.capacity && (
-            <p className="mt-1 text-xs font-semibold text-destructive animate-in fade-in duration-150">
-              {errors.capacity}
-            </p>
-          )}
-        </div>
+        {(info.parts?.length || 0) === 0 && (
+          <div>
+            <label className={labelCls} htmlFor="ewz-capacity">
+              {t("ewz.field.capacity")} <span className="text-destructive font-bold">*</span>
+            </label>
+            <input
+              id="ewz-capacity"
+              type="number"
+              min={0}
+              className={`${inputCls} ${errors.capacity ? "border-destructive ring-1 ring-destructive/30" : ""}`}
+              placeholder="Ví dụ: 100 chỗ ngồi"
+              value={info.capacity}
+              onFocus={(e) => e.currentTarget.select()}
+              onChange={(e) => {
+                setInfo({ ...info, capacity: e.target.value });
+                if (errors.capacity) setErrors((prev) => ({ ...prev, capacity: "" }));
+              }}
+            />
+            {errors.capacity && (
+              <p className="mt-1 text-xs font-semibold text-destructive animate-in fade-in duration-150">
+                {errors.capacity}
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Thời gian bắt đầu - kết thúc */}

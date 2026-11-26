@@ -289,17 +289,22 @@ function PublicInvitationPage() {
     );
   }
 
+  const invCfg = data?.invitationConfig || {};
   const searchParams =
     typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
-  const customBgImg = searchParams?.get("bg") || "";
-  const customBgColor = searchParams?.get("bgColor") || "";
-  const customTextColor = searchParams?.get("textColor") || "";
-  const customAccentColor = searchParams?.get("accentColor") || "";
-  const rawCustomFont = searchParams?.get("font") || "";
+  const customBgImg = searchParams?.get("bg") || invCfg.cityBgUrl || "";
+  const customBgColor = searchParams?.get("bgColor") || invCfg.bgThemeColor || "";
+  const customTextColor = searchParams?.get("textColor") || invCfg.textColor || "";
+  const customAccentColor = searchParams?.get("accentColor") || invCfg.accentColor || "";
+  const rawCustomFont = searchParams?.get("font") || invCfg.fontPreset || "";
   const customFont =
     rawCustomFont && !rawCustomFont.toLowerCase().includes("georgia")
       ? rawCustomFont
       : "'Be Vietnam Pro', 'Inter', 'Segoe UI', Roboto, sans-serif";
+  const displayProgramItems =
+    Array.isArray(invCfg.invProgramItems) && invCfg.invProgramItems.length > 0
+      ? invCfg.invProgramItems
+      : timelineItems;
 
   const dateObj = event.date ? new Date(event.date) : new Date();
   const dayNames = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
@@ -344,9 +349,13 @@ function PublicInvitationPage() {
           <div>
             <div className="w-16 h-0.5 bg-gradient-to-r from-slate-200 to-transparent mb-3" />
             <p className="font-sans italic text-2xl md:text-4xl leading-snug text-slate-100 drop-shadow">
-              Hội Tụ Doanh Trí,
-              <br />
-              Khẳng Định Vị Thế
+              {invCfg.invMotto || (
+                <>
+                  Hội Tụ Doanh Trí,
+                  <br />
+                  Khẳng Định Vị Thế
+                </>
+              )}
             </p>
           </div>
         </div>
@@ -354,7 +363,7 @@ function PublicInvitationPage() {
         {/* Right Column (Invitation Content) */}
         <div className="md:col-span-7 flex flex-col items-center text-center space-y-4">
           <div className="font-sans italic text-4xl md:text-5xl text-slate-100 tracking-wide">
-            Thư mời
+            {invCfg.invHeading || "Thư mời"}
           </div>
 
           <div className="flex items-center gap-3">
@@ -365,7 +374,7 @@ function PublicInvitationPage() {
 
           <div className="space-y-1">
             <div className="text-[11px] md:text-xs uppercase tracking-[0.35em] text-slate-300 font-semibold">
-              TRÂN TRỌNG KÍNH MỜI
+              {invCfg.invSubtitle || "TRÂN TRỌNG KÍNH MỜI"}
             </div>
             <h1 className="font-sans text-3xl md:text-5xl font-bold text-white tracking-wide drop-shadow">
               {displayGuestName}
@@ -379,13 +388,13 @@ function PublicInvitationPage() {
 
           <div className="space-y-2 pt-2">
             <div className="text-[11px] uppercase tracking-[0.3em] text-slate-300 font-semibold">
-              TỚI DỰ
+              {invCfg.invAttendLabel || "TỚI DỰ"}
             </div>
             <h2 className="font-sans text-3xl md:text-5xl font-bold uppercase tracking-wider text-white">
-              {event.name}
+              {invCfg.invEventTitle || event.name}
             </h2>
             <div className="inline-block bg-white text-slate-900 font-extrabold text-xs md:text-sm tracking-[0.16em] uppercase px-8 py-2 rounded-full shadow-xl">
-              CLB DOANH NHÂN CEO HN10
+              {invCfg.invOrgName || "CLB DOANH NHÂN CEO HN10"}
             </div>
           </div>
 
@@ -398,11 +407,15 @@ function PublicInvitationPage() {
                   <br />
                   NGÀY
                 </div>
-                <div className="font-sans text-3xl md:text-4xl font-bold text-white">{dayMonth}</div>
+                <div className="font-sans text-3xl md:text-4xl font-bold text-white">
+                  {invCfg.invDateText ? invCfg.invDateText.split(".").slice(0, 2).join(".") : dayMonth}
+                </div>
                 <div className="text-[10px] uppercase tracking-wider text-slate-300 text-left leading-tight">
                   NĂM
                   <br />
-                  <b className="text-white text-xs">{yearStr}</b>
+                  <b className="text-white text-xs">
+                    {invCfg.invDateText && invCfg.invDateText.split(".")[2] ? invCfg.invDateText.split(".")[2] : yearStr}
+                  </b>
                 </div>
               </div>
 
@@ -414,9 +427,9 @@ function PublicInvitationPage() {
                 </div>
                 <div className="text-left">
                   <div className="font-sans italic text-xl md:text-2xl text-white leading-tight">
-                    {event.venueName || "Hội trường CLB"}
+                    {invCfg.invVenueName || event.venueName || "Hội trường CLB"}
                   </div>
-                  <div className="text-[11px] text-slate-300">{event.location || "Hà Nội"}</div>
+                  <div className="text-[11px] text-slate-300">{invCfg.invLocation || event.location || "Hà Nội"}</div>
                 </div>
               </div>
             </div>
@@ -430,7 +443,7 @@ function PublicInvitationPage() {
             </div>
 
             <div className="grid grid-cols-3 gap-2 relative pt-1">
-              {timelineItems.map((it: any, idx: number) => (
+              {displayProgramItems.map((it: any, idx: number) => (
                 <div key={idx} className="flex flex-col items-center text-center space-y-1.5">
                   <span className="font-sans text-sm md:text-lg font-semibold text-white">{it.time}</span>
                   <span className="w-2.5 h-2.5 rotate-45 bg-white shadow ring-4 ring-slate-800" />
@@ -482,12 +495,18 @@ function PublicInvitationPage() {
           </div>
 
           <div className="pt-2 space-y-1">
-            <p className="font-sans italic text-sm md:text-base text-slate-200">
-              Sự hiện diện của bạn là niềm vinh hạnh của chúng tôi
-            </p>
-            <p className="font-sans italic text-lg md:text-2xl text-white">
-              Rất hân hạnh được đón tiếp!
-            </p>
+            {invCfg.invFooterWish ? (
+              <p className="font-sans italic text-sm md:text-lg text-slate-100">{invCfg.invFooterWish}</p>
+            ) : (
+              <>
+                <p className="font-sans italic text-sm md:text-base text-slate-200">
+                  Sự hiện diện của bạn là niềm vinh hạnh của chúng tôi
+                </p>
+                <p className="font-sans italic text-lg md:text-2xl text-white">
+                  Rất hân hạnh được đón tiếp!
+                </p>
+              </>
+            )}
           </div>
         </div>
       </div>

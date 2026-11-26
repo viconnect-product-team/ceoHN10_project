@@ -43,8 +43,6 @@ import { EventFeed } from "@/components/dashboard/EventFeed";
 import { LiveActivityMediaSection } from "@/components/common/LiveActivityMediaSection";
 import { EventSponsorPackageSelector } from "@/components/events/EventSponsorPackageSelector";
 import { EventQrStaffSelector } from "@/components/events/EventQrStaffSelector";
-import { EventPosterModal } from "@/components/events/EventPosterModal";
-import { EventPoster } from "@/components/events/EventPoster";
 import { EventQrSetupModal } from "@/components/events/EventQrSetupModal";
 import { isValidDriveUrl } from "@/components/events/modals/EventDetailModal";
 import {
@@ -191,7 +189,6 @@ function EventDetailPage() {
     "Hoàn tiền 100% cho đại biểu qua tài khoản ngân hàng trong vòng 3 - 5 ngày làm việc."
   );
   const [cancelling, setCancelling] = useState(false);
-  const [posterOpen, setPosterOpen] = useState(false);
   const [supplyModalOpen, setSupplyModalOpen] = useState(false);
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const [mediaModalOpen, setMediaModalOpen] = useState(false);
@@ -494,14 +491,6 @@ function EventDetailPage() {
               Gửi Thư Mời Đa Kênh
             </button>
             <button
-              type="button"
-              onClick={() => setPosterOpen(true)}
-              className="inline-flex items-center gap-2 rounded-xl border border-amber-500/40 bg-gradient-to-r from-amber-500/15 via-yellow-500/10 to-amber-500/15 px-4 py-2 text-sm font-bold text-amber-700 dark:text-amber-300 hover:bg-amber-500/25 transition cursor-pointer shadow-2xs"
-            >
-              <Sparkles className="h-4 w-4 text-amber-500" aria-hidden="true" />
-              Xem Poster &amp; QR Điểm Danh
-            </button>
-            <button
               onClick={onShare}
               className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
             >
@@ -710,53 +699,6 @@ function EventDetailPage() {
 
         {/* Right: guest QR registration + registration + check-in panels */}
         <aside className="space-y-5 min-w-0 w-full overflow-hidden">
-          {/* POSTER SỰ KIỆN & QR ĐIỂM DANH */}
-          <section className="rounded-2xl border-2 border-amber-500/40 bg-gradient-to-b from-amber-500/10 via-card to-card p-5 shadow-[var(--shadow-card)] text-center space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 text-[11px] font-black uppercase tracking-wider">
-                <Sparkles className="h-3 w-3 text-amber-500" />
-                POSTER SỰ KIỆN
-              </span>
-              <span className="text-xs text-muted-foreground font-medium">
-                {event.registered}/{event.capacity} đại biểu
-              </span>
-            </div>
-            <p className="text-xs text-muted-foreground text-left leading-relaxed">
-              Poster chính thức gồm banner tùy chỉnh, mốc giờ chi tiết, số lượng đại biểu tự động cập nhật, nhà tài trợ và mã QR điểm danh.
-            </p>
-            <div className="relative rounded-xl overflow-hidden border border-amber-300/60 shadow-sm max-h-56">
-              <img
-                src={(event as any).imageUrl || (event as any).image || "https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&auto=format&fit=crop&q=80"}
-                alt="Poster sự kiện"
-                className="w-full h-44 object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-3">
-                <div className="text-left text-white">
-                  <div className="text-xs font-bold line-clamp-1">{event.name}</div>
-                  <div className="text-[11px] text-amber-300">
-                    {(event as any).startTime || "08:30"} - {(event as any).endTime || "11:30"} | {fmt.date(event.date)}
-                  </div>
-                </div>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => setInvitationModalOpen(true)}
-              className="inline-flex items-center gap-2 rounded-xl border border-blue-500/40 bg-blue-500/10 px-4 py-2 text-sm font-bold text-[#003B95] dark:text-blue-300 hover:bg-blue-500/20 transition cursor-pointer shadow-2xs"
-            >
-              <Mail className="h-4 w-4" aria-hidden="true" />
-              Gửi Thư Mời Đa Kênh
-            </button>
-            <button
-              type="button"
-              onClick={() => setPosterOpen(true)}
-              className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:brightness-105 text-slate-950 font-black text-xs shadow-md shadow-amber-500/20 transition cursor-pointer"
-            >
-              <Maximize2 className="h-4 w-4" />
-              <span>Mở Toàn Màn Hình Poster &amp; Tải Xuống</span>
-            </button>
-          </section>
-
           {/* Quản lý Mã QR & Biểu Mẫu Sự Kiện — Tích hợp trực tiếp trong Chi Tiết Sự Kiện */}
           <section className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)] space-y-3">
             <div className="flex items-center gap-2 text-foreground font-bold text-xs uppercase tracking-wider">
@@ -797,15 +739,6 @@ function EventDetailPage() {
           >
             <ClipboardList className="h-5 w-5" aria-hidden="true" />
           </Link>
-          <button
-            type="button"
-            onClick={() => setPosterOpen(true)}
-            aria-label="Xem Poster Sự Kiện"
-            className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-amber-500/40 bg-gradient-to-r from-amber-500/15 to-yellow-500/10 text-amber-600 dark:text-amber-300 transition active:scale-95"
-            title="Xem Poster & QR Điểm Danh"
-          >
-            <Sparkles className="h-5 w-5 text-amber-500" aria-hidden="true" />
-          </button>
           <Link
             to="/checkin"
             aria-label={t("edetail.cta.checkin")}
@@ -916,25 +849,6 @@ function EventDetailPage() {
           </div>
         </div>
       )}
-
-      <EventPosterModal
-        open={posterOpen}
-        onClose={() => setPosterOpen(false)}
-        event={event}
-        canEditBanner={canManage}
-        onBannerChange={async (newUrl) => {
-          try {
-            await fetchNestApi(`/events/${event.id}`, {
-              method: "PUT",
-              body: JSON.stringify({ imageUrl: newUrl }),
-            });
-            toast.success("Đã cập nhật ảnh nền poster!");
-            await router.invalidate();
-          } catch (err: any) {
-            toast.error(err?.message || "Lỗi cập nhật ảnh poster");
-          }
-        }}
-      />
 
       {supplyModalOpen && (
         <SupplyDeclarationModal
