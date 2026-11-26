@@ -666,6 +666,17 @@ export class EventsController {
     return this.eventsService.clearInvitationGuests(id);
   }
 
+  @Get(':id/invitation-config')
+  async getInvitationConfig(@Param('id') id: string) {
+    return this.eventsService.getInvitationConfig(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put(':id/invitation-config')
+  async saveInvitationConfig(@Param('id') id: string, @Body() body: any) {
+    return this.eventsService.saveInvitationConfig(id, body);
+  }
+
   // UC-INV-03..06: Xem thư mời cá nhân hóa công khai & RSVP không cần đăng nhập
   @UseGuards(OptionalJwtAuthGuard)
   @Get(':id/public-invitation')

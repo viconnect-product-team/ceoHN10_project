@@ -106,6 +106,7 @@ export class AdminUpdateUserDto {
     role: z.string().optional(),
     executiveRole: z.string().optional(),
     department: z.string().optional(),
+    dataScope: z.string().optional(),
     account_status: z.string().optional(),
     targetSystem: z.string().optional(),
     customPermissions: z.array(z.string()).optional(),
@@ -119,6 +120,7 @@ export class AdminUpdateUserDto {
   role?: string | app_role;
   executiveRole?: string;
   department?: string;
+  dataScope?: string;
   account_status?: string;
   targetSystem?: string;
   customPermissions?: string[];

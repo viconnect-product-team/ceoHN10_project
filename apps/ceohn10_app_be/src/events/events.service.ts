@@ -832,13 +832,19 @@ export class EventsService extends BaseService implements OnModuleInit {
     const tagline = data.tagline ? String(data.tagline).trim() : '';
 
     const rawDate = data.date ? String(data.date).trim() : '';
-    const safeDate = rawDate
-      ? rawDate.includes('T')
-        ? rawDate.slice(0, 10)
-        : rawDate
-      : new Date().toISOString().slice(0, 10);
+    let safeDate = new Date().toISOString().slice(0, 10);
+    if (rawDate) {
+      if (/^\d{2}\/\d{2}\/\d{4}$/.test(rawDate)) {
+        const [dd, mm, yyyy] = rawDate.split('/');
+        safeDate = `${yyyy}-${mm}-${dd}`;
+      } else if (rawDate.includes('T')) {
+        safeDate = rawDate.slice(0, 10);
+      } else if (/^\d{4}-\d{2}-\d{2}/.test(rawDate)) {
+        safeDate = rawDate.slice(0, 10);
+      }
+    }
     const safeCapacity = Number.isFinite(Number(data.capacity))
-      ? Number(data.capacity)
+      ? Math.max(0, Math.trunc(Number(data.capacity)))
       : 0;
 
     // Validate địa điểm trùng khung giờ
@@ -962,29 +968,56 @@ export class EventsService extends BaseService implements OnModuleInit {
       for (let i = 0; i < data.tickets.length; i++) {
         const t = data.tickets[i];
         const ticketId = `${eventId}-${i + 1}`;
-        await this.prisma.$executeRaw`
-          INSERT INTO public.event_ticket_types (
-            id, event_id, association_id, name, price, quantity, description, sort_order, created_at, updated_at
-          ) VALUES (
-            ${ticketId},
-            ${eventId},
-            ${assocId}::uuid,
-            ${t.name},
-            ${t.price ?? 0},
-            ${t.quantity ?? 0},
-            ${t.description ?? ''},
-            ${i},
-            now(),
-            now()
-          )
-        `;
+        const safePrice = Number.isFinite(Number(t.price)) ? Number(t.price) : 0;
+        const safeQty = Number.isFinite(Number(t.quantity)) ? Math.max(0, Math.trunc(Number(t.quantity))) : 0;
+        try {
+          await this.prisma.$executeRaw`
+            INSERT INTO public.event_ticket_types (
+              id, event_id, association_id, name, price, quantity, description, sort_order, created_at, updated_at
+            ) VALUES (
+              ${ticketId},
+              ${eventId},
+              ${assocId}::uuid,
+              ${String(t.name || `Vé ${i + 1}`)},
+              ${safePrice},
+              ${safeQty},
+              ${String(t.description ?? '')},
+              ${i},
+              now(),
+              now()
+            )
+            ON CONFLICT (id) DO UPDATE SET
+              name = EXCLUDED.name,
+              price = EXCLUDED.price,
+              quantity = EXCLUDED.quantity,
+              description = EXCLUDED.description,
+              updated_at = now()
+          `;
+        } catch (ticketErr: any) {
+          this.logger.warn(`[createEvent] Fallback insert ticket_type ${ticketId}: ${ticketErr?.message}`);
+          await this.prisma.$executeRaw`
+            INSERT INTO public.event_ticket_types (
+              id, event_id, name, price, quantity, description, created_at, updated_at
+            ) VALUES (
+              ${ticketId},
+              ${eventId},
+              ${String(t.name || `Vé ${i + 1}`)},
+              ${safePrice},
+              ${safeQty},
+              ${String(t.description ?? '')},
+              now(),
+              now()
+            )
+            ON CONFLICT (id) DO NOTHING
+          `.catch(() => {});
+        }
         ticketRows.push({
           id: ticketId,
           eventId,
-          name: t.name,
-          price: t.price ?? 0,
-          quantity: t.quantity ?? 0,
-          description: t.description ?? '',
+          name: String(t.name || `Vé ${i + 1}`),
+          price: safePrice,
+          quantity: safeQty,
+          description: String(t.description ?? ''),
           sortOrder: i,
         });
       }
@@ -6798,6 +6831,33 @@ export class EventsService extends BaseService implements OnModuleInit {
     return { ok: true, message: 'Đã xóa toàn bộ danh sách khách mời của sự kiện.' };
   }
 
+  async getInvitationConfig(eventId: string) {
+    await this.prisma.$executeRawUnsafe(
+      `ALTER TABLE public.events ADD COLUMN IF NOT EXISTS invitation_config jsonb`,
+    ).catch(() => {});
+    const rows = await this.prisma.$queryRaw<any[]>`
+      SELECT invitation_config FROM public.events WHERE id = ${eventId} LIMIT 1
+    `.catch(() => []);
+    const raw = rows[0]?.invitation_config || null;
+    if (!raw) return { config: null };
+    const config = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    return { config };
+  }
+
+  async saveInvitationConfig(eventId: string, body: any) {
+    await this.prisma.$executeRawUnsafe(
+      `ALTER TABLE public.events ADD COLUMN IF NOT EXISTS invitation_config jsonb`,
+    ).catch(() => {});
+    const configPayload = body?.config && typeof body.config === 'object' ? body.config : body;
+    const jsonStr = JSON.stringify(configPayload || {});
+    await this.prisma.$executeRaw`
+      UPDATE public.events
+      SET invitation_config = ${jsonStr}::jsonb, updated_at = now()
+      WHERE id = ${eventId}
+    `;
+    return { ok: true, config: configPayload };
+  }
+
   /**
    * Gửi email thư mời cá nhân hóa qua MailService (SMTP) tới danh sách khách được chọn
    */
@@ -7010,11 +7070,19 @@ export class EventsService extends BaseService implements OnModuleInit {
       }
     } catch {}
 
+    const rawInvCfg = evRows[0]?.invitation_config || null;
+    const invitationConfig = rawInvCfg
+      ? typeof rawInvCfg === 'string'
+        ? JSON.parse(rawInvCfg)
+        : rawInvCfg
+      : null;
+
     return {
       event,
       tickets: tickets.map((t) => this.mapTicketRow(t)),
       guest,
       sepayConfig,
+      invitationConfig,
     };
   }
 
