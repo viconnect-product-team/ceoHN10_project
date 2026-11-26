@@ -873,6 +873,13 @@ export class EventsService extends BaseService implements OnModuleInit {
     const department = data.department ? String(data.department).trim() : 'ban_su_kien';
     const category = data.category ? String(data.category).trim() : 'su_kien_clb';
 
+    await this.prisma.$executeRawUnsafe(
+      `ALTER TABLE public.events ADD COLUMN IF NOT EXISTS department TEXT DEFAULT 'ban_su_kien'`,
+    ).catch(() => {});
+    await this.prisma.$executeRawUnsafe(
+      `ALTER TABLE public.events ADD COLUMN IF NOT EXISTS category TEXT DEFAULT 'su_kien_clb'`,
+    ).catch(() => {});
+
     try {
       await this.prisma.$executeRaw`
         INSERT INTO public.events (
@@ -942,12 +949,10 @@ export class EventsService extends BaseService implements OnModuleInit {
       } catch {
         await this.prisma.$executeRaw`
           INSERT INTO public.events (
-            id, name, department, category, date, location, capacity, registered, status, type, association_id, created_at, updated_at
+            id, name, date, location, capacity, registered, status, type, association_id, created_at, updated_at
           ) VALUES (
             ${eventId},
             ${data.name},
-            ${department},
-            ${category},
             ${safeDate}::date,
             ${data.location ?? ''},
             ${safeCapacity},

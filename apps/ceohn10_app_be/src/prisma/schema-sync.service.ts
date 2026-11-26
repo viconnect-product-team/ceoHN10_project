@@ -69,9 +69,16 @@ export class SchemaSyncService implements OnModuleInit {
       );`,
 
       // 3. Sự kiện, Hạng vé, Thư mời cá nhân hóa & Đăng ký
+      `ALTER TABLE public.events ADD COLUMN IF NOT EXISTS department TEXT DEFAULT 'ban_su_kien';`,
+      `ALTER TABLE public.events ADD COLUMN IF NOT EXISTS category TEXT DEFAULT 'su_kien_clb';`,
       `ALTER TABLE public.events ADD COLUMN IF NOT EXISTS tagline TEXT DEFAULT '';`,
       `ALTER TABLE public.events ADD COLUMN IF NOT EXISTS venue_name TEXT DEFAULT '';`,
       `ALTER TABLE public.events ADD COLUMN IF NOT EXISTS parts JSONB DEFAULT '[]'::jsonb;`,
+      `ALTER TABLE public.events ADD COLUMN IF NOT EXISTS invitation_config JSONB;`,
+      `ALTER TABLE public.events ADD COLUMN IF NOT EXISTS start_time TEXT DEFAULT '08:30';`,
+      `ALTER TABLE public.events ADD COLUMN IF NOT EXISTS end_time TEXT DEFAULT '11:30';`,
+      `ALTER TABLE public.events ADD COLUMN IF NOT EXISTS agenda JSONB DEFAULT '[]'::jsonb;`,
+      `ALTER TABLE public.events ADD COLUMN IF NOT EXISTS checkin_qr TEXT;`,
       `ALTER TABLE public.events ADD COLUMN IF NOT EXISTS form_config JSONB DEFAULT '{}'::jsonb;`,
       `ALTER TABLE public.events ADD COLUMN IF NOT EXISTS reserve_capacity INT DEFAULT 0;`,
       `ALTER TABLE public.events ADD COLUMN IF NOT EXISTS allow_walkin_checkin BOOLEAN DEFAULT FALSE;`,
