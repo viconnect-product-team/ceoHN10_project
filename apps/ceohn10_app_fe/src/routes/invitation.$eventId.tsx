@@ -295,7 +295,11 @@ function PublicInvitationPage() {
   const customBgColor = searchParams?.get("bgColor") || "";
   const customTextColor = searchParams?.get("textColor") || "";
   const customAccentColor = searchParams?.get("accentColor") || "";
-  const customFont = searchParams?.get("font") || "";
+  const rawCustomFont = searchParams?.get("font") || "";
+  const customFont =
+    rawCustomFont && !rawCustomFont.toLowerCase().includes("georgia")
+      ? rawCustomFont
+      : "'Be Vietnam Pro', 'Inter', 'Segoe UI', Roboto, sans-serif";
 
   const dateObj = event.date ? new Date(event.date) : new Date();
   const dayNames = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
@@ -319,7 +323,7 @@ function PublicInvitationPage() {
           ? `radial-gradient(circle at 72% 45%, ${customBgColor} 0%, #0f172a 92%)`
           : "radial-gradient(circle at 72% 45%, #334155 0%, #1e293b 48%, #0f172a 85%, #090d16 100%)",
         color: customTextColor || "#ffffff",
-        fontFamily: customFont || undefined,
+        fontFamily: customFont,
       }}
     >
       {/* Background City Image: Desktop left half, Mobile top banner */}
@@ -333,21 +337,13 @@ function PublicInvitationPage() {
         <div className="md:hidden absolute top-0 inset-x-0 h-72 bg-gradient-to-b from-slate-950/20 via-slate-900/75 to-[#162032]" />
       </div>
 
-      {/* Top-right Pennant Ribbon with HN10 Logo */}
-      <div
-        className="fixed md:absolute top-0 right-5 md:right-12 z-20 w-14 h-20 md:w-20 md:h-28 bg-white shadow-2xl flex items-center justify-center pb-3"
-        style={{ clipPath: "polygon(0 0, 100% 0, 100% 82%, 50% 100%, 0 82%)" }}
-      >
-        <img src="/hn10-logo.png" alt="CEO HN10" className="w-10 h-10 md:w-14 md:h-14 object-contain" />
-      </div>
-
       {/* Main Responsive Layout */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 py-8 md:py-10 grid grid-cols-1 md:grid-cols-12 items-center gap-6">
         {/* Left Column (Desktop Motto over city skyline) */}
         <div className="md:col-span-5 flex flex-col justify-between md:min-h-[580px] pt-2 pb-16 md:pb-0">
           <div>
             <div className="w-16 h-0.5 bg-gradient-to-r from-slate-200 to-transparent mb-3" />
-            <p className="font-serif italic text-2xl md:text-4xl leading-snug text-slate-100 drop-shadow">
+            <p className="font-sans italic text-2xl md:text-4xl leading-snug text-slate-100 drop-shadow">
               Hội Tụ Doanh Trí,
               <br />
               Khẳng Định Vị Thế
@@ -357,7 +353,7 @@ function PublicInvitationPage() {
 
         {/* Right Column (Invitation Content) */}
         <div className="md:col-span-7 flex flex-col items-center text-center space-y-4">
-          <div className="font-serif italic text-4xl md:text-5xl text-slate-100 tracking-wide">
+          <div className="font-sans italic text-4xl md:text-5xl text-slate-100 tracking-wide">
             Thư mời
           </div>
 
@@ -371,7 +367,7 @@ function PublicInvitationPage() {
             <div className="text-[11px] md:text-xs uppercase tracking-[0.35em] text-slate-300 font-semibold">
               TRÂN TRỌNG KÍNH MỜI
             </div>
-            <h1 className="font-serif text-3xl md:text-5xl font-bold text-white tracking-wide drop-shadow">
+            <h1 className="font-sans text-3xl md:text-5xl font-bold text-white tracking-wide drop-shadow">
               {displayGuestName}
             </h1>
             {displayGuestOrg && (
@@ -385,7 +381,7 @@ function PublicInvitationPage() {
             <div className="text-[11px] uppercase tracking-[0.3em] text-slate-300 font-semibold">
               TỚI DỰ
             </div>
-            <h2 className="font-serif text-3xl md:text-5xl font-bold uppercase tracking-wider text-white">
+            <h2 className="font-sans text-3xl md:text-5xl font-bold uppercase tracking-wider text-white">
               {event.name}
             </h2>
             <div className="inline-block bg-white text-slate-900 font-extrabold text-xs md:text-sm tracking-[0.16em] uppercase px-8 py-2 rounded-full shadow-xl">
@@ -402,7 +398,7 @@ function PublicInvitationPage() {
                   <br />
                   NGÀY
                 </div>
-                <div className="font-serif text-3xl md:text-4xl font-bold text-white">{dayMonth}</div>
+                <div className="font-sans text-3xl md:text-4xl font-bold text-white">{dayMonth}</div>
                 <div className="text-[10px] uppercase tracking-wider text-slate-300 text-left leading-tight">
                   NĂM
                   <br />
@@ -417,7 +413,7 @@ function PublicInvitationPage() {
                   HỘI TRƯỜNG
                 </div>
                 <div className="text-left">
-                  <div className="font-serif italic text-xl md:text-2xl text-white leading-tight">
+                  <div className="font-sans italic text-xl md:text-2xl text-white leading-tight">
                     {event.venueName || "Hội trường CLB"}
                   </div>
                   <div className="text-[11px] text-slate-300">{event.location || "Hà Nội"}</div>
@@ -436,7 +432,7 @@ function PublicInvitationPage() {
             <div className="grid grid-cols-3 gap-2 relative pt-1">
               {timelineItems.map((it: any, idx: number) => (
                 <div key={idx} className="flex flex-col items-center text-center space-y-1.5">
-                  <span className="font-serif text-sm md:text-lg font-semibold text-white">{it.time}</span>
+                  <span className="font-sans text-sm md:text-lg font-semibold text-white">{it.time}</span>
                   <span className="w-2.5 h-2.5 rotate-45 bg-white shadow ring-4 ring-slate-800" />
                   <span className="text-[11px] md:text-xs text-slate-300 leading-snug">{it.title}</span>
                 </div>
@@ -486,10 +482,10 @@ function PublicInvitationPage() {
           </div>
 
           <div className="pt-2 space-y-1">
-            <p className="font-serif italic text-sm md:text-base text-slate-200">
+            <p className="font-sans italic text-sm md:text-base text-slate-200">
               Sự hiện diện của bạn là niềm vinh hạnh của chúng tôi
             </p>
-            <p className="font-serif italic text-lg md:text-2xl text-white">
+            <p className="font-sans italic text-lg md:text-2xl text-white">
               Rất hân hạnh được đón tiếp!
             </p>
           </div>
@@ -514,7 +510,7 @@ function PublicInvitationPage() {
                   <div className="text-[11px] uppercase tracking-[0.25em] text-slate-400 font-semibold">
                     {event.name}
                   </div>
-                  <h3 className="font-serif text-2xl font-bold text-white mt-1">
+                  <h3 className="font-sans text-2xl font-bold text-white mt-1">
                     Xác nhận tham dự
                   </h3>
                   <p className="text-xs text-slate-300 mt-0.5">
@@ -525,7 +521,7 @@ function PublicInvitationPage() {
                 {/* Hộp Kính gửi */}
                 <div className="p-3.5 rounded-2xl bg-slate-800/80 border border-white/10 space-y-2">
                   <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Kính gửi</div>
-                  <div className="font-serif text-xl font-bold text-white">{displayGuestName}</div>
+                  <div className="font-sans text-xl font-bold text-white">{displayGuestName}</div>
                   {displayGuestOrg && <div className="text-xs text-slate-300">{displayGuestOrg}</div>}
                   {!guest && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
@@ -663,7 +659,7 @@ function PublicInvitationPage() {
                         >
                           −
                         </button>
-                        <span className="font-serif text-2xl font-bold w-8 text-center">{attendeeCount}</span>
+                        <span className="font-sans text-2xl font-bold w-8 text-center">{attendeeCount}</span>
                         <button
                           type="button"
                           onClick={() => setAttendeeCount((c) => Math.min(30, c + 1))}
@@ -769,7 +765,7 @@ function PublicInvitationPage() {
                     <div className="w-14 h-14 mx-auto rounded-full bg-slate-800 border border-white/20 flex items-center justify-center">
                       <Check className="h-7 w-7 text-slate-200" />
                     </div>
-                    <h3 className="font-serif text-2xl font-bold text-white">Cảm ơn Quý khách đã phản hồi</h3>
+                    <h3 className="font-sans text-2xl font-bold text-white">Cảm ơn Quý khách đã phản hồi</h3>
                     <p className="text-xs text-slate-300 leading-relaxed">
                       Ban Tổ Chức đã ghi nhận thông tin và rất mong được đón tiếp Quý khách trong các sự kiện tiếp theo của CEO HN10.
                     </p>
@@ -778,15 +774,22 @@ function PublicInvitationPage() {
                   <>
                     <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold">
                       <CreditCard className="h-3.5 w-3.5" />
-                      <span>Quét mã VietQR SePay để hoàn tất thanh toán vé</span>
+                      <span>Quét mã VietQR để hoàn tất thanh toán phí sự kiện</span>
                     </div>
-                    <h3 className="font-serif text-xl font-bold text-white">
-                      {rsvpResult.partsLabel} ({rsvpResult.attendeeCount} người)
+                    <h3 className="text-lg font-bold text-white">
+                      {rsvpResult.eventName || event.name}
                     </h3>
+                    <p className="text-xs text-slate-300">
+                      {rsvpResult.partsLabel} · {rsvpResult.attendeeCount} người
+                    </p>
                     <div className="p-3 bg-white rounded-2xl inline-block shadow-lg">
                       <img src={rsvpResult.vietQrUrl} alt="VietQR SePay" className="w-56 h-56 object-contain" />
                     </div>
                     <div className="p-3 rounded-xl bg-slate-800 text-left text-xs space-y-1">
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Mã vé / Đăng ký:</span>
+                        <b className="font-mono text-amber-300">{rsvpResult.regId}</b>
+                      </div>
                       <div className="flex justify-between">
                         <span className="text-slate-400">Số tiền:</span>
                         <b className="text-emerald-300 font-mono">{Number(rsvpResult.totalFee).toLocaleString("vi-VN")} đ</b>
@@ -795,14 +798,10 @@ function PublicInvitationPage() {
                         <span className="text-slate-400">Nội dung CK:</span>
                         <b className="font-mono text-white">{rsvpResult.transferContent}</b>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-400">Mã đăng ký:</span>
-                        <b className="font-mono text-white">{rsvpResult.regId}</b>
-                      </div>
                     </div>
                     <div className="flex items-center justify-center gap-2 text-xs text-slate-300">
                       <RefreshCw className="h-3.5 w-3.5 animate-spin text-emerald-400" />
-                      <span>Hệ thống đang tự động chờ xác nhận từ SePay...</span>
+                      <span>Thông tin vé &amp; mã QR thanh toán đã được gửi về Email của Quý khách.</span>
                     </div>
                   </>
                 ) : (
@@ -810,13 +809,15 @@ function PublicInvitationPage() {
                     <div className="w-16 h-16 mx-auto rounded-full bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center">
                       <CheckCircle2 className="h-9 w-9 text-emerald-400" />
                     </div>
-                    <h3 className="font-serif text-2xl font-bold text-white">
+                    <h3 className="text-2xl font-bold text-white">
                       {isPaidConfirmed ? "Đã thanh toán thành công!" : "Xác nhận tham dự thành công!"}
                     </h3>
-                    <p className="text-xs text-slate-300">
-                      {rsvpResult.partsLabel} · {rsvpResult.attendeeCount} người · Mã vé:{" "}
-                      <b className="font-mono text-white">{rsvpResult.regId}</b>
-                    </p>
+                    <div className="rounded-xl bg-slate-800/80 border border-white/10 p-3 text-xs space-y-1 text-left">
+                      <div><span className="text-slate-400">Sự kiện:</span> <b className="text-white">{rsvpResult.eventName || event.name}</b></div>
+                      <div><span className="text-slate-400">Phần tham dự:</span> <b className="text-white">{rsvpResult.partsLabel}</b></div>
+                      <div><span className="text-slate-400">Số lượng:</span> <b className="text-white">{rsvpResult.attendeeCount} người</b></div>
+                      <div><span className="text-slate-400">Mã vé:</span> <b className="font-mono text-emerald-300">{rsvpResult.regId}</b></div>
+                    </div>
                     <div className="p-3 bg-white rounded-2xl inline-block">
                       <img
                         src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(rsvpResult.regId)}`}
@@ -824,6 +825,9 @@ function PublicInvitationPage() {
                         className="w-40 h-40"
                       />
                     </div>
+                    <p className="text-[11px] text-slate-300">
+                      Vé điện tử &amp; mã vé <b className="font-mono text-white">{rsvpResult.regId}</b> đã được gửi về Email của Quý khách.
+                    </p>
                   </>
                 )}
 

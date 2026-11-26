@@ -6791,6 +6791,164 @@ export class EventsService extends BaseService implements OnModuleInit {
     return { ok: true, count: saved.length, guests: saved };
   }
 
+  async clearInvitationGuests(eventId: string) {
+    await this.prisma.$executeRaw`
+      DELETE FROM public.event_invitation_guests WHERE event_id = ${eventId}
+    `;
+    return { ok: true, message: 'Đã xóa toàn bộ danh sách khách mời của sự kiện.' };
+  }
+
+  /**
+   * Gửi email thư mời cá nhân hóa qua MailService (SMTP) tới danh sách khách được chọn
+   */
+  async sendInvitationEmails(
+    eventId: string,
+    body: {
+      guests?: Array<{
+        slug?: string;
+        fullName?: string;
+        title?: string;
+        company?: string;
+        email?: string;
+        link?: string;
+      }>;
+      template?: {
+        bgThemeColor?: string;
+        textColor?: string;
+        accentColor?: string;
+        fontPreset?: string;
+        baseUrl?: string;
+      };
+    },
+  ) {
+    const evRows = await this.prisma.$queryRaw<any[]>`
+      SELECT id, name, date, location, venue_name
+      FROM public.events
+      WHERE id = ${eventId}
+      LIMIT 1
+    `.catch(() => []);
+    const ev = evRows[0];
+    if (!ev) {
+      throw new NotFoundException('Không tìm thấy sự kiện để gửi thư mời.');
+    }
+
+    const inputGuests = Array.isArray(body?.guests) ? body.guests : [];
+    const validGuests = inputGuests.filter(
+      (g) =>
+        (typeof g?.email === 'string' && g.email.trim().includes('@')) ||
+        (typeof (g as any)?.phone === 'string' && String((g as any).phone).trim().length >= 8),
+    );
+    if (validGuests.length === 0) {
+      throw new BadRequestException(
+        'Không có khách mời nào có Email hoặc Số điện thoại hợp lệ trong danh sách đã chọn.',
+      );
+    }
+
+    const tpl = body?.template || {};
+    const baseUrl = (
+      tpl.baseUrl ||
+      process.env.APP_URL ||
+      'https://ceohn10.viconnect.vn'
+    ).replace(/\/$/, '');
+
+    const formattedDate = ev.date
+      ? new Date(ev.date).toLocaleDateString('vi-VN')
+      : '';
+    const locationText = [ev.venue_name, ev.location].filter(Boolean).join(' — ');
+
+    let sentCount = 0;
+    const failed: Array<{ email: string; fullName: string; reason: string }> = [];
+
+    for (const g of validGuests) {
+      const email = String(g.email || '').trim();
+      const phone = String((g as any).phone || '').trim();
+      const fullName = String(g.fullName || 'Quý Khách Mời').trim();
+      const slug =
+        String(g.slug || '').trim() || this.slugifyGuestName(fullName);
+      const link =
+        g.link && String(g.link).startsWith('http')
+          ? String(g.link)
+          : `${baseUrl}/invitation/${eventId}#${slug}`;
+      const roleOrg = [g.title, g.company].filter(Boolean).join(' · ');
+
+      const html = `
+        <div style="font-family:'Be Vietnam Pro','Segoe UI',Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;background:#ffffff;color:#0f172a;border:1px solid #e2e8f0;border-radius:12px;">
+          <p style="font-size:12px;font-weight:700;color:#003B95;letter-spacing:1px;text-transform:uppercase;margin:0 0 8px 0;">CLB DOANH NHÂN CEO HN10 — THƯ MỜI SỰ KIỆN</p>
+          <h2 style="margin:0 0 6px 0;font-size:20px;color:#0f172a;">Trân trọng kính mời: ${fullName}</h2>
+          ${roleOrg ? `<p style="margin:0 0 14px 0;font-size:13px;color:#475569;">${roleOrg}</p>` : ''}
+          <p style="font-size:14px;line-height:1.6;margin:12px 0;color:#1e293b;">
+            Ban Tổ Chức CLB Doanh Nhân CEO HN10 trân trọng kính mời Quý vị tham dự sự kiện: <strong>${ev.name}</strong>.
+          </p>
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px 16px;margin:14px 0;font-size:13px;color:#334155;">
+            ${formattedDate ? `<div><strong>Thời gian:</strong> ${formattedDate}</div>` : ''}
+            ${locationText ? `<div style="margin-top:4px;"><strong>Địa điểm:</strong> ${locationText}</div>` : ''}
+          </div>
+          <p style="font-size:14px;line-height:1.6;color:#1e293b;">
+            Quý vị vui lòng truy cập đường link thư mời cá nhân hóa dưới đây để xem chi tiết chương trình, chọn phần tham dự và xác nhận (RSVP):
+          </p>
+          <div style="margin:20px 0;text-align:center;">
+            <a href="${link}" style="display:inline-block;padding:12px 28px;background:#003B95;color:#ffffff;font-weight:700;font-size:14px;text-decoration:none;border-radius:8px;">
+              Mở Thư Mời &amp; Xác Nhận Tham Dự
+            </a>
+          </div>
+        </div>
+      `;
+
+      let deliveredAny = false;
+      let lastError = '';
+
+      if (email && email.includes('@')) {
+        try {
+          const res = await this.mailService.sendDirectEmail({
+            to: email,
+            subject: `[THƯ MỜI] ${ev.name} — Kính mời ${fullName}`,
+            html,
+            templateCode: 'event_invitation',
+          });
+          if (res && res.ok) {
+            deliveredAny = true;
+          } else {
+            lastError = res?.message || 'SMTP chưa gửi được email';
+          }
+        } catch (err: any) {
+          lastError = err?.message || 'Lỗi gửi email SMTP';
+        }
+      }
+
+      if (phone) {
+        try {
+          this.mailService.dispatchZaloOaNotification({
+            recipientPhone: phone,
+            recipientEmail: email || undefined,
+            title: `Thư mời sự kiện: ${ev.name}`,
+            content: `Trân trọng kính mời ${fullName} tham dự "${ev.name}"${formattedDate ? ` ngày ${formattedDate}` : ''}. Vui lòng bấm nút bên dưới để xem thư mời và xác nhận tham dự.`,
+            ctaText: 'Mở Thư Mời & Xác Nhận',
+            ctaUrl: link,
+            trackingType: 'event_invitation',
+          });
+          if (!email) deliveredAny = true;
+        } catch {}
+      }
+
+      if (deliveredAny) {
+        sentCount++;
+      } else {
+        failed.push({
+          email: email || phone,
+          fullName,
+          reason: lastError || 'Không gửi được qua Email/Zalo OA',
+        });
+      }
+    }
+
+    return {
+      ok: sentCount > 0,
+      sentCount,
+      failedCount: failed.length,
+      failed,
+    };
+  }
+
   async getPublicInvitation(eventId: string, slug?: string) {
     const evRows = await this.prisma.$queryRaw<any[]>`
       SELECT e.*, a.name as association_name, a.logo_url as association_logo
@@ -7046,9 +7204,66 @@ export class EventsService extends BaseService implements OnModuleInit {
       bankInfo = cfg;
     }
 
+    // Gửi Email trả về đúng Mã vé + Tên sự kiện + Phần đã đăng ký (+ QR thanh toán nếu có phí) cho khách
+    if (email && email.includes('@') && this.mailService) {
+      const formattedDate = ev.date ? new Date(ev.date).toLocaleDateString('vi-VN') : '';
+      const evLocation = [ev.venue_name, ev.location].filter(Boolean).join(' — ');
+      const qrCheckinUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(regId)}`;
+      const partsListText = selectedPartNames.length > 0 ? selectedPartNames.join(', ') : partsLabel;
+
+      const receiptHtml = `
+        <div style="font-family:'Be Vietnam Pro','Segoe UI',Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;background:#ffffff;color:#0f172a;border:1px solid #e2e8f0;border-radius:12px;">
+          <p style="font-size:12px;font-weight:700;color:#003B95;text-transform:uppercase;margin:0 0 6px 0;">CLB DOANH NHÂN CEO HN10 — XÁC NHẬN VÉ SỰ KIỆN</p>
+          <h2 style="margin:0 0 12px 0;font-size:20px;color:#0f172a;">${totalFee > 0 ? 'Thông Tin Đăng Ký & Thanh Toán Vé' : 'Vé Điện Tử Tham Dự Sự Kiện'}</h2>
+          <div style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:10px;padding:14px 16px;font-size:13px;line-height:1.7;">
+            <div><strong>Khách tham dự:</strong> ${fullName} (${attendeeCount} người)</div>
+            <div><strong>Sự kiện:</strong> ${eventTitle}</div>
+            <div><strong>Phần đã đăng ký:</strong> ${partsListText}</div>
+            <div><strong>Phân loại:</strong> ${partsLabel}</div>
+            <div><strong>Mã vé của Quý khách:</strong> <span style="font-family:monospace;font-size:15px;font-weight:800;color:#003B95;">${regId}</span></div>
+            ${formattedDate ? `<div><strong>Thời gian:</strong> ${formattedDate}</div>` : ''}
+            ${evLocation ? `<div><strong>Địa điểm:</strong> ${evLocation}</div>` : ''}
+            <div><strong>Tổng phí:</strong> <strong style="color:${totalFee > 0 ? '#d97706' : '#059669'};">${totalFee > 0 ? `${totalFee.toLocaleString('vi-VN')} VNĐ` : 'Miễn phí (0đ)'}</strong></div>
+          </div>
+          ${
+            totalFee > 0 && vietQrUrl
+              ? `<div style="margin-top:18px;text-align:center;padding:16px;border:1px dashed #f59e0b;border-radius:10px;background:#fffbeb;">
+                  <div style="font-size:13px;font-weight:700;color:#b45309;margin-bottom:8px;">QUÉT MÃ VIETQR ĐỂ THANH TOÁN PHÍ SỰ KIỆN</div>
+                  <img src="${vietQrUrl}" alt="VietQR Thanh Toán" style="width:220px;height:220px;object-fit:contain;border-radius:8px;background:#fff;padding:6px;" />
+                  <div style="margin-top:8px;font-size:12px;color:#334155;">
+                    <div><strong>Ngân hàng:</strong> ${bankInfo?.bankName || ''} — <strong>STK:</strong> ${bankInfo?.accountNumber || ''}</div>
+                    <div><strong>Chủ TK:</strong> ${bankInfo?.accountHolder || ''}</div>
+                    <div><strong>Số tiền:</strong> ${totalFee.toLocaleString('vi-VN')} VNĐ</div>
+                    <div><strong>Nội dung CK:</strong> <code style="font-weight:700;">${transferContent}</code></div>
+                  </div>
+                </div>`
+              : `<div style="margin-top:18px;text-align:center;padding:16px;border:1px solid #d1fae5;border-radius:10px;background:#ecfdf5;">
+                  <div style="font-size:13px;font-weight:700;color:#047857;margin-bottom:8px;">MÃ QR CHECK-IN SỰ KIỆN</div>
+                  <img src="${qrCheckinUrl}" alt="QR Check-in" style="width:180px;height:180px;background:#fff;padding:6px;border-radius:8px;" />
+                  <div style="margin-top:6px;font-size:12px;color:#065f46;">Vui lòng xuất trình mã vé <strong>${regId}</strong> tại bàn Lễ tân.</div>
+                </div>`
+          }
+        </div>
+      `;
+
+      void this.mailService
+        .sendDirectEmail({
+          to: email,
+          subject:
+            totalFee > 0
+              ? `[VÉ & QR THANH TOÁN] ${eventTitle} — Mã vé ${regId}`
+              : `[VÉ SỰ KIỆN] ${eventTitle} — Mã vé ${regId}`,
+          html: receiptHtml,
+          templateCode: 'event_ticket_rsvp',
+        })
+        .catch(() => {});
+    }
+
     return {
       ok: true,
       regId,
+      eventName: eventTitle,
+      selectedPartNames,
       attendMode,
       partsLabel,
       attendeeCount,

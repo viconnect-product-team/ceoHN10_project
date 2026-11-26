@@ -15,6 +15,7 @@ import {
   Send,
   Sparkles,
   UserPlus,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
@@ -76,6 +77,7 @@ export function EventInvitationBuilderModal({
   const [loadingGuests, setLoadingGuests] = useState(false);
   const [saving, setSaving] = useState(false);
   const [sendingEmails, setSendingEmails] = useState(false);
+  const [selectedGuestSlugs, setSelectedGuestSlugs] = useState<Set<string>>(new Set());
 
   // Member picker state
   const [appMembersOpen, setAppMembersOpen] = useState(false);
@@ -87,7 +89,7 @@ export function EventInvitationBuilderModal({
   const [textColor, setTextColor] = useState("#ffffff");
   const [accentColor, setAccentColor] = useState("#f1f5f9");
   const [cityBgUrl, setCityBgUrl] = useState("/skyline_perspective_dark.jpg");
-  const [fontPreset, setFontPreset] = useState<string>("Georgia, 'Playfair Display', serif");
+  const [fontPreset, setFontPreset] = useState<string>("'Be Vietnam Pro', 'Inter', 'Segoe UI', sans-serif");
   const [uploadingBg, setUploadingBg] = useState(false);
 
   useEffect(() => {
@@ -249,47 +251,95 @@ export function EventInvitationBuilderModal({
     }
   };
 
-  const handleSendBulkEmails = async () => {
-    const withEmail = guests.filter((g) => g.email && g.email.includes("@"));
-    if (withEmail.length === 0) {
-      toast.error("Danh sách khách mời chưa có địa chỉ Email hợp lệ.");
+  const handleClearGuests = async () => {
+    if (guests.length === 0) return;
+    if (!window.confirm(`Xác nhận xóa toàn bộ ${guests.length} khách mời cũ trong danh sách?`)) return;
+    setSaving(true);
+    try {
+      await fetchNestApi(`/events/${event.id}/invitation-guests`, {
+        method: "DELETE",
+      });
+      setGuests([]);
+      setSelectedGuestSlugs(new Set());
+      setSelectedIdx(0);
+      toast.success("Đã xóa sạch danh sách khách mời cũ!");
+    } catch (err: any) {
+      toast.error(err?.message || "Không thể xóa danh sách khách mời");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const sendEmailsToGuests = async (targetGuests: InvitationGuest[]) => {
+    const validTargets = targetGuests.filter(
+      (g) => (g.email && g.email.trim().includes("@")) || (g.phone && g.phone.trim().length >= 8),
+    );
+    if (validTargets.length === 0) {
+      toast.error("Khách mời được chọn chưa có Email hoặc Số điện thoại hợp lệ.");
       return;
     }
     setSendingEmails(true);
     try {
-      let sent = 0;
-      for (const g of withEmail) {
-        const link = buildGuestUrl(g.slug);
-        await fetchNestApi("/notifications/send", {
-          method: "POST",
-          body: JSON.stringify({
-            channel: "email",
-            to: g.email,
-            subject: `[THƯ MỜI TRÂN TRỌNG] ${event.name} — Kính mời ${g.fullName}`,
-            html: `
-              <div style="font-family:${fontPreset};max-width:620px;margin:0 auto;overflow:hidden;border-radius:18px;background:${bgThemeColor};color:${textColor};border:1px solid rgba(255,255,255,0.18);">
-                <div style="padding:28px;background:linear-gradient(135deg, ${bgThemeColor}ee, #0f172af2);text-align:center;">
-                  <div style="font-style:italic;font-size:28px;color:${accentColor};margin-bottom:6px;">Thư mời</div>
-                  <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;opacity:0.8;">TRÂN TRỌNG KÍNH MỜI</div>
-                  <h2 style="margin:8px 0 4px 0;font-size:24px;color:${textColor};">${g.fullName}</h2>
-                  <p style="margin:0 0 14px 0;font-size:13px;opacity:0.85;">${g.title}${g.company ? ` · ${g.company}` : ""}</p>
-                  <p style="font-size:15px;margin:14px 0;">Ban Tổ Chức CLB Doanh Nhân CEO HN10 trân trọng kính mời Quý vị tham dự sự kiện: <strong>${event.name}</strong>.</p>
-                  <p style="font-size:13px;opacity:0.85;">📅 Ngày: ${event.date} | 📍 Địa điểm: ${event.location}</p>
-                  <div style="margin:24px 0;">
-                    <a href="${link}" style="display:inline-block;padding:12px 30px;background:${accentColor};color:#0f172a;font-weight:bold;text-decoration:none;border-radius:999px;">
-                      Mở Thư Mời &amp; Xác Nhận Tham Dự
-                    </a>
-                  </div>
-                </div>
-              </div>
-            `,
-          }),
-        }).catch(() => {});
-        sent++;
+      const res = await fetchNestApi<{
+        ok: boolean;
+        sentCount: number;
+        failedCount: number;
+        failed?: Array<{ email: string; fullName: string; reason: string }>;
+      }>(`/events/${event.id}/send-invitations`, {
+        method: "POST",
+        body: JSON.stringify({
+          guests: validTargets.map((g) => ({
+            slug: g.slug,
+            fullName: g.fullName,
+            title: g.title,
+            company: g.company,
+            email: g.email,
+            phone: g.phone,
+            link: buildGuestUrl(g.slug),
+          })),
+          template: {
+            bgThemeColor,
+            textColor,
+            accentColor,
+            fontPreset,
+            baseUrl: typeof window !== "undefined" ? window.location.origin : "https://ceohn10.viconnect.vn",
+          },
+        }),
+      });
+
+      const sentCount = Number(res?.sentCount || 0);
+      const failedCount = Number(res?.failedCount || 0);
+      if (sentCount > 0 && failedCount === 0) {
+        toast.success(`Đã gửi link thư mời cá nhân hóa tới ${sentCount} khách (Email / Zalo OA)!`);
+      } else if (sentCount > 0 && failedCount > 0) {
+        const firstReason = res?.failed?.[0]?.reason || "Lỗi SMTP";
+        toast.warning(`Đã gửi ${sentCount} khách, thất bại ${failedCount} khách (${firstReason}).`);
+      } else {
+        const firstReason = res?.failed?.[0]?.reason || "Không gửi được email (kiểm tra cấu hình SMTP).";
+        toast.error(`Gửi thư mời thất bại: ${firstReason}`);
       }
-      toast.success(`Đã gửi thư mời cá nhân hóa tới ${sent} khách mời qua Email!`);
+    } catch (err: any) {
+      toast.error(err?.message || "Lỗi khi gửi link thư mời");
     } finally {
       setSendingEmails(false);
+    }
+  };
+
+  const handleSendSelectedEmails = async () => {
+    const chosen = guests.filter((g) => selectedGuestSlugs.has(g.slug));
+    if (chosen.length === 0) {
+      toast.error("Vui lòng chọn ít nhất 1 khách mời để gửi thư mời.");
+      return;
+    }
+    await sendEmailsToGuests(chosen);
+  };
+
+  const allSelected = guests.length > 0 && guests.every((g) => selectedGuestSlugs.has(g.slug));
+  const toggleSelectAllGuests = () => {
+    if (allSelected) {
+      setSelectedGuestSlugs(new Set());
+    } else {
+      setSelectedGuestSlugs(new Set(guests.map((g) => g.slug)));
     }
   };
 
@@ -395,18 +445,53 @@ export function EventInvitationBuilderModal({
               </div>
             )}
 
-            <div className="flex items-center justify-between text-xs font-bold text-muted-foreground pt-1">
-              <span>Danh sách khách mời ({guests.length})</span>
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-bold text-muted-foreground pt-1">
+              <div className="flex items-center gap-2">
+                {guests.length > 0 && (
+                  <label className="inline-flex items-center gap-1.5 cursor-pointer text-foreground">
+                    <input
+                      type="checkbox"
+                      checked={allSelected}
+                      onChange={toggleSelectAllGuests}
+                      className="rounded border-border"
+                    />
+                    <span>Chọn tất cả</span>
+                  </label>
+                )}
+                <span>({selectedGuestSlugs.size}/{guests.length})</span>
+              </div>
               {guests.length > 0 && (
-                <button
-                  type="button"
-                  onClick={handleSendBulkEmails}
-                  disabled={sendingEmails}
-                  className="inline-flex items-center gap-1 text-[#003B95] hover:underline cursor-pointer"
-                >
-                  {sendingEmails ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3" />}
-                  <span>Gửi Email hàng loạt</span>
-                </button>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={handleSendSelectedEmails}
+                    disabled={sendingEmails || selectedGuestSlugs.size === 0}
+                    className="inline-flex items-center gap-1 rounded-lg bg-[#003B95] hover:bg-[#002B70] disabled:opacity-50 text-white px-2.5 py-1.5 text-[11px] font-bold cursor-pointer"
+                  >
+                    {sendingEmails ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3" />}
+                    <span>Gửi tới mail đã chọn ({selectedGuestSlugs.size})</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => sendEmailsToGuests(guests)}
+                    disabled={sendingEmails}
+                    className="inline-flex items-center gap-1 rounded-lg border border-border bg-white hover:bg-slate-50 text-slate-700 px-2 py-1.5 text-[11px] font-bold cursor-pointer disabled:opacity-50"
+                    title="Gửi link thư mời tới tất cả khách mời"
+                  >
+                    <Mail className="h-3 w-3" />
+                    <span>Gửi tất cả</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleClearGuests}
+                    disabled={saving || sendingEmails}
+                    className="inline-flex items-center gap-1 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 px-2 py-1.5 text-[11px] font-bold cursor-pointer disabled:opacity-50"
+                    title="Xóa danh sách khách mời cũ"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                    <span>Xóa DS</span>
+                  </button>
+                </div>
               )}
             </div>
 
@@ -420,6 +505,7 @@ export function EventInvitationBuilderModal({
               <div className="space-y-1.5 overflow-y-auto flex-1">
                 {guests.map((g, idx) => {
                   const active = idx === selectedIdx;
+                  const isChecked = selectedGuestSlugs.has(g.slug);
                   const link = buildGuestUrl(g.slug);
                   return (
                     <div
@@ -431,11 +517,30 @@ export function EventInvitationBuilderModal({
                           : "border-border hover:bg-muted/50"
                       }`}
                     >
-                      <div className="min-w-0">
+                      <div className="flex items-start gap-2.5 min-w-0">
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onClick={(ev) => ev.stopPropagation()}
+                          onChange={() => {
+                            const next = new Set(selectedGuestSlugs);
+                            if (isChecked) next.delete(g.slug);
+                            else next.add(g.slug);
+                            setSelectedGuestSlugs(next);
+                          }}
+                          className="mt-1 rounded border-border shrink-0 cursor-pointer"
+                          aria-label={`Chọn ${g.fullName}`}
+                        />
+                        <div className="min-w-0">
                         <div className="text-xs font-bold text-foreground truncate">{g.fullName}</div>
                         <div className="text-[11px] text-muted-foreground truncate">
                           {g.title || "Doanh nhân"}{g.company ? ` · ${g.company}` : ""}
                         </div>
+                        {g.email ? (
+                          <div className="text-[10px] text-slate-500 truncate">{g.email}</div>
+                        ) : (
+                          <div className="text-[10px] text-rose-500 truncate">Chưa có Email</div>
+                        )}
                         <div className="flex flex-wrap items-center gap-1.5 mt-1">
                           <span className="text-[10px] font-mono text-blue-600 truncate">#{g.slug}</span>
                           <select
@@ -476,8 +581,21 @@ export function EventInvitationBuilderModal({
                             <option value="other_participant">Khách tham gia (Tính phí)</option>
                           </select>
                         </div>
+                        </div>
                       </div>
                       <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          type="button"
+                          disabled={sendingEmails || !g.email || !g.email.includes("@")}
+                          onClick={(ev) => {
+                            ev.stopPropagation();
+                            sendEmailsToGuests([g]);
+                          }}
+                          className="p-1.5 rounded-lg border border-border hover:bg-background text-emerald-700 disabled:opacity-40 cursor-pointer"
+                          title={g.email ? `Gửi thư mời tới ${g.email}` : "Khách chưa có Email"}
+                        >
+                          <Send className="h-3.5 w-3.5" />
+                        </button>
                         <button
                           type="button"
                           onClick={(ev) => {
@@ -609,10 +727,9 @@ export function EventInvitationBuilderModal({
                     className="w-full h-8 rounded-lg border border-white/15 bg-slate-950 px-2 text-[11px] text-slate-200"
                     title="Kiểu chữ thư mời"
                   >
-                    <option value="Georgia, 'Playfair Display', serif">Kiểu chữ: Serif Sang Trọng (Georgia)</option>
-                    <option value="'Times New Roman', serif">Kiểu chữ: Cổ Điển (Times New Roman)</option>
-                    <option value="'Be Vietnam Pro', 'Inter', sans-serif">Kiểu chữ: Hiện Đại (Be Vietnam Pro)</option>
-                    <option value="'Courier New', monospace">Kiểu chữ: Tối Giản (Monospace)</option>
+                    <option value="'Be Vietnam Pro', 'Inter', 'Segoe UI', sans-serif">Kiểu chữ: Hiện Đại Chuẩn Tiếng Việt (Be Vietnam Pro)</option>
+                    <option value="'Times New Roman', 'Noto Serif', serif">Kiểu chữ: Cổ Điển Trang Trọng (Times New Roman)</option>
+                    <option value="'Segoe UI', Roboto, Arial, sans-serif">Kiểu chữ: Thanh Lịch (Segoe UI)</option>
                   </select>
                 </div>
                 <div className="sm:col-span-5">
@@ -679,27 +796,19 @@ export function EventInvitationBuilderModal({
                   }`}
                 />
 
-                {/* Ruy-băng Logo CEO HN10 */}
-                <div
-                  className="absolute top-0 right-5 z-20 w-12 h-16 bg-white flex items-center justify-center pb-2 shadow-lg"
-                  style={{ clipPath: "polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%)" }}
-                >
-                  <img src="/hn10-logo.png" alt="HN10" className="w-8 h-8 object-contain" />
-                </div>
-
                 <div
                   className={`relative z-10 p-6 flex flex-col justify-center items-center text-center space-y-2.5 ${
                     previewMode === "desktop" ? "ml-[38%]" : "mt-28"
                   }`}
                 >
-                  <div className="font-serif italic text-2xl text-slate-100">Thư mời</div>
+                  <div className="font-sans italic text-2xl text-slate-100">Thư mời</div>
                   <div className="text-[9px] uppercase tracking-[0.28em] text-slate-300">TRÂN TRỌNG KÍNH MỜI</div>
-                  <div className="font-serif text-xl sm:text-2xl font-bold text-white">{activeGuest.fullName}</div>
+                  <div className="font-sans text-xl sm:text-2xl font-bold text-white">{activeGuest.fullName}</div>
                   <div className="text-[11px] text-slate-300">
                     {activeGuest.title}{activeGuest.company ? ` · ${activeGuest.company}` : ""}
                   </div>
                   <div className="text-[9px] uppercase tracking-[0.25em] text-slate-400 pt-1">TỚI DỰ</div>
-                  <div className="font-serif text-xl font-bold uppercase tracking-wider text-white">
+                  <div className="font-sans text-xl font-bold uppercase tracking-wider text-white">
                     {event.name}
                   </div>
                   <div className="px-4 py-1 rounded-full bg-white text-slate-900 text-[10px] font-extrabold uppercase tracking-wider">
@@ -714,7 +823,7 @@ export function EventInvitationBuilderModal({
                         <b className="text-base font-serif">{dayMonth}.{yearStr}</b>
                       </div>
                       <div className="text-right">
-                        <span className="font-serif italic text-sm text-white block">
+                        <span className="font-sans italic text-sm text-white block">
                           {(event as any).venueName || "Hội trường"}
                         </span>
                         <span className="text-slate-300 text-[9px]">{event.location || "Hà Nội"}</span>
