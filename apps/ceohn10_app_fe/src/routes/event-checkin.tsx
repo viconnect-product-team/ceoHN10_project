@@ -885,14 +885,49 @@ function PublicEventCheckinGatePage() {
           </div>
         )}
 
-        {/* Search / Scan Box & Upload QR Image */}
-        <div className="p-4 sm:p-5 rounded-2xl border border-slate-800 bg-slate-900/80 shadow-lg space-y-3">
+        {/* PHÂN LOẠI CHECK-IN RÕ RÀNG: ĐÃ ĐĂNG KÝ TRƯỚC vs KHÁCH ĐĂNG KÝ MỚI */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="p-3.5 rounded-2xl border-2 border-[#003B95] bg-blue-50/60 flex items-center gap-3 shadow-xs">
+            <div className="w-9 h-9 rounded-xl bg-[#003B95] text-white flex items-center justify-center shrink-0">
+              <QrCode className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-xs font-black text-[#003B95] uppercase tracking-wide">
+                1. Đã đăng ký trước (Mặc định)
+              </div>
+              <div className="text-[11px] text-slate-600">
+                Nhập Mã vé hoặc Tải ảnh QR vé đã gửi về email
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setWalkinModalOpen(true)}
+            className="p-3.5 rounded-2xl border-2 border-slate-200 hover:border-emerald-500 bg-white hover:bg-emerald-50/40 flex items-center gap-3 text-left transition shadow-xs cursor-pointer"
+          >
+            <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
+              <UserPlus className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-xs font-black text-emerald-800 uppercase tracking-wide">
+                2. Khách đăng ký mới (Chưa đăng ký trước)
+              </div>
+              <div className="text-[11px] text-slate-600">
+                Bấm để mở form đăng ký tại quầy &amp; check-in ngay
+              </div>
+            </div>
+          </button>
+        </div>
+
+        {/* Search / Scan Box & Upload QR Image (Mặc định chỉ cần Mã vé hoặc Tải ảnh QR vé email) */}
+        <div className="p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-              <Search className="w-4 h-4 text-blue-400" />
-              <span>Quét mã QR hoặc Nhập Mã Vé / Tải ảnh QR vé:</span>
+            <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+              <Search className="w-4 h-4 text-[#003B95]" />
+              <span>Nhập Mã Vé hoặc Tải ảnh mã QR vé gửi về Email:</span>
             </label>
-            <span className="text-[11px] text-slate-400">
+            <span className="text-[11px] text-slate-500">
               Đối soát tự động với danh sách sự kiện
             </span>
           </div>
@@ -908,36 +943,36 @@ function PublicEventCheckinGatePage() {
           <div className="flex flex-col sm:flex-row gap-2">
             <input
               type="text"
-              placeholder="VD: 4001, HN10-0001, EV-1234..."
+              placeholder="Nhập mã vé (VD: REG-..., HN10-0001)..."
               value={ticketInput}
               onChange={(e) => setTicketInput(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") lookupTicket(ticketInput);
               }}
-              className="flex-1 rounded-xl border border-slate-800 bg-slate-950 px-4 py-2.5 text-sm text-white font-mono placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              className="flex-1 rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 font-mono placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#003B95] transition"
             />
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={isDecodingImage || loading}
-              className="px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs sm:text-sm shadow-md transition disabled:opacity-60 flex items-center justify-center gap-1.5 cursor-pointer"
-              title="Tải ảnh mã QR vé từ thư viện ảnh hoặc ảnh chụp màn hình"
+              className="px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs sm:text-sm shadow-2xs transition disabled:opacity-60 flex items-center justify-center gap-1.5 cursor-pointer"
+              title="Tải ảnh mã QR vé từ email hoặc ảnh chụp màn hình"
             >
               {isDecodingImage ? (
-                <RefreshCw className="w-4 h-4 animate-spin text-amber-400" />
+                <RefreshCw className="w-4 h-4 animate-spin text-amber-600" />
               ) : (
-                <Upload className="w-4 h-4 text-amber-400" />
+                <Upload className="w-4 h-4 text-[#003B95]" />
               )}
-              <span>Tải ảnh QR</span>
+              <span>Tải ảnh QR vé</span>
             </button>
             <button
               type="button"
               onClick={() => lookupTicket(ticketInput)}
               disabled={loading || isDecodingImage}
-              className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm shadow-md transition disabled:opacity-60 flex items-center justify-center gap-1.5 cursor-pointer"
+              className="px-5 py-2.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white font-bold text-xs sm:text-sm shadow-sm transition disabled:opacity-60 flex items-center justify-center gap-1.5 cursor-pointer"
             >
               {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-              <span>Tra cứu</span>
+              <span>Check-in</span>
             </button>
           </div>
         </div>

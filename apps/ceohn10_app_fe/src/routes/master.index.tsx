@@ -600,21 +600,31 @@ function MasterAdminPortal() {
     toast.info("Đã thêm 1 dòng khoản phí mới. Hãy nhập tên và mã tiền tố SePay.");
   };
 
-  const handleRemoveFeeCategory = (id: string) => {
-    setSepayFormData((prev: any) => ({
-      ...prev,
-      fee_categories: (prev.fee_categories || []).filter((c: any) => c.id !== id),
-    }));
-    toast.success("Đã xóa khoản phí khỏi danh mục");
+  const handleRemoveFeeCategory = (idOrIdx: string | number) => {
+    setSepayFormData((prev: any) => {
+      const currentList = Array.isArray(prev.fee_categories)
+        ? prev.fee_categories
+        : DEFAULT_FEE_CATEGORIES;
+      return {
+        ...prev,
+        fee_categories: currentList.filter((c: any, idx: number) => (c.id ?? idx) !== idOrIdx),
+      };
+    });
+    toast.success("Đã xóa khoản phí khỏi danh mục (Nhớ bấm Lưu cấu hình để áp dụng)");
   };
 
-  const handleUpdateFeeCategory = (id: string, field: string, value: any) => {
-    setSepayFormData((prev: any) => ({
-      ...prev,
-      fee_categories: (prev.fee_categories || []).map((c: any) =>
-        c.id === id ? { ...c, [field]: value } : c
-      ),
-    }));
+  const handleUpdateFeeCategory = (idOrIdx: string | number, field: string, value: any) => {
+    setSepayFormData((prev: any) => {
+      const currentList = Array.isArray(prev.fee_categories)
+        ? prev.fee_categories
+        : DEFAULT_FEE_CATEGORIES;
+      return {
+        ...prev,
+        fee_categories: currentList.map((c: any, idx: number) =>
+          (c.id ?? idx) === idOrIdx ? { ...c, [field]: value } : c
+        ),
+      };
+    });
   };
 
   // State: Zalo OA Config Editor (Đọc từ API DB thật)
@@ -641,7 +651,7 @@ function MasterAdminPortal() {
         ...EMPTY_SEPAY_CONFIG,
         ...prev,
         ...sepayQ.data,
-        fee_categories: (sepayQ.data.fee_categories && sepayQ.data.fee_categories.length > 0)
+        fee_categories: Array.isArray(sepayQ.data.fee_categories)
           ? sepayQ.data.fee_categories
           : (prev.fee_categories || DEFAULT_FEE_CATEGORIES),
       }));
@@ -2140,7 +2150,7 @@ function MasterAdminPortal() {
                       <Wallet className="w-4 h-4 text-purple-700" />
                       Tài Khoản Ngân Hàng Nhận Tiền Tự Động
                     </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                       <div className="space-y-1">
                         <Label className="text-[11px] text-slate-700 font-semibold">Tên Ngân Hàng</Label>
                         <Input
@@ -2184,6 +2194,30 @@ function MasterAdminPortal() {
                           }
                           className="bg-white border-slate-300 text-xs h-9 uppercase font-bold"
                         />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-[11px] text-slate-700 font-semibold">Áp Dụng Cho Danh Mục Khoản Thu</Label>
+                        <Select
+                          value={sepayFormData.target_fee_category || "all"}
+                          onValueChange={(val) =>
+                            setSepayFormData({ ...sepayFormData, target_fee_category: val })
+                          }
+                        >
+                          <SelectTrigger className="bg-white border-slate-300 text-xs h-9 font-semibold">
+                            <SelectValue placeholder="Chọn danh mục khoản thu" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">Tất cả các danh mục khoản thu</SelectItem>
+                            {(Array.isArray(sepayFormData.fee_categories)
+                              ? sepayFormData.fee_categories
+                              : DEFAULT_FEE_CATEGORIES
+                            ).map((cat: any, idx: number) => (
+                              <SelectItem key={cat.id || idx} value={cat.prefix || cat.id || String(idx)}>
+                                {cat.name || cat.prefix || "Khoản thu"} ({cat.prefix || "N/A"})
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                     </div>
                   </div>
@@ -2298,9 +2332,21 @@ function MasterAdminPortal() {
                     </div>
 
                     <div className="space-y-3">
-                      {(sepayFormData.fee_categories || DEFAULT_FEE_CATEGORIES).map((cat: any, idx: number) => (
+                      {((Array.isArray(sepayFormData.fee_categories)
+                        ? sepayFormData.fee_categories
+                        : DEFAULT_FEE_CATEGORIES
+                      )).length === 0 ? (
+                        <div className="p-4 rounded-lg border border-dashed border-slate-300 bg-white text-center text-xs text-slate-500">
+                          Chưa có danh mục khoản thu nào. Bấm <strong>+ Thêm Khoản Thu / Loại Phí Mới</strong> để tạo mới rồi bấm Lưu cấu hình.
+                        </div>
+                      ) : (Array.isArray(sepayFormData.fee_categories)
+                        ? sepayFormData.fee_categories
+                        : DEFAULT_FEE_CATEGORIES
+                      ).map((cat: any, idx: number) => {
+                        const rowKey = cat.id ?? idx;
+                        return (
                         <div
-                          key={cat.id || idx}
+                          key={rowKey}
                           className={`p-3.5 rounded-lg border transition ${
                             cat.is_active !== false
                               ? "bg-white border-slate-200 shadow-xs"
@@ -2313,7 +2359,7 @@ function MasterAdminPortal() {
                               <Label className="text-[10px] text-slate-500 font-semibold uppercase">Tên Khoản Thu / Loại Phí</Label>
                               <Input
                                 value={cat.name || ""}
-                                onChange={(e) => handleUpdateFeeCategory(cat.id, "name", e.target.value)}
+                                onChange={(e) => handleUpdateFeeCategory(rowKey, "name", e.target.value)}
                                 placeholder="VD: Vé sự kiện, Phí gia nhập..."
                                 className="bg-white border-slate-300 text-xs h-8 font-semibold"
                               />
@@ -2325,7 +2371,7 @@ function MasterAdminPortal() {
                               <Input
                                 value={cat.prefix || ""}
                                 onChange={(e) =>
-                                  handleUpdateFeeCategory(cat.id, "prefix", e.target.value.toUpperCase().replace(/\s+/g, "_"))
+                                  handleUpdateFeeCategory(rowKey, "prefix", e.target.value.toUpperCase().replace(/\s+/g, "_"))
                                 }
                                 placeholder="VD: CEOHN10_XYZ"
                                 className="bg-white border-slate-300 text-xs h-8 font-mono font-bold text-blue-900"
@@ -2337,7 +2383,7 @@ function MasterAdminPortal() {
                               <Label className="text-[10px] text-slate-500 font-semibold uppercase">Quỹ Đích Nhận Tiền</Label>
                               <Select
                                 value={cat.target_fund_name || "Quỹ Tổng CLB CEO HN10"}
-                                onValueChange={(val) => handleUpdateFeeCategory(cat.id, "target_fund_name", val)}
+                                onValueChange={(val) => handleUpdateFeeCategory(rowKey, "target_fund_name", val)}
                               >
                                 <SelectTrigger className="bg-white border-slate-300 text-xs h-8">
                                   <SelectValue placeholder="Chọn Quỹ tiếp nhận" />
@@ -2359,7 +2405,7 @@ function MasterAdminPortal() {
                               <Label className="text-[10px] text-slate-500 font-semibold uppercase">Hành Động Nghiệp Vụ Tự Động</Label>
                               <Select
                                 value={cat.action_type || "custom"}
-                                onValueChange={(val) => handleUpdateFeeCategory(cat.id, "action_type", val)}
+                                onValueChange={(val) => handleUpdateFeeCategory(rowKey, "action_type", val)}
                               >
                                 <SelectTrigger className="bg-white border-slate-300 text-xs h-8">
                                   <SelectValue placeholder="Chọn hành động" />
@@ -2381,7 +2427,7 @@ function MasterAdminPortal() {
                             <div className="md:col-span-1 flex items-center justify-end gap-1.5 pt-3 md:pt-4">
                               <button
                                 type="button"
-                                onClick={() => handleUpdateFeeCategory(cat.id, "is_active", cat.is_active === false)}
+                                onClick={() => handleUpdateFeeCategory(rowKey, "is_active", cat.is_active === false)}
                                 className={`text-[10px] font-bold px-2 py-1 rounded cursor-pointer transition ${
                                   cat.is_active !== false
                                     ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
@@ -2393,7 +2439,7 @@ function MasterAdminPortal() {
                               </button>
                               <button
                                 type="button"
-                                onClick={() => handleRemoveFeeCategory(cat.id)}
+                                onClick={() => handleRemoveFeeCategory(rowKey)}
                                 className="p-1 rounded text-slate-400 hover:text-red-600 hover:bg-red-50 transition cursor-pointer"
                                 title="Xóa khoản phí này"
                               >
@@ -2402,7 +2448,8 @@ function MasterAdminPortal() {
                             </div>
                           </div>
                         </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
 

@@ -5003,25 +5003,26 @@ Trân trọng cảm ơn Anh/Chị!`;
           await this.prisma.$executeRaw`
             UPDATE public.members
             SET name = ${name},
-                contact = ${company || name},
+                contact = ${name},
+                company_name = ${company || null},
                 industry = ${industry},
                 address = CASE WHEN ${address} != '' THEN ${address} ELSE address END,
                 department = ${department},
-                "executiveRole" = ${title},
-                "updatedAt" = NOW()
+                executive_role = ${title},
+                updated_at = NOW()
             WHERE id = ${mId}
           `;
           updated++;
         } else {
           const newId = `MB${Date.now().toString(36).toUpperCase()}${Math.floor(Math.random() * 1000)}`;
-          const code = `CEO HN10-${Math.floor(1000 + Math.random() * 9000)}`;
+          const code = `CEOHN10-${Math.floor(1000 + Math.random() * 9000)}`;
           await this.prisma.$executeRaw`
             INSERT INTO public.members (
-              id, name, contact, email, phone, type, level, industry, status,
-              address, "feePaid", "feeYear", "joinedAt", "createdAt", "updatedAt",
-              "associationId", "executiveRole", department, code
+              id, name, contact, company_name, email, phone, type, level, industry, status,
+              address, fee_paid, fee_year, joined_at, created_at, updated_at,
+              association_id, executive_role, department, code
             ) VALUES (
-              ${newId}, ${name}, ${company || name}, ${email || null}, ${phone || null}, 'individual', 'Chính thức', ${industry}, 'active',
+              ${newId}, ${name}, ${name}, ${company || null}, ${email || null}, ${phone || null}, 'individual', 'Chính thức', ${industry}, 'active',
               ${address || null}, true, 2026, NOW()::date::text, NOW(), NOW(),
               ${defaultAssocId}::uuid, ${title}, ${department}, ${code}
             )

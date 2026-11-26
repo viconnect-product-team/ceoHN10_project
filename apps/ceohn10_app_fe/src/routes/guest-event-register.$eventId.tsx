@@ -1096,86 +1096,83 @@ function StandaloneGuestEventRegistrationPage() {
     );
   }
 
-  // 3. FORM VIEW (THƯ MỜI SỰ KIỆN PAXLAW-STYLE)
+  // 3. FORM VIEW (THƯ MỜI & ĐĂNG KÝ SỰ KIỆN THEME SÁNG SANG TRỌNG)
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0F172A] to-[#020617] py-8 sm:py-16 px-4 font-sans text-slate-200">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-blue-50/40 py-8 sm:py-14 px-4 font-sans text-slate-800">
       <div className="max-w-2xl mx-auto space-y-6">
-        {/* THIỆP MỜI SANG TRỌNG THEO PHONG CÁCH PAXLAW */}
-        <div className="rounded-3xl border-2 border-amber-500/40 bg-slate-900/95 shadow-[0_0_50px_rgba(217,119,6,0.15)] overflow-hidden backdrop-blur-md relative">
+        {/* THIỆP MỜI SANG TRỌNG THEME SÁNG */}
+        <div className="rounded-3xl border border-amber-200/90 bg-white shadow-xl shadow-slate-200/70 overflow-hidden relative">
           {/* Viền kim loại vàng hoàng gia */}
-          <div className="h-2 bg-gradient-to-r from-amber-600 via-amber-300 to-amber-600" />
+          <div className="h-2 bg-gradient-to-r from-[#003B95] via-amber-400 to-[#003B95]" />
 
-          <div className="p-6 sm:p-10 text-center space-y-6 relative">
+          <div className="p-6 sm:p-10 text-center space-y-5 relative">
             {/* Logo & Tổ Chức */}
-            <div className="flex flex-col items-center justify-center gap-2">
-              <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shadow-inner">
-                <Award className="w-8 h-8 text-amber-400" />
+            <div className="flex flex-col items-center justify-center gap-1.5">
+              <div className="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center shadow-xs">
+                <Award className="w-7 h-7 text-amber-600" />
               </div>
-              <div className="text-[11px] font-black tracking-[0.25em] text-amber-400 uppercase">
+              <div className="text-[11px] font-black tracking-[0.22em] text-[#003B95] uppercase">
                 HANOIBA · HIỆP HỘI DOANH NGHIỆP TRẺ HÀ NỘI
               </div>
-              <div className="text-xs font-bold tracking-widest text-slate-300 uppercase">
+              <div className="text-xs font-bold tracking-widest text-slate-600 uppercase">
                 CLB DOANH NHÂN CEO HN10
               </div>
             </div>
 
-            {/* Tiêu đề thư mời */}
-            <div className="space-y-1.5 pt-1">
-              <div className="text-[11px] font-semibold tracking-[0.3em] text-amber-400/80 uppercase">
-                ✦ FORMAL INVITATION ✦
+            {/* Tiêu đề */}
+            <div className="space-y-1 pt-1">
+              <div className="text-[11px] font-semibold tracking-[0.28em] text-amber-600 uppercase">
+                ✦ EVENT REGISTRATION ✦
               </div>
-              <h2 className="text-2xl sm:text-4xl font-serif font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 leading-tight">
-                THƯ MỜI THAM DỰ
+              <h2 className="text-2xl sm:text-3xl font-serif font-black tracking-wide text-[#003B95] leading-tight">
+                ĐĂNG KÝ THAM DỰ SỰ KIỆN
               </h2>
             </div>
 
-            {/* Khung tôn vinh danh tính đại biểu (Personalized Paxlaw Invitee Name) */}
-            <div className="bg-gradient-to-r from-amber-500/10 via-amber-400/20 to-amber-500/10 border-2 border-amber-400/60 rounded-2xl py-4 px-6 shadow-md mx-auto max-w-lg">
-              <span className="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-amber-300 block mb-1">
+            {/* Khung tôn vinh danh tính đại biểu */}
+            <div className="bg-gradient-to-r from-blue-50/80 via-amber-50/70 to-blue-50/80 border border-amber-300/80 rounded-2xl py-3.5 px-6 shadow-xs mx-auto max-w-lg">
+              <span className="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-amber-700 block mb-1">
                 TRÂN TRỌNG KÍNH MỜI
               </span>
-              <div className="text-xl sm:text-3xl font-serif font-black text-amber-300 drop-shadow-sm uppercase">
+              <div className="text-xl sm:text-2xl font-serif font-black text-slate-900 uppercase">
                 {inviteeName || fullName || "QUÝ ĐẠI BIỂU & DOANH NHÂN"}
               </div>
-              <span className="text-[11px] text-slate-400 font-medium block mt-1">
-                Tới tham dự chương trình đặc biệt cùng Cộng đồng Doanh Nhân CEO HN10
-              </span>
             </div>
 
             {/* Tên Sự Kiện */}
-            <div className="space-y-2 pt-2">
-              <h1 className="text-xl sm:text-2xl font-bold text-white font-serif leading-snug">
+            <div className="space-y-1.5 pt-1">
+              <h1 className="text-xl sm:text-2xl font-bold text-slate-900 font-serif leading-snug">
                 {event.name}
               </h1>
               {event.subtitle && (
-                <p className="text-xs sm:text-sm text-slate-400 italic max-w-lg mx-auto">
+                <p className="text-xs sm:text-sm text-slate-500 italic max-w-lg mx-auto">
                   {event.subtitle}
                 </p>
               )}
             </div>
 
-            {/* Thông Tin Thời Gian, Địa Điểm, Dresscode */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left pt-2">
-              <div className="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/80 space-y-1.5">
-                <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider">
-                  <Calendar className="w-4 h-4 text-amber-400" />
+            {/* Thông Tin Thời Gian, Địa Điểm */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left pt-1">
+              <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 space-y-1.5">
+                <div className="flex items-center gap-2 text-[#003B95] text-xs font-bold uppercase tracking-wider">
+                  <Calendar className="w-4 h-4 text-[#003B95]" />
                   <span>Thời gian tổ chức</span>
                 </div>
-                <div className="text-xs sm:text-sm font-semibold text-slate-200">
+                <div className="text-xs sm:text-sm font-semibold text-slate-900">
                   {event.date || "Theo thông báo từ BTC"}
                 </div>
-                <div className="text-[11px] text-slate-400 flex items-center gap-1">
-                  <Clock className="w-3 h-3 text-slate-500" />
-                  <span>Đón khách & Check-in: 30 phút trước khai mạc</span>
+                <div className="text-[11px] text-slate-500 flex items-center gap-1">
+                  <Clock className="w-3 h-3 text-slate-400" />
+                  <span>Đón khách &amp; Check-in: 30 phút trước khai mạc</span>
                 </div>
               </div>
 
-              <div className="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/80 space-y-1.5">
-                <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider">
-                  <MapPin className="w-4 h-4 text-amber-400" />
+              <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 space-y-1.5">
+                <div className="flex items-center gap-2 text-[#003B95] text-xs font-bold uppercase tracking-wider">
+                  <MapPin className="w-4 h-4 text-[#003B95]" />
                   <span>Địa điểm diễn ra</span>
                 </div>
-                <div className="text-xs sm:text-sm font-semibold text-slate-200 truncate">
+                <div className="text-xs sm:text-sm font-semibold text-slate-900 truncate">
                   {event.location || "Trung tâm Hội nghị"}
                 </div>
                 {event.location && (
@@ -1183,7 +1180,7 @@ function StandaloneGuestEventRegistrationPage() {
                     href={`https://maps.google.com/?q=${encodeURIComponent(event.location)}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-400 hover:text-amber-300 underline"
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#003B95] hover:underline"
                   >
                     <Compass className="w-3 h-3" />
                     <span>Xem bản đồ đường đi</span>
@@ -1193,22 +1190,22 @@ function StandaloneGuestEventRegistrationPage() {
             </div>
 
             {/* Fee & Dress Code */}
-            <div className="bg-amber-500/10 rounded-2xl p-4 border border-amber-500/20 text-xs text-left flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="bg-amber-50/80 rounded-2xl p-4 border border-amber-200 text-xs text-left flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
-                <span className="font-bold text-amber-400 uppercase tracking-wide block">
+                <span className="font-bold text-amber-800 uppercase tracking-wide block">
                   Quy định trang phục (Dress Code):
                 </span>
-                <span className="text-slate-300 text-[11px]">
+                <span className="text-slate-600 text-[11px]">
                   Trang phục lịch sự, Vest, Áo dài hoặc Doanh nhân công sở.
                 </span>
               </div>
               <div className="shrink-0">
                 {isFree ? (
-                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-full font-bold text-xs uppercase tracking-wide">
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-full font-bold text-xs uppercase tracking-wide">
                     ✦ Miễn Phí (0 đ)
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-amber-400/20 text-amber-300 border border-amber-400/40 rounded-full font-bold text-xs uppercase tracking-wide">
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 text-amber-900 border border-amber-300 rounded-full font-bold text-xs uppercase tracking-wide">
                     {new Intl.NumberFormat("vi-VN").format(ticketPrice)} đ / vé
                   </span>
                 )}
@@ -1596,59 +1593,10 @@ function StandaloneGuestEventRegistrationPage() {
             </div>
           </div>
 
-          {/* TRƯỜNG 6: LOẠI VÉ */}
+          {/* TRƯỜNG 6: GHI CHÚ / KẾT NỐI B2B */}
           <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-7 space-y-3">
             <label className="block text-sm sm:text-base font-bold text-slate-800">
-              6. Loại vé tham dự
-            </label>
-            <p className="text-xs text-slate-500">
-              Chọn hạng vé phù hợp với tư cách tham dự chương trình.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-              {(eventTickets.length > 0
-                ? eventTickets
-                : [
-                    { id: "Standard", name: "Vé Tiêu Chuẩn", price: ticketPrice, description: "Tham dự toàn bộ chương trình" },
-                    { id: "VIP", name: "Vé VIP Doanh Nhân", price: ticketPrice > 0 ? ticketPrice * 2 : 500000, description: "Bàn tiệc trang trọng, tài liệu VIP" },
-                    { id: "Guest", name: "Khách Mời Danh Dự", price: 0, description: "Khách mời đặc biệt từ BTC" },
-                  ]
-              ).map((t: any) => {
-                const isSelected =
-                  ticketType === t.name ||
-                  ticketType === t.id ||
-                  (ticketType.toUpperCase().includes("VIP") && (t.name || "").toUpperCase().includes("VIP"));
-                const tPrice = Number(t.price || 0);
-                return (
-                  <button
-                    key={t.id || t.name}
-                    type="button"
-                    onClick={() => setTicketType(t.name || t.id)}
-                    className={`p-3.5 rounded-2xl border text-left transition cursor-pointer ${
-                      isSelected
-                        ? "border-[#003B95] bg-blue-50/60 ring-2 ring-[#003B95]/20 shadow-xs"
-                        : "border-slate-200 hover:border-slate-300 bg-slate-50/50"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-bold text-xs text-slate-900">{t.name || t.label}</span>
-                      {isSelected && (
-                        <CheckCircle2 className="w-4 h-4 text-[#003B95]" />
-                      )}
-                    </div>
-                    <div className="text-xs font-bold text-[#003B95] mb-1">
-                      {tPrice <= 0 ? "Miễn phí (0đ)" : `${tPrice.toLocaleString("vi-VN")} đ`}
-                    </div>
-                    <span className="text-[11px] text-slate-500 block leading-tight">{t.description || t.desc}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* TRƯỜNG 8: GHI CHÚ / KẾT NỐI B2B */}
-          <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-7 space-y-3">
-            <label className="block text-sm sm:text-base font-bold text-slate-800">
-              7. Mong muốn kết nối B2B hoặc Ghi chú cho Ban Tổ Chức
+              6. Mong muốn kết nối B2B hoặc Ghi chú cho Ban Tổ Chức
             </label>
             <p className="text-xs text-slate-500">
               Quý khách có thể ghi ngành nghề mong muốn tìm đối tác hoặc yêu cầu đón tiếp đặc biệt (không bắt buộc).
@@ -1660,27 +1608,6 @@ function StandaloneGuestEventRegistrationPage() {
               onChange={(e) => setNote(e.target.value)}
               className="w-full p-3.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#003B95] bg-slate-50/60"
             />
-          </div>
-
-          {/* Tùy chọn Check-in ngay tại bàn tiếp đón */}
-          <div className="p-4 bg-emerald-50/80 rounded-2xl border-2 border-emerald-300 shadow-xs">
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={isCheckinNow}
-                onChange={(e) => setIsCheckinNow(e.target.checked)}
-                className="mt-1 w-5 h-5 text-emerald-600 rounded border-emerald-400 focus:ring-emerald-500 cursor-pointer"
-              />
-              <div className="flex-1">
-                <span className="text-sm font-bold text-emerald-950 flex items-center gap-1.5">
-                  <QrCode className="w-4 h-4 text-emerald-600" />
-                  Điểm danh Check-in vào cửa sự kiện ngay lúc này
-                </span>
-                <p className="text-xs text-emerald-800 mt-1 leading-relaxed">
-                  Tích chọn mục này nếu Quý Anh/Chị đang có mặt tại bàn lễ tân của sự kiện để hệ thống lập tức điểm danh <strong>Đã tham dự (Attended)</strong> và cấp mã quay thưởng may mắn.
-                </p>
-              </div>
-            </label>
           </div>
 
           {/* Submit Button */}
