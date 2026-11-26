@@ -71,17 +71,17 @@ function PublicInvitationPage() {
       .then((res) => {
         setData(res);
         if (res?.guest) {
-          setTicketTier("invited_guest");
+          setTicketTier(res.guest.guestType === "other_participant" ? "other_participant" : "invited_guest");
           setCustomFullName(res.guest.fullName || "");
           setCustomTitle(res.guest.title || "");
           setCustomCompany(res.guest.company || "");
           setContactEmail(res.guest.email || "");
           setContactPhone(res.guest.phone || "");
-        } else if (initialSlug) {
-          setTicketTier("invited_guest");
-          setCustomFullName(formatSlugFallback(initialSlug));
         } else {
           setTicketTier("other_participant");
+          if (initialSlug) {
+            setCustomFullName(formatSlugFallback(initialSlug));
+          }
         }
       })
       .catch(() => setData(null))
@@ -220,8 +220,14 @@ function PublicInvitationPage() {
       return;
     }
     const finalName = (customFullName || displayGuestName).trim();
+    const finalEmail = (contactEmail || guest?.email || "").trim();
+    const finalPhone = (contactPhone || guest?.phone || "").trim();
     if (!finalName) {
       toast.error("Vui lòng nhập Họ và tên!");
+      return;
+    }
+    if (activeOpt.mode !== "declined" && (!finalEmail || !finalPhone)) {
+      toast.error("Vui lòng nhập đầy đủ Email và Số điện thoại để kiểm tra định danh vé!");
       return;
     }
     if (activeOpt.mode !== "declined" && attendeeCount > 1) {
@@ -541,34 +547,67 @@ function PublicInvitationPage() {
                   )}
                 </div>
 
-                {/* Chọn loại vé: Khách mời (Miễn phí) vs Khách tham gia khác */}
+                {/* Đối tượng vé do Ban Truyền thông / Ban Sự kiện & Hậu cần chỉ định (chỉ đọc) */}
                 <div className="space-y-1.5">
                   <label className="block text-xs font-bold text-slate-200">Đối tượng vé áp dụng</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setTicketTier("invited_guest")}
-                      className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
-                        ticketTier === "invited_guest"
-                          ? "border-emerald-400 bg-emerald-500/15 text-white"
-                          : "border-white/15 bg-slate-800/40 text-slate-300 hover:border-white/30"
-                      }`}
-                    >
-                      <div className="text-xs font-bold">Vé Khách mời</div>
-                      <div className="text-[11px] text-emerald-300">Miễn phí (theo thư mời)</div>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setTicketTier("other_participant")}
-                      className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
-                        ticketTier === "other_participant"
-                          ? "border-amber-400 bg-amber-500/15 text-white"
-                          : "border-white/15 bg-slate-800/40 text-slate-300 hover:border-white/30"
-                      }`}
-                    >
-                      <div className="text-xs font-bold">Khách tham gia khác</div>
-                      <div className="text-[11px] text-amber-300">Tính phí theo vé sự kiện</div>
-                    </button>
+                  {ticketTier === "invited_guest" ? (
+                    <div className="p-3 rounded-xl border border-emerald-400/50 bg-emerald-500/15 text-white flex items-center justify-between gap-2">
+                      <div>
+                        <div className="text-xs font-bold">Vé Khách mời (Theo danh sách BTC)</div>
+                        <div className="text-[11px] text-emerald-300">Miễn phí tham dự (0 đ)</div>
+                      </div>
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/30 text-[10px] font-bold uppercase text-emerald-200">
+                        0 đ
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="p-3 rounded-xl border border-amber-400/50 bg-amber-500/15 text-white space-y-1.5">
+                      <div className="flex items-center justify-between gap-2">
+                        <div>
+                          <div className="text-xs font-bold">Khách tham gia sự kiện</div>
+                          <div className="text-[11px] text-amber-300">Áp dụng giá vé theo từng phần chương trình</div>
+                        </div>
+                      </div>
+                      {Array.isArray(data?.tickets) && data.tickets.length > 0 && (
+                        <div className="pt-1.5 border-t border-white/10 flex flex-wrap gap-1.5">
+                          {data.tickets.map((tk: any, idx: number) => (
+                            <span
+                              key={tk.id || idx}
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-950/60 border border-white/15 text-[10px] text-slate-200"
+                            >
+                              <span>{tk.name}:</span>
+                              <strong className="text-amber-300">
+                                {Number(tk.price || 0) > 0 ? `${Number(tk.price).toLocaleString("vi-VN")} đ` : "Miễn phí"}
+                              </strong>
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Email & SĐT định danh để check trùng đăng ký */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-300 mb-1">Email *</label>
+                    <input
+                      type="email"
+                      placeholder="email@company.vn"
+                      value={contactEmail}
+                      onChange={(e) => setContactEmail(e.target.value)}
+                      className="h-9 w-full rounded-xl border border-white/20 bg-slate-950/60 px-3 text-xs text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-300 mb-1">Số điện thoại *</label>
+                    <input
+                      type="tel"
+                      placeholder="09xxxxxxxx"
+                      value={contactPhone}
+                      onChange={(e) => setContactPhone(e.target.value)}
+                      className="h-9 w-full rounded-xl border border-white/20 bg-slate-950/60 px-3 text-xs text-white"
+                    />
                   </div>
                 </div>
 

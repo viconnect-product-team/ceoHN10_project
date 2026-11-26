@@ -646,8 +646,9 @@ export class EventsController {
   async saveInvitationGuests(
     @Param('id') id: string,
     @Body('guests') guests: any[],
+    @Request() req: any,
   ) {
-    return this.eventsService.saveInvitationGuests(id, guests);
+    return this.eventsService.saveInvitationGuests(id, guests, req?.user);
   }
 
   // UC-INV-03..06: Xem thư mời cá nhân hóa công khai & RSVP không cần đăng nhập

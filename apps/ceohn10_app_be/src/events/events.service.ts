@@ -87,11 +87,13 @@ export class EventsService extends BaseService implements OnModuleInit {
         company text DEFAULT '',
         email text DEFAULT '',
         phone text DEFAULT '',
+        guest_type text DEFAULT 'invited_guest',
         source text DEFAULT 'import',
         sent_at timestamp with time zone,
         created_at timestamp with time zone DEFAULT now(),
         UNIQUE(event_id, slug)
       );
+      ALTER TABLE public.event_invitation_guests ADD COLUMN IF NOT EXISTS guest_type text DEFAULT 'invited_guest';
 
       ALTER TABLE public.event_registrations ADD COLUMN IF NOT EXISTS is_walkin boolean DEFAULT false;
       ALTER TABLE public.event_registrations ADD COLUMN IF NOT EXISTS registration_origin text DEFAULT 'pre_registered';
@@ -6688,33 +6690,91 @@ export class EventsService extends BaseService implements OnModuleInit {
       company: r.company || '',
       email: r.email || '',
       phone: r.phone || '',
+      guestType: r.guest_type === 'other_participant' ? 'other_participant' : 'invited_guest',
       source: r.source || 'import',
       sentAt: r.sent_at,
       createdAt: r.created_at,
     }));
   }
 
-  async saveInvitationGuests(eventId: string, guests: any[]) {
+  private async canUserClassifyInvitationGuests(actor?: any): Promise<boolean> {
+    if (!actor) return false;
+    const roleStr = String(actor.role || '').toLowerCase();
+    const rolesArr: string[] = Array.isArray(actor.roles) ? actor.roles.map((r: any) => String(r).toLowerCase()) : [];
+    const emailStr = String(actor.email || '').toLowerCase();
+    if (
+      roleStr === 'platform_admin' ||
+      roleStr === 'admin' ||
+      rolesArr.includes('platform_admin') ||
+      rolesArr.includes('admin') ||
+      emailStr === 'admin@ceohn10.vn'
+    ) {
+      return true;
+    }
+
+    const userId = actor.id || actor.sub || actor.userId;
+    if (!userId) return false;
+    const rows = await this.prisma.$queryRaw<any[]>`
+      SELECT m.department, m.executive_role, ur.role::text as user_role
+      FROM public.members m
+      LEFT JOIN public.user_roles ur ON ur.user_id = m.user_id
+      WHERE m.user_id::text = ${String(userId)} OR LOWER(m.email) = LOWER(${emailStr})
+      LIMIT 3
+    `.catch(() => []);
+
+    for (const r of rows) {
+      const uRole = String(r.user_role || r.executive_role || '').toLowerCase();
+      const dept = String(r.department || '').toLowerCase();
+      if (uRole === 'platform_admin' || uRole === 'admin') return true;
+      const isHead =
+        uRole === 'truong_ban_chuyen_trach' ||
+        uRole.includes('truong_ban') ||
+        uRole.includes('trưởng ban');
+      const isMediaOrEventDept =
+        dept.includes('truyền thông') ||
+        dept.includes('truyen thong') ||
+        dept.includes('sự kiện') ||
+        dept.includes('su kien') ||
+        dept.includes('hậu cần');
+      if (isHead && isMediaOrEventDept) return true;
+    }
+    return false;
+  }
+
+  async saveInvitationGuests(eventId: string, guests: any[], actor?: any) {
     const list = Array.isArray(guests) ? guests : [];
+    const hasExplicitClassification = list.some((g) => g.guestType !== undefined || g.guest_type !== undefined);
+    if (hasExplicitClassification && actor) {
+      const allowed = await this.canUserClassifyInvitationGuests(actor);
+      if (!allowed) {
+        throw new ForbiddenException(
+          'Chỉ Trưởng ban Truyền thông, Trưởng ban Sự kiện & Hậu cần hoặc Quản trị viên mới có quyền phân loại Khách mời / Khách tham gia sự kiện.',
+        );
+      }
+    }
+
     const saved: any[] = [];
     for (const g of list) {
       const fullName = String(g.fullName || g.name || '').trim();
       if (!fullName) continue;
       const baseSlug = g.slug ? String(g.slug).trim().toLowerCase() : this.slugifyGuestName(fullName);
       const id = `INV-${eventId}-${baseSlug}`.slice(0, 120);
+      const rawType = String(g.guestType || g.guest_type || 'invited_guest').trim();
+      const guestType = rawType === 'other_participant' ? 'other_participant' : 'invited_guest';
       await this.prisma.$executeRaw`
         INSERT INTO public.event_invitation_guests (
-          id, event_id, slug, full_name, title, company, email, phone, source, created_at
+          id, event_id, slug, full_name, title, company, email, phone, guest_type, source, created_at
         ) VALUES (
           ${id}, ${eventId}, ${baseSlug}, ${fullName}, ${String(g.title || '')}, ${String(g.company || '')},
-          ${String(g.email || '')}, ${String(g.phone || '')}, ${String(g.source || 'import')}, now()
+          ${String(g.email || '')}, ${String(g.phone || '')}, ${guestType}, ${String(g.source || 'import')}, now()
         )
         ON CONFLICT (event_id, slug) DO UPDATE SET
           full_name = EXCLUDED.full_name,
           title = EXCLUDED.title,
           company = EXCLUDED.company,
           email = EXCLUDED.email,
-          phone = EXCLUDED.phone
+          phone = EXCLUDED.phone,
+          guest_type = EXCLUDED.guest_type
       `.catch(() => {});
       saved.push({
         id,
@@ -6725,6 +6785,7 @@ export class EventsService extends BaseService implements OnModuleInit {
         company: String(g.company || ''),
         email: String(g.email || ''),
         phone: String(g.phone || ''),
+        guestType,
       });
     }
     return { ok: true, count: saved.length, guests: saved };
@@ -6764,6 +6825,7 @@ export class EventsService extends BaseService implements OnModuleInit {
           company: g.company || '',
           email: g.email || '',
           phone: g.phone || '',
+          guestType: g.guest_type === 'other_participant' ? 'other_participant' : 'invited_guest',
         };
       }
     }
@@ -6890,9 +6952,47 @@ export class EventsService extends BaseService implements OnModuleInit {
       };
     }
 
+    // Kiểm tra trùng đăng ký (Email + Họ tên + Số điện thoại) để không cho đăng ký thêm lần 2
+    const cleanEmail = email.toLowerCase();
+    const cleanPhone = phone.replace(/\D/g, '');
+    const cleanName = fullName.toLowerCase();
+    if (cleanEmail || (cleanPhone && cleanName)) {
+      const dupRows = await this.prisma.$queryRaw<any[]>`
+        SELECT id, member_name, email, phone
+        FROM public.event_registrations
+        WHERE event_id = ${eventId}
+          AND status NOT IN ('cancelled', 'declined')
+          AND (
+            (${cleanEmail} != '' AND LOWER(TRIM(COALESCE(email, ''))) = ${cleanEmail})
+            OR (
+              ${cleanPhone} != ''
+              AND ${cleanName} != ''
+              AND regexp_replace(COALESCE(phone, ''), '\\D', '', 'g') = ${cleanPhone}
+              AND LOWER(TRIM(COALESCE(member_name, ''))) = ${cleanName}
+            )
+          )
+        LIMIT 1
+      `.catch(() => []);
+      if (dupRows.length > 0) {
+        throw new BadRequestException(
+          'Thông tin (Họ tên / Email / Số điện thoại) này đã đăng ký tham dự sự kiện trước đó, không thể đăng ký thêm lần 2!',
+        );
+      }
+    }
+
     // Trường hợp tham dự 1 phần hoặc toàn bộ (UC-INV-04, UC-INV-05)
-    const ticketTier: 'invited_guest' | 'other_participant' =
-      body.ticketTier === 'invited_guest' ? 'invited_guest' : 'other_participant';
+    // Phân loại vé lấy từ CSDL (do Trưởng ban Truyền thông / Trưởng ban Sự kiện & Hậu cần chỉ định), không cho khách tự chọn
+    let ticketTier: 'invited_guest' | 'other_participant' = 'other_participant';
+    if (body.guestSlug && String(body.guestSlug).trim()) {
+      const gRows = await this.prisma.$queryRaw<any[]>`
+        SELECT guest_type FROM public.event_invitation_guests
+        WHERE event_id = ${eventId} AND LOWER(slug) = ${String(body.guestSlug).trim().toLowerCase()}
+        LIMIT 1
+      `.catch(() => []);
+      if (gRows.length > 0) {
+        ticketTier = gRows[0].guest_type === 'other_participant' ? 'other_participant' : 'invited_guest';
+      }
+    }
     const tierBadge = ticketTier === 'invited_guest' ? 'Vé Khách mời' : 'Vé Khách tham dự';
     const partsLabel =
       attendMode === 'full'
