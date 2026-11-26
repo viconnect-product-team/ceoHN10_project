@@ -4522,6 +4522,14 @@ Trân trọng cảm ơn Anh/Chị!`;
       });
     }
 
+    // Đồng bộ cả bảng ceohn10_users (nếu có) vì UsersRepository ưu tiên ceohn10_users khi đăng nhập
+    await this.prisma.$executeRawUnsafe(
+      `UPDATE public.ceohn10_users SET password = $1, email = $2, username = $2, name = $3, updated_at = NOW() WHERE LOWER(email) = $2 OR LOWER(username) = $2`,
+      hashedPassword,
+      cleanEmail,
+      member.contact || member.name,
+    ).catch(() => {});
+
     // Thiết lập bắt buộc đổi mật khẩu lần đầu đăng nhập
     await this.prisma.$executeRaw`
       UPDATE public.vione_users

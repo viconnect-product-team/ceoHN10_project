@@ -109,20 +109,37 @@ export class DocumentsRepository {
     }
     const sharedWithJson = JSON.stringify(sharedWith || []);
     const docId = crypto.randomUUID();
-    await this.prisma.$executeRaw`
-      INSERT INTO public.documents (
-        id, code, name, category, size, uploaded_by, type, file_path, association_id, 
-        folder_id, drive_url, is_folder, share_scope, share_role, shared_with, 
-        is_starred, color_tag, description, doc_scope, enterprise_name, uploaded_at
-      )
-      VALUES (
-        ${docId}, ${code}, ${name}, ${category}, ${size}, ${uploadedBy}, ${type}, ${filePath}, 
-        ${associationId ? associationId : null}::uuid, ${folderId || null}, ${driveUrl || null}, 
-        ${isFolder}, ${shareScope}, ${shareRole}, ${sharedWithJson}::jsonb, 
-        ${isStarred}, ${colorTag || null}, ${description || null}, ${docScope}, 
-        ${enterpriseName || null}, NOW()
-      )
-    `;
+    try {
+      await this.prisma.$executeRaw`
+        INSERT INTO public.documents (
+          id, code, name, category, size, uploaded_by, type, file_path, association_id, 
+          folder_id, drive_url, is_folder, share_scope, share_role, shared_with, 
+          is_starred, color_tag, description, doc_scope, enterprise_name, uploaded_at
+        )
+        VALUES (
+          ${docId}::uuid, ${code}, ${name}, ${category}, ${size}, ${uploadedBy}, ${type}, ${filePath}, 
+          ${associationId ? associationId : null}::uuid, ${folderId || null}, ${driveUrl || null}, 
+          ${isFolder}, ${shareScope}, ${shareRole}, ${sharedWithJson}::jsonb, 
+          ${isStarred}, ${colorTag || null}, ${description || null}, ${docScope}, 
+          ${enterpriseName || null}, NOW()
+        )
+      `;
+    } catch {
+      await this.prisma.$executeRaw`
+        INSERT INTO public.documents (
+          id, code, name, category, size, uploaded_by, type, file_path, association_id, 
+          folder_id, drive_url, is_folder, share_scope, share_role, shared_with, 
+          is_starred, color_tag, description, doc_scope, enterprise_name, uploaded_at
+        )
+        VALUES (
+          ${docId}, ${code}, ${name}, ${category}, ${size}, ${uploadedBy}, ${type}, ${filePath}, 
+          ${associationId ? associationId : null}::uuid, ${folderId || null}, ${driveUrl || null}, 
+          ${isFolder}, ${shareScope}, ${shareRole}, ${sharedWithJson}::jsonb, 
+          ${isStarred}, ${colorTag || null}, ${description || null}, ${docScope}, 
+          ${enterpriseName || null}, NOW()
+        )
+      `;
+    }
 
     const rows = await this.prisma.$queryRaw<any[]>`
       SELECT code, name, category, size, uploaded_at, uploaded_by, type, file_path, folder_id, drive_url, is_folder,

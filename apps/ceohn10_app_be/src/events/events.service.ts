@@ -4739,13 +4739,23 @@ export class EventsService extends BaseService implements OnModuleInit {
         )
       `;
     } catch {
-      await this.prisma.$executeRaw`
-        INSERT INTO public.event_feedback (
-          id, event_id, member_name, member_phone, member_email, rating, content, created_at
-        ) VALUES (
-          ${feedbackId}, ${eventId}, ${userName}, ${userPhone}, ${userEmail}, ${rating}, ${rawComment}, now()
-        )
-      `;
+      try {
+        await this.prisma.$executeRaw`
+          INSERT INTO public.event_feedback (
+            id, event_id, member_name, member_phone, member_email, rating, content, created_at
+          ) VALUES (
+            ${feedbackId}::uuid, ${eventId}, ${userName}, ${userPhone}, ${userEmail}, ${rating}, ${rawComment}, now()
+          )
+        `;
+      } catch {
+        await this.prisma.$executeRaw`
+          INSERT INTO public.event_feedback (
+            id, event_id, member_name, member_phone, member_email, rating, content, created_at
+          ) VALUES (
+            ${feedbackId}, ${eventId}, ${userName}, ${userPhone}, ${userEmail}, ${rating}, ${rawComment}, now()
+          )
+        `;
+      }
     }
 
     // Đồng bộ vào feedbacks CRM

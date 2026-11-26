@@ -153,13 +153,13 @@ export class VotingRepository {
           'crm', (SELECT COUNT(*)::int FROM public.poll_votes pv WHERE pv.poll_id = p.id AND pv.source_app = 'crm')
         ) as source_stats
       FROM public.polls p
-      LEFT JOIN public.events e ON p.event_id = e.id
+      LEFT JOIN public.events e ON COALESCE(p.target_id, p.event_id::text) = e.id::text
       ORDER BY p.created_at DESC
     `.catch(async () => {
       return this.prisma.$queryRaw<any[]>`
         SELECT p.*, e.name as event_name, e.date as event_date, e.status as event_status
         FROM public.polls p
-        LEFT JOIN public.events e ON p.event_id = e.id
+        LEFT JOIN public.events e ON COALESCE(p.target_id, p.event_id::text) = e.id::text
         ORDER BY p.created_at DESC
       `.catch(() => [] as any[]);
     });
@@ -191,7 +191,7 @@ export class VotingRepository {
           'crm', (SELECT COUNT(*)::int FROM public.poll_votes pv WHERE pv.poll_id = p.id AND pv.source_app = 'crm')
         ) as source_stats
       FROM public.polls p
-      LEFT JOIN public.events e ON p.event_id = e.id
+      LEFT JOIN public.events e ON COALESCE(p.target_id, p.event_id::text) = e.id::text
       WHERE p.id = ${safePollId}::uuid
       LIMIT 1
     `.catch(() => [] as any[]);

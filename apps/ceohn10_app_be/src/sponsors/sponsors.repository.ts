@@ -294,13 +294,22 @@ export class SponsorsRepository implements OnModuleInit {
   }
 
   async getPrizeByIdRaw(id: string): Promise<any[]> {
-    return this.prisma.$queryRaw<any[]>`
-      SELECT ep.*, p.name as prod_name, p.company as prod_company, p.price as prod_price, p.image_url as prod_image
-      FROM public.event_prizes ep
-      LEFT JOIN public.products p ON ep.target_id = p.id
-      WHERE ep.id = ${id}
-      LIMIT 1
-    `;
+    try {
+      return await this.prisma.$queryRaw<any[]>`
+        SELECT ep.*, p.name as prod_name, p.company as prod_company, p.price as prod_price, p.image_url as prod_image
+        FROM public.event_prizes ep
+        LEFT JOIN public.products p ON ep.target_id::text = p.id::text
+        WHERE ep.id = ${id}
+        LIMIT 1
+      `;
+    } catch {
+      return this.prisma.$queryRaw<any[]>`
+        SELECT ep.*
+        FROM public.event_prizes ep
+        WHERE ep.id = ${id}
+        LIMIT 1
+      `.catch(() => []);
+    }
   }
 
   async findProductForPrize(productId: string): Promise<any[]> {
