@@ -17,6 +17,7 @@ import {
   UserPlus,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
 import { fetchNestApi, uploadFileToNest, resolveMediaUrl } from "@/lib/api-client";
 import type { EventItem } from "@/lib/events.functions";
 
@@ -28,6 +29,7 @@ interface InvitationGuest {
   company: string;
   email: string;
   phone: string;
+  guestType?: "invited_guest" | "other_participant";
   source?: string;
 }
 
@@ -52,6 +54,22 @@ export function EventInvitationBuilderModal({
   event: EventItem | null;
   onClose: () => void;
 }) {
+  const { user } = useAuth();
+  const canClassifyGuests = (() => {
+    const role = String(user?.role || "").toLowerCase();
+    const dept = String((user as any)?.department || "").toLowerCase();
+    const email = String(user?.email || "").toLowerCase();
+    if (role === "platform_admin" || role === "admin" || email === "admin@ceohn10.vn") return true;
+    const isHead = role === "truong_ban_chuyen_trach" || role.includes("truong_ban");
+    const isAllowedDept =
+      dept.includes("truyền thông") ||
+      dept.includes("truyen thong") ||
+      dept.includes("sự kiện") ||
+      dept.includes("su kien") ||
+      dept.includes("hậu cần");
+    return isHead && isAllowedDept;
+  })();
+
   const [guests, setGuests] = useState<InvitationGuest[]>([]);
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop");
@@ -418,7 +436,46 @@ export function EventInvitationBuilderModal({
                         <div className="text-[11px] text-muted-foreground truncate">
                           {g.title || "Doanh nhân"}{g.company ? ` · ${g.company}` : ""}
                         </div>
-                        <div className="text-[10px] font-mono text-blue-600 truncate">#{g.slug}</div>
+                        <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                          <span className="text-[10px] font-mono text-blue-600 truncate">#{g.slug}</span>
+                          <select
+                            value={g.guestType === "other_participant" ? "other_participant" : "invited_guest"}
+                            disabled={!canClassifyGuests || saving}
+                            onClick={(ev) => ev.stopPropagation()}
+                            onChange={async (ev) => {
+                              ev.stopPropagation();
+                              const nextType = ev.target.value as "invited_guest" | "other_participant";
+                              const updatedGuest = { ...g, guestType: nextType };
+                              setGuests((prev) => prev.map((item, i) => (i === idx ? updatedGuest : item)));
+                              try {
+                                await fetchNestApi(`/events/${event.id}/invitation-guests`, {
+                                  method: "POST",
+                                  body: JSON.stringify({ guests: [updatedGuest] }),
+                                });
+                                toast.success(
+                                  nextType === "invited_guest"
+                                    ? `Đã đặt "${g.fullName}" là Khách mời (0đ)`
+                                    : `Đã đặt "${g.fullName}" là Khách tham gia (Tính phí)`,
+                                );
+                              } catch (err: any) {
+                                toast.error(err?.message || "Không thể phân loại khách mời");
+                              }
+                            }}
+                            title={
+                              canClassifyGuests
+                                ? "Phân loại đối tượng vé (Trưởng ban Truyền thông / Sự kiện & Hậu cần)"
+                                : "Chỉ Trưởng ban Truyền thông hoặc Trưởng ban Sự kiện & Hậu cần được phân loại"
+                            }
+                            className={`text-[10px] font-bold rounded-md px-1.5 py-0.5 border cursor-pointer disabled:opacity-70 ${
+                              g.guestType === "other_participant"
+                                ? "bg-amber-50 border-amber-300 text-amber-800"
+                                : "bg-emerald-50 border-emerald-300 text-emerald-800"
+                            }`}
+                          >
+                            <option value="invited_guest">Khách mời (0đ)</option>
+                            <option value="other_participant">Khách tham gia (Tính phí)</option>
+                          </select>
+                        </div>
                       </div>
                       <div className="flex items-center gap-1 shrink-0">
                         <button
