@@ -1,9 +1,52 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
-export class SponsorsRepository {
+export class SponsorsRepository implements OnModuleInit {
   constructor(private readonly prisma: PrismaService) {}
+
+  async onModuleInit() {
+    await this.prisma
+      .$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS public.sponsor_packages (
+          id TEXT PRIMARY KEY,
+          tier TEXT NOT NULL,
+          price BIGINT NOT NULL DEFAULT 0,
+          benefits TEXT[] DEFAULT ARRAY[]::TEXT[],
+          available INT NOT NULL DEFAULT 10,
+          sold INT NOT NULL DEFAULT 0,
+          association_id UUID,
+          package_type TEXT DEFAULT 'cash',
+          in_kind_description TEXT,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+        CREATE TABLE IF NOT EXISTS public.sponsors (
+          id TEXT PRIMARY KEY,
+          name TEXT NOT NULL,
+          tier TEXT NOT NULL DEFAULT 'gold',
+          sponsor_type TEXT DEFAULT 'enterprise',
+          package_type TEXT DEFAULT 'cash',
+          in_kind_description TEXT,
+          contact TEXT DEFAULT '',
+          email TEXT DEFAULT '',
+          phone TEXT DEFAULT '',
+          amount BIGINT NOT NULL DEFAULT 0,
+          events INT NOT NULL DEFAULT 0,
+          since DATE,
+          status TEXT DEFAULT 'active',
+          association_id UUID,
+          birth_date DATE,
+          age INT,
+          website TEXT,
+          company_name TEXT,
+          in_kind_items JSONB DEFAULT '[]'::jsonb,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+      `)
+      .catch(() => {});
+  }
 
   async resolveDefaultAssociationId(): Promise<string | null> {
     const rows = await this.prisma.$queryRaw<any[]>`
