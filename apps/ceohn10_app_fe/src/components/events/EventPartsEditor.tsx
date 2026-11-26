@@ -10,6 +10,7 @@ export interface EventSubItem {
 export interface EventPartConfig {
   id: string;
   name: string;
+  capacity?: number;
   fee: number;
   guestFee?: number;
   isPaid?: boolean;
@@ -22,6 +23,7 @@ export function createDefaultCeoHn10Parts(): EventPartConfig[] {
     {
       id: "part_1",
       name: "Lễ Khai Giảng CEO HN10",
+      capacity: 100,
       fee: 0,
       guestFee: 0,
       isPaid: false,
@@ -34,6 +36,7 @@ export function createDefaultCeoHn10Parts(): EventPartConfig[] {
     {
       id: "part_2",
       name: "Dự Tiệc Chúc Mừng",
+      capacity: 100,
       fee: 1000,
       guestFee: 0,
       isPaid: true,
@@ -65,6 +68,7 @@ export function EventPartsEditor({
       {
         id: `part_${Date.now()}_${idx}`,
         name: `Phần ${idx}: Chương trình`,
+        capacity: 100,
         fee: 0,
         guestFee: 0,
         isPaid: false,
@@ -173,7 +177,7 @@ export function EventPartsEditor({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
-              <div className={hidePriceInputs ? "sm:col-span-7" : "sm:col-span-6"}>
+              <div className={hidePriceInputs ? "sm:col-span-5" : "sm:col-span-4"}>
                 <label className="block text-[11px] font-semibold text-muted-foreground mb-1">
                   Tên phần chương trình chính
                 </label>
@@ -182,6 +186,23 @@ export function EventPartsEditor({
                   value={part.name}
                   onChange={(e) => updatePart(pIdx, { name: e.target.value })}
                   placeholder="VD: Lễ Khai Giảng CEO HN10 / Dự Tiệc"
+                  className="h-9 w-full rounded-xl border border-border bg-background px-3 text-xs font-semibold text-foreground"
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="block text-[11px] font-semibold text-muted-foreground mb-1">
+                  Sức chứa (chỗ) <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  value={part.capacity ?? ""}
+                  onChange={(e) => {
+                    const num = parseInt(e.target.value.replace(/\D/g, ""), 10);
+                    updatePart(pIdx, { capacity: Number.isFinite(num) ? num : 0 });
+                  }}
+                  placeholder="100"
                   className="h-9 w-full rounded-xl border border-border bg-background px-3 text-xs font-semibold text-foreground"
                 />
               </div>

@@ -142,6 +142,8 @@ function EventWizardDialog({
   }, []);
   const defaultTpl = EVENT_TYPE_TEMPLATES[(initialType as EventTypeKey) || "khai_giang"] || EVENT_TYPE_TEMPLATES.khai_giang;
 
+  const defaultParts = createDefaultCeoHn10Parts();
+  const initialPartsCap = defaultParts.reduce((s, p) => s + (Number(p.capacity) || 0), 0);
   const [step, setStep] = useState<0 | 1 | 2 | 3>(0);
   const [createdEvent, setCreatedEvent] = useState<EventItem | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -152,7 +154,7 @@ function EventWizardDialog({
     startTime: "08:30",
     endTime: "11:30",
     location: initialType === "charity" ? defaultTpl.defaultLocation : "",
-    capacity: initialType === "charity" ? defaultTpl.defaultCapacity : "",
+    capacity: initialType === "charity" ? defaultTpl.defaultCapacity : String(initialPartsCap),
     type: initialType || "khai_giang",
     status: "upcoming",
     imageUrl: defaultTpl.bgImage,
@@ -163,7 +165,7 @@ function EventWizardDialog({
     recurrenceRule: "Hàng tháng",
     isPaid: false,
     venueName: "",
-    parts: createDefaultCeoHn10Parts(),
+    parts: defaultParts,
     customFields: [],
   });
   const [tickets, setTickets] = useState<TicketDraft[]>([]);
@@ -228,7 +230,13 @@ function EventWizardDialog({
     if (!info.location.trim()) {
       errs.location = "Vui lòng nhập địa điểm tổ chức sự kiện!";
     }
-    if (!info.capacity.trim() || Number(info.capacity) <= 0) {
+    const partsList = Array.isArray(info.parts) ? info.parts : [];
+    if (partsList.length > 0) {
+      const missingPart = partsList.find((p) => !Number(p.capacity) || Number(p.capacity) <= 0);
+      if (missingPart) {
+        errs.capacity = `Vui lòng nhập sức chứa (> 0) cho "${missingPart.name || "phần chương trình"}"!`;
+      }
+    } else if (!info.capacity.trim() || Number(info.capacity) <= 0) {
       errs.capacity = "Vui lòng nhập số lượng đại biểu (sức chứa)!";
     }
 
@@ -300,19 +308,39 @@ function EventWizardDialog({
     }
     if (step === 1) {
       if (!validateTickets()) return;
-      const declaredCap = parseInt(String(info.capacity).replace(/\D/g, ""), 10) || 0;
-      const totalTicketsQty = tickets.reduce(
-        (sum, tk) => sum + (parseInt(String(tk.quantity).replace(/\D/g, ""), 10) || 0),
-        0,
-      );
-      if (declaredCap > 0 && totalTicketsQty > declaredCap) {
-        const extra = totalTicketsQty - declaredCap;
+      const partsList = Array.isArray(info.parts) ? info.parts : [];
+      let extra = 0;
+      const overParts: string[] = [];
+      if (partsList.length > 0) {
+        for (const p of partsList) {
+          const partCap = Number(p.capacity) || 0;
+          const partQty = tickets
+            .filter((tk) => tk.partId === p.id)
+            .reduce((sum, tk) => sum + (parseInt(String(tk.quantity).replace(/\D/g, ""), 10) || 0), 0);
+          if (partCap > 0 && partQty > partCap) {
+            const diff = partQty - partCap;
+            extra += diff;
+            overParts.push(`${p.name}: ${partQty}/${partCap} vé (+${diff})`);
+          }
+        }
+      } else {
+        const declaredCap = parseInt(String(info.capacity).replace(/\D/g, ""), 10) || 0;
+        const totalTicketsQty = tickets.reduce(
+          (sum, tk) => sum + (parseInt(String(tk.quantity).replace(/\D/g, ""), 10) || 0),
+          0,
+        );
+        if (declaredCap > 0 && totalTicketsQty > declaredCap) {
+          extra = totalTicketsQty - declaredCap;
+        }
+      }
+      if (extra > 0) {
         if (approvedReserveExtra !== extra) {
+          const detailText = overParts.length > 0 ? `\n(${overParts.join("; ")})` : "";
           const ok = window.confirm(
-            `Tổng số vé đã nhập (${totalTicketsQty.toLocaleString("vi-VN")} vé) vượt quá ${extra.toLocaleString("vi-VN")} vé so với mức ${declaredCap.toLocaleString("vi-VN")} vé đã khai báo ở Bước 1.\n\nBạn có muốn tạo thêm ${extra.toLocaleString("vi-VN")} vé dự phòng cho khách đến check-in chưa đăng ký qua form (đăng ký qua mã check-in lúc sắp diễn ra sự kiện) không?`,
+            `Số lượng vé đã nhập vượt quá ${extra.toLocaleString("vi-VN")} vé so với sức chứa đã khai báo ở Bước 1.${detailText}\n\nBạn có muốn tạo thêm ${extra.toLocaleString("vi-VN")} vé dự phòng cho khách đến check-in chưa đăng ký qua form không?`,
           );
           if (!ok) {
-            toast.info("Vui lòng điều chỉnh lại số lượng vé theo đúng sức chứa Bước 1.");
+            toast.info("Vui lòng điều chỉnh lại số lượng vé theo đúng sức chứa từng phần ở Bước 1.");
             return;
           }
           setApprovedReserveExtra(extra);
@@ -342,11 +370,21 @@ function EventWizardDialog({
     setSubmitting(true);
     try {
       const syncedParts = (Array.isArray(info.parts) ? info.parts : []).map((part) => {
-        const matchedTicket = tickets.find((tk) => tk.partId === part.id);
-        if (!matchedTicket) return part;
-        const pFee = part.isPaid ? parseVndNumber(matchedTicket.price) : 0;
-        const gFee = part.isPaid ? parseVndNumber(matchedTicket.guestPrice || "0") : 0;
-        return { ...part, fee: pFee, guestFee: gFee };
+        const partTickets = tickets.filter((tk) => tk.partId === part.id);
+        const partTicketQty = partTickets.reduce(
+          (sum, tk) => sum + (parseInt(String(tk.quantity).replace(/\D/g, ""), 10) || 0),
+          0,
+        );
+        const matchedTicket = partTickets[0];
+        const pFee = matchedTicket ? (part.isPaid ? parseVndNumber(matchedTicket.price) : 0) : part.fee;
+        const gFee = matchedTicket ? (part.isPaid ? parseVndNumber(matchedTicket.guestPrice || "0") : 0) : part.guestFee;
+        return {
+          ...part,
+          capacity: Number(part.capacity) || 0,
+          ticketQuantity: partTicketQty,
+          fee: pFee,
+          guestFee: gFee,
+        };
       });
       const computedTicketPrice = info.isPaid && tickets.length > 0
         ? Math.max(0, ...tickets.map((tk) => parseVndNumber(tk.price)))
@@ -963,17 +1001,24 @@ function InfoStep({
         </div>
         <div>
           <label className={labelCls} htmlFor="ewz-capacity">
-            {t("ewz.field.capacity")} <span className="text-destructive font-bold">*</span>
+            {(info.parts?.length || 0) > 0 ? "Tổng sức chứa (tự tính theo từng phần)" : t("ewz.field.capacity")}{" "}
+            <span className="text-destructive font-bold">*</span>
           </label>
           <input
             id="ewz-capacity"
             type="number"
             min={0}
-            className={`${inputCls} ${errors.capacity ? "border-destructive ring-1 ring-destructive/30" : ""}`}
+            readOnly={(info.parts?.length || 0) > 0}
+            className={`${inputCls} ${(info.parts?.length || 0) > 0 ? "bg-muted font-bold cursor-not-allowed" : ""} ${errors.capacity ? "border-destructive ring-1 ring-destructive/30" : ""}`}
             placeholder="Ví dụ: 100 chỗ ngồi"
-            value={info.capacity}
+            value={
+              (info.parts?.length || 0) > 0
+                ? String((info.parts || []).reduce((s, p) => s + (Number(p.capacity) || 0), 0))
+                : info.capacity
+            }
             onFocus={(e) => e.currentTarget.select()}
             onChange={(e) => {
+              if ((info.parts?.length || 0) > 0) return;
               setInfo({ ...info, capacity: e.target.value });
               if (errors.capacity) setErrors((prev) => ({ ...prev, capacity: "" }));
             }}
@@ -1129,7 +1174,15 @@ function InfoStep({
         venueName={info.venueName || ""}
         onChangeVenueName={(v) => setInfo({ ...info, venueName: v })}
         parts={Array.isArray(info.parts) ? info.parts : createDefaultCeoHn10Parts()}
-        onChangeParts={(nextParts) => setInfo({ ...info, parts: nextParts })}
+        onChangeParts={(nextParts) => {
+          const sumCap = nextParts.reduce((s, p) => s + (Number(p.capacity) || 0), 0);
+          setInfo({
+            ...info,
+            parts: nextParts,
+            ...(nextParts.length > 0 ? { capacity: String(sumCap) } : {}),
+          });
+          if (errors.capacity) setErrors((prev) => ({ ...prev, capacity: "" }));
+        }}
         hidePriceInputs={true}
       />
 
@@ -1403,25 +1456,62 @@ function TicketStep({
         <p className="mt-0.5 text-xs text-muted-foreground">{t("ewz.tickets.hint")}</p>
       </div>
 
-      {/* Bộ đếm sức chứa Bước 1 vs Tổng số vé đã nhập */}
-      <div
-        className={`p-3 rounded-xl border text-xs flex flex-wrap items-center justify-between gap-2 ${
-          declaredCapacity > 0 && totalConfiguredTickets > declaredCapacity
-            ? "bg-amber-50 dark:bg-amber-950/40 border-amber-300 text-amber-900 dark:text-amber-200"
-            : "bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200"
-        }`}
-      >
-        <span>
-          Sức chứa Bước 1: <strong>{declaredCapacity > 0 ? `${declaredCapacity.toLocaleString("vi-VN")} vé` : "Chưa giới hạn"}</strong> · Tổng vé đã nhập:{" "}
-          <strong>{totalConfiguredTickets.toLocaleString("vi-VN")} vé</strong>
-        </span>
-        {declaredCapacity > 0 && totalConfiguredTickets > declaredCapacity && (
-          <span className="font-semibold">
-            Vượt {(totalConfiguredTickets - declaredCapacity).toLocaleString("vi-VN")} vé{" "}
-            {approvedReserveExtra > 0 ? "(Đã bật vé dự phòng check-in tại quầy)" : "(Sẽ hỏi tạo vé dự phòng khi Tiếp tục)"}
+      {/* Bộ đếm sức chứa & số lượng vé theo từng phần của sự kiện */}
+      {parts.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          {parts.map((part, pIdx) => {
+            const partCap = Number(part.capacity) || 0;
+            const partQty = tickets
+              .filter((tk) => tk.partId === part.id)
+              .reduce((sum, tk) => sum + (parseInt(String(tk.quantity).replace(/\D/g, ""), 10) || 0), 0);
+            const isOver = partCap > 0 && partQty > partCap;
+            return (
+              <div
+                key={part.id || pIdx}
+                className={`p-3 rounded-xl border text-xs flex flex-col gap-1 ${
+                  isOver
+                    ? "bg-amber-50 dark:bg-amber-950/40 border-amber-300 text-amber-900 dark:text-amber-200"
+                    : "bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200"
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2 font-bold">
+                  <span className="truncate">Phần {pIdx + 1}: {part.name}</span>
+                  <span className="shrink-0 text-[11px] px-2 py-0.5 rounded-full bg-white/80 dark:bg-slate-800 border border-border">
+                    {partQty.toLocaleString("vi-VN")} / {partCap > 0 ? partCap.toLocaleString("vi-VN") : "∞"} vé
+                  </span>
+                </div>
+                <div className="text-[11px] text-muted-foreground">
+                  Sức chứa riêng: <strong>{partCap > 0 ? `${partCap.toLocaleString("vi-VN")} chỗ` : "Chưa giới hạn"}</strong>
+                  {isOver && (
+                    <span className="ml-1.5 font-semibold text-amber-700 dark:text-amber-300">
+                      (Vượt {(partQty - partCap).toLocaleString("vi-VN")} vé{approvedReserveExtra > 0 ? " — Đã bật dự phòng" : ""})
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div
+          className={`p-3 rounded-xl border text-xs flex flex-wrap items-center justify-between gap-2 ${
+            declaredCapacity > 0 && totalConfiguredTickets > declaredCapacity
+              ? "bg-amber-50 dark:bg-amber-950/40 border-amber-300 text-amber-900 dark:text-amber-200"
+              : "bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200"
+          }`}
+        >
+          <span>
+            Sức chứa Bước 1: <strong>{declaredCapacity > 0 ? `${declaredCapacity.toLocaleString("vi-VN")} vé` : "Chưa giới hạn"}</strong> · Tổng vé đã nhập:{" "}
+            <strong>{totalConfiguredTickets.toLocaleString("vi-VN")} vé</strong>
           </span>
-        )}
-      </div>
+          {declaredCapacity > 0 && totalConfiguredTickets > declaredCapacity && (
+            <span className="font-semibold">
+              Vượt {(totalConfiguredTickets - declaredCapacity).toLocaleString("vi-VN")} vé{" "}
+              {approvedReserveExtra > 0 ? "(Đã bật vé dự phòng check-in tại quầy)" : "(Sẽ hỏi tạo vé dự phòng khi Tiếp tục)"}
+            </span>
+          )}
+        </div>
+      )}
 
       {!isPaid ? (
         <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
@@ -1449,7 +1539,12 @@ function TicketStep({
         {tickets.map((tk, i) => (
           <div key={i} className="rounded-xl border border-border bg-card p-3 shadow-xs">
             <div className="mb-2 flex items-center justify-between gap-2">
-              <div className="flex-1">
+              <div className="flex-1 space-y-1">
+                {tk.partName && (
+                  <span className="inline-block rounded-md bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-bold text-slate-700 dark:text-slate-200">
+                    Phần: {tk.partName}
+                  </span>
+                )}
                 <label htmlFor={`ewz-ticket-name-${i}`} className="sr-only">
                   {t("ewz.tickets.name")}
                 </label>
@@ -1610,7 +1705,10 @@ function TicketStep({
             className="inline-flex flex-1 min-w-[200px] items-center justify-center gap-1.5 rounded-xl border border-dashed border-border bg-muted/30 py-2 px-3 text-xs font-semibold text-[#003B95] dark:text-blue-400 hover:bg-muted transition cursor-pointer"
           >
             <Plus className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>Thêm vé cho: {part.name}</span>
+            <span>
+              Thêm vé cho: {part.name}
+              {Number(part.capacity) > 0 ? ` (Sức chứa: ${Number(part.capacity).toLocaleString("vi-VN")})` : ""}
+            </span>
           </button>
         ))}
         {parts.length === 0 && (

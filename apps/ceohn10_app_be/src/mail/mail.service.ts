@@ -269,7 +269,7 @@ export class MailService {
    * Phục vụ yêu cầu: Khi có Học viên mới tham gia, đăng ký sự kiện thành công,
    * hoặc bất kỳ thông báo gửi mail nào cũng đồng thời gửi về tài khoản Zalo của người nhận qua Zalo OA.
    */
-  private dispatchZaloOaNotification(payload: {
+  public dispatchZaloOaNotification(payload: {
     recipientPhone?: string;
     recipientEmail?: string;
     recipientName?: string;
