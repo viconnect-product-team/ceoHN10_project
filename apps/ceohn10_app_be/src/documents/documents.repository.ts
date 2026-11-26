@@ -65,6 +65,31 @@ export class DocumentsRepository {
     docScope: string = 'association',
     enterpriseName?: string | null,
   ): Promise<any> {
+    await this.prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS public.documents (
+        id TEXT PRIMARY KEY,
+        code TEXT,
+        name TEXT NOT NULL,
+        category TEXT DEFAULT 'Tài liệu',
+        size TEXT DEFAULT '',
+        uploaded_by TEXT DEFAULT 'Thành viên CLB',
+        type TEXT DEFAULT 'pdf',
+        file_path TEXT,
+        association_id UUID,
+        folder_id TEXT,
+        drive_url TEXT,
+        is_folder BOOLEAN DEFAULT false,
+        share_scope TEXT DEFAULT 'public',
+        share_role TEXT DEFAULT 'viewer',
+        shared_with JSONB DEFAULT '[]'::jsonb,
+        is_starred BOOLEAN DEFAULT false,
+        color_tag TEXT,
+        description TEXT,
+        doc_scope TEXT DEFAULT 'association',
+        enterprise_name TEXT,
+        uploaded_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `).catch(() => {});
     const ensureCols = [
       `ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS code TEXT`,
       `ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS folder_id TEXT`,
@@ -83,14 +108,15 @@ export class DocumentsRepository {
       await this.prisma.$executeRawUnsafe(sql).catch(() => {});
     }
     const sharedWithJson = JSON.stringify(sharedWith || []);
+    const docId = crypto.randomUUID();
     await this.prisma.$executeRaw`
       INSERT INTO public.documents (
-        code, name, category, size, uploaded_by, type, file_path, association_id, 
+        id, code, name, category, size, uploaded_by, type, file_path, association_id, 
         folder_id, drive_url, is_folder, share_scope, share_role, shared_with, 
         is_starred, color_tag, description, doc_scope, enterprise_name, uploaded_at
       )
       VALUES (
-        ${code}, ${name}, ${category}, ${size}, ${uploadedBy}, ${type}, ${filePath}, 
+        ${docId}, ${code}, ${name}, ${category}, ${size}, ${uploadedBy}, ${type}, ${filePath}, 
         ${associationId ? associationId : null}::uuid, ${folderId || null}, ${driveUrl || null}, 
         ${isFolder}, ${shareScope}, ${shareRole}, ${sharedWithJson}::jsonb, 
         ${isStarred}, ${colorTag || null}, ${description || null}, ${docScope}, 

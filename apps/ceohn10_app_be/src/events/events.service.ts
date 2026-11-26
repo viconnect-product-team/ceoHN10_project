@@ -4707,12 +4707,24 @@ export class EventsService extends BaseService implements OnModuleInit {
       throw new BadRequestException('Vui lòng nhập nội dung đánh giá / phản hồi cho sự kiện');
     }
 
-    const feedbackId = `fb_ev_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const feedbackId = crypto.randomUUID();
     const userName = (data.userName || data.memberName || data.name || 'Đại biểu CEO HN10').trim();
     const userEmail = (data.userEmail || data.memberEmail || data.email || '').trim().toLowerCase();
     const userPhone = (data.userPhone || data.memberPhone || data.phone || '').trim();
     const rating = Math.min(5, Math.max(1, Number(data.rating) || 5));
 
+    await this.prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS public.event_feedback (
+        id text PRIMARY KEY,
+        event_id text NOT NULL,
+        member_name text DEFAULT '',
+        member_phone text DEFAULT '',
+        member_email text DEFAULT '',
+        rating integer DEFAULT 5,
+        content text DEFAULT '',
+        created_at timestamp with time zone DEFAULT now()
+      )
+    `).catch(() => {});
     await this.prisma.$executeRawUnsafe(`ALTER TABLE public.event_feedback ADD COLUMN IF NOT EXISTS comment TEXT`).catch(() => {});
     await this.prisma.$executeRawUnsafe(`ALTER TABLE public.event_feedback ADD COLUMN IF NOT EXISTS content TEXT`).catch(() => {});
     await this.prisma.$executeRawUnsafe(`ALTER TABLE public.event_feedback ADD COLUMN IF NOT EXISTS feedback_text TEXT`).catch(() => {});

@@ -4479,41 +4479,40 @@ Trân trọng cảm ơn Anh/Chị!`;
       );
     }
 
-    // 1. Sinh mật khẩu ngẫu nhiên cho Học viên (vd: CEO HN10@9482)
+    // 1. Sinh mật khẩu ngẫu nhiên cho Học viên (vd: CEOHN10@9482)
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-    const passwordRaw = `CEO HN10@${randomSuffix}`;
+    const passwordRaw = `CEOHN10@${randomSuffix}`;
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(passwordRaw, salt);
+    const cleanEmail = String(member.email).trim().toLowerCase();
 
     // 2. Tìm hoặc tạo tài khoản trong vione_users
-    const userRecord = await this.prisma.vione_users
-      .findFirst({
-        where: {
-          OR: [{ email: member.email }, { username: member.email }],
-        },
-      })
-      .catch(() => null);
+    const existingUsers = await this.prisma.$queryRaw<any[]>`
+      SELECT id FROM public.vione_users
+      WHERE LOWER(email) = ${cleanEmail} OR LOWER(username) = ${cleanEmail}
+      LIMIT 1
+    `.catch(() => []);
 
     let assignedUserId: string;
-    if (userRecord) {
-      assignedUserId = userRecord.id;
-      await this.prisma.vione_users
-        .update({
-          where: { id: userRecord.id },
-          data: {
-            password: hashedPassword,
-            name: member.contact || member.name,
-            updated_at: new Date(),
-          },
-        })
-        .catch(() => null);
+    if (existingUsers.length > 0 && existingUsers[0]?.id) {
+      assignedUserId = String(existingUsers[0].id);
+      await this.prisma.$executeRaw`
+        UPDATE public.vione_users
+        SET password = ${hashedPassword},
+            email = ${cleanEmail},
+            username = ${cleanEmail},
+            name = ${member.contact || member.name},
+            email_verified = true,
+            updated_at = NOW()
+        WHERE id = ${assignedUserId}::uuid
+      `;
     } else {
       assignedUserId = crypto.randomUUID();
       await this.prisma.vione_users.create({
         data: {
           id: assignedUserId,
-          username: member.email,
-          email: member.email,
+          username: cleanEmail,
+          email: cleanEmail,
           name: member.contact || member.name,
           password: hashedPassword,
           email_verified: true,

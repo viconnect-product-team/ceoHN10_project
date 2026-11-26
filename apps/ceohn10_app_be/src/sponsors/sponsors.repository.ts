@@ -332,6 +332,29 @@ export class SponsorsRepository implements OnModuleInit {
     imageUrl: string | null,
     highlightColor: string,
   ): Promise<void> {
+    await this.prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS public.event_prizes (
+        id TEXT PRIMARY KEY,
+        event_id TEXT NOT NULL,
+        rank_name TEXT DEFAULT 'Giải Thưởng',
+        title TEXT NOT NULL,
+        value TEXT DEFAULT '',
+        amount BIGINT DEFAULT 0,
+        quantity INT DEFAULT 1,
+        target_type TEXT DEFAULT 'PRODUCT',
+        target_id TEXT,
+        sponsor_name TEXT DEFAULT '',
+        sponsor_package_id TEXT,
+        description TEXT DEFAULT '',
+        icon_name TEXT DEFAULT 'Gift',
+        image_url TEXT,
+        highlight_color TEXT DEFAULT 'from-amber-500 to-yellow-600',
+        status TEXT DEFAULT 'active',
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `).catch(() => {});
+
     await this.prisma.$executeRaw`
       INSERT INTO public.event_prizes (
         id, event_id, rank_name, title, value, amount, quantity,
