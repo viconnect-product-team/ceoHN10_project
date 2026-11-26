@@ -263,11 +263,10 @@ export class VotingRepository {
     const validEventId = toValidUuid(eventId);
     const validTrainingId = toValidUuid(trainingId);
 
-    await this.prisma.$executeRawUnsafe(`
-      ALTER TABLE public.polls ADD COLUMN IF NOT EXISTS training_id UUID;
-      ALTER TABLE public.polls ADD COLUMN IF NOT EXISTS target_type TEXT;
-      ALTER TABLE public.polls ADD COLUMN IF NOT EXISTS target_id TEXT;
-    `).catch(() => { });
+    await this.prisma.$executeRawUnsafe(`ALTER TABLE public.polls ADD COLUMN IF NOT EXISTS training_id UUID`).catch(() => {});
+    await this.prisma.$executeRawUnsafe(`ALTER TABLE public.polls ADD COLUMN IF NOT EXISTS target_type TEXT`).catch(() => {});
+    await this.prisma.$executeRawUnsafe(`ALTER TABLE public.polls ADD COLUMN IF NOT EXISTS target_id TEXT`).catch(() => {});
+    await this.prisma.$executeRawUnsafe(`ALTER TABLE public.polls ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT now()`).catch(() => {});
 
     await this.prisma.$executeRawUnsafe(`
       INSERT INTO public.polls (

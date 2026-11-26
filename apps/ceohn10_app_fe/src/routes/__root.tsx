@@ -648,6 +648,7 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     pathname.startsWith("/landing") ||
     pathname.includes("/register") ||
     pathname.startsWith("/guest-event-register") ||
+    pathname.startsWith("/invitation") ||
     pathname.startsWith("/guest-voting") ||
     pathname.startsWith("/public-voting") ||
     pathname.startsWith("/guest-event-feedback") ||
@@ -675,6 +676,7 @@ function AuthGate({ children }: { children: React.ReactNode }) {
       pathname.startsWith("/association/register") ||
       pathname === "/association/login" ||
       pathname.startsWith("/association/login") ||
+      pathname.startsWith("/invitation") ||
       pathname === "/auth" ||
       pathname.startsWith("/auth");
 

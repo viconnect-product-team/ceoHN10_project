@@ -504,6 +504,8 @@ export class VotingService {
       luckyNumber?: string;
       prize?: string;
       prizeName?: string;
+      prizeTitle?: string;
+      prizeValue?: string;
       eventName?: string;
       eventId?: string;
       winnerEmail?: string;
@@ -511,7 +513,9 @@ export class VotingService {
       winnerPhone?: string;
     },
   ) {
-    const effectivePrize = data.prize || data.prizeName || 'Phần quà may mắn từ Ban Tổ Chức';
+    const effectivePrize =
+      (data.prize || data.prizeName || data.prizeTitle || '').trim() ||
+      'Phần quà may mắn từ Ban Tổ Chức';
     const title = `🎁 [Ưu Đãi Trúng Thưởng] Chúc mừng bạn đã trúng ${effectivePrize}!`;
     const body = `Ban Tổ chức CLB Doanh Nhân CEO HN10 xin trân trọng chúc mừng Anh/Chị ${data.winnerName} (${data.winnerCompany || 'Học viên'}, Số may mắn: #${data.luckyNumber || 'LUCKY'}) đã xuất sắc trúng giải thưởng "${effectivePrize}" tại sự kiện "${data.eventName || 'Sự kiện CEO HN10'}". Phần thưởng đã được đẩy vào mục Ưu Đãi của bạn!`;
 
@@ -525,7 +529,9 @@ export class VotingService {
       winnerCompany: data.winnerCompany,
       winnerCode: data.winnerCode,
       luckyNumber: data.luckyNumber,
-      prize: data.prize,
+      prize: effectivePrize,
+      prizeTitle: effectivePrize,
+      prizeValue: data.prizeValue,
       eventName: data.eventName,
       eventId: data.eventId,
       type: 'perk_reward',
@@ -574,6 +580,7 @@ export class VotingService {
           winnerCode: targetMemberCode,
           luckyNumber: data.luckyNumber,
           prizeTitle: effectivePrize,
+          prizeValue: data.prizeValue,
           eventName: data.eventName || 'Sự kiện CLB CEO HN10',
           perkUrl: 'https://ceohn10.viconnect.vn/association/perks',
         })

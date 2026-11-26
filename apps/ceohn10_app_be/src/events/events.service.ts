@@ -4713,13 +4713,28 @@ export class EventsService extends BaseService implements OnModuleInit {
     const userPhone = (data.userPhone || data.memberPhone || data.phone || '').trim();
     const rating = Math.min(5, Math.max(1, Number(data.rating) || 5));
 
-    await this.prisma.$executeRaw`
-      INSERT INTO public.event_feedback (
-        id, event_id, member_name, member_phone, member_email, rating, comment, content, feedback_text, status, created_at
-      ) VALUES (
-        ${feedbackId}, ${eventId}, ${userName}, ${userPhone}, ${userEmail}, ${rating}, ${rawComment}, ${rawComment}, ${rawComment}, 'received', now()
-      )
-    `;
+    await this.prisma.$executeRawUnsafe(`ALTER TABLE public.event_feedback ADD COLUMN IF NOT EXISTS comment TEXT`).catch(() => {});
+    await this.prisma.$executeRawUnsafe(`ALTER TABLE public.event_feedback ADD COLUMN IF NOT EXISTS content TEXT`).catch(() => {});
+    await this.prisma.$executeRawUnsafe(`ALTER TABLE public.event_feedback ADD COLUMN IF NOT EXISTS feedback_text TEXT`).catch(() => {});
+    await this.prisma.$executeRawUnsafe(`ALTER TABLE public.event_feedback ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'received'`).catch(() => {});
+
+    try {
+      await this.prisma.$executeRaw`
+        INSERT INTO public.event_feedback (
+          id, event_id, member_name, member_phone, member_email, rating, comment, content, feedback_text, status, created_at
+        ) VALUES (
+          ${feedbackId}, ${eventId}, ${userName}, ${userPhone}, ${userEmail}, ${rating}, ${rawComment}, ${rawComment}, ${rawComment}, 'received', now()
+        )
+      `;
+    } catch {
+      await this.prisma.$executeRaw`
+        INSERT INTO public.event_feedback (
+          id, event_id, member_name, member_phone, member_email, rating, content, created_at
+        ) VALUES (
+          ${feedbackId}, ${eventId}, ${userName}, ${userPhone}, ${userEmail}, ${rating}, ${rawComment}, now()
+        )
+      `;
+    }
 
     // Đồng bộ vào feedbacks CRM
     const evRows = await this.prisma.$queryRaw<any[]>`SELECT name, title, association_id FROM public.events WHERE id = ${eventId} LIMIT 1`.catch(() => []);
@@ -7053,27 +7068,19 @@ export class EventsService extends BaseService implements OnModuleInit {
       }
     }
 
-    // Lấy cấu hình SePay từ Master Admin để hiển thị VietQR khi có phí
-    let sepayConfig = {
-      bankName: 'MBBank',
-      accountNumber: '888809012026',
-      accountHolder: 'CLB DOANH NHAN CEO HN10',
-      prefixEvent: 'CEO1983_EVT',
+    // Lấy cấu hình SePay chuẩn từ PaymentService (master_system_settings -> app_settings -> env)
+    const loadedSepay = this.paymentService
+      ? await this.paymentService.getSepayConfig().catch(() => null)
+      : null;
+    const sepayConfig = {
+      bankName: loadedSepay?.bankName || process.env.SEPAY_BANK_NAME || 'MBBank',
+      accountNumber: loadedSepay?.accountNumber || process.env.SEPAY_ACCOUNT_NO || '',
+      accountHolder:
+        loadedSepay?.accountHolder ||
+        process.env.SEPAY_ACCOUNT_HOLDER ||
+        'CLB DOANH NHAN CEO HN10',
+      prefixEvent: loadedSepay?.prefixEvent || 'CEO1983_EVT',
     };
-    try {
-      const cfgRows = await this.prisma.$queryRaw<any[]>`
-        SELECT value FROM public.master_system_settings WHERE key = 'sepay_integration_config' LIMIT 1
-      `.catch(() => []);
-      if (cfgRows.length > 0 && cfgRows[0]?.value) {
-        const val = typeof cfgRows[0].value === 'string' ? JSON.parse(cfgRows[0].value) : cfgRows[0].value;
-        sepayConfig = {
-          bankName: val.bank_brand_name || val.bankName || sepayConfig.bankName,
-          accountNumber: val.account_number || val.accountNumber || sepayConfig.accountNumber,
-          accountHolder: val.account_owner || val.account_holder || val.accountHolder || sepayConfig.accountHolder,
-          prefixEvent: val.prefix_event || val.prefixEvent || sepayConfig.prefixEvent,
-        };
-      }
-    } catch {}
 
     const rawInvCfg = evRows[0]?.invitation_config || null;
     const invitationConfig = rawInvCfg
@@ -7271,9 +7278,11 @@ export class EventsService extends BaseService implements OnModuleInit {
     if (totalFee > 0) {
       const pubInfo = await this.getPublicInvitation(eventId);
       const cfg = pubInfo.sepayConfig;
-      const bankShort = cfg.bankName.toUpperCase().includes('MB') ? 'MB' : cfg.bankName;
-      transferContent = `${cfg.prefixEvent}_${regId}`;
-      vietQrUrl = `https://img.vietqr.io/image/${bankShort}-${cfg.accountNumber}-compact2.png?amount=${totalFee}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(cfg.accountHolder)}`;
+      if (cfg.accountNumber) {
+        const bankShort = cfg.bankName.toUpperCase().includes('MB') ? 'MB' : cfg.bankName;
+        transferContent = `${cfg.prefixEvent}_${regId}`;
+        vietQrUrl = `https://img.vietqr.io/image/${encodeURIComponent(bankShort)}-${encodeURIComponent(cfg.accountNumber)}-compact2.png?amount=${totalFee}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(cfg.accountHolder)}`;
+      }
       bankInfo = cfg;
     }
 

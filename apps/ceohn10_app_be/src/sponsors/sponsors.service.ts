@@ -540,9 +540,10 @@ export class SponsorsService extends BaseService {
       }
     }
 
-    const rankName = dto.rankName?.trim() || 'Giải Thưởng';
+    const rankName = dto.rankName ? String(dto.rankName).trim() : 'Giải Thưởng';
+    const rawValueStr = dto.value !== undefined && dto.value !== null ? String(dto.value).trim() : '';
     const value =
-      dto.value?.trim() ||
+      rawValueStr ||
       (amount > 0n
         ? `${Number(amount).toLocaleString('vi-VN')} VNĐ`
         : 'Đang cập nhật');
