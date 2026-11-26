@@ -7303,7 +7303,24 @@ export class EventsService extends BaseService implements OnModuleInit {
       const pubInfo = await this.getPublicInvitation(eventId);
       const cfg = pubInfo.sepayConfig;
       if (cfg.accountNumber) {
-        const bankShort = cfg.bankName.toUpperCase().includes('MB') ? 'MB' : cfg.bankName;
+        const rawBank = String(cfg.bankName || 'MB').toUpperCase();
+        const bankShort = rawBank.includes('VPB') || rawBank.includes('VPBANK')
+          ? 'VPB'
+          : rawBank.includes('VIETCOM') || rawBank.includes('VCB')
+          ? 'VCB'
+          : rawBank.includes('TECHCOM') || rawBank.includes('TCB')
+          ? 'TCB'
+          : rawBank.includes('MB')
+          ? 'MB'
+          : rawBank.includes('ACB')
+          ? 'ACB'
+          : rawBank.includes('BIDV')
+          ? 'BIDV'
+          : rawBank.includes('VIETIN') || rawBank.includes('CTG')
+          ? 'CTG'
+          : rawBank.includes('TPB')
+          ? 'TPB'
+          : cfg.bankName;
         transferContent = `${cfg.prefixEvent}_${regId}`;
         vietQrUrl = `https://img.vietqr.io/image/${encodeURIComponent(bankShort)}-${encodeURIComponent(cfg.accountNumber)}-compact2.png?amount=${totalFee}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(cfg.accountHolder)}`;
       }

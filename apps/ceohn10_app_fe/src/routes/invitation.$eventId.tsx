@@ -67,7 +67,13 @@ function PublicInvitationPage() {
     };
     const initialSlug = readHash();
     setLoading(true);
-    fetchNestApi<any>(`/events/${eventId}/public-invitation${initialSlug ? `?slug=${encodeURIComponent(initialSlug)}` : ""}`)
+    const invEndpoint = `/events/${eventId}/public-invitation${initialSlug ? `?slug=${encodeURIComponent(initialSlug)}` : ""}`;
+    fetchNestApi<any>(invEndpoint)
+      .catch(async () => {
+        const directRes = await fetch(`/api${invEndpoint}`);
+        if (!directRes.ok) throw new Error(`HTTP ${directRes.status}`);
+        return directRes.json();
+      })
       .then((res) => {
         setData(res);
         if (res?.guest) {
