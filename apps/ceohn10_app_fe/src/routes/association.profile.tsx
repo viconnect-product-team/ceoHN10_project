@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   Settings,
+  ArrowLeft,
   MoreVertical,
   Edit3,
   Trash2,
@@ -977,7 +978,7 @@ export default function ProfileScreen() {
           className="size-9 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-orange-50 dark:hover:bg-slate-800 flex items-center justify-center transition cursor-pointer"
           title="Quay lại"
         >
-          <img src="/icons/profile/arrow-left-02.svg" className="size-5" alt="back" />
+          <ArrowLeft className="size-5 text-slate-700 dark:text-slate-200" />
         </button>
         <div className="text-center font-semibold text-base text-slate-900 dark:text-white font-['Inter']">
           {isEn ? "Profile" : "Hồ sơ cá nhân"}
@@ -988,7 +989,7 @@ export default function ProfileScreen() {
           className="size-9 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-orange-50 dark:hover:bg-slate-800 flex items-center justify-center transition cursor-pointer"
           title="Cài đặt"
         >
-          <img src="/icons/profile/setting-07.svg" className="size-5" alt="settings" />
+          <Settings className="size-5 text-slate-700 dark:text-slate-200" />
         </button>
       </div>
 
@@ -1018,6 +1019,9 @@ export default function ProfileScreen() {
                 src={displayCover}
                 alt="Cover Photo"
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).style.display = "none";
+                }}
               />
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-950 text-white">

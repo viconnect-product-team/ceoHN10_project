@@ -1096,12 +1096,6 @@ function MembersPage() {
           <p className="mt-1 text-sm text-muted-foreground">{t("members.subtitle")}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {/* Badge phân quyền dữ liệu (Data Scope) */}
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-xs">
-            <ShieldCheck className="h-3.5 w-3.5 text-blue-600" />
-            <span>{perm.dataScopeLabel}</span>
-          </span>
-
           <div className="inline-flex rounded-xl border border-border bg-card p-0.5 shadow-[var(--shadow-card)]">
             <button
               onClick={() => setView("cards")}
@@ -1173,21 +1167,12 @@ function MembersPage() {
             <button
               onClick={() => setShowDynamicSchemaModal(true)}
               className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950/40 px-3.5 py-2 text-xs font-bold text-indigo-700 dark:text-indigo-300 shadow-xs hover:bg-indigo-100 dark:hover:bg-indigo-900/60 cursor-pointer transition"
-              title="Ban Công Nghệ tùy chỉnh định dạng các trường (select, textarea, text...)"
+              title="Thêm trường thông tin động cho danh sách học viên"
             >
               <Settings2 className="h-4 w-4" />
-              <span>Cấu hình trường động (Ban Công Nghệ)</span>
+              <span>Thêm trường thông tin</span>
             </button>
           </PermissionGuard>
-
-          <Link
-            to="/departments"
-            className="inline-flex items-center gap-1.5 rounded-xl border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/40 px-3.5 py-2 text-xs font-bold text-amber-800 dark:text-amber-300 shadow-xs hover:bg-amber-100 dark:hover:bg-amber-900/60 cursor-pointer transition"
-            title="Quản lý và chỉnh sửa tên 6 Ban chuyên môn"
-          >
-            <Building2 className="h-4 w-4" />
-            <span>Chỉnh sửa tên Ban</span>
-          </Link>
         </div>
       </div>
 

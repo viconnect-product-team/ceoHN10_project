@@ -667,7 +667,7 @@ export function Sidebar({
 
   const { theme } = useTheme();
   const brandName = overrideBrandName || activeAssoc?.name || t("brand.name");
-  const brandLogo = theme === "light" ? "/hn10-logo.png" : "/hn10-logo-2.png";
+  const brandLogo = "/hn10-logo-2.png";
 
   // Collapse only applies to the desktop sidebar; the mobile drawer is always full.
   const [collapsed, setCollapsed] = useState(false);

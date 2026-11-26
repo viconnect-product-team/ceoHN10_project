@@ -72,20 +72,16 @@ async function resolveDatabaseConfig() {
   const isDocker =
     fs.existsSync('/.dockerenv') ||
     process.env.IS_DOCKER === 'true' ||
+    process.env.DOCKER_CONTAINER === 'true' ||
+    process.env.NODE_ENV === 'production' ||
     Boolean(process.env.REMOTE_SERVER);
 
   if (isDocker) {
     process.env.DATABASE_URL = process.env.REMOTE_DATABASE_URL || remoteDbUrl;
   } else {
-    // Môi trường Localhost cá nhân: Tuân thủ nghiêm ngặt Rule 0 (STRICT DATABASE POLICY)
-    // Luôn ưu tiên CSDL Local 127.0.0.1:5432/ceohn10_project
-    const isLocalAlive = await probeTcp('127.0.0.1', 5432, 2500);
-    if (isLocalAlive) {
-      process.env.DATABASE_URL = process.env.LOCAL_DATABASE_URL || localDbUrl;
-    } else {
-      // Nếu probe 127.0.0.1:5432 chưa kịp phản hồi, vẫn giữ nguyên Localhost để không bị sập theo remote
-      process.env.DATABASE_URL = process.env.LOCAL_DATABASE_URL || localDbUrl;
-    }
+    // Môi trường Localhost cá nhân: Khóa cứng về CSDL Local 127.0.0.1:5432/ceohn10_project
+    await probeTcp('127.0.0.1', 5432, 1500);
+    process.env.DATABASE_URL = localDbUrl;
   }
 
   const isLocal =

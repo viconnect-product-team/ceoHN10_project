@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef, useDeferredValue } from "react";
 import { createPortal } from "react-dom";
 import {
   Check,
@@ -90,6 +90,7 @@ type Info = {
   isFixed?: boolean;
   recurrenceRule?: string;
   isPaid?: boolean;
+  reserveCapacity?: number;
 };
 
 const emptyTicket = (): TicketDraft => ({ name: "", price: "", quantity: "", description: "" });
@@ -167,6 +168,7 @@ function EventWizardDialog({
   });
   const [tickets, setTickets] = useState<TicketDraft[]>([]);
   const [qrFields, setQrFields] = useState<QrField[]>(["registration_code"]);
+  const [approvedReserveExtra, setApprovedReserveExtra] = useState<number>(0);
 
   const reset = () => {
     setStep(0);
@@ -273,61 +275,22 @@ function EventWizardDialog({
     const hasPaidPart = parts.some((p) => Boolean(p.isPaid));
     setInfo((prev) => ({ ...prev, isPaid: hasPaidPart }));
 
-    if (parts.length > 0) {
-      setTickets((prev) => {
-        const nextTickets: TicketDraft[] = [];
-        parts.forEach((part) => {
-          const existingForPart = prev.filter((tk) => tk.partId === part.id);
-          if (existingForPart.length > 0) {
-            existingForPart.forEach((tk) => {
-              nextTickets.push({
-                ...tk,
-                partName: part.name,
-                isPartFree: !part.isPaid,
-                price: part.isPaid ? (parseVndNumber(tk.price) > 0 ? tk.price : String(Number(part.fee) > 0 ? part.fee : 1000)) : "0",
-                guestPrice: part.isPaid ? (tk.guestPrice ?? String(Number(part.guestFee ?? 0))) : "0",
-              });
-            });
-          } else if (part.isPaid) {
-            const basePrice = String(Number(part.fee) > 0 ? part.fee : 1000);
-            nextTickets.push(
-              {
-                partId: part.id,
-                partName: part.name,
-                isPartFree: false,
-                name: `Vé VIP — ${part.name}`,
-                price: basePrice,
-                guestPrice: "0",
-                quantity: "20",
-                description: `Hạng vé VIP thuộc ${part.name} (tự động xuất QR SePay)`,
-              },
-              {
-                partId: part.id,
-                partName: part.name,
-                isPartFree: false,
-                name: `Vé Tiêu Chuẩn — ${part.name}`,
-                price: basePrice,
-                guestPrice: "0",
-                quantity: "30",
-                description: `Hạng vé Tiêu Chuẩn thuộc ${part.name} (tự động xuất QR SePay)`,
-              },
-            );
-          } else {
-            nextTickets.push({
-              partId: part.id,
-              partName: part.name,
-              isPartFree: true,
-              name: `Vé Tham Dự — ${part.name}`,
-              price: "0",
-              guestPrice: "0",
-              quantity: info.capacity || "50",
-              description: `Vé miễn phí thuộc ${part.name}`,
-            });
-          }
-        });
-        return nextTickets;
-      });
-    }
+    // Chỉ đồng bộ tên phần & trạng thái miễn phí/có phí cho các vé người tạo đã nhập;
+    // KHÔNG tự động sinh sẵn loại vé hay số lượng vé.
+    setTickets((prev) =>
+      prev.map((tk) => {
+        if (!tk.partId) return tk;
+        const matchedPart = parts.find((p) => p.id === tk.partId);
+        if (!matchedPart) return tk;
+        return {
+          ...tk,
+          partName: matchedPart.name,
+          isPartFree: !matchedPart.isPaid,
+          price: matchedPart.isPaid ? tk.price : "0",
+          guestPrice: matchedPart.isPaid ? (tk.guestPrice ?? "0") : "0",
+        };
+      }),
+    );
   };
 
   const next = () => {
@@ -335,7 +298,32 @@ function EventWizardDialog({
       if (!validateInfo()) return;
       syncTicketsFromParts();
     }
-    if (step === 1 && !validateTickets()) return;
+    if (step === 1) {
+      if (!validateTickets()) return;
+      const declaredCap = parseInt(String(info.capacity).replace(/\D/g, ""), 10) || 0;
+      const totalTicketsQty = tickets.reduce(
+        (sum, tk) => sum + (parseInt(String(tk.quantity).replace(/\D/g, ""), 10) || 0),
+        0,
+      );
+      if (declaredCap > 0 && totalTicketsQty > declaredCap) {
+        const extra = totalTicketsQty - declaredCap;
+        if (approvedReserveExtra !== extra) {
+          const ok = window.confirm(
+            `Tổng số vé đã nhập (${totalTicketsQty.toLocaleString("vi-VN")} vé) vượt quá ${extra.toLocaleString("vi-VN")} vé so với mức ${declaredCap.toLocaleString("vi-VN")} vé đã khai báo ở Bước 1.\n\nBạn có muốn tạo thêm ${extra.toLocaleString("vi-VN")} vé dự phòng cho khách đến check-in chưa đăng ký qua form (đăng ký qua mã check-in lúc sắp diễn ra sự kiện) không?`,
+          );
+          if (!ok) {
+            toast.info("Vui lòng điều chỉnh lại số lượng vé theo đúng sức chứa Bước 1.");
+            return;
+          }
+          setApprovedReserveExtra(extra);
+          setInfo((prev) => ({ ...prev, reserveCapacity: extra }));
+          toast.success(`Đã kích hoạt thêm ${extra.toLocaleString("vi-VN")} vé dự phòng check-in tại quầy!`);
+        }
+      } else if (approvedReserveExtra !== 0) {
+        setApprovedReserveExtra(0);
+        setInfo((prev) => ({ ...prev, reserveCapacity: 0 }));
+      }
+    }
     setStep((s) => (s + 1) as 0 | 1 | 2);
   };
 
@@ -379,7 +367,9 @@ function EventWizardDialog({
           customFields: Array.isArray(info.customFields) ? info.customFields : [],
           dynamicFields: Array.isArray(info.customFields) ? info.customFields : [],
           address: info.location.trim(),
-          capacity: Number(info.capacity) || 0,
+          capacity: (Number(info.capacity) || 0) + (approvedReserveExtra > 0 ? approvedReserveExtra : 0),
+          reserveCapacity: approvedReserveExtra,
+          allowWalkinCheckin: approvedReserveExtra > 0,
           type: info.type,
           status: info.status,
           imageUrl: info.imageUrl,
@@ -525,19 +515,8 @@ function EventWizardDialog({
               setErrors={setErrors}
               onTogglePaid={(newPaid) => {
                 setInfo({ ...info, isPaid: newPaid });
-                if (newPaid) {
-                  if (tickets.length === 0 || tickets.every((t) => parseVndNumber(t.price) === 0)) {
-                    setTickets([
-                      { name: "Vé VIP", price: "500000", quantity: "50", description: "Bàn tiệc VIP, tài liệu cao cấp" },
-                      { name: "Vé Tiêu Chuẩn", price: "200000", quantity: "100", description: "Tham dự toàn bộ chương trình" },
-                    ]);
-                  }
-                } else {
-                  setTickets((prev) =>
-                    prev.length > 0
-                      ? prev.map((t) => ({ ...t, price: "0" }))
-                      : [{ name: "Vé Tiêu Chuẩn", price: "0", quantity: "", description: "Miễn phí tham dự" }]
-                  );
+                if (!newPaid) {
+                  setTickets((prev) => prev.map((t) => ({ ...t, price: "0" })));
                 }
               }}
             />
@@ -545,6 +524,8 @@ function EventWizardDialog({
           {step === 1 && (
             <TicketStep
               isPaid={!!info.isPaid}
+              declaredCapacity={parseInt(String(info.capacity).replace(/\D/g, ""), 10) || 0}
+              approvedReserveExtra={approvedReserveExtra}
               parts={Array.isArray(info.parts) ? info.parts : []}
               tickets={tickets}
               setTickets={setTickets}
@@ -1352,6 +1333,8 @@ function InfoStep({
 
 function TicketStep({
   isPaid,
+  declaredCapacity,
+  approvedReserveExtra,
   parts,
   tickets,
   setTickets,
@@ -1359,6 +1342,8 @@ function TicketStep({
   setErrors,
 }: {
   isPaid: boolean;
+  declaredCapacity: number;
+  approvedReserveExtra: number;
   parts: EventPartConfig[];
   tickets: TicketDraft[];
   setTickets: (v: TicketDraft[]) => void;
@@ -1368,26 +1353,44 @@ function TicketStep({
   const t = useT();
   const [selectedPartTab, setSelectedPartTab] = useState<string>(parts[0]?.id || "all");
   const [showFullSeatingEditor, setShowFullSeatingEditor] = useState(false);
+  const deferredTickets = useDeferredValue(tickets);
 
   const update = (i: number, patch: Partial<TicketDraft>) =>
     setTickets(tickets.map((tk, idx) => (idx === i ? { ...tk, ...patch } : tk)));
   const remove = (i: number) => setTickets(tickets.filter((_, idx) => idx !== i));
 
+  const totalConfiguredTickets = useMemo(
+    () =>
+      tickets.reduce(
+        (sum, tk) => sum + (parseInt(String(tk.quantity).replace(/\D/g, ""), 10) || 0),
+        0,
+      ),
+    [tickets],
+  );
+
   const ticketsForPreview = useMemo(() => {
     const filtered =
       selectedPartTab === "all"
-        ? tickets
-        : tickets.filter((tk) => tk.partId === selectedPartTab || (!tk.partId && parts.length === 0));
-    return filtered.map((tk) => ({
-      name: tk.name || "Vé sự kiện",
-      price: tk.isPartFree ? 0 : parseVndNumber(tk.price),
-      quantity: Math.max(1, parseInt(String(tk.quantity).replace(/\D/g, ""), 10) || 10),
-      description: tk.description,
-    }));
-  }, [tickets, selectedPartTab, parts.length]);
+        ? deferredTickets
+        : deferredTickets.filter((tk) => tk.partId === selectedPartTab || (!tk.partId && parts.length === 0));
+    return filtered
+      .filter((tk) => {
+        const q = parseInt(String(tk.quantity).replace(/\D/g, ""), 10) || 0;
+        return tk.name.trim().length > 0 && q > 0;
+      })
+      .map((tk) => ({
+        name: tk.name.trim(),
+        price: tk.isPartFree ? 0 : parseVndNumber(tk.price),
+        quantity: parseInt(String(tk.quantity).replace(/\D/g, ""), 10) || 0,
+        description: tk.description,
+      }));
+  }, [deferredTickets, selectedPartTab, parts.length]);
 
   const previewLayout = useMemo(
-    () => buildSeatingLayoutFromTickets(ticketsForPreview),
+    () =>
+      ticketsForPreview.length > 0
+        ? buildSeatingLayoutFromTickets(ticketsForPreview)
+        : { dynamicZones: [], dynamicSeats: [] },
     [ticketsForPreview],
   );
 
@@ -1398,6 +1401,26 @@ function TicketStep({
           <Ticket className="h-4 w-4 text-primary" aria-hidden="true" /> {t("ewz.tickets.heading")}
         </h3>
         <p className="mt-0.5 text-xs text-muted-foreground">{t("ewz.tickets.hint")}</p>
+      </div>
+
+      {/* Bộ đếm sức chứa Bước 1 vs Tổng số vé đã nhập */}
+      <div
+        className={`p-3 rounded-xl border text-xs flex flex-wrap items-center justify-between gap-2 ${
+          declaredCapacity > 0 && totalConfiguredTickets > declaredCapacity
+            ? "bg-amber-50 dark:bg-amber-950/40 border-amber-300 text-amber-900 dark:text-amber-200"
+            : "bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200"
+        }`}
+      >
+        <span>
+          Sức chứa Bước 1: <strong>{declaredCapacity > 0 ? `${declaredCapacity.toLocaleString("vi-VN")} vé` : "Chưa giới hạn"}</strong> · Tổng vé đã nhập:{" "}
+          <strong>{totalConfiguredTickets.toLocaleString("vi-VN")} vé</strong>
+        </span>
+        {declaredCapacity > 0 && totalConfiguredTickets > declaredCapacity && (
+          <span className="font-semibold">
+            Vượt {(totalConfiguredTickets - declaredCapacity).toLocaleString("vi-VN")} vé{" "}
+            {approvedReserveExtra > 0 ? "(Đã bật vé dự phòng check-in tại quầy)" : "(Sẽ hỏi tạo vé dự phòng khi Tiếp tục)"}
+          </span>
+        )}
       </div>
 
       {!isPaid ? (
@@ -1569,17 +1592,17 @@ function TicketStep({
           <button
             key={part.id}
             type="button"
-            onClick={() =>
+              onClick={() =>
               setTickets([
                 ...tickets,
                 {
                   partId: part.id,
                   partName: part.name,
                   isPartFree: !part.isPaid,
-                  name: part.isPaid ? `Vé VIP — ${part.name}` : `Vé Tham Dự — ${part.name}`,
-                  price: part.isPaid ? "1000" : "0",
+                  name: "",
+                  price: part.isPaid ? "" : "0",
                   guestPrice: "0",
-                  quantity: "20",
+                  quantity: "",
                   description: part.isPaid ? `Thuộc ${part.name}` : `Miễn phí (${part.name})`,
                 },
               ])
@@ -1596,7 +1619,7 @@ function TicketStep({
             onClick={() =>
               setTickets([
                 ...tickets,
-                { name: "Vé VIP", price: isPaid ? "1000" : "0", quantity: "20", description: "" },
+                { name: "", price: isPaid ? "" : "0", quantity: "", description: "" },
               ])
             }
             className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-border bg-muted/30 py-2.5 text-sm font-semibold text-[#003B95] dark:text-blue-400 hover:bg-muted transition cursor-pointer"
@@ -1663,42 +1686,55 @@ function TicketStep({
           </div>
         )}
 
-        {/* Render danh sách ghế tối giản theo từng loại vé */}
-        <div className="space-y-3">
-          {previewLayout.dynamicZones.map((zone, zIdx) => {
-            const zoneTickets = ticketsForPreview[zIdx];
-            const seatCount = zoneTickets?.quantity || 0;
-            const zoneSeats = previewLayout.dynamicSeats.filter(
-              (s) => s.y >= zone.y && s.y <= zone.y + zone.height,
-            );
-            return (
-              <div
-                key={zone.id}
-                className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900/40 p-3 space-y-2"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-800 dark:text-slate-100">
-                    {zoneTickets?.name || zone.name}
-                  </span>
-                  <span className="text-[11px] font-mono text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-0.5 rounded">
-                    {seatCount} ghế · {zoneTickets?.price ? `${zoneTickets.price.toLocaleString("vi-VN")} đ` : "Miễn phí"}
-                  </span>
-                </div>
-                <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto">
-                  {zoneSeats.map((seat) => (
-                    <span
-                      key={seat.id}
-                      title={seat.label}
-                      className="inline-flex items-center justify-center rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-2 py-1 text-[10px] font-mono font-semibold text-slate-700 dark:text-slate-200"
-                    >
-                      {seat.id}
+        {/* Render danh sách ghế tối giản theo từng loại vé (chỉ sinh khi có loại vé & số lượng > 0) */}
+        {previewLayout.dynamicZones.length === 0 ? (
+          <p className="rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-900/30 p-4 text-center text-xs text-slate-500">
+            Chưa có ghế nào. Vui lòng nhập tên loại vé và số lượng vé (&gt; 0) ở trên để hệ thống tự động sinh sơ đồ ghế tương ứng.
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {previewLayout.dynamicZones.map((zone, zIdx) => {
+              const zoneTickets = ticketsForPreview[zIdx];
+              const seatCount = zoneTickets?.quantity || 0;
+              const zoneSeats = previewLayout.dynamicSeats.filter(
+                (s) => s.y >= zone.y && s.y <= zone.y + zone.height,
+              );
+              const visibleSeats = zoneSeats.slice(0, 60);
+              const hiddenCount = Math.max(0, zoneSeats.length - visibleSeats.length);
+              return (
+                <div
+                  key={zone.id}
+                  className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900/40 p-3 space-y-2"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                      {zoneTickets?.name || zone.name}
                     </span>
-                  ))}
+                    <span className="text-[11px] font-mono text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-0.5 rounded">
+                      {seatCount} ghế · {zoneTickets?.price ? `${zoneTickets.price.toLocaleString("vi-VN")} đ` : "Miễn phí"}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto">
+                    {visibleSeats.map((seat) => (
+                      <span
+                        key={seat.id}
+                        title={seat.label}
+                        className="inline-flex items-center justify-center rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-2 py-1 text-[10px] font-mono font-semibold text-slate-700 dark:text-slate-200"
+                      >
+                        {seat.id}
+                      </span>
+                    ))}
+                    {hiddenCount > 0 && (
+                      <span className="inline-flex items-center justify-center rounded-md border border-dashed border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 px-2 py-1 text-[10px] font-semibold text-slate-600 dark:text-slate-300">
+                        +{hiddenCount} ghế nữa
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
 
         {showFullSeatingEditor && (
           <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
