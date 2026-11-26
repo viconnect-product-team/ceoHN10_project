@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import {
   Injectable,
   OnModuleInit,
@@ -13,9 +14,24 @@ export class PrismaService
   private readonly logger = new Logger(PrismaService.name);
 
   constructor() {
-    const standardDbUrl =
-      process.env.DATABASE_URL ||
+    const localDbUrl =
       'postgresql://app1:5%5ES0CEpvYwC1%28%23YN1UoJ@127.0.0.1:5432/ceohn10_project';
+    const remoteDbUrl =
+      'postgresql://app1:5%5ES0CEpvYwC1%28%23YN1UoJ@113.20.107.184:6432/ceohn10_project?pgbouncer=true';
+
+    const isServerRuntime =
+      fs.existsSync('/.dockerenv') ||
+      process.env.IS_DOCKER === 'true' ||
+      process.env.DOCKER_CONTAINER === 'true' ||
+      process.env.NODE_ENV === 'production' ||
+      Boolean(process.env.REMOTE_SERVER);
+
+    const standardDbUrl = isServerRuntime
+      ? process.env.REMOTE_DATABASE_URL ||
+        (process.env.DATABASE_URL && !process.env.DATABASE_URL.includes('127.0.0.1')
+          ? process.env.DATABASE_URL
+          : remoteDbUrl)
+      : localDbUrl;
 
     super({
       datasources: {

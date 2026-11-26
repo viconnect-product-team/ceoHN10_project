@@ -657,7 +657,7 @@ export function CeoHn10StudentAppScreen() {
         {/* Bên trái: Logo CEO HN10 (Theme sáng màu đen, theme tối màu trắng, không nền) */}
         <div className="flex items-center gap-2.5">
           <img
-            src={isLight ? "/hn10-logo.png" : "/hn10-logo-2.png"}
+            src="/hn10-logo-2.png"
             alt="CEO HN10"
             className={`h-9 w-11 shrink-0 object-contain bg-transparent ${isLight ? "brightness-0" : ""}`}
           />
