@@ -1073,13 +1073,14 @@ function AccountManagementPage() {
               },
               {
                 key: "access_scope",
-                label: "Phạm vi truy cập",
-                width: 170,
+                label: "Quyền vào (Hệ thống / App)",
+                width: 185,
                 align: "center",
                 render: (u: any) => {
                   const hasCrm = Boolean(
                     u.canAccessCrm ||
                     u.can_access_crm ||
+                    u.targetSystem === "crm" ||
                     u.targetSystem === "all" ||
                     u.role === "admin" ||
                     u.role === "platform_admin" ||
@@ -1091,13 +1092,28 @@ function AccountManagementPage() {
                     u.executiveRole === "pho_team" ||
                     u.executiveRole === "truong_ban_chuyen_trach"
                   );
-                  return hasCrm ? (
-                    <span className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-bold bg-blue-50 text-[#002B70] dark:bg-blue-950 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                      💻 CRM &amp; App
-                    </span>
-                  ) : (
+                  const hasApp =
+                    u.targetSystem === "crm" || u.canAccessApp === false || u.can_access_app === false
+                      ? false
+                      : true;
+
+                  if (hasCrm && hasApp) {
+                    return (
+                      <span className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-bold bg-blue-50 text-[#002B70] dark:bg-blue-950 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                        💻 Cả 2 (CRM &amp; App)
+                      </span>
+                    );
+                  }
+                  if (hasCrm && !hasApp) {
+                    return (
+                      <span className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-bold bg-purple-50 text-purple-800 dark:bg-purple-950 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+                        🖥️ Chỉ Hệ thống CRM
+                      </span>
+                    );
+                  }
+                  return (
                     <span className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-bold bg-amber-50 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
-                      📱 Chỉ App CEOHN10
+                      📱 Chỉ App CEO HN10
                     </span>
                   );
                 },

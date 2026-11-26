@@ -33,7 +33,7 @@ import { MemberHeader } from "@/components/member/MemberShell";
 import { useServerData } from "@/hooks/use-server-data";
 import { getMyHistory, type MyHistory } from "@/lib/member-app.functions";
 import { useT } from "@/lib/i18n";
-import { resolveMediaUrl } from "@/lib/api-client";
+import { fetchNestApi, resolveMediaUrl } from "@/lib/api-client";
 import { toast } from "sonner";
 import { getQrUrl } from "@/lib/qr";
 import {
@@ -89,6 +89,38 @@ function HistoryScreen() {
 
   // Modals state
   const [selectedTicket, setSelectedTicket] = useState<any | null>(null);
+  const [serverVoteActivities, setServerVoteActivities] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchNestApi<any[]>("/voting/polls")
+      .then((polls) => {
+        if (!Array.isArray(polls)) return;
+        const voted = polls
+          .filter((p) => Boolean(p.myVote))
+          .map((p) => {
+            const chosenTitle =
+              p.myVoteOptionTitle ||
+              (Array.isArray(p.options)
+                ? p.options.find((o: any) => o.id === p.myVote)?.title
+                : null) ||
+              "Lựa chọn đã chọn";
+            const summary = p.eventName
+              ? `Bạn đã chọn "${chosenTitle}" tại biểu quyết "${p.title}" ở sự kiện "${p.eventName}"`
+              : `Bạn đã chọn "${chosenTitle}" tại biểu quyết "${p.title}"`;
+            return {
+              id: `vote-${p.id}`,
+              type: "voting",
+              category: "voting",
+              title: summary,
+              description: summary,
+              date: p.createdAt || new Date().toISOString(),
+              status: "completed",
+            };
+          });
+        setServerVoteActivities(voted);
+      })
+      .catch(() => {});
+  }, []);
 
   // 1. Connection List State - Only populated when user sends connection requests
   const [connectionList, setConnectionList] = useState<any[]>(() => {
@@ -301,8 +333,17 @@ function HistoryScreen() {
       }
     }
 
+    // From server vote history
+    for (const v of serverVoteActivities) {
+      const key = v.id || `${v.title}_${v.date}`;
+      if (!seenIds.has(key)) {
+        seenIds.add(key);
+        list.push(v);
+      }
+    }
+
     return list.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  }, [localActivities, data?.activities]);
+  }, [localActivities, data?.activities, serverVoteActivities]);
 
   const filteredActivities = useMemo(() => {
     return allActivities.filter((a) => {

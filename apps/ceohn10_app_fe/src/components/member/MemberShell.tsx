@@ -996,7 +996,7 @@ function MemberTabBar() {
                       setQrModalOpen(true);
                     }}
                     aria-label="Quét mã QR Check-in"
-                    className="-mt-5 relative size-12 rounded-full bg-slate-900 text-white border-2 border-white dark:border-slate-800 shadow-[0_6px_20px_rgba(15,23,42,0.35)] flex flex-col items-center justify-center active:scale-90 transition-transform cursor-pointer outline-none group"
+                    className="-mt-5 relative size-12 rounded-full bg-[#003B95] text-white border-2 border-white dark:border-slate-800 shadow-[0_6px_20px_rgba(0,59,149,0.28)] flex flex-col items-center justify-center active:scale-90 transition-transform cursor-pointer outline-none group"
                   >
                     {isScanningPhase ? (
                       <Scan className="size-6 text-white stroke-[2.3] animate-pulse" />
@@ -1129,21 +1129,21 @@ function MemberTabBar() {
                 to={tab.to}
                 search={linkSearch as any}
                 onClick={handleTabClick}
-                className={`relative flex-1 py-1.5 px-1 rounded-2xl flex flex-col items-center justify-center gap-0.5 transition-all duration-200 active:scale-95 cursor-pointer border ${
+                className={`relative flex-1 py-1.5 px-1 rounded-2xl flex flex-col items-center justify-center gap-0.5 transition-all duration-200 active:scale-95 cursor-pointer bg-transparent hover:bg-transparent ${
                   active
-                    ? "bg-slate-900 text-white border-slate-900 shadow-sm"
-                    : "bg-slate-50/80 dark:bg-slate-800/40 border-slate-200/70 dark:border-slate-700/60 text-slate-600 dark:text-slate-400 hover:bg-slate-100/90 dark:hover:bg-slate-800/80"
+                    ? "text-[#003B95] dark:text-blue-400"
+                    : "text-slate-500 dark:text-slate-400 hover:text-[#003B95]"
                 }`}
               >
                 <div className="relative">
-                  {Icon && <Icon active={active} brandColor={active ? "#FFFFFF" : undefined} />}
+                  {Icon && <Icon active={active} brandColor={active ? "#003B95" : undefined} />}
                   {notificationBadge || seasonalBadge}
                 </div>
                 <span
                   className={`text-[10px] tracking-tight leading-3 select-none font-['Inter'] ${
                     active
-                      ? "font-bold text-white"
-                      : "font-medium text-slate-600 dark:text-slate-400"
+                      ? "font-bold text-[#003B95] dark:text-blue-400"
+                      : "font-medium text-slate-500 dark:text-slate-400"
                   }`}
                 >
                   {lang === "en"

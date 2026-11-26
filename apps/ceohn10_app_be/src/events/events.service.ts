@@ -1265,6 +1265,15 @@ export class EventsService extends BaseService implements OnModuleInit {
       }
     }
 
+    // Tự động đóng các biểu quyết gắn với sự kiện nếu sự kiện đã kết thúc hoặc bị hủy
+    if (status === 'completed' || status === 'cancelled') {
+      await this.prisma.$executeRaw`
+        UPDATE public.polls
+        SET status = 'closed', updated_at = now()
+        WHERE event_id::text = ${id} AND status != 'closed'
+      `.catch(() => { });
+    }
+
     // Kiểm tra nếu có sự thay đổi thời gian hoặc địa điểm tổ chức
     const oldDateStr = current.date
       ? current.date instanceof Date
@@ -4035,6 +4044,21 @@ export class EventsService extends BaseService implements OnModuleInit {
       DELETE FROM public.event_materials WHERE event_id = ${id}
     `.catch(() => { });
 
+    await this.prisma.$executeRaw`
+      DELETE FROM public.event_invitation_guests WHERE event_id = ${id}
+    `.catch(() => { });
+
+    await this.prisma.$executeRawUnsafe(
+      `DELETE FROM public.feed_posts WHERE content LIKE $1 OR title LIKE $1 OR metadata::text LIKE $1`,
+      `%${id}%`,
+    ).catch(() => { });
+
+    await this.prisma.$executeRawUnsafe(
+      `DELETE FROM public.business_notifications WHERE source_record_id = $1 OR safe_display_data::text LIKE $2`,
+      id,
+      `%${id}%`,
+    ).catch(() => { });
+
     // Delete event record
     await this.prisma.$executeRaw`
       DELETE FROM public.events WHERE id = ${id}
@@ -4925,8 +4949,8 @@ export class EventsService extends BaseService implements OnModuleInit {
       throw new BadRequestException('Mã vé không được để trống hoặc không hợp lệ');
     }
     const rows = await this.prisma.$queryRaw<any[]>`
-      SELECT r.*, e.name as event_name, e.title as event_title, e.association_id as event_assoc_id,
-             e.date as event_date, e.start_time, e.end_time, e.time as event_time
+      SELECT r.*, e.name as event_name, e.association_id as event_assoc_id,
+             e.date as event_date
       FROM public.event_registrations r
       LEFT JOIN public.events e ON e.id = r.event_id
       WHERE r.id = ${clean} 
@@ -4935,7 +4959,6 @@ export class EventsService extends BaseService implements OnModuleInit {
          OR r.phone = ${clean}
          OR LOWER(TRIM(COALESCE(r.email, ''))) = LOWER(${clean})
          OR (r.qr_payload IS NOT NULL AND r.qr_payload = ${clean})
-         OR (r.qr_code IS NOT NULL AND r.qr_code = ${clean})
       ORDER BY r.created_at DESC
       LIMIT 1
     `.catch(() => []);
@@ -4957,7 +4980,7 @@ export class EventsService extends BaseService implements OnModuleInit {
         ticket: {
           id: reg.id,
           memberName: reg.member_name,
-          eventTitle: reg.event_name || reg.event_title,
+          eventTitle: reg.event_name,
           phone: reg.phone,
           company: reg.company,
           attendedParts: parseJsonArraySafe(reg.attended_parts),
@@ -4976,7 +4999,7 @@ export class EventsService extends BaseService implements OnModuleInit {
     if (reg.event_date) {
       try {
         const dStr = reg.event_date instanceof Date ? reg.event_date.toISOString().slice(0, 10) : String(reg.event_date).slice(0, 10);
-        const tStr = reg.start_time || reg.event_time || '08:30';
+        const tStr = '08:30';
         const [sh, sm] = tStr.split(':').map((v: string) => parseInt(v, 10) || 0);
         const eventStart = new Date(dStr);
         eventStart.setHours(sh, sm, 0, 0);
@@ -5104,7 +5127,7 @@ export class EventsService extends BaseService implements OnModuleInit {
         ticket: {
           id: reg.id,
           memberName: reg.member_name,
-          eventTitle: reg.event_name || reg.event_title,
+          eventTitle: reg.event_name,
           phone: reg.phone,
           company: reg.company,
         },
@@ -5122,7 +5145,7 @@ export class EventsService extends BaseService implements OnModuleInit {
         ticket: {
           id: reg.id,
           memberName: reg.member_name,
-          eventTitle: reg.event_name || reg.event_title,
+          eventTitle: reg.event_name,
           phone: reg.phone,
           company: reg.company,
           checkedInAt: reg.checked_in_at ? new Date(reg.checked_in_at).toLocaleString('vi-VN') : null,
@@ -6815,14 +6838,15 @@ export class EventsService extends BaseService implements OnModuleInit {
     const attendees = Array.isArray(body.attendees) ? body.attendees : [];
     const totalFee = Math.max(0, Number(body.totalFee || 0));
     const regId = `REG-${Date.now().toString().slice(-6)}-${Math.floor(100 + Math.random() * 899)}`;
+    const memberCode = String(body.memberCode || body.guestSlug || `GUEST-${regId.slice(-6)}`).trim();
 
     if (attendMode === 'declined') {
       await this.prisma.$executeRaw`
         INSERT INTO public.event_registrations (
-          id, event_id, member_name, company, email, phone, ticket_type, ticket_count,
+          id, event_id, member_code, association_id, member_name, company, email, phone, ticket_type, ticket_count,
           status, payment_status, payment_amount, attended_parts, dynamic_data, note, created_at, updated_at
         ) VALUES (
-          ${regId}, ${eventId}, ${fullName}, ${company}, ${email}, ${phone},
+          ${regId}, ${eventId}, ${memberCode}, ${ev.association_id}::uuid, ${fullName}, ${company}, ${email}, ${phone},
           'Khách mời từ chối', 0, 'declined', 'none', 0, '[]'::jsonb,
           ${JSON.stringify({ title, company, attendMode: 'declined', declinedAt: new Date().toISOString() })}::jsonb,
           ${String(body.note || 'Khách mời phản hồi không thể tham dự từ thư mời')}, now(), now()
@@ -6889,10 +6913,10 @@ export class EventsService extends BaseService implements OnModuleInit {
 
     await this.prisma.$executeRaw`
       INSERT INTO public.event_registrations (
-        id, event_id, member_name, company, email, phone, ticket_type, ticket_count,
+        id, event_id, member_code, association_id, member_name, company, email, phone, ticket_type, ticket_count,
         status, payment_status, payment_amount, attended_parts, dynamic_data, note, created_at, updated_at
       ) VALUES (
-        ${regId}, ${eventId}, ${fullName}, ${company}, ${email}, ${phone},
+        ${regId}, ${eventId}, ${memberCode}, ${ev.association_id}::uuid, ${fullName}, ${company}, ${email}, ${phone},
         ${partsLabel}, ${attendeeCount}, ${regStatus}, ${paymentStatus}, ${totalFee},
         ${JSON.stringify(selectedPartNames)}::jsonb,
         ${JSON.stringify(dynamicPayload)}::jsonb,

@@ -269,8 +269,11 @@ function VotingPage() {
     if (!confirm("Xóa bình chọn này?")) return;
     setDeleting(id);
     try {
-      await deleteVote({ data: { id } });
+      await fetchNestApi(`/voting/polls/${id}`, { method: "DELETE" });
+      toast.success("Đã xóa biểu quyết thành công");
       await router.invalidate();
+    } catch (err: any) {
+      toast.error(err?.message || "Không thể xóa biểu quyết");
     } finally {
       setDeleting(null);
     }

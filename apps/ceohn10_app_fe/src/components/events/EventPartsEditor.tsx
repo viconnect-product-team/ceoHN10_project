@@ -12,6 +12,7 @@ export interface EventPartConfig {
   name: string;
   fee: number;
   guestFee?: number;
+  isPaid?: boolean;
   isParty?: boolean;
   items: EventSubItem[];
 }
@@ -23,6 +24,7 @@ export function createDefaultCeoHn10Parts(): EventPartConfig[] {
       name: "Lễ Khai Giảng CEO HN10",
       fee: 0,
       guestFee: 0,
+      isPaid: false,
       isParty: false,
       items: [
         { time: "08:00 - 08:30", title: "Đón khách & giao lưu" },
@@ -34,6 +36,7 @@ export function createDefaultCeoHn10Parts(): EventPartConfig[] {
       name: "Dự Tiệc Chúc Mừng",
       fee: 1000,
       guestFee: 0,
+      isPaid: true,
       isParty: true,
       items: [{ time: "11:30 - 14:00", title: "Tiệc trưa chúc mừng & kết nối B2B" }],
     },
@@ -45,11 +48,13 @@ export function EventPartsEditor({
   onChangeVenueName,
   parts,
   onChangeParts,
+  hidePriceInputs = false,
 }: {
   venueName: string;
   onChangeVenueName: (v: string) => void;
   parts: EventPartConfig[];
   onChangeParts: (next: EventPartConfig[]) => void;
+  hidePriceInputs?: boolean;
 }) {
   const safeParts = Array.isArray(parts) ? parts : [];
 
@@ -62,6 +67,7 @@ export function EventPartsEditor({
         name: `Phần ${idx}: Chương trình`,
         fee: 0,
         guestFee: 0,
+        isPaid: false,
         isParty: false,
         items: [{ time: "18:30", title: "Hoạt động chính" }],
       },
@@ -167,7 +173,7 @@ export function EventPartsEditor({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
-              <div className="sm:col-span-6">
+              <div className={hidePriceInputs ? "sm:col-span-7" : "sm:col-span-6"}>
                 <label className="block text-[11px] font-semibold text-muted-foreground mb-1">
                   Tên phần chương trình chính
                 </label>
@@ -179,26 +185,64 @@ export function EventPartsEditor({
                   className="h-9 w-full rounded-xl border border-border bg-background px-3 text-xs font-semibold text-foreground"
                 />
               </div>
-              <div className="sm:col-span-3">
-                <label className="block text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 mb-1">
-                  Vé Khách mời (0 = Free)
-                </label>
-                <VndCurrencyInput
-                  value={Number(part.guestFee ?? 0)}
-                  onChange={(val) => updatePart(pIdx, { guestFee: Number(String(val).replace(/\D/g, "")) || 0 })}
-                  placeholder="0"
-                />
-              </div>
-              <div className="sm:col-span-3">
-                <label className="block text-[11px] font-semibold text-muted-foreground mb-1">
-                  Vé Khách khác (VNĐ)
-                </label>
-                <VndCurrencyInput
-                  value={Number(part.fee || 0)}
-                  onChange={(val) => updatePart(pIdx, { fee: Number(String(val).replace(/\D/g, "")) || 0 })}
-                  placeholder="0"
-                />
-              </div>
+
+              {hidePriceInputs ? (
+                <div className="sm:col-span-5">
+                  <label className="block text-[11px] font-semibold text-muted-foreground mb-1">
+                    Hình thức vé của phần này (Giá vé cấu hình ở Bước 2)
+                  </label>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => updatePart(pIdx, { isPaid: false, fee: 0, guestFee: 0 })}
+                      className={`flex-1 h-9 rounded-xl border text-xs font-bold transition cursor-pointer ${
+                        !(part.isPaid ?? Number(part.fee || 0) > 0)
+                          ? "border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300"
+                          : "border-border bg-background text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      Miễn phí
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updatePart(pIdx, { isPaid: true })}
+                      className={`flex-1 h-9 rounded-xl border text-xs font-bold transition cursor-pointer ${
+                        part.isPaid ?? Number(part.fee || 0) > 0
+                          ? "border-amber-500 bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
+                          : "border-border bg-background text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      Có thu phí
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="sm:col-span-3">
+                    <label className="block text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 mb-1">
+                      Vé Khách mời (0 = Free)
+                    </label>
+                    <VndCurrencyInput
+                      value={Number(part.guestFee ?? 0)}
+                      onChange={(val) => updatePart(pIdx, { guestFee: Number(String(val).replace(/\D/g, "")) || 0 })}
+                      placeholder="0"
+                    />
+                  </div>
+                  <div className="sm:col-span-3">
+                    <label className="block text-[11px] font-semibold text-muted-foreground mb-1">
+                      Vé Khách khác (VNĐ)
+                    </label>
+                    <VndCurrencyInput
+                      value={Number(part.fee || 0)}
+                      onChange={(val) => {
+                        const num = Number(String(val).replace(/\D/g, "")) || 0;
+                        updatePart(pIdx, { fee: num, isPaid: num > 0 });
+                      }}
+                      placeholder="0"
+                    />
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Các mốc giờ bên trong phần */}

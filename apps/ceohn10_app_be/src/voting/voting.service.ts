@@ -71,8 +71,15 @@ export class VotingService {
         }
         if (evEnded) {
           pollStatus = 'closed';
+          if (r.status !== 'closed') {
+            void this.votingRepo.markPollClosed(r.id);
+          }
         }
       }
+
+      const myVoteOption = r.my_vote
+        ? options.find((o) => o.id === r.my_vote) || null
+        : null;
 
       return {
         id: r.id,
@@ -83,6 +90,7 @@ export class VotingService {
         eventName: r.event_name || null,
         options,
         myVote: r.my_vote || null,
+        myVoteOptionTitle: myVoteOption?.title || null,
         myVoteSource: r.my_vote_source || null,
         totalVotes,
         sourceStats,
@@ -120,8 +128,15 @@ export class VotingService {
       }
       if (evEnded) {
         pollStatus = 'closed';
+        if (r.status !== 'closed') {
+          void this.votingRepo.markPollClosed(r.id);
+        }
       }
     }
+
+    const myVoteOption = r.my_vote
+      ? options.find((o) => o.id === r.my_vote) || null
+      : null;
 
     return {
       id: r.id,
@@ -132,6 +147,7 @@ export class VotingService {
       eventName: r.event_name || null,
       options,
       myVote: r.my_vote || null,
+      myVoteOptionTitle: myVoteOption?.title || null,
       myVoteSource: r.my_vote_source || null,
       totalVotes,
       sourceStats,
@@ -150,6 +166,11 @@ export class VotingService {
       throw new BadRequestException('pollId and optionId are required');
     }
 
+    const existing = await this.getPollById(userId, pollId);
+    if (existing.status === 'closed') {
+      throw new BadRequestException('Phiên biểu quyết này đã kết thúc, không thể bỏ phiếu.');
+    }
+
     const validSource = sourceApp === 'crm' ? 'crm' : 'association_app';
     const voteId = crypto.randomUUID();
 
@@ -160,7 +181,19 @@ export class VotingService {
       userId,
       validSource,
     );
-    return this.getPollById(userId, pollId);
+    const updatedPoll = await this.getPollById(userId, pollId);
+    const chosenTitle =
+      updatedPoll.myVoteOptionTitle ||
+      updatedPoll.options.find((o: any) => o.id === optionId)?.title ||
+      'Lựa chọn đã chọn';
+    const historyNote = updatedPoll.eventName
+      ? `Bạn đã chọn "${chosenTitle}" tại biểu quyết "${updatedPoll.title}" ở sự kiện "${updatedPoll.eventName}"`
+      : `Bạn đã chọn "${chosenTitle}" tại biểu quyết "${updatedPoll.title}"`;
+
+    return {
+      ...updatedPoll,
+      voteHistorySummary: historyNote,
+    };
   }
 
   async createPoll(userId: string, data: CreatePollDto) {

@@ -1365,8 +1365,21 @@ function EventsScreen() {
 
   // Category & bookmark state
   const [eventCategory, setEventCategory] = useState<
-    "all" | "upcoming" | "free" | "paid" | "registered" | "bookmarked" | "history" | "b2b" | "gala" | "training" | "caravan" | "ban_thien_nguyen" | "ban_su_kien" | "ban_dao_tao" | "ban_b2b" | "ban_truyen_thong"
+    "all" | "classes" | "upcoming" | "free" | "paid" | "registered" | "bookmarked" | "history" | "b2b" | "gala" | "training" | "caravan" | "ban_thien_nguyen" | "ban_su_kien" | "ban_dao_tao" | "ban_b2b" | "ban_truyen_thong"
   >("all");
+  const [joinedClasses, setJoinedClasses] = useState<any[]>([]);
+  const [loadingClasses, setLoadingClasses] = useState(false);
+
+  useEffect(() => {
+    setLoadingClasses(true);
+    fetchNestApi<any>("/trainings")
+      .then((res) => {
+        const list = Array.isArray(res) ? res : res?.items || res?.data || [];
+        setJoinedClasses(list);
+      })
+      .catch(() => {})
+      .finally(() => setLoadingClasses(false));
+  }, []);
   const [activityFilter, setActivityFilter] = useState<"all" | "b2b_connect" | "trainings" | "fixed_committee" | "extraordinary">("all");
   const [recapModalEvent, setRecapModalEvent] = useState<MyEvent | any | null>(null);
   const [eventsPage, setEventsPage] = useState(1);
@@ -2234,6 +2247,23 @@ function EventsScreen() {
                   </span>
                 </button>
 
+                {/* 1b. Lớp học (Danh mục chính) */}
+                <button
+                  type="button"
+                  onClick={() => setEventCategory("classes")}
+                  className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-semibold cursor-pointer transition shrink-0 ${eventCategory === "classes"
+                    ? "bg-[#003B95] border-[#003B95] text-white shadow-xs"
+                    : "border-blue-200 dark:border-blue-800 bg-blue-50/70 dark:bg-blue-950/30 text-[#003B95] dark:text-blue-300 hover:bg-blue-100/70"
+                    }`}
+                >
+                  <GraduationCap className="size-3.5" />
+                  <span>Lớp học</span>
+                  <span className={`px-1.5 py-0.5 rounded-full text-xs font-normal ${eventCategory === "classes" ? "bg-white/20 text-white" : "bg-white dark:bg-slate-800 text-[#003B95] dark:text-blue-300"
+                    }`}>
+                    {joinedClasses.length}
+                  </span>
+                </button>
+
                 {/* 2. Sắp diễn ra */}
                 <button
                   type="button"
@@ -2383,7 +2413,103 @@ function EventsScreen() {
               </div>
             )}
 
-            {/* Event Cards List */}
+            {/* Event Cards List hoặc Danh Mục Lớp Học */}
+            {eventCategory === "classes" ? (
+              <div className="self-stretch pt-4 pb-3 space-y-4">
+                {loadingClasses ? (
+                  <div className="py-10 text-center text-xs text-slate-500">Đang tải danh sách lớp học &amp; lịch buổi học cố định...</div>
+                ) : joinedClasses.length === 0 ? (
+                  <div className="py-10 px-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 text-center space-y-2">
+                    <GraduationCap className="size-8 mx-auto text-[#003B95]" />
+                    <div className="text-sm font-bold text-slate-800 dark:text-slate-100">
+                      Chưa có lớp học hoặc buổi học cố định nào được lên lịch
+                    </div>
+                    <p className="text-xs text-slate-500 max-w-xs mx-auto">
+                      Khi Ban Đào Tạo lên lịch các buổi học cố định từ hệ thống CRM, thông tin lớp học và lịch từng buổi sẽ hiển thị tự động tại đây.
+                    </p>
+                  </div>
+                ) : (
+                  joinedClasses.map((cls: any) => {
+                    const sessions: any[] = Array.isArray(cls.sessions)
+                      ? cls.sessions
+                      : Array.isArray(cls.schedule)
+                        ? cls.schedule
+                        : [];
+                    return (
+                      <div
+                        key={cls.id}
+                        className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 shadow-xs space-y-3"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <div className="size-11 rounded-2xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 flex items-center justify-center text-[#003B95] dark:text-blue-300 shrink-0">
+                              <GraduationCap className="size-5" />
+                            </div>
+                            <div>
+                              <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 mb-1">
+                                Lớp học đã tham gia
+                              </span>
+                              <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-snug">
+                                {cls.name || cls.title || "Khóa học CEO HN10"}
+                              </h4>
+                              <p className="text-[11px] text-slate-500 mt-0.5">
+                                {cls.instructor ? `Giảng viên: ${cls.instructor}` : "Ban Đào Tạo CEO HN10"}
+                                {cls.location ? ` · ${cls.location}` : ""}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center justify-between">
+                            <span>Lịch các buổi học cố định từ hệ thống</span>
+                            <span className="font-mono text-[#003B95]">{sessions.length} buổi</span>
+                          </div>
+                          {sessions.length === 0 ? (
+                            <p className="text-xs text-slate-500 italic py-2">
+                              Chưa có buổi học cố định nào được lên lịch trong lớp này.
+                            </p>
+                          ) : (
+                            <div className="space-y-2">
+                              {sessions.map((ss: any, sIdx: number) => (
+                                <div
+                                  key={ss.id || sIdx}
+                                  className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/40 p-3 flex items-center justify-between gap-3"
+                                >
+                                  <div className="min-w-0">
+                                    <div className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                                      Buổi {sIdx + 1}: {ss.title || ss.topic || ss.name || "Chuyên đề CEO HN10"}
+                                    </div>
+                                    <div className="text-[11px] text-slate-500 mt-0.5 flex flex-wrap items-center gap-2">
+                                      <span className="inline-flex items-center gap-1">
+                                        <Calendar className="size-3" /> {formatDisplayDate(ss.date || ss.sessionDate)}
+                                      </span>
+                                      {(ss.time || ss.startTime) && (
+                                        <span className="inline-flex items-center gap-1">
+                                          <Clock className="size-3" /> {ss.time || `${ss.startTime}${ss.endTime ? ` - ${ss.endTime}` : ""}`}
+                                        </span>
+                                      )}
+                                      {ss.location && (
+                                        <span className="inline-flex items-center gap-1">
+                                          <MapPin className="size-3" /> {ss.location}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-[#003B95] border border-blue-200 shrink-0">
+                                    {ss.status === "completed" ? "Đã học" : "Theo lịch"}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            ) : (
             <div className="self-stretch pt-4 pb-3 flex flex-col justify-start items-start gap-2">
               {displayEventsList.length === 0 ? (
                 <div className="self-stretch py-10 px-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center text-center gap-3">
@@ -2520,9 +2646,10 @@ function EventsScreen() {
                   );
                 }))}
             </div>
+            )}
 
-            {/* Xem tất cả - Chỉ hiển thị khi đang lọc theo danh mục khác tab Tất cả và danh sách có dữ liệu (tránh trùng nút trong empty box) */}
-            {eventCategory !== "all" && displayEventsList.length > 0 && (
+            {/* Xem tất cả - Chỉ hiển thị khi đang lọc theo danh mục sự kiện khác Tất cả và Lớp học */}
+            {eventCategory !== "all" && eventCategory !== "classes" && displayEventsList.length > 0 && (
               <div className="self-stretch px-4 flex flex-col justify-start items-center gap-2.5">
                 <button
                   type="button"

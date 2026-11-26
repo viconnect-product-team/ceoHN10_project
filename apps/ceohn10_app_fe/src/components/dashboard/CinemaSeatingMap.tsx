@@ -1533,13 +1533,13 @@ export function CinemaSeatingMap({
                 }}
                 className="relative will-change-transform"
               >
-                {/* SÂN KHẤU TRUNG TÂM */}
-                <div className="absolute top-4 left-1/2 -translate-x-1/2 w-[720px] text-center py-2.5 px-6 rounded-2xl bg-gradient-to-r from-slate-800 via-slate-900 to-slate-800 text-white shadow-md border-b-4 border-amber-400 pointer-events-none z-10">
-                  <div className="text-xs uppercase tracking-widest font-black text-amber-400 flex items-center justify-center gap-2">
-                    <span>✦</span> SÂN KHẤU CHÍNH HỘI TRƯỜNG CEO HN10 <span>✦</span>
+                {/* SÂN KHẤU TRUNG TÂM (TỐI GIẢN) */}
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 w-[720px] text-center py-2.5 px-6 rounded-2xl bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 shadow-xs border border-slate-300 dark:border-slate-700 border-b-2 border-b-slate-500 pointer-events-none z-10">
+                  <div className="text-xs uppercase tracking-widest font-bold text-slate-800 dark:text-slate-100 flex items-center justify-center gap-2">
+                    SÂN KHẤU CHÍNH HỘI TRƯỜNG
                   </div>
-                  <div className="text-[10.5px] text-slate-300 font-medium">
-                    Vị trí trung tâm · Toàn bộ ghế và phân khu có thể kéo thả di chuyển tự do tới bất kỳ vị trí nào
+                  <div className="text-[10.5px] text-slate-500 dark:text-slate-400 font-medium">
+                    Vị trí trung tâm · Kéo thả ghế và phân khu tới vị trí mong muốn
                   </div>
                 </div>
 
@@ -1554,8 +1554,8 @@ export function CinemaSeatingMap({
                 {dynamicZones.map((zone) => {
                   const colorMap = {
                     amber: {
-                      border: "border-amber-400/70 bg-amber-500/10 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200",
-                      header: "bg-amber-200/80 dark:bg-amber-900/60 text-amber-950 dark:text-amber-200 border-amber-300/80",
+                      border: "border-slate-300 bg-slate-50/90 dark:bg-slate-800/40 text-slate-800 dark:text-slate-200",
+                      header: "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700",
                     },
                     blue: {
                       border: "border-blue-400/70 bg-blue-500/10 dark:bg-blue-950/20 text-blue-900 dark:text-blue-200",

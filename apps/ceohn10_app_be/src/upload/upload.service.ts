@@ -93,7 +93,7 @@ export class UploadService {
     let saved = false;
     let url: string | null = null;
 
-    // 1. Ưu tiên tải trực tiếp lên MinIO (S3 Object Storage)
+    // Bắt buộc tải trực tiếp lên MinIO (S3 Object Storage) - không lưu cục bộ
     try {
       const minioUrl = await this.minioService.uploadFile(
         safeFilename,
@@ -105,28 +105,9 @@ export class UploadService {
         saved = true;
       }
     } catch (minioErr: any) {
-      console.warn(
-        'MinIO upload unreachable/failed, fallback to disk storage:',
-        minioErr?.message,
+      throw new InternalServerErrorException(
+        `Không thể lưu ảnh đại diện lên MinIO: ${minioErr?.message || 'MinIO unreachable'}`,
       );
-    }
-
-    // 2. Chỉ ghi vào ổ đĩa cục bộ làm fallback nếu MinIO không khả dụng
-    if (!saved) {
-      try {
-        url = await this.saveToLocalDisk(
-          'avatars',
-          baseFilename,
-          file.buffer,
-          file.mimetype,
-        );
-        saved = Boolean(url);
-      } catch (diskErr: any) {
-        console.warn(
-          'Local disk write notice in saveAvatar:',
-          diskErr?.message,
-        );
-      }
     }
 
     if (!saved || !url) {
@@ -217,27 +198,9 @@ export class UploadService {
         saved = true;
       }
     } catch (minioErr: any) {
-      console.warn(
-        'MinIO upload unreachable/failed for logo, fallback to disk storage:',
-        minioErr?.message,
+      throw new InternalServerErrorException(
+        `Không thể lưu logo lên MinIO: ${minioErr?.message || 'MinIO unreachable'}`,
       );
-    }
-
-    if (!saved) {
-      try {
-        url = await this.saveToLocalDisk(
-          'logos',
-          baseFilename,
-          file.buffer,
-          file.mimetype,
-        );
-        saved = Boolean(url);
-      } catch (diskErr: any) {
-        console.warn(
-          'Local disk write notice in saveCompanyLogo:',
-          diskErr?.message,
-        );
-      }
     }
 
     if (!saved || !url) {
@@ -306,37 +269,20 @@ export class UploadService {
     let saved = false;
     let url: string | null = null;
 
-    // 1. Luôn ghi tệp ra ổ đĩa cục bộ ngay lập tức để phục vụ tức thì (0ms latency, không lỗi 500 do timeout MinIO)
-    try {
-      url = await this.saveToLocalDisk(
-        'association-logos',
-        baseFilename,
-        file.buffer,
-        file.mimetype,
-      );
-      saved = Boolean(url);
-    } catch (diskErr: any) {
-      console.warn(
-        'Local disk write notice in saveAssociationLogo:',
-        diskErr?.message,
-      );
-    }
-
-    // 2. Đồng thời tải lên MinIO để dự phòng
+    // Bắt buộc tải trực tiếp lên MinIO (S3 Object Storage)
     try {
       const minioUrl = await this.minioService.uploadFile(
         safeFilename,
         file.buffer,
         file.mimetype,
       );
-      if (minioUrl && !url) {
+      if (minioUrl) {
         url = minioUrl;
         saved = true;
       }
     } catch (minioErr: any) {
-      console.warn(
-        'MinIO upload notice for association logo:',
-        minioErr?.message,
+      throw new InternalServerErrorException(
+        `Không thể lưu logo hiệp hội lên MinIO: ${minioErr?.message || 'MinIO unreachable'}`,
       );
     }
 
@@ -412,7 +358,7 @@ export class UploadService {
     let saved = false;
     let url: string | null = null;
 
-    // 1. Ưu tiên tải trực tiếp lên MinIO (S3 Object Storage)
+    // Bắt buộc tải trực tiếp lên MinIO (S3 Object Storage) - không lưu cục bộ
     try {
       const minioUrl = await this.minioService.uploadFile(
         safeFilename,
@@ -424,25 +370,9 @@ export class UploadService {
         saved = true;
       }
     } catch (minioErr: any) {
-      console.warn(
-        'MinIO upload unreachable/failed, fallback to disk storage:',
-        minioErr?.message,
+      throw new InternalServerErrorException(
+        `Không thể lưu tệp tin lên MinIO: ${minioErr?.message || 'MinIO unreachable'}`,
       );
-    }
-
-    // 2. Chỉ ghi vào ổ đĩa cục bộ làm fallback nếu MinIO không khả dụng
-    if (!saved) {
-      try {
-        url = await this.saveToLocalDisk(
-          folder,
-          baseFilename,
-          file.buffer,
-          file.mimetype,
-        );
-        saved = Boolean(url);
-      } catch (diskErr: any) {
-        console.warn(`Local disk write notice in saveFile:`, diskErr?.message);
-      }
     }
 
     if (!saved || !url) {

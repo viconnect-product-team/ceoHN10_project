@@ -26,9 +26,11 @@ import {
   Camera,
   Package,
   MessageSquare,
+  Mail,
 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/dashboard/AppShell";
+import { EventInvitationBuilderModal } from "@/components/events/EventInvitationBuilderModal";
 
 import { CrudModal, type CrudField, type CrudValues } from "@/components/dashboard/CrudModal";
 import { EventAttendees } from "@/components/dashboard/EventAttendees";
@@ -180,6 +182,7 @@ function EventDetailPage() {
   }, [user, event]);
 
   const [editOpen, setEditOpen] = useState(false);
+  const [invitationModalOpen, setInvitationModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
@@ -484,6 +487,14 @@ function EventDetailPage() {
           <div className="hidden flex-wrap items-center gap-2 md:flex">
             <button
               type="button"
+              onClick={() => setInvitationModalOpen(true)}
+              className="inline-flex items-center gap-2 rounded-xl border border-blue-500/40 bg-blue-500/10 px-4 py-2 text-sm font-bold text-[#003B95] dark:text-blue-300 hover:bg-blue-500/20 transition cursor-pointer shadow-2xs"
+            >
+              <Mail className="h-4 w-4" aria-hidden="true" />
+              Gửi Thư Mời Đa Kênh
+            </button>
+            <button
+              type="button"
               onClick={() => setPosterOpen(true)}
               className="inline-flex items-center gap-2 rounded-xl border border-amber-500/40 bg-gradient-to-r from-amber-500/15 via-yellow-500/10 to-amber-500/15 px-4 py-2 text-sm font-bold text-amber-700 dark:text-amber-300 hover:bg-amber-500/25 transition cursor-pointer shadow-2xs"
             >
@@ -730,6 +741,14 @@ function EventDetailPage() {
             </div>
             <button
               type="button"
+              onClick={() => setInvitationModalOpen(true)}
+              className="inline-flex items-center gap-2 rounded-xl border border-blue-500/40 bg-blue-500/10 px-4 py-2 text-sm font-bold text-[#003B95] dark:text-blue-300 hover:bg-blue-500/20 transition cursor-pointer shadow-2xs"
+            >
+              <Mail className="h-4 w-4" aria-hidden="true" />
+              Gửi Thư Mời Đa Kênh
+            </button>
+            <button
+              type="button"
               onClick={() => setPosterOpen(true)}
               className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:brightness-105 text-slate-950 font-black text-xs shadow-md shadow-amber-500/20 transition cursor-pointer"
             >
@@ -953,6 +972,11 @@ function EventDetailPage() {
         isOpen={isQrSetupOpen}
         onClose={() => setIsQrSetupOpen(false)}
         onUpdated={() => router.invalidate()}
+      />
+      <EventInvitationBuilderModal
+        open={invitationModalOpen}
+        event={event}
+        onClose={() => setInvitationModalOpen(false)}
       />
     </AppShell>
   );

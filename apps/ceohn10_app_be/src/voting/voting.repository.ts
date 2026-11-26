@@ -378,7 +378,7 @@ export class VotingRepository {
     await this.prisma.$executeRaw`
       UPDATE public.polls
       SET status = 'closed', updated_at = now()
-      WHERE id = ${id}::uuid
+      WHERE id::text = ${id}
     `.catch(() => { });
   }
 
@@ -419,14 +419,22 @@ export class VotingRepository {
 
   async deletePollRaw(id: string): Promise<void> {
     await this.prisma.$executeRaw`
-      DELETE FROM public.poll_votes WHERE poll_id = ${id}::uuid
+      DELETE FROM public.business_notifications
+      WHERE source_domain = 'voting' AND source_record_id = ${id}
     `.catch(() => { });
     await this.prisma.$executeRaw`
-      DELETE FROM public.poll_options WHERE poll_id = ${id}::uuid
+      DELETE FROM public.member_notifications
+      WHERE ref_type = 'voting' AND ref_id = ${id}
     `.catch(() => { });
     await this.prisma.$executeRaw`
-      DELETE FROM public.polls WHERE id = ${id}::uuid
+      DELETE FROM public.poll_votes WHERE poll_id::text = ${id}
     `.catch(() => { });
+    await this.prisma.$executeRaw`
+      DELETE FROM public.poll_options WHERE poll_id::text = ${id}
+    `.catch(() => { });
+    await this.prisma.$executeRaw`
+      DELETE FROM public.polls WHERE id::text = ${id}
+    `;
   }
 
   async findMemberForLuckyDraw(

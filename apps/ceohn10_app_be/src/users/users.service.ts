@@ -2608,162 +2608,37 @@ export class UsersService implements OnModuleInit {
         actualId,
       );
 
-    // Tra cứu thông tin doanh nghiệp gắn với Học viên để xóa triệt để
-    const memberRows = await this.prisma.$queryRaw<any[]>`
-      SELECT id, code, company_name, tax_code FROM public.members
-      WHERE user_id::text = ${actualId} 
-         OR id::text = ${actualId} 
-         OR id::text = ${cleanTargetId} 
-         OR code = ${cleanTargetId} 
-         OR (LOWER(email) = LOWER(${userEmail}) AND ${userEmail} != '')
-    `.catch(() => []);
-    const memberCompName = (memberRows[0]?.company_name || '').trim();
-    const memberTaxCode = (memberRows[0]?.tax_code || '').trim();
-
-    // 1. Cascade cleanup related records to avoid FK constraint violations
+    // 1. Chỉ xóa dữ liệu TÀI KHOẢN (vione_users, user_roles, user_profiles, auth.users)
+    // Tuyệt đối KHÔNG xóa hồ sơ Học viên trong public.members (chỉ gỡ liên kết user_id = NULL)
     try {
-      // 1.1 Xóa doanh nghiệp liên kết trong cả companies và vione_companies
       if (isUuid) {
         await this.prisma
           .$executeRawUnsafe(
-            `DELETE FROM public.companies WHERE owner_id = $1::uuid OR created_by = $1::uuid`,
+            `UPDATE public.members SET user_id = NULL, updated_at = NOW() WHERE user_id = $1::uuid`,
             actualId,
           )
-          .catch(() => { });
+          .catch(() => {});
+
         await this.prisma
           .$executeRawUnsafe(
-            `DELETE FROM public.vione_companies WHERE user_id = $1::uuid`,
+            `DELETE FROM public.vba_member_permissions WHERE user_id = $1::uuid`,
             actualId,
           )
-          .catch(() => { });
-      }
-      if (memberCompName) {
-        await this.prisma
-          .$executeRawUnsafe(
-            `DELETE FROM public.companies WHERE LOWER(name) = LOWER($1)`,
-            memberCompName,
-          )
-          .catch(() => { });
-        await this.prisma
-          .$executeRawUnsafe(
-            `DELETE FROM public.vione_companies WHERE LOWER(name) = LOWER($1)`,
-            memberCompName,
-          )
-          .catch(() => { });
-      }
-      if (memberTaxCode) {
-        await this.prisma
-          .$executeRawUnsafe(
-            `DELETE FROM public.companies WHERE tax_code = $1`,
-            memberTaxCode,
-          )
-          .catch(() => { });
-      }
-      if (isUuid) {
-        await this.prisma
-          .$executeRawUnsafe(
-            `DELETE FROM public.vba_member_permissions WHERE user_id = $1::uuid OR member_id::text = $1 OR member_id::text = $2`,
-            actualId,
-            cleanTargetId,
-          )
-          .catch(() => { });
+          .catch(() => {});
 
         await this.prisma
           .$executeRawUnsafe(
             `DELETE FROM public.memberships WHERE user_id = $1::uuid`,
             actualId,
           )
-          .catch(() => { });
-
-        await this.prisma
-          .$executeRawUnsafe(
-            `DELETE FROM public.business_relationship_moment_media WHERE owner_user_id = $1::uuid`,
-            actualId,
-          )
-          .catch(() => { });
-
-        await this.prisma
-          .$executeRawUnsafe(
-            `DELETE FROM public.business_relationship_moments WHERE owner_user_id = $1::uuid OR target_user_id = $1::uuid`,
-            actualId,
-          )
-          .catch(() => { });
-
-        await this.prisma
-          .$executeRawUnsafe(
-            `DELETE FROM public.meeting_participants WHERE user_id = $1::uuid`,
-            actualId,
-          )
-          .catch(() => { });
-
-        await this.prisma
-          .$executeRawUnsafe(
-            `DELETE FROM public.business_appointments WHERE host_user_id = $1::uuid OR guest_user_id = $1::uuid`,
-            actualId,
-          )
-          .catch(() => { });
-
-        await this.prisma
-          .$executeRawUnsafe(
-            `DELETE FROM public.event_registrations WHERE user_id = $1::uuid`,
-            actualId,
-          )
-          .catch(() => { });
-
-        await this.prisma
-          .$executeRawUnsafe(
-            `DELETE FROM public.member_business_cards WHERE user_id = $1::uuid`,
-            actualId,
-          )
-          .catch(() => { });
+          .catch(() => {});
 
         await this.prisma
           .$executeRawUnsafe(
             `DELETE FROM public.card_settings WHERE user_id = $1::uuid`,
             actualId,
           )
-          .catch(() => { });
-
-        await this.prisma
-          .$executeRawUnsafe(
-            `DELETE FROM public.user_connections WHERE requester_user_id = $1::uuid OR recipient_user_id = $1::uuid`,
-            actualId,
-          )
-          .catch(() => { });
-
-        await this.prisma
-          .$executeRawUnsafe(
-            `DELETE FROM public.direct_messages WHERE sender_id = $1::uuid OR recipient_id = $1::uuid`,
-            actualId,
-          )
-          .catch(() => { });
-
-        if (userEmail) {
-          await this.prisma
-            .$executeRawUnsafe(
-              `DELETE FROM public.members WHERE user_id = $1::uuid OR id::text = $1 OR id::text = $2 OR code = $2 OR LOWER(email) = $3`,
-              actualId,
-              cleanTargetId,
-              userEmail,
-            )
-            .catch(() => { });
-        } else {
-          await this.prisma
-            .$executeRawUnsafe(
-              `DELETE FROM public.members WHERE user_id = $1::uuid OR id::text = $1 OR id::text = $2 OR code = $2`,
-              actualId,
-              cleanTargetId,
-            )
-            .catch(() => { });
-        }
-      } else {
-        await this.prisma
-          .$executeRawUnsafe(
-            `DELETE FROM public.members WHERE id::text = $1 OR code = $1 OR (LOWER(email) = $2 AND $2 != '')`,
-            cleanTargetId,
-            userEmail,
-          )
-          .catch(() => { });
+          .catch(() => {});
       }
 
       await this.usersRepo.deleteUserRoles(actualId);
@@ -2771,6 +2646,20 @@ export class UsersService implements OnModuleInit {
       await this.usersRepo.deleteUser(actualId);
       if (isUuid) {
         await this.usersRepo.deleteAuthUser(actualId);
+      }
+      if (userEmail) {
+        await this.prisma
+          .$executeRawUnsafe(
+            `DELETE FROM public.vione_users WHERE LOWER(email) = $1 OR LOWER(username) = $1`,
+            userEmail,
+          )
+          .catch(() => {});
+        await this.prisma
+          .$executeRawUnsafe(
+            `DELETE FROM auth.users WHERE LOWER(email) = $1`,
+            userEmail,
+          )
+          .catch(() => {});
       }
     } catch (err: any) {
       console.warn(
