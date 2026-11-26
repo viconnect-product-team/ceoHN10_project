@@ -17,7 +17,7 @@ import {
   UserPlus,
 } from "lucide-react";
 import { toast } from "sonner";
-import { fetchNestApi } from "@/lib/api-client";
+import { fetchNestApi, uploadFileToNest, resolveMediaUrl } from "@/lib/api-client";
 import type { EventItem } from "@/lib/events.functions";
 
 interface InvitationGuest {
@@ -64,6 +64,14 @@ export function EventInvitationBuilderModal({
   const [appMembers, setAppMembers] = useState<any[]>([]);
   const [selectedMemberIds, setSelectedMemberIds] = useState<Set<string>>(new Set());
 
+  // Tùy chỉnh mẫu Thư mời (Màu sắc, Ảnh nền thành phố, Kiểu chữ)
+  const [bgThemeColor, setBgThemeColor] = useState("#1e293b");
+  const [textColor, setTextColor] = useState("#ffffff");
+  const [accentColor, setAccentColor] = useState("#f1f5f9");
+  const [cityBgUrl, setCityBgUrl] = useState("/skyline_perspective_dark.jpg");
+  const [fontPreset, setFontPreset] = useState<string>("Georgia, 'Playfair Display', serif");
+  const [uploadingBg, setUploadingBg] = useState(false);
+
   useEffect(() => {
     if (!open || !event?.id) return;
     setLoadingGuests(true);
@@ -88,7 +96,14 @@ export function EventInvitationBuilderModal({
 
   const buildGuestUrl = (slug: string) => {
     const origin = typeof window !== "undefined" ? window.location.origin : "https://ceohn10.viconnect.vn";
-    return `${origin}/invitation/${event.id}#${slug}`;
+    const qs = new URLSearchParams({
+      bg: cityBgUrl,
+      bgColor: bgThemeColor,
+      textColor,
+      accentColor,
+      font: fontPreset,
+    });
+    return `${origin}/invitation/${event.id}?${qs.toString()}#${slug}`;
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -234,15 +249,19 @@ export function EventInvitationBuilderModal({
             to: g.email,
             subject: `[THƯ MỜI TRÂN TRỌNG] ${event.name} — Kính mời ${g.fullName}`,
             html: `
-              <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;background:#0f172a;color:#fff;border-radius:16px;">
-                <h2 style="margin:0 0 8px 0;color:#fff;">TRÂN TRỌNG KÍNH MỜI: ${g.fullName}</h2>
-                <p style="color:#cbd5e1;font-size:14px;">${g.title}${g.company ? ` · ${g.company}` : ""}</p>
-                <p style="font-size:15px;margin:16px 0;">Ban Tổ Chức CLB Doanh Nhân CEO HN10 trân trọng kính mời Quý vị tham dự sự kiện: <strong>${event.name}</strong>.</p>
-                <p style="color:#94a3b8;font-size:13px;">📅 Ngày: ${event.date} | 📍 Địa điểm: ${event.location}</p>
-                <div style="margin:24px 0;text-align:center;">
-                  <a href="${link}" style="display:inline-block;padding:12px 28px;background:#ffffff;color:#0f172a;font-weight:bold;text-decoration:none;border-radius:999px;">
-                    Mở Thư Mời &amp; Xác Nhận Tham Dự
-                  </a>
+              <div style="font-family:${fontPreset};max-width:620px;margin:0 auto;overflow:hidden;border-radius:18px;background:${bgThemeColor};color:${textColor};border:1px solid rgba(255,255,255,0.18);">
+                <div style="padding:28px;background:linear-gradient(135deg, ${bgThemeColor}ee, #0f172af2);text-align:center;">
+                  <div style="font-style:italic;font-size:28px;color:${accentColor};margin-bottom:6px;">Thư mời</div>
+                  <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;opacity:0.8;">TRÂN TRỌNG KÍNH MỜI</div>
+                  <h2 style="margin:8px 0 4px 0;font-size:24px;color:${textColor};">${g.fullName}</h2>
+                  <p style="margin:0 0 14px 0;font-size:13px;opacity:0.85;">${g.title}${g.company ? ` · ${g.company}` : ""}</p>
+                  <p style="font-size:15px;margin:14px 0;">Ban Tổ Chức CLB Doanh Nhân CEO HN10 trân trọng kính mời Quý vị tham dự sự kiện: <strong>${event.name}</strong>.</p>
+                  <p style="font-size:13px;opacity:0.85;">📅 Ngày: ${event.date} | 📍 Địa điểm: ${event.location}</p>
+                  <div style="margin:24px 0;">
+                    <a href="${link}" style="display:inline-block;padding:12px 30px;background:${accentColor};color:#0f172a;font-weight:bold;text-decoration:none;border-radius:999px;">
+                      Mở Thư Mời &amp; Xác Nhận Tham Dự
+                    </a>
+                  </div>
                 </div>
               </div>
             `,
@@ -473,6 +492,108 @@ export function EventInvitationBuilderModal({
               </div>
             </div>
 
+            {/* Thanh tùy chỉnh Màu sắc, Ảnh nền thành phố & Kiểu chữ */}
+            <div className="rounded-2xl bg-slate-900/90 border border-white/10 p-3 space-y-2.5 text-xs">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Màu mẫu:</span>
+                {[
+                  { label: "Xám - Trắng", bg: "#1e293b", txt: "#ffffff", acc: "#f1f5f9" },
+                  { label: "Navy HN10", bg: "#003B95", txt: "#ffffff", acc: "#e0f2fe" },
+                  { label: "Xám Bạc Sáng", bg: "#e2e8f0", txt: "#0f172a", acc: "#0f172a" },
+                  { label: "Đen Than", bg: "#18181b", txt: "#fafafa", acc: "#e4e4e7" },
+                ].map((preset) => (
+                  <button
+                    key={preset.label}
+                    type="button"
+                    onClick={() => {
+                      setBgThemeColor(preset.bg);
+                      setTextColor(preset.txt);
+                      setAccentColor(preset.acc);
+                    }}
+                    className="px-2 py-1 rounded-lg border border-white/15 bg-white/5 hover:bg-white/15 text-[11px] font-semibold text-slate-200 cursor-pointer"
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+                <label className="inline-flex items-center gap-1 text-[11px] text-slate-300 ml-auto">
+                  Nền:
+                  <input
+                    type="color"
+                    value={bgThemeColor}
+                    onChange={(e) => setBgThemeColor(e.target.value)}
+                    className="w-6 h-6 rounded cursor-pointer bg-transparent border-0"
+                  />
+                </label>
+                <label className="inline-flex items-center gap-1 text-[11px] text-slate-300">
+                  Chữ:
+                  <input
+                    type="color"
+                    value={textColor}
+                    onChange={(e) => setTextColor(e.target.value)}
+                    className="w-6 h-6 rounded cursor-pointer bg-transparent border-0"
+                  />
+                </label>
+                <label className="inline-flex items-center gap-1 text-[11px] text-slate-300">
+                  Nhấn:
+                  <input
+                    type="color"
+                    value={accentColor}
+                    onChange={(e) => setAccentColor(e.target.value)}
+                    className="w-6 h-6 rounded cursor-pointer bg-transparent border-0"
+                  />
+                </label>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
+                <div className="sm:col-span-5">
+                  <select
+                    value={fontPreset}
+                    onChange={(e) => setFontPreset(e.target.value)}
+                    className="w-full h-8 rounded-lg border border-white/15 bg-slate-950 px-2 text-[11px] text-slate-200"
+                    title="Kiểu chữ thư mời"
+                  >
+                    <option value="Georgia, 'Playfair Display', serif">Kiểu chữ: Serif Sang Trọng (Georgia)</option>
+                    <option value="'Times New Roman', serif">Kiểu chữ: Cổ Điển (Times New Roman)</option>
+                    <option value="'Be Vietnam Pro', 'Inter', sans-serif">Kiểu chữ: Hiện Đại (Be Vietnam Pro)</option>
+                    <option value="'Courier New', monospace">Kiểu chữ: Tối Giản (Monospace)</option>
+                  </select>
+                </div>
+                <div className="sm:col-span-5">
+                  <input
+                    type="text"
+                    value={cityBgUrl}
+                    onChange={(e) => setCityBgUrl(e.target.value)}
+                    placeholder="URL ảnh nền thành phố..."
+                    className="w-full h-8 rounded-lg border border-white/15 bg-slate-950 px-2 text-[11px] text-slate-200"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="w-full h-8 rounded-lg border border-white/20 bg-white/10 hover:bg-white/20 text-[11px] font-semibold text-white flex items-center justify-center cursor-pointer">
+                    {uploadingBg ? "..." : "Đổi ảnh"}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (ev) => {
+                        const f = ev.target.files?.[0];
+                        if (!f) return;
+                        setUploadingBg(true);
+                        try {
+                          const up = await uploadFileToNest(f);
+                          const url = resolveMediaUrl(up?.url || up?.filePath || up?.fileUrl || "") || up?.url;
+                          if (url) setCityBgUrl(url);
+                        } catch {
+                          toast.error("Không tải được ảnh nền");
+                        } finally {
+                          setUploadingBg(false);
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
+              </div>
+            </div>
+
             {/* Khung Preview Poster */}
             <div className="flex-1 flex items-center justify-center overflow-auto py-2">
               <div
@@ -480,12 +601,14 @@ export function EventInvitationBuilderModal({
                   previewMode === "mobile" ? "w-[320px] min-h-[540px]" : "w-full min-h-[380px]"
                 }`}
                 style={{
-                  background: "radial-gradient(circle at 70% 50%, #334155 0%, #1e293b 48%, #0f172a 100%)",
+                  background: `radial-gradient(circle at 70% 50%, ${bgThemeColor} 0%, #0f172a 100%)`,
+                  color: textColor,
+                  fontFamily: fontPreset,
                 }}
               >
                 {/* Ảnh thành phố nền */}
                 <img
-                  src="/skyline_perspective_dark.jpg"
+                  src={cityBgUrl || "/skyline_perspective_dark.jpg"}
                   alt="City"
                   className={`absolute inset-0 object-cover opacity-45 grayscale-[30%] ${
                     previewMode === "mobile" ? "h-52 w-full" : "h-full w-1/2"

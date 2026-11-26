@@ -33,15 +33,17 @@ import {
   ArrowRight,
   TrendingUp,
   FileText,
+  Vote,
   Briefcase,
   Layers,
   ShieldCheck,
   ChevronLeft,
   Bell,
+  Camera,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/lib/theme";
-import { fetchNestApi, resolveMediaUrl } from "@/lib/api-client";
+import { fetchNestApi, resolveMediaUrl, uploadFileToNest } from "@/lib/api-client";
 import { AssociationMemberQrModal } from "@/components/member/AssociationMemberQrModal";
 import { isPrivilegedAdminOrPresident, isMediaDepartmentMember } from "@/lib/checkin-gatekeeper-auth";
 import { toast } from "sonner";
@@ -153,6 +155,8 @@ export function CeoHn10StudentAppScreen() {
   // State Data
   const [profile, setProfile] = useState<StudentProfile | null>(null);
   const [events, setEvents] = useState<EventItem[]>([]);
+  const [polls, setPolls] = useState<any[]>([]);
+  const [votingOptionId, setVotingOptionId] = useState<string | null>(null);
   const [classes, setClasses] = useState<ClassTrainingItem[]>([]);
   const [peers, setPeers] = useState<PeerConnection[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -160,6 +164,11 @@ export function CeoHn10StudentAppScreen() {
 
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
+  const [homeCoverUrl, setHomeCoverUrl] = useState<string>(() => {
+    if (typeof window === "undefined") return "/ceohn10_hero_daylight_skyline.jpg";
+    return localStorage.getItem("ceohn10_home_cover_url") || "/ceohn10_hero_daylight_skyline.jpg";
+  });
+  const [homeCoverFailed, setHomeCoverFailed] = useState(false);
 
   // Selected ticket for modal viewer
   const [viewTicketEvent, setViewTicketEvent] = useState<EventItem | null>(null);
@@ -411,6 +420,18 @@ export function CeoHn10StudentAppScreen() {
       } catch (err) {
         setPeers([]);
       }
+
+      // 5. Load Biểu Quyết (Polls) from Backend
+      try {
+        const pollsRes = await fetchNestApi<any[]>("/voting/polls").catch(() => []);
+        if (Array.isArray(pollsRes)) {
+          setPolls(pollsRes);
+        } else {
+          setPolls([]);
+        }
+      } catch {
+        setPolls([]);
+      }
     } catch (error) {
       console.error("Error loading student portal data:", error);
     } finally {
@@ -421,6 +442,52 @@ export function CeoHn10StudentAppScreen() {
   useEffect(() => {
     loadData();
   }, [user]);
+
+  const handleCastPollVote = async (pollId: string, optionId: string) => {
+    setVotingOptionId(optionId);
+    try {
+      const updated = await fetchNestApi<any>(`/voting/polls/${pollId}/vote`, {
+        method: "POST",
+        body: JSON.stringify({ optionId, sourceApp: "association_app" }),
+      });
+      setPolls((prev) =>
+        prev.map((p) => (p.id === pollId ? { ...p, ...updated } : p))
+      );
+
+      const chosenTitle =
+        updated?.myVoteOptionTitle ||
+        updated?.options?.find((o: any) => o.id === optionId)?.title ||
+        "Lựa chọn đã chọn";
+      const summary =
+        updated?.voteHistorySummary ||
+        (updated?.eventName
+          ? `Bạn đã chọn "${chosenTitle}" tại biểu quyết "${updated.title}" ở sự kiện "${updated.eventName}"`
+          : `Bạn đã chọn "${chosenTitle}" tại biểu quyết "${updated.title}"`);
+
+      try {
+        const raw = localStorage.getItem("vba_local_activities");
+        const arr = raw ? JSON.parse(raw) : [];
+        const nextList = Array.isArray(arr) ? arr.filter((x: any) => x.id !== `vote-${pollId}`) : [];
+        nextList.unshift({
+          id: `vote-${pollId}`,
+          type: "voting",
+          category: "voting",
+          title: summary,
+          description: summary,
+          date: new Date().toISOString(),
+          status: "completed",
+        });
+        localStorage.setItem("vba_local_activities", JSON.stringify(nextList));
+        window.dispatchEvent(new Event("vba.history.changed"));
+      } catch { }
+
+      toast.success(summary);
+    } catch (err: any) {
+      toast.error(err?.message || "Không thể ghi nhận biểu quyết");
+    } finally {
+      setVotingOptionId(null);
+    }
+  };
 
   // Load Class Discussion Comments
   const loadClassComments = async (classId: string) => {
@@ -642,23 +709,51 @@ export function CeoHn10StudentAppScreen() {
         {/* ======================================================== */}
         {activeTab === "home" && (
           <div className="space-y-5">
-            {/* ── HERO VISUAL BANNER (HÌNH ẢNH TRÁNG LỆ SKYLINE & ÍT CHỮ) ── */}
+            {/* ── HERO VISUAL BANNER (CÓ THỂ ĐỔI ẢNH BÌA & FALLBACK GRADIENT) ── */}
             <section className="relative rounded-3xl overflow-hidden shadow-sm border border-slate-200">
-              <div className="relative h-44 w-full">
-                <img
-                  src="/ceohn10_hero_daylight_skyline.jpg"
-                  alt="CEO HN10 Skyline"
-                  className="w-full h-full object-cover"
-                />
+              <div className="relative h-44 w-full bg-gradient-to-br from-[#003B95] via-slate-800 to-slate-900">
+                {!homeCoverFailed && homeCoverUrl && (
+                  <img
+                    src={homeCoverUrl}
+                    alt="CEO HN10 Cover"
+                    onError={() => setHomeCoverFailed(true)}
+                    className="w-full h-full object-cover"
+                  />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-950/20" />
                 <div className="absolute inset-0 p-4 flex flex-col justify-between text-white">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-2">
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/20 backdrop-blur-md border border-white/30 tracking-wider uppercase text-amber-300">
                       ★ CLB DOANH NHÂN CEO HN10
                     </span>
-                    <span className="text-[10px] text-slate-300 font-mono">
-                      {profile?.studentCode || "CEOHN10_VIP"}
-                    </span>
+                    <label
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 text-white cursor-pointer transition"
+                      title="Đổi ảnh bìa trang chủ"
+                    >
+                      <Camera className="w-3 h-3" />
+                      <span>Đổi ảnh bìa</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={async (ev) => {
+                          const f = ev.target.files?.[0];
+                          if (!f) return;
+                          try {
+                            const up = await uploadFileToNest(f);
+                            const nextUrl = resolveMediaUrl(up?.url || up?.filePath || up?.fileUrl || "") || up?.url;
+                            if (nextUrl) {
+                              setHomeCoverUrl(nextUrl);
+                              setHomeCoverFailed(false);
+                              localStorage.setItem("ceohn10_home_cover_url", nextUrl);
+                              toast.success("Đã cập nhật ảnh bìa trang chủ lên MinIO!");
+                            }
+                          } catch (err: any) {
+                            toast.error(err?.message || "Không tải được ảnh lên MinIO, vui lòng thử lại!");
+                          }
+                        }}
+                      />
+                    </label>
                   </div>
                   <div>
                     <h2 className="text-base font-black text-white tracking-tight leading-tight">
@@ -707,10 +802,16 @@ export function CeoHn10StudentAppScreen() {
                   >
                     <div>
                       {/* Event Cover Photo */}
-                      <div className="relative h-32 w-full rounded-2xl overflow-hidden mb-3 bg-slate-100">
+                      <div className="relative h-32 w-full rounded-2xl overflow-hidden mb-3 bg-gradient-to-br from-[#003B95] to-slate-800">
                         <img
-                          src={idx % 2 === 0 ? "/ceohn10_hero_cosmos_skyline.jpg" : "/business_connect_light.jpg"}
+                          src={
+                            resolveMediaUrl((evt as any).imageUrl || (evt as any).image) ||
+                            (idx % 2 === 0 ? "/ceohn10_hero_cosmos_skyline.jpg" : "/business_connect_light.jpg")
+                          }
                           alt={evt.name}
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).style.display = "none";
+                          }}
                           className="w-full h-full object-cover"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />
@@ -775,6 +876,144 @@ export function CeoHn10StudentAppScreen() {
                 ))}
               </div>
             </section>
+
+            {/* ── BIỂU QUYẾT & BẦU CỬ (NGAY DƯỚI SỰ KIỆN SẮP TỚI) ── */}
+            {polls.length > 0 && (
+              <section className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                      <Vote className="w-4 h-4 text-[#C62828]" />
+                      Biểu Quyết &amp; Lấy Ý Kiến Hội Viên
+                    </h3>
+                    <p className="text-[11px] text-slate-500">
+                      Tham gia biểu quyết trực tiếp và theo dõi lịch sử lựa chọn của bạn
+                    </p>
+                  </div>
+                  <Link
+                    to="/association/history"
+                    className="text-xs font-bold text-blue-700 hover:text-blue-800 flex items-center gap-0.5 cursor-pointer"
+                  >
+                    <span>Lịch sử</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+
+                <div className="space-y-3">
+                  {polls.slice(0, 4).map((poll) => {
+                    const isClosed = poll.status === "closed";
+                    const options = Array.isArray(poll.options) ? poll.options : [];
+                    const totalVotes = Number(poll.totalVotes || 0);
+                    const myOptionTitle =
+                      poll.myVoteOptionTitle ||
+                      options.find((o: any) => o.id === poll.myVote)?.title ||
+                      null;
+
+                    return (
+                      <div
+                        key={poll.id}
+                        className="rounded-3xl bg-white border border-slate-200 p-4 shadow-2xs space-y-3"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                              <span
+                                className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${
+                                  isClosed
+                                    ? "bg-slate-100 text-slate-600 border border-slate-200"
+                                    : "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                }`}
+                              >
+                                {isClosed ? "Đã đóng" : "Đang mở"}
+                              </span>
+                              {poll.eventName && (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200 truncate max-w-[200px]">
+                                  Sự kiện: {poll.eventName}
+                                </span>
+                              )}
+                            </div>
+                            <h4 className="text-[14px] font-bold text-slate-900 leading-snug">
+                              {poll.title}
+                            </h4>
+                            {poll.description && (
+                              <p className="text-[11px] text-slate-500 mt-1 line-clamp-2">
+                                {poll.description}
+                              </p>
+                            )}
+                          </div>
+                          <span className="shrink-0 text-[11px] font-semibold text-slate-500">
+                            {totalVotes} phiếu
+                          </span>
+                        </div>
+
+                        <div className="space-y-2">
+                          {options.map((opt: any) => {
+                            const isSelected = poll.myVote === opt.id;
+                            const pct =
+                              totalVotes > 0
+                                ? Math.round(((opt.votesCount || 0) / totalVotes) * 100)
+                                : 0;
+                            const isBusy = votingOptionId === opt.id;
+
+                            return (
+                              <button
+                                key={opt.id}
+                                type="button"
+                                disabled={isClosed || isBusy}
+                                onClick={() => handleCastPollVote(poll.id, opt.id)}
+                                className={`w-full text-left rounded-2xl border p-2.5 transition-all relative overflow-hidden ${
+                                  isSelected
+                                    ? "border-[#003B95] bg-blue-50/60"
+                                    : isClosed
+                                    ? "border-slate-200 bg-slate-50/70 opacity-85 cursor-not-allowed"
+                                    : "border-slate-200 bg-white hover:border-blue-300 cursor-pointer"
+                                }`}
+                              >
+                                <div
+                                  className={`absolute inset-y-0 left-0 transition-all ${
+                                    isSelected ? "bg-blue-500/12" : "bg-slate-200/40"
+                                  }`}
+                                  style={{ width: `${pct}%` }}
+                                />
+                                <div className="relative flex items-center justify-between gap-2 text-xs">
+                                  <span className="font-semibold text-slate-800 flex items-center gap-1.5">
+                                    {isSelected && (
+                                      <CheckCircle2 className="w-3.5 h-3.5 text-[#003B95] shrink-0" />
+                                    )}
+                                    <span>{opt.title}</span>
+                                  </span>
+                                  <span className="font-bold text-slate-700 shrink-0">
+                                    {pct}% ({opt.votesCount || 0})
+                                  </span>
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        {myOptionTitle && (
+                          <div className="rounded-2xl bg-emerald-50 border border-emerald-200 px-3 py-2 text-[11px] text-emerald-800 font-medium flex items-start gap-1.5">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                            <span>
+                              Lịch sử biểu quyết: Bạn đã chọn{" "}
+                              <strong>{myOptionTitle}</strong> tại biểu quyết{" "}
+                              <strong>{poll.title}</strong>
+                              {poll.eventName ? (
+                                <>
+                                  {" "}
+                                  ở sự kiện <strong>{poll.eventName}</strong>
+                                </>
+                              ) : null}
+                              .
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
 
             {/* ── TIẾN ĐỘ HỌC TẬP (VÒNG TRÒN GAUGE % KÈM TIMELINE HÀNH TRÌNH ĐÀO TẠO) ── */}
             <section className="space-y-4">

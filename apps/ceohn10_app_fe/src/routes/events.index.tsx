@@ -674,14 +674,6 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
             subtitle={t("events.subtitle")}
             actions={
               <>
-                <button
-                  type="button"
-                  onClick={() => handleOpenBroadcastModal()}
-                  className="inline-flex items-center gap-2 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-2 text-sm font-semibold text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 shadow-xs cursor-pointer transition active:scale-95"
-                >
-                  <Mail className="h-4 w-4 text-amber-600" />
-                  Gửi Thư Mời Đa Kênh (Word/Excel/Zalo/Email)
-                </button>
                 {can("EVTO_EXPORT") && (
                   <button
                     onClick={handleExport}

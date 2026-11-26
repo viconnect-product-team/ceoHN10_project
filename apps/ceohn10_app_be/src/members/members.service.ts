@@ -5,6 +5,7 @@ import {
   BadRequestException,
   Logger,
   Optional,
+  OnModuleInit,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
@@ -33,7 +34,7 @@ export {
 };
 
 @Injectable()
-export class MembersService {
+export class MembersService implements OnModuleInit {
   private readonly logger = new Logger(MembersService.name);
 
   constructor(
@@ -42,6 +43,34 @@ export class MembersService {
     private readonly membersRepo: MembersRepository,
     @Optional() private readonly zaloService?: ZaloService,
   ) { }
+
+  async onModuleInit() {
+    await this.prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS public.user_connections (
+        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        requester_user_id uuid NOT NULL,
+        recipient_user_id uuid NOT NULL,
+        status text NOT NULL DEFAULT 'pending',
+        created_at timestamptz DEFAULT now(),
+        updated_at timestamptz DEFAULT now()
+      );
+    `).catch(() => {});
+    await this.prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS public.business_meetings (
+        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        association_id uuid,
+        requester_user_id uuid,
+        recipient_user_id uuid,
+        title text,
+        meeting_date timestamptz,
+        location text,
+        status text DEFAULT 'pending',
+        notes text,
+        created_at timestamptz DEFAULT now(),
+        updated_at timestamptz DEFAULT now()
+      );
+    `).catch(() => {});
+  }
 
   private async checkIsPlatformAdmin(userId: string): Promise<boolean> {
     if (!userId) return false;
@@ -2443,6 +2472,10 @@ export class MembersService {
       await this.prisma.$executeRaw`
         DELETE FROM public.vione_users
         WHERE LOWER(email) = ${memberEmail} OR LOWER(username) = ${memberEmail}
+      `.catch(() => { });
+      await this.prisma.$executeRaw`
+        DELETE FROM auth.users
+        WHERE LOWER(email) = ${memberEmail}
       `.catch(() => { });
       await this.prisma.$executeRaw`
         DELETE FROM auth.users

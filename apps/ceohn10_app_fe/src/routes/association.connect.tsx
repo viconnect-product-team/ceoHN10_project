@@ -26,7 +26,7 @@ import {
 import { toast } from "sonner";
 import { fetchNestApi, resolveMediaUrl } from "@/lib/api-client";
 import { useAuth } from "@/context/AuthContext";
-import { MemberHeader } from "@/components/member/MemberShell";
+import { useTheme } from "@/lib/theme";
 import { FeedView } from "@/components/feed/FeedView";
 
 export const Route = createFileRoute("/association/connect")({
@@ -384,11 +384,83 @@ export function AssociationConnectScreen() {
     return list;
   }, [activeTab, myMeetingsList, sentMeetingsList, cancelledMeetingsList, searchQuery]);
 
+  const { theme } = useTheme();
+  const isLight = theme === "light";
+  const [directoryMembers, setDirectoryMembers] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchNestApi<any>("/members/directory")
+      .then((res) => {
+        const list = Array.isArray(res) ? res : res?.items || res?.data || [];
+        setDirectoryMembers(list);
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <div className="vba-animate pb-6 min-h-screen bg-stone-50 dark:bg-slate-950 font-sans">
-      <MemberHeader title="Gặp Gỡ &amp; Kết Nối B2B" back />
+      {/* Header chỉ hiển thị Logo CEO HN10 (không text Gặp gỡ kết nối, không nút back) */}
+      <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-2.5 flex items-center justify-center">
+        <img
+          src={isLight ? "/hn10-logo.png" : "/hn10-logo-2.png"}
+          alt="CEO HN10"
+          className={`h-8 w-auto object-contain ${isLight ? "brightness-0" : ""}`}
+        />
+      </header>
 
-      {/* ── TOP SECTION TOGGLE: BẢNG TIN / HẸN GẶP 1-1 / DANH BẠ KẾT NỐI ── */}
+      {/* ── DẢI AVATAR HỌC VIÊN ĐANG DÙNG APP (SCROLL NGANG TỐI ĐA 6 HỌC VIÊN + XEM TẤT CẢ) ── */}
+      {directoryMembers.length > 0 && (
+        <div className="px-4 pt-3 max-w-2xl mx-auto">
+          <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 shadow-xs space-y-2.5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                Học viên CEO HN10 ({directoryMembers.length})
+              </span>
+              <Link
+                to={"/association/members" as any}
+                className="text-[11px] font-bold text-[#003B95] dark:text-blue-400 hover:underline flex items-center gap-0.5"
+              >
+                <span>Xem tất cả</span>
+                <ChevronRight className="size-3.5" />
+              </Link>
+            </div>
+            <div className="flex items-start gap-3 overflow-x-auto pb-1 no-scrollbar">
+              {directoryMembers.slice(0, 6).map((m: any) => {
+                const avatar = resolveMediaUrl(m.avatarUrl || m.avatar);
+                const name = m.personName || m.name || m.contact || "Học viên";
+                return (
+                  <button
+                    key={m.id || m.code || name}
+                    type="button"
+                    onClick={() => navigate({ to: "/association/members" as any })}
+                    className="flex flex-col items-center gap-1.5 w-16 shrink-0 cursor-pointer group"
+                  >
+                    <div className="size-12 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-bold text-[#003B95]">
+                      {avatar ? (
+                        <img
+                          src={avatar}
+                          alt={name}
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).style.display = "none";
+                          }}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span>{String(name).trim().slice(0, 2).toUpperCase()}</span>
+                      )}
+                    </div>
+                    <span className="text-[10.5px] font-medium text-slate-700 dark:text-slate-300 text-center line-clamp-2 leading-tight group-hover:text-[#003B95]">
+                      {name}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── TOP SECTION TOGGLE: BẢNG TIN / HẸN GẶP 1-1 ── */}
       <div className="px-4 pt-2.5 max-w-2xl mx-auto">
         <div className="p-1 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-1.5">
           <button
@@ -396,8 +468,8 @@ export function AssociationConnectScreen() {
             onClick={() => setMainSection("feed")}
             className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
               mainSection === "feed"
-                ? "bg-red-600 text-white shadow-sm border border-red-600"
-                : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700/80 border border-slate-200/60 dark:border-slate-700/60"
+                ? "bg-[#003B95] text-white shadow-sm"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700/80"
             }`}
           >
             <MessageSquare className="size-3.5 shrink-0" />
@@ -405,20 +477,11 @@ export function AssociationConnectScreen() {
           </button>
           <button
             type="button"
-            onClick={() => navigate({ to: "/association/members" as any })}
-            className="flex-1 py-2 px-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700/80 border border-slate-200/60 dark:border-slate-700/60"
-            title="Mở danh bạ hội viên để kết nối, kết bạn, nhắn tin và gọi điện"
-          >
-            <Users className="size-3.5 text-blue-600 shrink-0" />
-            <span className="font-bold whitespace-nowrap">👥 Danh Bạ</span>
-          </button>
-          <button
-            type="button"
             onClick={() => setMainSection("meetings")}
             className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
               mainSection === "meetings"
-                ? "bg-red-600 text-white shadow-sm border border-red-600"
-                : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700/80 border border-slate-200/60 dark:border-slate-700/60"
+                ? "bg-[#003B95] text-white shadow-sm"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700/80"
             }`}
           >
             <Handshake className="size-3.5 shrink-0" />

@@ -705,7 +705,7 @@ function RegPage() {
     <AppShell>
       <PageHeader
         title="Quản Lý Đăng Ký & Xếp Chỗ Sự Kiện"
-        subtitle="Quản lý danh sách tham dự, sơ đồ chỗ ngồi và theo dõi thanh toán sự kiện"
+        subtitle="Quản lý danh sách tham dự và theo dõi thanh toán sự kiện"
         actions={
           <div className="flex items-center gap-2">
             <button
@@ -721,16 +721,6 @@ function RegPage() {
               className="inline-flex items-center gap-1.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] px-3.5 py-2 text-xs font-bold text-white shadow-xs transition cursor-pointer"
             >
               <span>Gửi Thông Báo Sự Kiện</span>
-            </button>
-            <button
-              onClick={() => {
-                setSelectedReg(null);
-                setSeatInput("");
-                setSeatingModalOpen(true);
-              }}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 px-3.5 py-2 text-xs font-bold text-slate-800 dark:text-slate-200 transition cursor-pointer"
-            >
-              <span>Sơ Đồ Chỗ Ngồi</span>
             </button>
             <button
               onClick={() => setExportModalOpen(true)}

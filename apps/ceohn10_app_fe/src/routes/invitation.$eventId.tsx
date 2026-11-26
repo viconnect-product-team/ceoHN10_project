@@ -283,6 +283,14 @@ function PublicInvitationPage() {
     );
   }
 
+  const searchParams =
+    typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+  const customBgImg = searchParams?.get("bg") || "";
+  const customBgColor = searchParams?.get("bgColor") || "";
+  const customTextColor = searchParams?.get("textColor") || "";
+  const customAccentColor = searchParams?.get("accentColor") || "";
+  const customFont = searchParams?.get("font") || "";
+
   const dateObj = event.date ? new Date(event.date) : new Date();
   const dayNames = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
   const dayOfWeek = !isNaN(dateObj.getTime()) ? dayNames[dateObj.getDay()] : "Thứ Bảy";
@@ -290,16 +298,22 @@ function PublicInvitationPage() {
     ? `${String(dateObj.getDate()).padStart(2, "0")}.${String(dateObj.getMonth() + 1).padStart(2, "0")}`
     : "05.12";
   const yearStr = !isNaN(dateObj.getTime()) ? String(dateObj.getFullYear()) : "2026";
-  const heroBg = event.image && !String(event.image).includes("unsplash")
-    ? resolveMediaUrl(event.image) || "/skyline_perspective_dark.jpg"
-    : "/skyline_perspective_dark.jpg";
+  const heroBg = customBgImg
+    ? resolveMediaUrl(customBgImg) || customBgImg
+    : event.image && !String(event.image).includes("unsplash")
+      ? resolveMediaUrl(event.image) || "/skyline_perspective_dark.jpg"
+      : "/skyline_perspective_dark.jpg";
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location || "Hà Nội")}`;
 
   return (
     <div
-      className="min-h-screen w-full relative overflow-x-hidden text-white flex flex-col justify-center"
+      className="min-h-screen w-full relative overflow-x-hidden flex flex-col justify-center"
       style={{
-        background: "radial-gradient(circle at 72% 45%, #334155 0%, #1e293b 48%, #0f172a 85%, #090d16 100%)",
+        background: customBgColor
+          ? `radial-gradient(circle at 72% 45%, ${customBgColor} 0%, #0f172a 92%)`
+          : "radial-gradient(circle at 72% 45%, #334155 0%, #1e293b 48%, #0f172a 85%, #090d16 100%)",
+        color: customTextColor || "#ffffff",
+        fontFamily: customFont || undefined,
       }}
     >
       {/* Background City Image: Desktop left half, Mobile top banner */}

@@ -34,15 +34,37 @@ import { EVENT_TYPE_TEMPLATES, type EventTypeKey } from "@/lib/event-type-templa
 import { EventQrStaffSelector } from "@/components/events/EventQrStaffSelector";
 import { EventSponsorPackageSelector } from "@/components/events/EventSponsorPackageSelector";
 import { parseEventDocument, type ParsedEventData } from "@/lib/event-doc-parser";
-import { buildSeatingLayoutFromTickets } from "@/components/dashboard/CinemaSeatingMap";
+import { CinemaSeatingMap, buildSeatingLayoutFromTickets } from "@/components/dashboard/CinemaSeatingMap";
 import { EventPartsEditor, createDefaultCeoHn10Parts, type EventPartConfig } from "@/components/events/EventPartsEditor";
 
 type EventType = EventItem["type"];
 type EventStatus = EventItem["status"];
 
+export type EventCustomFieldType =
+  | "text"
+  | "textarea"
+  | "number"
+  | "date"
+  | "select"
+  | "checkbox"
+  | "email"
+  | "phone";
+
+export type EventCustomFieldDraft = {
+  id: string;
+  label: string;
+  type: EventCustomFieldType;
+  required?: boolean;
+  optionsText?: string;
+};
+
 type TicketDraft = {
+  partId?: string;
+  partName?: string;
+  isPartFree?: boolean;
   name: string;
   price: string;
+  guestPrice?: string;
   quantity: string;
   description: string;
 };
@@ -56,6 +78,7 @@ type Info = {
   location: string;
   venueName?: string;
   parts?: EventPartConfig[];
+  customFields?: EventCustomFieldDraft[];
   capacity: string;
   type: EventType;
   status: EventStatus;
@@ -140,6 +163,7 @@ function EventWizardDialog({
     isPaid: false,
     venueName: "",
     parts: createDefaultCeoHn10Parts(),
+    customFields: [],
   });
   const [tickets, setTickets] = useState<TicketDraft[]>([]);
   const [qrFields, setQrFields] = useState<QrField[]>(["registration_code"]);
@@ -221,32 +245,96 @@ function EventWizardDialog({
         errs[`ticket_${idx}_name`] = "Vui lòng nhập tên hạng vé!";
       }
       const priceNum = parseVndNumber(tk.price);
-      if (!info.isPaid && priceNum > 0) {
-        errs[`ticket_${idx}_price`] = "Sự kiện miễn phí không được tạo vé có phí";
+      if ((!info.isPaid || tk.isPartFree) && priceNum > 0) {
+        errs[`ticket_${idx}_price`] = "Phần/sự kiện miễn phí không được đặt giá > 0";
+      }
+      if (info.isPaid && tk.isPartFree === false && priceNum <= 0) {
+        errs[`ticket_${idx}_price`] = "Vui lòng nhập giá vé > 0đ cho phần có thu phí";
       }
     });
     setErrors(errs);
-    if (!info.isPaid && tickets.some((tk) => parseVndNumber(tk.price) > 0)) {
-      toast.error("Đây là sự kiện miễn phí không được tạo vé có phí cho sự kiện!");
-      return false;
-    }
     if (info.isPaid && tickets.length === 0) {
-      toast.error("Bạn đã chọn sự kiện Có thu phí, vui lòng thêm ít nhất 1 hạng vé!");
+      toast.error("Có phần thu phí, vui lòng thiết lập ít nhất 1 hạng vé!");
       return false;
     }
     if (info.isPaid && !tickets.some((tk) => parseVndNumber(tk.price) > 0)) {
-      toast.error("Bạn đã chọn sự kiện Có thu phí, vui lòng thiết lập ít nhất 1 hạng vé có phí lớn hơn 0đ!");
+      toast.error("Vui lòng nhập giá vé > 0đ cho ít nhất 1 phần có thu phí!");
       return false;
     }
     if (Object.keys(errs).length > 0) {
-      toast.error("Vui lòng nhập tên cho các hạng vé!");
+      toast.error("Vui lòng kiểm tra lại thông tin giá vé!");
       return false;
     }
     return true;
   };
 
+  const syncTicketsFromParts = () => {
+    const parts = Array.isArray(info.parts) ? info.parts : [];
+    const hasPaidPart = parts.some((p) => Boolean(p.isPaid));
+    setInfo((prev) => ({ ...prev, isPaid: hasPaidPart }));
+
+    if (parts.length > 0) {
+      setTickets((prev) => {
+        const nextTickets: TicketDraft[] = [];
+        parts.forEach((part) => {
+          const existingForPart = prev.filter((tk) => tk.partId === part.id);
+          if (existingForPart.length > 0) {
+            existingForPart.forEach((tk) => {
+              nextTickets.push({
+                ...tk,
+                partName: part.name,
+                isPartFree: !part.isPaid,
+                price: part.isPaid ? (parseVndNumber(tk.price) > 0 ? tk.price : String(Number(part.fee) > 0 ? part.fee : 1000)) : "0",
+                guestPrice: part.isPaid ? (tk.guestPrice ?? String(Number(part.guestFee ?? 0))) : "0",
+              });
+            });
+          } else if (part.isPaid) {
+            const basePrice = String(Number(part.fee) > 0 ? part.fee : 1000);
+            nextTickets.push(
+              {
+                partId: part.id,
+                partName: part.name,
+                isPartFree: false,
+                name: `Vé VIP — ${part.name}`,
+                price: basePrice,
+                guestPrice: "0",
+                quantity: "20",
+                description: `Hạng vé VIP thuộc ${part.name} (tự động xuất QR SePay)`,
+              },
+              {
+                partId: part.id,
+                partName: part.name,
+                isPartFree: false,
+                name: `Vé Tiêu Chuẩn — ${part.name}`,
+                price: basePrice,
+                guestPrice: "0",
+                quantity: "30",
+                description: `Hạng vé Tiêu Chuẩn thuộc ${part.name} (tự động xuất QR SePay)`,
+              },
+            );
+          } else {
+            nextTickets.push({
+              partId: part.id,
+              partName: part.name,
+              isPartFree: true,
+              name: `Vé Tham Dự — ${part.name}`,
+              price: "0",
+              guestPrice: "0",
+              quantity: info.capacity || "50",
+              description: `Vé miễn phí thuộc ${part.name}`,
+            });
+          }
+        });
+        return nextTickets;
+      });
+    }
+  };
+
   const next = () => {
-    if (step === 0 && !validateInfo()) return;
+    if (step === 0) {
+      if (!validateInfo()) return;
+      syncTicketsFromParts();
+    }
     if (step === 1 && !validateTickets()) return;
     setStep((s) => (s + 1) as 0 | 1 | 2);
   };
@@ -265,6 +353,13 @@ function EventWizardDialog({
     }
     setSubmitting(true);
     try {
+      const syncedParts = (Array.isArray(info.parts) ? info.parts : []).map((part) => {
+        const matchedTicket = tickets.find((tk) => tk.partId === part.id);
+        if (!matchedTicket) return part;
+        const pFee = part.isPaid ? parseVndNumber(matchedTicket.price) : 0;
+        const gFee = part.isPaid ? parseVndNumber(matchedTicket.guestPrice || "0") : 0;
+        return { ...part, fee: pFee, guestFee: gFee };
+      });
       const computedTicketPrice = info.isPaid && tickets.length > 0
         ? Math.max(0, ...tickets.map((tk) => parseVndNumber(tk.price)))
         : 0;
@@ -280,7 +375,9 @@ function EventWizardDialog({
           time: `${(info.startTime || "08:30").trim()} - ${(info.endTime || "11:30").trim()}`,
           location: info.location.trim(),
           venueName: (info.venueName || "").trim(),
-          parts: Array.isArray(info.parts) ? info.parts : [],
+          parts: syncedParts,
+          customFields: Array.isArray(info.customFields) ? info.customFields : [],
+          dynamicFields: Array.isArray(info.customFields) ? info.customFields : [],
           address: info.location.trim(),
           capacity: Number(info.capacity) || 0,
           type: info.type,
@@ -448,6 +545,7 @@ function EventWizardDialog({
           {step === 1 && (
             <TicketStep
               isPaid={!!info.isPaid}
+              parts={Array.isArray(info.parts) ? info.parts : []}
               tickets={tickets}
               setTickets={setTickets}
               errors={errors}
@@ -456,7 +554,12 @@ function EventWizardDialog({
           )}
           {step === 2 && <QrStep qrFields={qrFields} toggleQr={toggleQr} sample={qrSample} />}
           {step === 3 && createdEvent && (
-            <AttendeeRegistrationStep event={createdEvent} tickets={tickets} onClose={close} />
+            <AttendeeRegistrationStep
+              event={createdEvent}
+              tickets={tickets}
+              customFields={info.customFields || []}
+              onClose={close}
+            />
           )}
         </div>
 
@@ -1030,47 +1133,164 @@ function InfoStep({
             )}
           </div>
 
-          {/* Có phí vs Miễn phí */}
+          {/* Thông báo tự động nhận biết thu phí theo từng phần */}
           <div>
             <label className={labelCls}>Chính sách vé tham gia</label>
-            <div className="flex items-center gap-2 mt-1">
-              <button
-                type="button"
-                onClick={() => onTogglePaid ? onTogglePaid(false) : setInfo({ ...info, isPaid: false })}
-                className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${!info.isPaid
-                    ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400"
-                    : "border-border bg-background text-muted-foreground hover:text-foreground"
-                  }`}
-              >
-                Miễn phí (Free)
-              </button>
-              <button
-                type="button"
-                onClick={() => onTogglePaid ? onTogglePaid(true) : setInfo({ ...info, isPaid: true })}
-                className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${info.isPaid
-                    ? "border-amber-500 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400"
-                    : "border-border bg-background text-muted-foreground hover:text-foreground"
-                  }`}
-              >
-                Có thu phí (Vé)
-              </button>
+            <div className="mt-1 rounded-xl border border-blue-200 bg-blue-50/70 dark:border-blue-900 dark:bg-blue-950/30 px-3 py-2 text-[11px] text-blue-800 dark:text-blue-200">
+              Chọn <strong>Miễn phí</strong> hoặc <strong>Có thu phí</strong> ngay ở từng phần chương trình bên dưới. Bước 2 sẽ tự động nhận biết phần có phí để cấu hình giá vé &amp; tích hợp QR SePay.
             </div>
-            <p className="mt-1 text-[11px] text-muted-foreground">
-              {info.isPaid
-                ? "Thiết lập chi tiết các hạng vé và mức phí ở Bước 2 tiếp theo."
-                : "Học viên và khách mời đăng ký tham dự miễn phí 100%."}
-            </p>
           </div>
         </div>
       </div>
 
-      {/* Cấu hình các phần chương trình & phí từng phần (UC-INV-01) */}
+      {/* Cấu hình các phần chương trình (ẩn ô giá ở Bước 1, tự nhận biết ở Bước 2) */}
       <EventPartsEditor
         venueName={info.venueName || ""}
         onChangeVenueName={(v) => setInfo({ ...info, venueName: v })}
         parts={Array.isArray(info.parts) ? info.parts : createDefaultCeoHn10Parts()}
         onChangeParts={(nextParts) => setInfo({ ...info, parts: nextParts })}
+        hidePriceInputs={true}
       />
+
+      {/* Trường dữ liệu động cho form đăng ký sự kiện */}
+      <div className="rounded-2xl border border-border bg-muted/20 p-4 space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-foreground">
+              Thêm Trường Dữ Liệu Động (Form Đăng Ký Sự Kiện)
+            </h4>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              Tự do thêm các trường thông tin cần thu thập với đầy đủ định dạng và nhãn (Label) hiển thị trên form đăng ký.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              const nextFields: EventCustomFieldDraft[] = [
+                ...(info.customFields || []),
+                {
+                  id: `cf_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+                  label: "",
+                  type: "text",
+                  required: false,
+                  optionsText: "",
+                },
+              ];
+              setInfo({ ...info, customFields: nextFields });
+            }}
+            className="inline-flex items-center gap-1 rounded-lg border border-blue-300 bg-blue-50 px-2.5 py-1.5 text-[11px] font-bold text-blue-700 hover:bg-blue-100 cursor-pointer"
+          >
+            <Plus className="h-3.5 w-3.5" /> Thêm trường động
+          </button>
+        </div>
+
+        {(!info.customFields || info.customFields.length === 0) ? (
+          <p className="text-[11px] text-muted-foreground italic">
+            Chưa có trường động nào. Bấm &quot;+ Thêm trường động&quot; để tạo thêm câu hỏi / thông tin riêng cho sự kiện này.
+          </p>
+        ) : (
+          <div className="space-y-2.5">
+            {info.customFields.map((cf, cfIdx) => (
+              <div
+                key={cf.id}
+                className="rounded-xl border border-border bg-card p-3 space-y-2 shadow-2xs"
+              >
+                <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-end">
+                  <div className="sm:col-span-5">
+                    <label className="block text-[11px] font-semibold text-muted-foreground mb-1">
+                      Tên trường (Label)
+                    </label>
+                    <input
+                      type="text"
+                      value={cf.label}
+                      onChange={(e) => {
+                        const next = (info.customFields || []).map((x, i) =>
+                          i === cfIdx ? { ...x, label: e.target.value } : x,
+                        );
+                        setInfo({ ...info, customFields: next });
+                      }}
+                      placeholder="VD: Yêu cầu ăn chay / Size áo / Số khách đi kèm"
+                      className="h-9 w-full rounded-lg border border-border bg-background px-2.5 text-xs"
+                    />
+                  </div>
+                  <div className="sm:col-span-4">
+                    <label className="block text-[11px] font-semibold text-muted-foreground mb-1">
+                      Định dạng dữ liệu
+                    </label>
+                    <select
+                      value={cf.type}
+                      onChange={(e) => {
+                        const next = (info.customFields || []).map((x, i) =>
+                          i === cfIdx ? { ...x, type: e.target.value as EventCustomFieldType } : x,
+                        );
+                        setInfo({ ...info, customFields: next });
+                      }}
+                      className="h-9 w-full rounded-lg border border-border bg-background px-2 text-xs font-medium"
+                    >
+                      <option value="text">Văn bản ngắn (Text)</option>
+                      <option value="textarea">Đoạn văn dài (Textarea)</option>
+                      <option value="number">Số (Number)</option>
+                      <option value="date">Ngày/Tháng/Năm (Date)</option>
+                      <option value="select">Danh sách chọn (Dropdown)</option>
+                      <option value="checkbox">Checkbox (Có / Không)</option>
+                      <option value="email">Email</option>
+                      <option value="phone">Số điện thoại</option>
+                    </select>
+                  </div>
+                  <div className="sm:col-span-2 flex items-center gap-1.5 h-9">
+                    <input
+                      id={`cf-req-${cf.id}`}
+                      type="checkbox"
+                      checked={Boolean(cf.required)}
+                      onChange={(e) => {
+                        const next = (info.customFields || []).map((x, i) =>
+                          i === cfIdx ? { ...x, required: e.target.checked } : x,
+                        );
+                        setInfo({ ...info, customFields: next });
+                      }}
+                      className="h-4 w-4 rounded border-border"
+                    />
+                    <label htmlFor={`cf-req-${cf.id}`} className="text-[11px] font-semibold text-muted-foreground cursor-pointer">
+                      Bắt buộc
+                    </label>
+                  </div>
+                  <div className="sm:col-span-1 flex justify-end h-9 items-center">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setInfo({
+                          ...info,
+                          customFields: (info.customFields || []).filter((_, i) => i !== cfIdx),
+                        });
+                      }}
+                      className="text-rose-500 hover:bg-rose-50 p-1.5 rounded-lg cursor-pointer"
+                      title="Xóa trường"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </div>
+                {cf.type === "select" && (
+                  <div>
+                    <input
+                      type="text"
+                      value={cf.optionsText || ""}
+                      onChange={(e) => {
+                        const next = (info.customFields || []).map((x, i) =>
+                          i === cfIdx ? { ...x, optionsText: e.target.value } : x,
+                        );
+                        setInfo({ ...info, customFields: next });
+                      }}
+                      placeholder="Nhập các lựa chọn phân cách bằng dấu phẩy (VD: Size S, Size M, Size L, Size XL)"
+                      className="h-8 w-full rounded-lg border border-border bg-background px-2.5 text-xs"
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Mô tả / Nội dung chi tiết sự kiện */}
       <div>
@@ -1132,21 +1352,44 @@ function InfoStep({
 
 function TicketStep({
   isPaid,
+  parts,
   tickets,
   setTickets,
   errors,
   setErrors,
 }: {
   isPaid: boolean;
+  parts: EventPartConfig[];
   tickets: TicketDraft[];
   setTickets: (v: TicketDraft[]) => void;
   errors: Record<string, string>;
   setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 }) {
   const t = useT();
+  const [selectedPartTab, setSelectedPartTab] = useState<string>(parts[0]?.id || "all");
+  const [showFullSeatingEditor, setShowFullSeatingEditor] = useState(false);
+
   const update = (i: number, patch: Partial<TicketDraft>) =>
     setTickets(tickets.map((tk, idx) => (idx === i ? { ...tk, ...patch } : tk)));
   const remove = (i: number) => setTickets(tickets.filter((_, idx) => idx !== i));
+
+  const ticketsForPreview = useMemo(() => {
+    const filtered =
+      selectedPartTab === "all"
+        ? tickets
+        : tickets.filter((tk) => tk.partId === selectedPartTab || (!tk.partId && parts.length === 0));
+    return filtered.map((tk) => ({
+      name: tk.name || "Vé sự kiện",
+      price: tk.isPartFree ? 0 : parseVndNumber(tk.price),
+      quantity: Math.max(1, parseInt(String(tk.quantity).replace(/\D/g, ""), 10) || 10),
+      description: tk.description,
+    }));
+  }, [tickets, selectedPartTab, parts.length]);
+
+  const previewLayout = useMemo(
+    () => buildSeatingLayoutFromTickets(ticketsForPreview),
+    [ticketsForPreview],
+  );
 
   return (
     <div className="space-y-4">
@@ -1241,21 +1484,28 @@ function TicketStep({
                 <VndCurrencyInput
                   id={`ewz-ticket-price-${i}`}
                   placeholder="0 (0 là miễn phí)"
-                  className={`${inputCls} ${!isPaid ? "bg-muted cursor-not-allowed opacity-80" : ""}`}
-                  value={!isPaid ? 0 : parseVndNumber(tk.price)}
+                  disabled={!isPaid || tk.isPartFree === true}
+                  className={`${inputCls} ${!isPaid || tk.isPartFree === true ? "bg-muted cursor-not-allowed opacity-80" : ""}`}
+                  value={!isPaid || tk.isPartFree === true ? 0 : parseVndNumber(tk.price)}
                   onChange={(val) => {
-                    if (!isPaid && val > 0) {
-                      toast.error("đây là sự kiện miễn phí không được tạo vé có phí cho sự kiện");
+                    if ((!isPaid || tk.isPartFree === true) && val > 0) {
+                      toast.error("Phần miễn phí không được tạo vé có phí!");
                       update(i, { price: "0" });
                       return;
                     }
                     update(i, { price: String(val) });
+                    if (errors[`ticket_${i}_price`]) {
+                      setErrors((prev) => ({ ...prev, [`ticket_${i}_price`]: "" }));
+                    }
                   }}
                 />
+                {errors[`ticket_${i}_price`] && (
+                  <p className="mt-1 text-[11px] font-medium text-rose-500">{errors[`ticket_${i}_price`]}</p>
+                )}
                 <p className="mt-1 text-[10.5px] text-muted-foreground">
-                  {!isPaid || parseVndNumber(tk.price) <= 0
-                    ? "Vé 0 đồng = Miễn phí tham dự."
-                    : "Từ 1 đ trở lên = Vé có phí bắt buộc thanh toán."}
+                  {!isPaid || tk.isPartFree === true || parseVndNumber(tk.price) <= 0
+                    ? "Phần miễn phí — không thu phí."
+                    : "Phần có thu phí — tự động xuất QR SePay khi đăng ký."}
                 </p>
               </div>
               <div>
@@ -1314,19 +1564,151 @@ function TicketStep({
         ))}
       </div>
 
-      <button
-        type="button"
-        onClick={() => {
-          if (!isPaid) {
-            setTickets([...tickets, { name: "", price: "0", quantity: "", description: "" }]);
-          } else {
-            setTickets([...tickets, { name: "", price: "200000", quantity: "", description: "" }]);
-          }
-        }}
-        className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-border bg-muted/30 py-2.5 text-sm font-semibold text-[#003B95] dark:text-blue-400 hover:bg-muted transition cursor-pointer"
-      >
-        <Plus className="h-4 w-4" aria-hidden="true" /> {t("ewz.tickets.add")}
-      </button>
+      <div className="flex flex-wrap gap-2">
+        {parts.map((part) => (
+          <button
+            key={part.id}
+            type="button"
+            onClick={() =>
+              setTickets([
+                ...tickets,
+                {
+                  partId: part.id,
+                  partName: part.name,
+                  isPartFree: !part.isPaid,
+                  name: part.isPaid ? `Vé VIP — ${part.name}` : `Vé Tham Dự — ${part.name}`,
+                  price: part.isPaid ? "1000" : "0",
+                  guestPrice: "0",
+                  quantity: "20",
+                  description: part.isPaid ? `Thuộc ${part.name}` : `Miễn phí (${part.name})`,
+                },
+              ])
+            }
+            className="inline-flex flex-1 min-w-[200px] items-center justify-center gap-1.5 rounded-xl border border-dashed border-border bg-muted/30 py-2 px-3 text-xs font-semibold text-[#003B95] dark:text-blue-400 hover:bg-muted transition cursor-pointer"
+          >
+            <Plus className="h-3.5 w-3.5" aria-hidden="true" />
+            <span>Thêm vé cho: {part.name}</span>
+          </button>
+        ))}
+        {parts.length === 0 && (
+          <button
+            type="button"
+            onClick={() =>
+              setTickets([
+                ...tickets,
+                { name: "Vé VIP", price: isPaid ? "1000" : "0", quantity: "20", description: "" },
+              ])
+            }
+            className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-border bg-muted/30 py-2.5 text-sm font-semibold text-[#003B95] dark:text-blue-400 hover:bg-muted transition cursor-pointer"
+          >
+            <Plus className="h-4 w-4" aria-hidden="true" /> {t("ewz.tickets.add")}
+          </button>
+        )}
+      </div>
+
+      {/* Sơ đồ chỗ ngồi tối giản tự động sinh đúng số ghế & loại vé theo từng phần */}
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-card p-4 space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100">
+              Sơ Đồ Chỗ Ngồi Theo Từng Phần &amp; Loại Vé
+            </h4>
+            <p className="text-[11px] text-slate-500 mt-0.5">
+              Tự động sinh đúng số ghế ứng với số lượng và tên loại vé của từng phần (giao diện tối giản).
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowFullSeatingEditor((v) => !v)}
+            className="rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-2.5 py-1 text-[11px] font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 cursor-pointer"
+          >
+            {showFullSeatingEditor ? "Thu gọn sơ đồ kéo thả" : "Mở sơ đồ kéo thả đầy đủ"}
+          </button>
+        </div>
+
+        {/* Tabs chọn phần sự kiện */}
+        {parts.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {parts.map((p) => {
+              const active = selectedPartTab === p.id;
+              const partSeatTotal = tickets
+                .filter((tk) => tk.partId === p.id)
+                .reduce((s, tk) => s + (parseInt(String(tk.quantity).replace(/\D/g, ""), 10) || 0), 0);
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => setSelectedPartTab(p.id)}
+                  className={`px-3 py-1.5 rounded-lg border text-xs font-semibold transition cursor-pointer ${
+                    active
+                      ? "border-slate-800 bg-slate-800 text-white dark:border-slate-200 dark:bg-slate-200 dark:text-slate-900"
+                      : "border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                  }`}
+                >
+                  {p.name} ({partSeatTotal} ghế)
+                </button>
+              );
+            })}
+            <button
+              type="button"
+              onClick={() => setSelectedPartTab("all")}
+              className={`px-3 py-1.5 rounded-lg border text-xs font-semibold transition cursor-pointer ${
+                selectedPartTab === "all"
+                  ? "border-slate-800 bg-slate-800 text-white dark:border-slate-200 dark:bg-slate-200 dark:text-slate-900"
+                  : "border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+              }`}
+            >
+              Tất cả các phần
+            </button>
+          </div>
+        )}
+
+        {/* Render danh sách ghế tối giản theo từng loại vé */}
+        <div className="space-y-3">
+          {previewLayout.dynamicZones.map((zone, zIdx) => {
+            const zoneTickets = ticketsForPreview[zIdx];
+            const seatCount = zoneTickets?.quantity || 0;
+            const zoneSeats = previewLayout.dynamicSeats.filter(
+              (s) => s.y >= zone.y && s.y <= zone.y + zone.height,
+            );
+            return (
+              <div
+                key={zone.id}
+                className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900/40 p-3 space-y-2"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                    {zoneTickets?.name || zone.name}
+                  </span>
+                  <span className="text-[11px] font-mono text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-0.5 rounded">
+                    {seatCount} ghế · {zoneTickets?.price ? `${zoneTickets.price.toLocaleString("vi-VN")} đ` : "Miễn phí"}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto">
+                  {zoneSeats.map((seat) => (
+                    <span
+                      key={seat.id}
+                      title={seat.label}
+                      className="inline-flex items-center justify-center rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-2 py-1 text-[10px] font-mono font-semibold text-slate-700 dark:text-slate-200"
+                    >
+                      {seat.id}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {showFullSeatingEditor && (
+          <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
+            <CinemaSeatingMap
+              tickets={ticketsForPreview}
+              onSelectSeat={(seatLabel) => toast.info(`Đã xem ghế: ${seatLabel}`)}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -1403,10 +1785,12 @@ function QrStep({
 function AttendeeRegistrationStep({
   event,
   tickets,
+  customFields = [],
   onClose,
 }: {
   event: EventItem;
   tickets: TicketDraft[];
+  customFields?: EventCustomFieldDraft[];
   onClose: () => void;
 }) {
   const [formData, setFormData] = useState({
@@ -1417,6 +1801,15 @@ function AttendeeRegistrationStep({
     email: "",
     ticketType: tickets[0]?.name || "Standard VIP",
   });
+  const [customValues, setCustomValues] = useState<Record<string, any>>({});
+  const [sepayQrResult, setSepayQrResult] = useState<{
+    regId: string;
+    amount: number;
+    vietQrUrl: string;
+    transferContent: string;
+    memberName: string;
+    ticketType: string;
+  } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [attendeeList, setAttendeeList] = useState<
     Array<{
@@ -1448,23 +1841,41 @@ function AttendeeRegistrationStep({
 
     setSubmitting(true);
     try {
-      await fetchNestApi(`/events/${event.id}/attendees/add-or-checkin`, {
+      const selectedTicket = tickets.find((tk) => tk.name === formData.ticketType);
+      const ticketAmount = selectedTicket ? parseVndNumber(selectedTicket.price) : 0;
+
+      const rsvpRes = await fetchNestApi<any>(`/events/${event.id}/public-rsvp`, {
         method: "POST",
         body: JSON.stringify({
-          eventId: event.id,
-          memberName: formData.memberName.trim(),
-          position: formData.position.trim(),
+          fullName: formData.memberName.trim(),
+          title: formData.position.trim(),
           phone: formData.phone.trim(),
           company: formData.company.trim(),
           email: formData.email.trim(),
-          ticketType: formData.ticketType,
-          checkedIn: false,
-          paymentStatus: "confirmed",
+          attendMode: selectedTicket?.partId ? "single_part" : "full",
+          selectedPartNames: [formData.ticketType],
+          attendeeCount: 1,
+          ticketTier: "other_participant",
+          totalFee: ticketAmount,
+          customFields: customValues,
         }),
       });
 
+      if (ticketAmount > 0 && rsvpRes?.vietQrUrl) {
+        setSepayQrResult({
+          regId: rsvpRes.regId || "",
+          amount: ticketAmount,
+          vietQrUrl: rsvpRes.vietQrUrl,
+          transferContent: rsvpRes.transferContent || "",
+          memberName: formData.memberName.trim(),
+          ticketType: formData.ticketType,
+        });
+      } else {
+        setSepayQrResult(null);
+      }
+
       const newAttendee = {
-        id: `ATT-${Date.now()}`,
+        id: rsvpRes?.regId || `ATT-${Date.now()}`,
         name: formData.memberName.trim(),
         position: formData.position.trim(),
         phone: formData.phone.trim(),
@@ -1478,7 +1889,11 @@ function AttendeeRegistrationStep({
       };
 
       setAttendeeList((prev) => [newAttendee, ...prev]);
-      toast.success(`Đã đăng ký tham dự thành công cho: ${formData.memberName}`);
+      toast.success(
+        ticketAmount > 0
+          ? `Đã tạo đăng ký (${ticketAmount.toLocaleString("vi-VN")} đ) & xuất mã QR SePay!`
+          : `Đã đăng ký tham dự thành công cho: ${formData.memberName}`,
+      );
 
       setFormData({
         memberName: "",
@@ -1488,6 +1903,7 @@ function AttendeeRegistrationStep({
         email: "",
         ticketType: tickets[0]?.name || "Standard VIP",
       });
+      setCustomValues({});
     } catch (err: any) {
       console.error("[AttendeeRegistrationStep] Register failed:", err);
       toast.error(err?.message || "Không thể đăng ký thành viên lúc này");
@@ -1615,11 +2031,14 @@ function AttendeeRegistrationStep({
                 className={inputCls}
               >
                 {tickets.length > 0 ? (
-                  tickets.map((t, idx) => (
-                    <option key={idx} value={t.name}>
-                      {t.name}
-                    </option>
-                  ))
+                  tickets.map((t, idx) => {
+                    const pNum = parseVndNumber(t.price);
+                    return (
+                      <option key={idx} value={t.name}>
+                        {t.name} {pNum > 0 ? `(${pNum.toLocaleString("vi-VN")} đ)` : "(Miễn phí)"}
+                      </option>
+                    );
+                  })
                 ) : (
                   <>
                     <option value="VIP Pass">Vé VIP Khách mời</option>
@@ -1630,6 +2049,68 @@ function AttendeeRegistrationStep({
               </select>
             </div>
           </div>
+
+          {/* Các trường dữ liệu động đã cấu hình ở Bước 1 */}
+          {customFields.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-border">
+              {customFields.map((cf) => {
+                const val = customValues[cf.id] ?? "";
+                const lbl = cf.label.trim() || "Trường thông tin";
+                return (
+                  <div key={cf.id} className={cf.type === "textarea" ? "sm:col-span-2" : ""}>
+                    <label className={labelCls}>
+                      {lbl} {cf.required && <span className="text-rose-500">*</span>}
+                    </label>
+                    {cf.type === "textarea" ? (
+                      <textarea
+                        rows={2}
+                        required={cf.required}
+                        value={val}
+                        onChange={(e) => setCustomValues({ ...customValues, [cf.id]: e.target.value })}
+                        className="w-full rounded-xl border border-border bg-background p-2.5 text-xs"
+                      />
+                    ) : cf.type === "select" ? (
+                      <select
+                        required={cf.required}
+                        value={val}
+                        onChange={(e) => setCustomValues({ ...customValues, [cf.id]: e.target.value })}
+                        className={inputCls}
+                      >
+                        <option value="">-- Chọn {lbl} --</option>
+                        {(cf.optionsText || "")
+                          .split(",")
+                          .map((s) => s.trim())
+                          .filter(Boolean)
+                          .map((opt) => (
+                            <option key={opt} value={opt}>
+                              {opt}
+                            </option>
+                          ))}
+                      </select>
+                    ) : cf.type === "checkbox" ? (
+                      <label className="flex items-center gap-2 text-xs font-medium text-foreground py-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={Boolean(val)}
+                          onChange={(e) => setCustomValues({ ...customValues, [cf.id]: e.target.checked })}
+                          className="h-4 w-4 rounded border-border"
+                        />
+                        <span>Có / Đồng ý</span>
+                      </label>
+                    ) : (
+                      <input
+                        type={cf.type === "phone" ? "tel" : cf.type}
+                        required={cf.required}
+                        value={val}
+                        onChange={(e) => setCustomValues({ ...customValues, [cf.id]: e.target.value })}
+                        className={inputCls}
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           <div className="flex items-center justify-end pt-1">
             <button
@@ -1643,6 +2124,34 @@ function AttendeeRegistrationStep({
             </button>
           </div>
         </form>
+
+        {/* Hiển thị mã QR SePay ngay sau khi đăng ký phần có thu phí */}
+        {sepayQrResult && (
+          <div className="mt-3 rounded-2xl border border-amber-300 bg-amber-50/70 dark:border-amber-800 dark:bg-amber-950/30 p-4 flex flex-col sm:flex-row items-center gap-4">
+            <img
+              src={sepayQrResult.vietQrUrl}
+              alt="QR Thanh toán SePay"
+              className="w-40 h-40 rounded-xl border border-border bg-white p-1.5 shrink-0"
+            />
+            <div className="space-y-1.5 text-xs">
+              <div className="font-bold text-amber-900 dark:text-amber-300 text-sm">
+                Mã QR Thanh Toán SePay — {sepayQrResult.amount.toLocaleString("vi-VN")} đ
+              </div>
+              <p className="text-muted-foreground">
+                Đại biểu: <strong>{sepayQrResult.memberName}</strong> · Vé: <strong>{sepayQrResult.ticketType}</strong>
+              </p>
+              <p className="text-muted-foreground">
+                Mã đơn: <span className="font-mono font-bold text-foreground">{sepayQrResult.regId}</span>
+              </p>
+              <p className="text-muted-foreground">
+                Nội dung CK: <span className="font-mono font-bold text-blue-700 dark:text-blue-300">{sepayQrResult.transferContent}</span>
+              </p>
+              <p className="text-[11px] text-emerald-700 dark:text-emerald-400 font-medium">
+                Quét mã bằng app ngân hàng để test đối soát tự động qua SePay.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Danh sách đại biểu vừa đăng ký */}
