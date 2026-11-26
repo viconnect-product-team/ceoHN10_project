@@ -48,4 +48,4 @@ RUN mkdir -p /app/uploads/avatars /app/uploads/documents /tmp/uploads/avatars /t
 USER appuser
 
 EXPOSE 4003
-CMD ["sh", "-c", "if [ -f docker-entrypoint.sh ]; then ./docker-entrypoint.sh; fi; if [ -f apps/ceohn10_app_be/dist/src/main.js ]; then node apps/ceohn10_app_be/dist/src/main; else node apps/ceohn10_app_be/dist/main; fi"]
+CMD ["sh", "-c", "if [ -d packages/db/prisma/migrations ]; then npx --prefix packages/db prisma migrate deploy || true; fi; if [ -f docker-entrypoint.sh ]; then ./docker-entrypoint.sh; fi; if [ -f apps/ceohn10_app_be/dist/src/main.js ]; then node apps/ceohn10_app_be/dist/src/main; else node apps/ceohn10_app_be/dist/main; fi"]

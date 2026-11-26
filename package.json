@@ -16,6 +16,8 @@
     "dev:fe": "npm run dev --prefix apps/ceohn10_app_fe",
     "dev:be": "npm run dev --prefix apps/ceohn10_app_be",
     "test:localhost": "node scripts/test-localhost-e2e.mjs",
+    "db:sync-schema": "node scripts/sync-db-schema.mjs",
+    "db:diff-schema": "node scripts/sync-db-schema.mjs --diff",
     "lint": "turbo run lint",
     "save": "git add -A && git commit -m \"chore(save): auto-save checkpoint\"",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
