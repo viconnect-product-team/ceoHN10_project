@@ -430,7 +430,12 @@ export class PaymentService {
       let eventFundId: string | undefined = targetFundId || undefined;
       if (!eventFundId) {
         const eventFund = await this.prisma.financial_funds.findFirst({
-          where: { code: 'FUND_BAN_SU_KIEN_HAU_CAN' },
+          where: {
+            OR: [
+              { code: 'FUND_BAN_SU_KIEN_HAU_CAN' },
+              { name: { contains: 'Sự kiện', mode: 'insensitive' } },
+            ],
+          },
         }).catch(() => null);
         eventFundId = eventFund?.id || undefined;
       }
@@ -440,6 +445,32 @@ export class PaymentService {
           WHERE id = $2::uuid
         `, transferAmount, eventFundId).catch(() => {});
       }
+
+      // Ghi sổ dòng tiền chi tiết vào financial_report_rows cho Quỹ Ban Sự Kiện
+      await this.prisma.$executeRawUnsafe(`
+        INSERT INTO public.financial_report_rows (
+          id, transaction_date, voucher_no, category, description,
+          income_amount, expense_amount, balance_after, party_name, status,
+          custom_data, created_at, updated_at
+        ) VALUES (
+          gen_random_uuid(), NOW()::date, $1, 'Thu phí sự kiện (SePay)', $2,
+          $3, 0, 0, $4, 'completed',
+          $5::jsonb, NOW(), NOW()
+        )
+      `,
+        `SEPAY-${String(gatewayId || regId).slice(0, 20)}`,
+        `Thu tiền vé sự kiện qua SePay (Mã vé: ${regId})`,
+        transferAmount,
+        regRows[0]?.member_name || 'Khách tham dự',
+        JSON.stringify({
+          department: 'Ban Sự Kiện',
+          sourceFund: 'SePay VietQR',
+          targetFund: 'Quỹ Ban Sự Kiện',
+          type: 'IN',
+          flowDirection: 'in',
+          regId,
+        }),
+      ).catch(() => {});
 
       if (eventId) {
         await this.prisma.sepay_webhook_events.update({

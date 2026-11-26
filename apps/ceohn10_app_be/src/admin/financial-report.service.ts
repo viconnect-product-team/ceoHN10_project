@@ -442,7 +442,7 @@ export class FinancialReportService implements OnModuleInit {
     const voucherIn = `CK-IN-${timestamp}`;
 
     const customDataOut = {
-      department: toDept,
+      department: fromDept,
       sourceFund: fromDept,
       targetFund: toDept,
       type: 'OUT',
@@ -461,7 +461,7 @@ export class FinancialReportService implements OnModuleInit {
       fundAccountLink: data.fundAccountLink || '',
     };
 
-    // 1. Ghi giao dịch xuất quỹ từ Quỹ Tổng
+    // 1. Ghi giao dịch xuất quỹ từ Quỹ nguồn
     const outRow = await this.prisma.$queryRawUnsafe<any[]>(
       `INSERT INTO public.financial_report_rows (
         id, transaction_date, voucher_no, category, description,
@@ -474,20 +474,20 @@ export class FinancialReportService implements OnModuleInit {
       ) RETURNING *`,
       txDate,
       voucherOut,
-      `[CHI ĐIỀU CHUYỂN] ${data.description} -> Cấp cho ${toDept}`,
+      `[CHI ĐIỀU CHUYỂN] ${data.description} -> Chuyển về ${toDept}`,
       amount,
       toDept,
       JSON.stringify(customDataOut),
     );
 
-    // 2. Ghi giao dịch nhập quỹ vào Ban Công Nghệ (type: 'IN')
+    // 2. Ghi giao dịch nhập quỹ vào Quỹ đích (type: 'IN')
     const inRow = await this.prisma.$queryRawUnsafe<any[]>(
       `INSERT INTO public.financial_report_rows (
         id, transaction_date, voucher_no, category, description,
         income_amount, expense_amount, balance_after, party_name, status,
         custom_data, created_at, updated_at
       ) VALUES (
-        gen_random_uuid(), $1::date, $2, 'Kinh phí cấp từ Quỹ Tổng', $3,
+        gen_random_uuid(), $1::date, $2, 'Kinh phí điều chuyển nội bộ', $3,
         $4, 0, 0, $5, 'completed',
         $6::jsonb, NOW(), NOW()
       ) RETURNING *`,
@@ -498,6 +498,36 @@ export class FinancialReportService implements OnModuleInit {
       fromDept,
       JSON.stringify(customDataIn),
     );
+
+    // 3. Cập nhật số dư thực tế trên bảng financial_funds cho cả Quỹ nguồn (-) và Quỹ đích (+)
+    if (amount > 0) {
+      const fromKeyword = fromDept.toLowerCase().includes('tổng')
+        ? '%Tổng%'
+        : fromDept.toLowerCase().includes('sự kiện')
+        ? '%Sự kiện%'
+        : `%${fromDept}%`;
+      const toKeyword = toDept.toLowerCase().includes('tổng')
+        ? '%Tổng%'
+        : toDept.toLowerCase().includes('sự kiện')
+        ? '%Sự kiện%'
+        : `%${toDept}%`;
+
+      await this.prisma.$executeRawUnsafe(
+        `UPDATE public.financial_funds
+         SET current_balance = GREATEST(0, current_balance - $1), updated_at = NOW()
+         WHERE id = (SELECT id FROM public.financial_funds WHERE name ILIKE $2 ORDER BY created_at ASC LIMIT 1)`,
+        amount,
+        fromKeyword,
+      ).catch(() => {});
+
+      await this.prisma.$executeRawUnsafe(
+        `UPDATE public.financial_funds
+         SET current_balance = current_balance + $1, updated_at = NOW()
+         WHERE id = (SELECT id FROM public.financial_funds WHERE name ILIKE $2 ORDER BY created_at ASC LIMIT 1)`,
+        amount,
+        toKeyword,
+      ).catch(() => {});
+    }
 
     return {
       success: true,
