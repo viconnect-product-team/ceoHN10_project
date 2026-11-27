@@ -1,4 +1,5 @@
 DATABASE_URL=postgresql://app1:5%5ES0CEpvYwC1%28%23YN1UoJ@113.20.107.184:6432/ceohn10_test?pgbouncer=true
+REMOTE_DATABASE_URL=postgresql://app1:5%5ES0CEpvYwC1%28%23YN1UoJ@113.20.107.184:6432/ceohn10_test?pgbouncer=true
 JWT_SECRET=super-secret-jwt-key-test
 NODE_ENV=production
 PORT=4003
