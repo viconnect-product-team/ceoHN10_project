@@ -24,6 +24,41 @@ export class FinancialInitController {
   }
 
   /**
+   * Sổ chi tiết dòng tiền minh bạch (người chuyển phí sự kiện, thu/chi nhập tay, SePay)
+   */
+  @Get('detailed-ledger')
+  getDetailedLedger() {
+    return this.finService.getDetailedLedger();
+  }
+
+  /**
+   * Nhập tay khoản Thu / Chi trực tiếp vào Quỹ (tự động biến động số dư Quỹ & tùy chọn chuyển về Quỹ Tổng)
+   */
+  @Post('manual-cashflow')
+  @UseGuards(JwtAuthGuard)
+  createManualCashflow(
+    @Req() req: any,
+    @Body()
+    dto: {
+      fundId?: string;
+      flowType: 'IN' | 'OUT';
+      category: string;
+      amount: number;
+      payerName: string;
+      payerPhone?: string;
+      payerEmail?: string;
+      companyName?: string;
+      studentCode?: string;
+      paymentMethod?: 'bank' | 'cash' | 'vietqr';
+      description: string;
+      transactionDate?: string;
+      transferToGeneral?: boolean;
+    },
+  ) {
+    return this.finService.createManualCashflow(req.user, dto);
+  }
+
+  /**
    * Cập nhật thông tin Quỹ & Tài khoản ngân hàng của Quỹ
    */
   @Put('funds/:id')

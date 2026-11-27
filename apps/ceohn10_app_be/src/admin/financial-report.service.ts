@@ -1,5 +1,6 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { assertRecordOwnershipOrPrivilege } from '../auth/ownership.util';
 
 export interface FinancialColumn {
   id: string;
@@ -344,17 +345,20 @@ export class FinancialReportService implements OnModuleInit {
   /**
    * Thêm hàng giao dịch tài chính mới
    */
-  async addRow(data: {
-    transaction_date?: string;
-    voucher_no?: string;
-    category?: string;
-    description?: string;
-    income_amount?: number;
-    expense_amount?: number;
-    party_name?: string;
-    status?: string;
-    custom_data?: Record<string, any>;
-  }) {
+  async addRow(
+    data: {
+      transaction_date?: string;
+      voucher_no?: string;
+      category?: string;
+      description?: string;
+      income_amount?: number;
+      expense_amount?: number;
+      party_name?: string;
+      status?: string;
+      custom_data?: Record<string, any>;
+    },
+    actor?: any,
+  ) {
     const txDate = data.transaction_date || new Date().toISOString().split('T')[0];
     const voucherNo = data.voucher_no || `PT-${Date.now().toString().slice(-6)}`;
     const category = data.category || 'Chi phí hoạt động';
@@ -363,7 +367,14 @@ export class FinancialReportService implements OnModuleInit {
     const expense = Number(data.expense_amount || 0);
     const partyName = data.party_name || '';
     const status = data.status || 'completed';
-    const customDataJson = JSON.stringify(data.custom_data || {});
+    const actorId = String(actor?.id || actor?.sub || actor?.userId || '').trim();
+    const actorName = String(actor?.name || actor?.email || '').trim();
+    const customDataWithOwner = {
+      ...(data.custom_data || {}),
+      ...(actorId ? { createdBy: actorId } : {}),
+      ...(actorName ? { createdByName: actorName } : {}),
+    };
+    const customDataJson = JSON.stringify(customDataWithOwner);
 
     const inserted = await this.prisma.$queryRawUnsafe<any[]>(
       `INSERT INTO public.financial_report_rows (
@@ -392,7 +403,7 @@ export class FinancialReportService implements OnModuleInit {
   /**
    * Cập nhật hàng tài chính
    */
-  async updateRow(id: string, data: Partial<FinancialRow>) {
+  async updateRow(id: string, data: Partial<FinancialRow>, actor?: any) {
     const existing = await this.prisma.$queryRawUnsafe<any[]>(
       `SELECT * FROM public.financial_report_rows WHERE id = $1::uuid LIMIT 1`,
       id,
@@ -400,6 +411,18 @@ export class FinancialReportService implements OnModuleInit {
     if (!existing[0]) throw new NotFoundException('Không tìm thấy bản ghi');
 
     const cur = existing[0];
+    const curCustom =
+      typeof cur.custom_data === 'string'
+        ? JSON.parse(cur.custom_data || '{}')
+        : cur.custom_data || {};
+    if (actor) {
+      assertRecordOwnershipOrPrivilege(
+        actor,
+        curCustom.createdBy || cur.created_by,
+        curCustom.createdByName || cur.created_by_name,
+        'chỉnh sửa bản ghi tài chính',
+      );
+    }
     const txDate = data.transaction_date ?? cur.transaction_date;
     const voucherNo = data.voucher_no ?? cur.voucher_no;
     const category = data.category ?? cur.category;
@@ -446,7 +469,25 @@ export class FinancialReportService implements OnModuleInit {
   /**
    * Xóa hàng
    */
-  async deleteRow(id: string) {
+  async deleteRow(id: string, actor?: any) {
+    if (actor) {
+      const existing = await this.prisma.$queryRawUnsafe<any[]>(
+        `SELECT * FROM public.financial_report_rows WHERE id = $1::uuid LIMIT 1`,
+        id,
+      ).catch(() => []);
+      if (existing[0]) {
+        const curCustom =
+          typeof existing[0].custom_data === 'string'
+            ? JSON.parse(existing[0].custom_data || '{}')
+            : existing[0].custom_data || {};
+        assertRecordOwnershipOrPrivilege(
+          actor,
+          curCustom.createdBy || existing[0].created_by,
+          curCustom.createdByName || existing[0].created_by_name,
+          'xóa bản ghi tài chính',
+        );
+      }
+    }
     await this.prisma.$executeRawUnsafe(
       `DELETE FROM public.financial_report_rows WHERE id = $1::uuid`,
       id,
@@ -822,7 +863,21 @@ export class FinancialReportService implements OnModuleInit {
     };
   }
 
-  async deleteFundTransferOrder(orderId: string) {
+  async deleteFundTransferOrder(orderId: string, actor?: any) {
+    if (actor) {
+      const rows = await this.prisma.$queryRawUnsafe<any[]>(
+        `SELECT created_by, created_by_name FROM public.fund_transfer_orders WHERE id = $1::uuid LIMIT 1`,
+        orderId,
+      ).catch(() => []);
+      if (rows[0]) {
+        assertRecordOwnershipOrPrivilege(
+          actor,
+          rows[0].created_by,
+          rows[0].created_by_name,
+          'xóa lệnh chuyển tiền',
+        );
+      }
+    }
     await this.prisma.$executeRawUnsafe(
       `DELETE FROM public.fund_transfer_orders WHERE id = $1::uuid`,
       orderId,

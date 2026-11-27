@@ -23,6 +23,8 @@ import { EmptyState } from "@/components/dashboard/StateKit";
 import { CrudModal, type CrudField, type CrudValues } from "@/components/dashboard/CrudModal";
 import { UniversalDocumentViewerModal } from "@/components/documents/UniversalDocumentViewerModal";
 import { useRole } from "@/hooks/use-role";
+import { useAuth } from "@/context/AuthContext";
+import { canModifyRecord } from "@/lib/rbac-permission-helpers";
 import { useFmt, useT } from "@/lib/i18n";
 import {
   deleteDocumentFn,
@@ -117,10 +119,11 @@ function DocDetailPage() {
   const t = useT();
   const fmt = useFmt();
   const router = useRouter();
+  const { user: currentUser } = useAuth();
   const { isAdmin, isModerator, isPlatformAdmin } = useRole();
-  const canWrite = isAdmin || isModerator || isPlatformAdmin;
 
   const doc = Route.useLoaderData() as Document;
+  const canWrite = (isAdmin || isModerator || isPlatformAdmin) && canModifyRecord(currentUser, doc.createdBy, doc.uploadedBy);
 
   const updateFn = useServerFn(updateDocumentFn);
   const deleteFn = useServerFn(deleteDocumentFn);

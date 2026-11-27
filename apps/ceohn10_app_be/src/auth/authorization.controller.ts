@@ -11,6 +11,8 @@ import {
 import { AuthorizationService } from './authorization.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { RolesGuard } from './roles.guard';
+import { Roles } from './roles.decorator';
 
 @Controller('rbac')
 export class AuthorizationController {
@@ -77,7 +79,8 @@ export class AuthorizationController {
    * Cập nhật Ma trận phân quyền (Cấp thêm hoặc thu hồi permission của một Role)
    */
   @Post('update-matrix')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('platform_admin', 'admin')
   async updateRolePermission(
     @Body() dto: { roleId: string; permissionId: string; enabled: boolean },
     @Req() req: any,
@@ -126,7 +129,8 @@ export class AuthorizationController {
    * Gán chức vụ mới cho người dùng theo Scope (hỗ trợ cả userId/roleIdOrCode và userIdentifier/roleCode)
    */
   @Post('assign-role')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('platform_admin', 'admin')
   async assignRole(
     @Body()
     dto: {
@@ -158,7 +162,8 @@ export class AuthorizationController {
    * Thu hồi chức vụ
    */
   @Post('revoke-assignment')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('platform_admin', 'admin')
   async revokeRoleAssignment(
     @Body() dto: { assignmentId: string; reason?: string },
     @Req() req: any,
@@ -181,7 +186,8 @@ export class AuthorizationController {
    * Lấy danh sách Audit Log quản trị hệ thống
    */
   @Get('audit-logs')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('platform_admin', 'admin')
   async getAuditLogs(
     @Query('page') page = '1',
     @Query('limit') limit = '50',

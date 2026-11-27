@@ -73,22 +73,22 @@ export class FinancialReportController {
   @Post('rows')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @RequireActions('FIN_ROW_ADD')
-  async addRow(@Body() body: AddRowDto) {
-    return this.financialReportService.addRow(body);
+  async addRow(@Req() req: any, @Body() body: AddRowDto) {
+    return this.financialReportService.addRow(body, req.user);
   }
 
   @Put('rows/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @RequireActions('FIN_ROW_EDIT')
-  async updateRow(@Param('id') id: string, @Body() body: UpdateRowDto) {
-    return this.financialReportService.updateRow(id, body);
+  async updateRow(@Req() req: any, @Param('id') id: string, @Body() body: UpdateRowDto) {
+    return this.financialReportService.updateRow(id, body, req.user);
   }
 
   @Delete('rows/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @RequireActions('FIN_ROW_DELETE')
-  async deleteRow(@Param('id') id: string) {
-    return this.financialReportService.deleteRow(id);
+  async deleteRow(@Req() req: any, @Param('id') id: string) {
+    return this.financialReportService.deleteRow(id, req.user);
   }
 
   // ── LỆNH ĐIỀU CHUYỂN NGÂN SÁCH QUỸ BAN CHUYÊN MÔN (BAN CÔNG NGHỆ) ───────────
@@ -126,8 +126,8 @@ export class FinancialReportController {
 
   @Delete('fund-transfers/:id')
   @UseGuards(JwtAuthGuard)
-  async deleteFundTransferOrder(@Param('id') id: string) {
-    return this.financialReportService.deleteFundTransferOrder(id);
+  async deleteFundTransferOrder(@Req() req: any, @Param('id') id: string) {
+    return this.financialReportService.deleteFundTransferOrder(id, req.user);
   }
 
   @Post('fund-transfer')

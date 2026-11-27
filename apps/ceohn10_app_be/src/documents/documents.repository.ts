@@ -24,7 +24,7 @@ export class DocumentsRepository {
     if (associationId) {
       return this.prisma.$queryRaw<any[]>`
         SELECT id, COALESCE(code, id::text) as code, COALESCE(name, title, 'Tài liệu') as name,
-               category, size, uploaded_at, uploaded_by, type,
+               category, size, uploaded_at, uploaded_by, created_by, type,
                COALESCE(file_path, file_url, drive_url, '') as file_path,
                association_id, folder_id, drive_url, is_folder,
                share_scope, share_role, shared_with, is_starred, color_tag, description, doc_scope, enterprise_name
@@ -35,7 +35,7 @@ export class DocumentsRepository {
     }
     return this.prisma.$queryRaw<any[]>`
       SELECT id, COALESCE(code, id::text) as code, COALESCE(name, title, 'Tài liệu') as name,
-             category, size, uploaded_at, uploaded_by, type,
+             category, size, uploaded_at, uploaded_by, created_by, type,
              COALESCE(file_path, file_url, drive_url, '') as file_path,
              association_id, folder_id, drive_url, is_folder,
              share_scope, share_role, shared_with, is_starred, color_tag, description, doc_scope, enterprise_name
@@ -64,6 +64,7 @@ export class DocumentsRepository {
     description?: string | null,
     docScope: string = 'association',
     enterpriseName?: string | null,
+    createdBy?: string | null,
   ): Promise<any> {
     await this.prisma.$executeRawUnsafe(`
       CREATE TABLE IF NOT EXISTS public.documents (
@@ -104,6 +105,7 @@ export class DocumentsRepository {
       `ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS description TEXT`,
       `ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS doc_scope TEXT DEFAULT 'association'`,
       `ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS enterprise_name TEXT`,
+      `ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS created_by TEXT`,
     ];
     for (const sql of ensureCols) {
       await this.prisma.$executeRawUnsafe(sql).catch(() => {});
@@ -113,12 +115,12 @@ export class DocumentsRepository {
     try {
       await this.prisma.$executeRaw`
         INSERT INTO public.documents (
-          id, code, name, category, size, uploaded_by, type, file_path, association_id, 
+          id, code, name, category, size, uploaded_by, created_by, type, file_path, association_id, 
           folder_id, drive_url, is_folder, share_scope, share_role, shared_with, 
           is_starred, color_tag, description, doc_scope, enterprise_name, uploaded_at
         )
         VALUES (
-          ${docId}::uuid, ${code}, ${name}, ${category}, ${size}, ${uploadedBy}, ${type}, ${filePath}, 
+          ${docId}::uuid, ${code}, ${name}, ${category}, ${size}, ${uploadedBy}, ${createdBy || null}, ${type}, ${filePath}, 
           ${associationId ? associationId : null}::uuid, ${folderId || null}, ${driveUrl || null}, 
           ${isFolder}, ${shareScope}, ${shareRole}, ${sharedWithJson}::jsonb, 
           ${isStarred}, ${colorTag || null}, ${description || null}, ${docScope}, 
@@ -128,12 +130,12 @@ export class DocumentsRepository {
     } catch {
       await this.prisma.$executeRaw`
         INSERT INTO public.documents (
-          id, code, name, category, size, uploaded_by, type, file_path, association_id, 
+          id, code, name, category, size, uploaded_by, created_by, type, file_path, association_id, 
           folder_id, drive_url, is_folder, share_scope, share_role, shared_with, 
           is_starred, color_tag, description, doc_scope, enterprise_name, uploaded_at
         )
         VALUES (
-          ${docId}, ${code}, ${name}, ${category}, ${size}, ${uploadedBy}, ${type}, ${filePath}, 
+          ${docId}, ${code}, ${name}, ${category}, ${size}, ${uploadedBy}, ${createdBy || null}, ${type}, ${filePath}, 
           ${associationId ? associationId : null}::uuid, ${folderId || null}, ${driveUrl || null}, 
           ${isFolder}, ${shareScope}, ${shareRole}, ${sharedWithJson}::jsonb, 
           ${isStarred}, ${colorTag || null}, ${description || null}, ${docScope}, 
@@ -143,7 +145,7 @@ export class DocumentsRepository {
     }
 
     const rows = await this.prisma.$queryRaw<any[]>`
-      SELECT code, name, category, size, uploaded_at, uploaded_by, type, file_path, folder_id, drive_url, is_folder,
+      SELECT code, name, category, size, uploaded_at, uploaded_by, created_by, type, file_path, folder_id, drive_url, is_folder,
              share_scope, share_role, shared_with, is_starred, color_tag, description, doc_scope, enterprise_name
       FROM public.documents
       WHERE code = ${code}
@@ -280,7 +282,7 @@ export class DocumentsRepository {
         id,
       );
     const rows = await this.prisma.$queryRaw<any[]>`
-      SELECT code, name, category, size, uploaded_at, uploaded_by, type, file_path, folder_id, drive_url, is_folder,
+      SELECT code, name, category, size, uploaded_at, uploaded_by, created_by, type, file_path, folder_id, drive_url, is_folder,
              share_scope, share_role, shared_with, is_starred, color_tag, description, doc_scope, enterprise_name
       FROM public.documents
       WHERE code = ${id} OR (${isUuid}::boolean AND id = ${id}::uuid)
@@ -291,14 +293,16 @@ export class DocumentsRepository {
 
   async findFilePath(
     id: string,
-  ): Promise<{ filePath: string | null; name: string } | null> {
+  ): Promise<{ filePath: string | null; name: string; createdBy: string | null; uploadedBy: string | null } | null> {
     const rows = await this.prisma.$queryRaw<any[]>`
-      SELECT file_path, name FROM public.documents WHERE code = ${id} LIMIT 1
+      SELECT file_path, name, created_by, uploaded_by FROM public.documents WHERE code = ${id} LIMIT 1
     `.catch(() => []);
     if (!rows[0]) return null;
     return {
       filePath: rows[0].file_path || null,
       name: rows[0].name || 'document',
+      createdBy: rows[0].created_by || null,
+      uploadedBy: rows[0].uploaded_by || null,
     };
   }
 }

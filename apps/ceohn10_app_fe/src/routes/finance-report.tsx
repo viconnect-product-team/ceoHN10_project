@@ -50,6 +50,8 @@ import { CustomTable, TableActionsGroup, type CustomTableColumn } from "@/compon
 import { useQuery } from "@tanstack/react-query";
 import { fetchNestApi } from "@/lib/api-client";
 import { usePermissions } from "@/hooks/use-permissions";
+import { useAuth } from "@/context/AuthContext";
+import { canModifyRecord } from "@/lib/rbac-permission-helpers";
 import type { Transaction } from "@/types/finance.types";
 import { exportToExcel, formatDisplayDate, formatExcelCurrency } from "@/lib/excel-export";
 import { DynamicImportWizardModal } from "@/components/dynamic-import/DynamicImportWizardModal";
@@ -92,6 +94,7 @@ interface DepartmentAllocation {
 
 export function FinanceReport() {
   const perm = usePermissions();
+  const { user: currentUser } = useAuth();
 
   // Filters
   const [period, setPeriod] = useState<PeriodFilter>("all");
@@ -107,8 +110,26 @@ export function FinanceReport() {
     items: InflowPayerDetail[];
   } | null>(null);
 
-  // Modal State: Lệnh Chuyển Tiền Quỹ Tổng <-> Quỹ Ban
+  // Modal State: Lệnh Chuyển Tiền Quỹ Tổng <-> Quỹ Ban & Nhập Tay Dòng Tiền
   const [showTransferModal, setShowTransferModal] = useState(false);
+  const [showManualCashflowModal, setShowManualCashflowModal] = useState(false);
+  const [isSubmittingManual, setIsSubmittingManual] = useState(false);
+  const [manualCashflowForm, setManualCashflowForm] = useState({
+    fundId: "",
+    flowType: "IN" as "IN" | "OUT",
+    category: "Thu phí / Tài trợ / Sự kiện",
+    amount: "",
+    payerName: "",
+    payerPhone: "",
+    payerEmail: "",
+    companyName: "",
+    studentCode: "",
+    paymentMethod: "bank" as "bank" | "cash" | "vietqr",
+    description: "",
+    transactionDate: new Date().toISOString().slice(0, 10),
+    transferToGeneral: true,
+  });
+  const [ledgerSearch, setLedgerSearch] = useState("");
   const [showDynamicImportModal, setShowDynamicImportModal] = useState(false);
   const [transferForm, setTransferForm] = useState({
     direction: "master_to_dept" as "master_to_dept" | "dept_to_master",
@@ -178,6 +199,19 @@ export function FinanceReport() {
     queryFn: async () => {
       try {
         const res = await fetchNestApi<any[]>("/financial-report/fund-transfers");
+        if (Array.isArray(res)) return res;
+      } catch {}
+      return [];
+    },
+    refetchInterval: 5000,
+  });
+
+  // 5. Fetch Sổ chi tiết dòng tiền minh bạch (người chuyển phí sự kiện, nhập tay, SePay)
+  const detailedLedgerQuery = useQuery({
+    queryKey: ["financial-detailed-ledger"],
+    queryFn: async () => {
+      try {
+        const res = await fetchNestApi<any[]>("/finance-init/detailed-ledger");
         if (Array.isArray(res)) return res;
       } catch {}
       return [];
@@ -339,6 +373,63 @@ export function FinanceReport() {
       toast.error(err?.message || "Lỗi khi tạo lệnh chuyển tiền");
     } finally {
       setIsSubmittingTransfer(false);
+    }
+  };
+
+  const handleExecuteManualCashflow = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const amt = Number(manualCashflowForm.amount.replace(/[^0-9]/g, "")) || 0;
+    if (amt <= 0) {
+      toast.error("Vui lòng nhập số tiền hợp lệ lớn hơn 0");
+      return;
+    }
+    if (!manualCashflowForm.payerName.trim()) {
+      toast.error("Vui lòng nhập họ tên người nộp / người nhận tiền");
+      return;
+    }
+
+    setIsSubmittingManual(true);
+    try {
+      const res: any = await fetchNestApi("/finance-init/manual-cashflow", {
+        method: "POST",
+        body: JSON.stringify({
+          fundId: manualCashflowForm.fundId || generalFund?.id,
+          flowType: manualCashflowForm.flowType,
+          category: manualCashflowForm.category,
+          amount: amt,
+          payerName: manualCashflowForm.payerName,
+          payerPhone: manualCashflowForm.payerPhone,
+          payerEmail: manualCashflowForm.payerEmail,
+          companyName: manualCashflowForm.companyName,
+          studentCode: manualCashflowForm.studentCode,
+          paymentMethod: manualCashflowForm.paymentMethod,
+          description: manualCashflowForm.description,
+          transactionDate: manualCashflowForm.transactionDate,
+          transferToGeneral: manualCashflowForm.transferToGeneral,
+        }),
+      });
+      await Promise.all([
+        fundsQuery.refetch(),
+        transfersQuery.refetch(),
+        txQuery.refetch(),
+        detailedLedgerQuery.refetch(),
+      ]);
+      setShowManualCashflowModal(false);
+      setManualCashflowForm((prev) => ({
+        ...prev,
+        amount: "",
+        payerName: "",
+        payerPhone: "",
+        payerEmail: "",
+        companyName: "",
+        studentCode: "",
+        description: "",
+      }));
+      toast.success(res?.message || "Đã ghi nhận biến động dòng tiền thành công!");
+    } catch (err: any) {
+      toast.error(err?.message || "Không thể ghi nhận giao dịch nhập tay");
+    } finally {
+      setIsSubmittingManual(false);
     }
   };
 
@@ -556,7 +647,22 @@ export function FinanceReport() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <button
+              onClick={() => {
+                setManualCashflowForm((prev) => ({
+                  ...prev,
+                  fundId: prev.fundId || generalFund?.id || allFunds[0]?.id || "",
+                }));
+                setShowManualCashflowModal(true);
+              }}
+              className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs shadow-sm flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
+              title="Nhập tay khoản thu/chi và tự động cập nhật số dư Quỹ"
+            >
+              <Plus className="w-4 h-4" />
+              <span>+ Nhập Tay Thu / Chi Quỹ</span>
+            </button>
+
             <button
               onClick={() => setShowDynamicImportModal(true)}
               className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
@@ -1199,15 +1305,121 @@ export function FinanceReport() {
                       },
                     ]
                   : []),
-                {
-                  key: "delete",
-                  label: "Xóa",
-                  icon: Trash2,
-                  danger: true,
-                  onClick: () => handleDeleteOrder(r),
-                },
+                ...(canModifyRecord(currentUser, r.created_by, r.created_by_name)
+                  ? [
+                      {
+                        key: "delete",
+                        label: "Xóa",
+                        icon: Trash2,
+                        danger: true,
+                        onClick: () => handleDeleteOrder(r),
+                      },
+                    ]
+                  : []),
               ],
             }}
+          />
+        </div>
+
+        {/* ── 4C. SỔ CHI TIẾT DÒNG TIỀN MINH BẠCH (NGƯỜI CHUYỂN PHÍ SỰ KIỆN, NHẬP TAY & SEPAY) ── */}
+        <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 className="text-base font-black text-slate-900 tracking-tight flex items-center gap-2">
+                <Users2 className="w-5 h-5 text-emerald-600" />
+                <span>Sổ Chi Tiết Người Chuyển Tiền &amp; Dòng Tiền Minh Bạch</span>
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Hiển thị đầy đủ thông tin người đã chuyển tiền thanh toán phí sự kiện, giao dịch nhập tay &amp; SePay theo thời gian thực.
+              </p>
+            </div>
+            <div className="relative w-full sm:w-72">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+              <input
+                type="text"
+                value={ledgerSearch}
+                onChange={(e) => setLedgerSearch(e.target.value)}
+                placeholder="Tìm người chuyển, email, SĐT, mã vé..."
+                className="w-full h-9 pl-9 pr-3 rounded-xl border border-slate-200 text-xs bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-600"
+              />
+            </div>
+          </div>
+
+          <CustomTable<any>
+            data={(detailedLedgerQuery.data || []).filter((item: any) => {
+              const q = ledgerSearch.trim().toLowerCase();
+              if (!q) return true;
+              return [
+                item.payerName,
+                item.payerEmail,
+                item.payerPhone,
+                item.companyName,
+                item.voucherNo,
+                item.description,
+                item.fundName,
+                item.category,
+              ]
+                .filter(Boolean)
+                .some((v) => String(v).toLowerCase().includes(q));
+            })}
+            keyExtractor={(r) => r.id}
+            emptyText="Chưa có dữ liệu dòng tiền chi tiết."
+            columns={[
+              {
+                key: "date",
+                label: "Ngày GD",
+                width: 115,
+                render: (r) => (
+                  <span className="font-mono text-xs text-slate-600">
+                    {String(r.date || "").slice(0, 10)}
+                  </span>
+                ),
+              },
+              { key: "voucherNo", label: "Mã GD / Vé", width: 140 },
+              {
+                key: "payerName",
+                label: "Người Chuyển / Nhận (Rõ Ràng)",
+                width: 240,
+                render: (r) => (
+                  <div className="space-y-0.5">
+                    <div className="font-bold text-slate-900 text-xs">{r.payerName || "—"}</div>
+                    {(r.payerPhone || r.payerEmail || r.companyName) && (
+                      <div className="text-[11px] text-slate-500 truncate">
+                        {[r.payerPhone, r.payerEmail, r.companyName].filter(Boolean).join(" · ")}
+                      </div>
+                    )}
+                  </div>
+                ),
+              },
+              { key: "fundName", label: "Quỹ Hạch Toán", width: 180 },
+              { key: "description", label: "Nội Dung Chi Tiết", width: 250 },
+              {
+                key: "amount",
+                label: "Số Tiền",
+                align: "right",
+                width: 140,
+                render: (r) => (
+                  <span
+                    className={`font-mono font-black ${
+                      r.flowType === "OUT" ? "text-rose-600" : "text-emerald-600"
+                    }`}
+                  >
+                    {r.flowType === "OUT" ? "-" : "+"}
+                    {Number(r.amount || 0).toLocaleString("vi-VN")} đ
+                  </span>
+                ),
+              },
+              {
+                key: "createdByName",
+                label: "Người Tạo",
+                width: 150,
+                render: (r) => (
+                  <span className="text-xs text-slate-600 font-medium">
+                    {r.createdByName || "Hệ thống"}
+                  </span>
+                ),
+              },
+            ]}
           />
         </div>
 
@@ -1825,22 +2037,230 @@ export function FinanceReport() {
                   actionColumn={{
                     title: "THAO TÁC",
                     width: 110,
-                    actions: (r) => [
-                      {
-                        key: "del",
-                        label: "Xóa",
-                        icon: Trash2,
-                        danger: true,
-                        onClick: async () => {
-                          await fetchNestApi(`/financial-report/rows/${r.id}`, { method: "DELETE" });
-                          await deptRowsQuery.refetch();
-                          toast.success("Đã xóa dòng giao dịch!");
-                        },
-                      },
-                    ],
+                    actions: (r) =>
+                      canModifyRecord(currentUser, r.custom_data?.createdBy, r.custom_data?.createdByName)
+                        ? [
+                            {
+                              key: "del",
+                              label: "Xóa",
+                              icon: Trash2,
+                              danger: true,
+                              onClick: async () => {
+                                await fetchNestApi(`/financial-report/rows/${r.id}`, { method: "DELETE" });
+                                await deptRowsQuery.refetch();
+                                toast.success("Đã xóa dòng giao dịch!");
+                              },
+                            },
+                          ]
+                        : [],
                   }}
                 />
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── MODAL NHẬP TAY THU / CHI DÒNG TIỀN (TỰ ĐỘNG BIẾN ĐỘNG QUỸ & CHUYỂN QUỸ TỔNG) ── */}
+        {showManualCashflowModal && (
+          <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
+            <div className="w-full max-w-xl rounded-3xl bg-white border border-slate-200 shadow-2xl overflow-hidden">
+              <div className="px-6 py-4 bg-slate-950 text-white flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Wallet className="w-5 h-5 text-amber-400" />
+                  <h3 className="text-sm font-black uppercase tracking-wider">
+                    Nhập Tay Biến Động Dòng Tiền Quỹ
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowManualCashflowModal(false)}
+                  className="p-1.5 rounded-full hover:bg-white/10 text-white cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <form onSubmit={handleExecuteManualCashflow} className="p-6 space-y-4 text-xs">
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setManualCashflowForm((p) => ({ ...p, flowType: "IN" }))}
+                    className={`py-2.5 rounded-xl font-black border transition cursor-pointer ${
+                      manualCashflowForm.flowType === "IN"
+                        ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
+                        : "bg-slate-50 text-slate-700 border-slate-200"
+                    }`}
+                  >
+                    + Khoản Thu Vào Quỹ
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setManualCashflowForm((p) => ({ ...p, flowType: "OUT" }))}
+                    className={`py-2.5 rounded-xl font-black border transition cursor-pointer ${
+                      manualCashflowForm.flowType === "OUT"
+                        ? "bg-rose-600 text-white border-rose-600 shadow-sm"
+                        : "bg-slate-50 text-slate-700 border-slate-200"
+                    }`}
+                  >
+                    - Khoản Chi Ra Từ Quỹ
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Quỹ Hạch Toán *</label>
+                    <select
+                      value={manualCashflowForm.fundId}
+                      onChange={(e) => setManualCashflowForm((p) => ({ ...p, fundId: e.target.value }))}
+                      className="w-full h-10 px-3 rounded-xl border border-slate-300 bg-white text-slate-900 font-semibold"
+                    >
+                      {allFunds.map((f: any) => (
+                        <option key={f.id} value={f.id}>
+                          {f.name} ({Number(f.current_balance || 0).toLocaleString("vi-VN")} đ)
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Số Tiền (VNĐ) *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="VD: 5000000"
+                      value={manualCashflowForm.amount}
+                      onChange={(e) => setManualCashflowForm((p) => ({ ...p, amount: e.target.value }))}
+                      className="w-full h-10 px-3 rounded-xl border border-slate-300 font-mono font-bold text-slate-900"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">
+                      Họ Tên Người Nộp / Người Nhận *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Nguyễn Văn A..."
+                      value={manualCashflowForm.payerName}
+                      onChange={(e) => setManualCashflowForm((p) => ({ ...p, payerName: e.target.value }))}
+                      className="w-full h-10 px-3 rounded-xl border border-slate-300 text-slate-900"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Số Điện Thoại</label>
+                    <input
+                      type="tel"
+                      placeholder="0983..."
+                      value={manualCashflowForm.payerPhone}
+                      onChange={(e) => setManualCashflowForm((p) => ({ ...p, payerPhone: e.target.value }))}
+                      className="w-full h-10 px-3 rounded-xl border border-slate-300 text-slate-900"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Email</label>
+                    <input
+                      type="email"
+                      placeholder="email@congty.vn"
+                      value={manualCashflowForm.payerEmail}
+                      onChange={(e) => setManualCashflowForm((p) => ({ ...p, payerEmail: e.target.value }))}
+                      className="w-full h-10 px-3 rounded-xl border border-slate-300 text-slate-900"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Doanh Nghiệp / Mã HV</label>
+                    <input
+                      type="text"
+                      placeholder="Công ty / HN10-..."
+                      value={manualCashflowForm.companyName}
+                      onChange={(e) => setManualCashflowForm((p) => ({ ...p, companyName: e.target.value }))}
+                      className="w-full h-10 px-3 rounded-xl border border-slate-300 text-slate-900"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Danh Mục</label>
+                    <select
+                      value={manualCashflowForm.category}
+                      onChange={(e) => setManualCashflowForm((p) => ({ ...p, category: e.target.value }))}
+                      className="w-full h-10 px-3 rounded-xl border border-slate-300 bg-white text-slate-900"
+                    >
+                      <option value="Thanh toán phí sự kiện">Thanh toán phí sự kiện</option>
+                      <option value="Phí tham gia CLB">Phí tham gia CLB</option>
+                      <option value="Tài trợ CLB">Tài trợ CLB</option>
+                      <option value="Thu nhập tay khác">Thu nhập tay khác</option>
+                      <option value="Chi hoạt động sự kiện">Chi hoạt động sự kiện</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Hình Thức</label>
+                    <select
+                      value={manualCashflowForm.paymentMethod}
+                      onChange={(e) => setManualCashflowForm((p) => ({ ...p, paymentMethod: e.target.value as any }))}
+                      className="w-full h-10 px-3 rounded-xl border border-slate-300 bg-white text-slate-900"
+                    >
+                      <option value="bank">Chuyển khoản NH</option>
+                      <option value="cash">Tiền mặt</option>
+                      <option value="vietqr">VietQR</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Ngày Giao Dịch</label>
+                    <input
+                      type="date"
+                      value={manualCashflowForm.transactionDate}
+                      onChange={(e) => setManualCashflowForm((p) => ({ ...p, transactionDate: e.target.value }))}
+                      className="w-full h-10 px-3 rounded-xl border border-slate-300 text-slate-900"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Nội Dung Diễn Giải *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="VD: Thu tiền vé sự kiện Khai giảng từ anh Nguyễn Văn A..."
+                    value={manualCashflowForm.description}
+                    onChange={(e) => setManualCashflowForm((p) => ({ ...p, description: e.target.value }))}
+                    className="w-full h-10 px-3 rounded-xl border border-slate-300 text-slate-900"
+                  />
+                </div>
+
+                {manualCashflowForm.flowType === "IN" && manualCashflowForm.fundId !== generalFund?.id && (
+                  <label className="flex items-center gap-2 p-3 rounded-xl bg-blue-50 border border-blue-200 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={manualCashflowForm.transferToGeneral}
+                      onChange={(e) => setManualCashflowForm((p) => ({ ...p, transferToGeneral: e.target.checked }))}
+                      className="rounded text-blue-700"
+                    />
+                    <span className="font-bold text-blue-950">
+                      Tự động lập lệnh chuyển khoản thu này thẳng vào Quỹ Tổng CEOHN10
+                    </span>
+                  </label>
+                )}
+
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                  <button
+                    type="button"
+                    onClick={() => setShowManualCashflowModal(false)}
+                    className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 cursor-pointer"
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmittingManual}
+                    className="px-5 py-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-white font-black shadow-sm disabled:opacity-50 cursor-pointer"
+                  >
+                    {isSubmittingManual ? "Đang hạch toán..." : "Xác Nhận Ghi Nhận & Cập Nhật Quỹ"}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}

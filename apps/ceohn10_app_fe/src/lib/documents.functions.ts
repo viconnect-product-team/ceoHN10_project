@@ -10,6 +10,7 @@ export type Document = {
   size: string;
   uploadedAt: string;
   uploadedBy: string;
+  createdBy?: string | null;
   type: "pdf" | "doc" | "docx" | "xls" | "xlsx" | "ppt" | "pptx" | "txt" | "csv" | "zip" | "rar" | "png" | "jpg" | "jpeg" | "folder" | "other";
   docScope?: "association" | "enterprise";
   enterpriseName?: string;

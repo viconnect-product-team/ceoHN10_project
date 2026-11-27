@@ -41,7 +41,28 @@ export class FinancialInitService {
 
     const acceptedOrders = await this.prisma.$queryRawUnsafe<any[]>(`
       SELECT * FROM public.fund_transfer_orders WHERE status = 'accepted' ORDER BY accepted_at DESC
-    `).catch(() => []);
+    `).catch(() => [] as any[]);
+
+    // Nạp thêm dữ liệu đăng ký sự kiện đã thanh toán & giao dịch nhập tay để hiển thị rõ thông tin người chuyển
+    const paidEventRegs = await this.prisma.$queryRawUnsafe<any[]>(`
+      SELECT er.id, er.registration_id, er.full_name, er.email, er.phone, er.company,
+             er.amount_paid, er.payment_method, er.payment_status, er.paid_at, er.created_at,
+             e.name AS event_name
+      FROM public.event_registrations er
+      LEFT JOIN public.events e ON e.id::text = er.event_id::text
+      WHERE LOWER(COALESCE(er.payment_status, '')) = 'paid' AND COALESCE(er.amount_paid, 0) > 0
+      ORDER BY COALESCE(er.paid_at, er.created_at) DESC
+      LIMIT 300
+    `).catch(() => [] as any[]);
+
+    const manualRows = await this.prisma.$queryRawUnsafe<any[]>(`
+      SELECT id, transaction_date, voucher_no, category, description,
+             income_amount, expense_amount, party_name, status, custom_data, created_at
+      FROM public.financial_report_rows
+      WHERE COALESCE(custom_data->>'manualCashflow', '') = 'true'
+      ORDER BY transaction_date DESC, created_at DESC
+      LIMIT 300
+    `).catch(() => [] as any[]);
 
     return funds.map((f) => {
       // 1. Số dư đầu kỳ phân bổ
@@ -71,11 +92,18 @@ export class FinancialInitService {
         .filter((ev) => ev.fund_id === f.id && ev.transfer_type === 'in')
         .reduce((sum, ev) => sum + Number(ev.transfer_amount), 0);
 
+      // 5. Tiền nhập tay trực tiếp vào quỹ này
+      const fundManualRows = manualRows.filter(
+        (mr) => mr.custom_data?.fundId === f.id,
+      );
+      const manualIn = fundManualRows.reduce((sum, mr) => sum + Number(mr.income_amount || 0), 0);
+      const manualOut = fundManualRows.reduce((sum, mr) => sum + Number(mr.expense_amount || 0), 0);
+
       // Tổng tiền Vào (Inflow)
-      const totalInflow = obAllocated + transferIn + sepayIn;
+      const totalInflow = obAllocated + transferIn + sepayIn + manualIn;
 
       // Tổng tiền Ra (Outflow)
-      const totalOutflow = transferOut;
+      const totalOutflow = transferOut + manualOut;
 
       // Danh sách giao dịch Vào / Ra chi tiết của quỹ này
       const txList: any[] = [];
@@ -156,17 +184,52 @@ export class FinancialInitService {
       sepayEvents
         .filter((ev) => ev.fund_id === f.id && ev.transfer_type === 'in')
         .forEach((ev) => {
+          const contentUpper = String(ev.content || '').toUpperCase();
+          const matchedReg = paidEventRegs.find((reg) => {
+            const code = String(reg.registration_id || '').toUpperCase();
+            return code && contentUpper.includes(code);
+          });
           txList.push({
             id: ev.id,
             type: 'IN',
             typeName: 'SePay Webhook',
             amount: Number(ev.transfer_amount),
             date: ev.transaction_date ? ev.transaction_date.toISOString().slice(0, 10) : '2026-11-23',
-            counterparty: ev.bank_brand_name || 'Ngân hàng',
-            description: ev.content,
+            counterparty: matchedReg?.full_name
+              ? `${matchedReg.full_name}${matchedReg.company ? ` (${matchedReg.company})` : ''}`
+              : ev.bank_brand_name || 'Khách chuyển khoản SePay',
+            payerEmail: matchedReg?.email || null,
+            payerPhone: matchedReg?.phone || null,
+            eventTitle: matchedReg?.event_name || null,
+            ticketCode: matchedReg?.registration_id || null,
+            description: matchedReg
+              ? `Thanh toán vé sự kiện "${matchedReg.event_name || 'CEO HN10'}" (${matchedReg.registration_id}) - ${ev.content}`
+              : ev.content,
             voucherNo: ev.reference_number || ev.gateway_transaction_id,
           });
         });
+
+      fundManualRows.forEach((mr) => {
+        const isIncome = Number(mr.income_amount || 0) > 0;
+        const cd = mr.custom_data || {};
+        txList.push({
+          id: mr.id,
+          type: isIncome ? 'IN' : 'OUT',
+          typeName: isIncome ? 'Nhập tay Thu Quỹ' : 'Nhập tay Chi Quỹ',
+          amount: isIncome ? Number(mr.income_amount) : Number(mr.expense_amount),
+          date: mr.transaction_date ? String(mr.transaction_date).slice(0, 10) : new Date().toISOString().slice(0, 10),
+          counterparty: mr.party_name || cd.payerName || 'Giao dịch nhập tay',
+          payerEmail: cd.payerEmail || null,
+          payerPhone: cd.payerPhone || null,
+          companyName: cd.companyName || null,
+          studentCode: cd.studentCode || null,
+          paymentMethod: cd.paymentMethod || 'bank',
+          createdBy: cd.createdBy || null,
+          createdByName: cd.createdByName || null,
+          description: mr.description,
+          voucherNo: mr.voucher_no,
+        });
+      });
 
       return {
         ...f,
@@ -177,6 +240,280 @@ export class FinancialInitService {
         transactions: txList,
       };
     });
+  }
+
+  /**
+   * Nhập tay khoản Thu / Chi trực tiếp vào Quỹ Tổng hoặc Quỹ Ban (tự động biến động số dư quỹ theo thời gian thực)
+   */
+  async createManualCashflow(
+    actor: any,
+    dto: {
+      fundId?: string;
+      flowType: 'IN' | 'OUT';
+      category: string;
+      amount: number;
+      payerName: string;
+      payerPhone?: string;
+      payerEmail?: string;
+      companyName?: string;
+      studentCode?: string;
+      paymentMethod?: 'bank' | 'cash' | 'vietqr';
+      description: string;
+      transactionDate?: string;
+      transferToGeneral?: boolean;
+    },
+  ) {
+    const amount = Math.round(Number(dto.amount) || 0);
+    if (amount <= 0) {
+      throw new BadRequestException('Số tiền giao dịch phải lớn hơn 0');
+    }
+    if (!dto.payerName?.trim()) {
+      throw new BadRequestException('Vui lòng nhập rõ họ tên người nộp / người nhận tiền');
+    }
+
+    const flowType = dto.flowType === 'OUT' ? 'OUT' : 'IN';
+    const txDate = dto.transactionDate || new Date().toISOString().slice(0, 10);
+    const voucherNo = `${flowType === 'IN' ? 'PT' : 'PC'}-TAY-${Date.now().toString().slice(-6)}`;
+    const actorId = String(actor?.id || actor?.sub || actor?.userId || '');
+    const actorName = String(actor?.name || actor?.email || 'Quản trị viên');
+
+    const generalFund = await this.prisma.financial_funds.findFirst({
+      where: { OR: [{ code: 'FUND_GENERAL' }, { fund_type: 'GENERAL' }] },
+    });
+    const targetFund = dto.fundId
+      ? await this.prisma.financial_funds.findUnique({ where: { id: dto.fundId } })
+      : generalFund;
+
+    if (!targetFund) {
+      throw new NotFoundException('Không tìm thấy Quỹ hạch toán trong CSDL');
+    }
+
+    if (flowType === 'OUT' && Number(targetFund.current_balance) < amount) {
+      throw new BadRequestException(
+        `Số dư ${targetFund.name} (${Number(targetFund.current_balance).toLocaleString('vi-VN')} đ) không đủ để chi ${amount.toLocaleString('vi-VN')} đ`,
+      );
+    }
+
+    const customData = {
+      manualCashflow: 'true',
+      fundId: targetFund.id,
+      fundName: targetFund.name,
+      flowType,
+      payerName: dto.payerName.trim(),
+      payerPhone: dto.payerPhone?.trim() || null,
+      payerEmail: dto.payerEmail?.trim() || null,
+      companyName: dto.companyName?.trim() || null,
+      studentCode: dto.studentCode?.trim() || null,
+      paymentMethod: dto.paymentMethod || 'bank',
+      createdBy: actorId,
+      createdByName: actorName,
+      transferToGeneral: Boolean(dto.transferToGeneral),
+    };
+
+    await this.prisma.$transaction(async (tx) => {
+      // 1. Cập nhật biến động số dư Quỹ ngay lập tức
+      const nextBalance =
+        flowType === 'IN'
+          ? BigInt(Number(targetFund.current_balance) + amount)
+          : BigInt(Math.max(0, Number(targetFund.current_balance) - amount));
+
+      await tx.financial_funds.update({
+        where: { id: targetFund.id },
+        data: { current_balance: nextBalance, updated_at: new Date() },
+      });
+
+      // 2. Lưu chi tiết dòng tiền nhập tay vào financial_report_rows
+      await tx.$executeRawUnsafe(
+        `INSERT INTO public.financial_report_rows (
+          id, transaction_date, voucher_no, category, description,
+          income_amount, expense_amount, balance_after, party_name, status,
+          custom_data, created_at, updated_at
+        ) VALUES (
+          gen_random_uuid(), $1::date, $2, $3, $4,
+          $5, $6, $7, $8, 'completed',
+          $9::jsonb, NOW(), NOW()
+        )`,
+        txDate,
+        voucherNo,
+        dto.category || (flowType === 'IN' ? 'Thu nhập tay' : 'Chi nhập tay'),
+        dto.description || `${flowType === 'IN' ? 'Thu' : 'Chi'} từ ${dto.payerName.trim()}`,
+        flowType === 'IN' ? amount : 0,
+        flowType === 'OUT' ? amount : 0,
+        Number(nextBalance),
+        dto.payerName.trim(),
+        JSON.stringify(customData),
+      );
+
+      // 3. Nếu là khoản Thu vào Quỹ Ban và bật "Lập lệnh chuyển thẳng về Quỹ Tổng"
+      if (
+        flowType === 'IN' &&
+        dto.transferToGeneral &&
+        generalFund &&
+        targetFund.id !== generalFund.id
+      ) {
+        await tx.financial_funds.update({
+          where: { id: targetFund.id },
+          data: {
+            current_balance: BigInt(Math.max(0, Number(nextBalance) - amount)),
+            updated_at: new Date(),
+          },
+        });
+        await tx.financial_funds.update({
+          where: { id: generalFund.id },
+          data: {
+            current_balance: BigInt(Number(generalFund.current_balance) + amount),
+            updated_at: new Date(),
+          },
+        });
+
+        const trfCode = `LCT-AUTO-${Date.now().toString().slice(-6)}`;
+        await tx.$executeRawUnsafe(
+          `INSERT INTO public.fund_transfer_orders (
+            transfer_code, direction, source_fund_id, destination_fund_id,
+            source_fund_name, destination_fund_name, amount, description,
+            status, created_by, created_by_name, accepted_by, accepted_by_name, accepted_at,
+            transfer_date, created_at, updated_at
+          ) VALUES (
+            $1, 'dept_to_master', $2::uuid, $3::uuid,
+            $4, $5, $6, $7,
+            'accepted', $8, $9, $8, $9, NOW(),
+            $10::date, NOW(), NOW()
+          )`,
+          trfCode,
+          targetFund.id,
+          generalFund.id,
+          targetFund.name,
+          generalFund.name,
+          amount,
+          `[Tự động chuyển về Quỹ Tổng] ${dto.description || dto.payerName.trim()}`,
+          actorId,
+          actorName,
+          txDate,
+        );
+      }
+    });
+
+    return {
+      success: true,
+      voucherNo,
+      amount,
+      flowType,
+      fundName: targetFund.name,
+      message:
+        flowType === 'IN' && dto.transferToGeneral && generalFund && targetFund.id !== generalFund.id
+          ? `Đã ghi nhận khoản thu ${amount.toLocaleString('vi-VN')} đ từ ${dto.payerName.trim()} và chuyển thẳng vào ${generalFund.name}!`
+          : `Đã ghi nhận khoản ${flowType === 'IN' ? 'Thu' : 'Chi'} ${amount.toLocaleString('vi-VN')} đ (${targetFund.name}) thành công!`,
+    };
+  }
+
+  /**
+   * Lấy Sổ chi tiết dòng tiền minh bạch (hiển thị rõ người chuyển phí sự kiện, giao dịch nhập tay, SePay & điều chuyển quỹ)
+   */
+  async getDetailedLedger() {
+    const [paidEventRegs, manualRows, sepayEvents, funds] = await Promise.all([
+      this.prisma.$queryRawUnsafe<any[]>(`
+        SELECT er.id, er.registration_id, er.full_name, er.email, er.phone, er.company,
+               er.amount_paid, er.payment_method, er.payment_status, er.paid_at, er.created_at,
+               e.name AS event_name
+        FROM public.event_registrations er
+        LEFT JOIN public.events e ON e.id::text = er.event_id::text
+        WHERE LOWER(COALESCE(er.payment_status, '')) = 'paid' AND COALESCE(er.amount_paid, 0) > 0
+        ORDER BY COALESCE(er.paid_at, er.created_at) DESC
+        LIMIT 300
+      `).catch(() => []),
+      this.prisma.$queryRawUnsafe<any[]>(`
+        SELECT id, transaction_date, voucher_no, category, description,
+               income_amount, expense_amount, party_name, status, custom_data, created_at
+        FROM public.financial_report_rows
+        ORDER BY transaction_date DESC, created_at DESC
+        LIMIT 300
+      `).catch(() => []),
+      this.prisma.sepay_webhook_events.findMany({
+        orderBy: { transaction_date: 'desc' },
+        take: 100,
+      }).catch(() => []),
+      this.prisma.financial_funds.findMany().catch(() => []),
+    ]);
+
+    const fundMap = new Map<string, string>(
+      funds.map((f) => [f.id, f.name] as [string, string]),
+    );
+    const ledger: any[] = [];
+
+    for (const reg of paidEventRegs) {
+      ledger.push({
+        id: `EVT-${reg.id}`,
+        voucherNo: reg.registration_id || `REG-${reg.id}`,
+        flowType: 'IN',
+        category: 'Thanh toán phí sự kiện',
+        payerName: reg.full_name || 'Đại biểu sự kiện',
+        payerEmail: reg.email || '',
+        payerPhone: reg.phone || '',
+        companyName: reg.company || '',
+        studentCode: reg.registration_id || '',
+        fundName: 'Quỹ Ban Sự kiện & Hậu cần',
+        paymentMethod: reg.payment_method || 'vietqr',
+        amount: Number(reg.amount_paid || 0),
+        description: `Thanh toán vé sự kiện "${reg.event_name || 'Sự kiện CEO HN10'}" (Mã vé: ${reg.registration_id})`,
+        date: (reg.paid_at || reg.created_at) ? new Date(reg.paid_at || reg.created_at).toISOString() : new Date().toISOString(),
+        source: 'event_payment',
+        createdBy: null,
+        createdByName: 'Hệ thống SePay / Check-in',
+      });
+    }
+
+    for (const mr of manualRows) {
+      const cd = mr.custom_data || {};
+      const isIn = Number(mr.income_amount || 0) > 0;
+      ledger.push({
+        id: mr.id,
+        voucherNo: mr.voucher_no || 'PT-TAY',
+        flowType: isIn ? 'IN' : 'OUT',
+        category: mr.category || (isIn ? 'Thu nhập tay' : 'Chi nhập tay'),
+        payerName: mr.party_name || cd.payerName || '—',
+        payerEmail: cd.payerEmail || '',
+        payerPhone: cd.payerPhone || '',
+        companyName: cd.companyName || '',
+        studentCode: cd.studentCode || '',
+        fundName: cd.fundName || (cd.fundId ? fundMap.get(cd.fundId) : null) || cd.department || 'Quỹ Tổng CEOHN10',
+        paymentMethod: cd.paymentMethod || 'bank',
+        amount: isIn ? Number(mr.income_amount || 0) : Number(mr.expense_amount || 0),
+        description: mr.description || '',
+        date: mr.transaction_date ? new Date(mr.transaction_date).toISOString() : new Date().toISOString(),
+        source: cd.manualCashflow === 'true' ? 'manual' : 'report_row',
+        createdBy: cd.createdBy || null,
+        createdByName: cd.createdByName || 'Quản trị viên',
+      });
+    }
+
+    for (const ev of sepayEvents) {
+      const contentUpper = String(ev.content || '').toUpperCase();
+      const matched = paidEventRegs.find((reg) => reg.registration_id && contentUpper.includes(String(reg.registration_id).toUpperCase()));
+      if (!matched) {
+        ledger.push({
+          id: `SEPAY-${ev.id}`,
+          voucherNo: ev.reference_number || ev.gateway_transaction_id || 'SEPAY',
+          flowType: ev.transfer_type === 'out' ? 'OUT' : 'IN',
+          category: 'Giao dịch ngân hàng SePay',
+          payerName: ev.bank_brand_name || 'Chuyển khoản SePay',
+          payerEmail: '',
+          payerPhone: '',
+          companyName: '',
+          studentCode: '',
+          fundName: (ev.fund_id && fundMap.get(ev.fund_id)) || 'Quỹ Tổng CEOHN10',
+          paymentMethod: 'vietqr',
+          amount: Number(ev.transfer_amount || 0),
+          description: ev.content || 'Biến động số dư SePay',
+          date: ev.transaction_date ? ev.transaction_date.toISOString() : new Date().toISOString(),
+          source: 'sepay',
+          createdBy: null,
+          createdByName: 'SePay Webhook',
+        });
+      }
+    }
+
+    ledger.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    return ledger;
   }
 
   /**

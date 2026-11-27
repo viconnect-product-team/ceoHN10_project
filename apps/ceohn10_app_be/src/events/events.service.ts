@@ -1131,10 +1131,9 @@ export class EventsService extends BaseService implements OnModuleInit {
     const current = existing[0];
     const isFullAdmin = await this.checkIsPlatformAdmin(userId);
     const isOwner = Boolean(current.created_by && String(current.created_by) === String(userId));
-    const isAdmin = isFullAdmin || isOwner || (await this.checkIsAdmin(userId, current.association_id));
-    if (!isAdmin) {
+    if (!isFullAdmin && !isOwner) {
       throw new ForbiddenException(
-        'Chỉ Lớp trưởng, Platform Admin hoặc người tạo sự kiện mới có quyền cập nhật sự kiện này',
+        'Chỉ Lớp trưởng, Super Admin (Platform Admin) hoặc người tạo sự kiện mới có quyền cập nhật sự kiện này',
       );
     }
 
@@ -1580,10 +1579,9 @@ export class EventsService extends BaseService implements OnModuleInit {
     const current = existing[0];
     const isFullAdmin = await this.checkIsPlatformAdmin(userId);
     const isOwner = Boolean(current.created_by && String(current.created_by) === String(userId));
-    const isAdmin = isFullAdmin || isOwner || (await this.checkIsAdmin(userId, current.association_id));
-    if (!isAdmin) {
+    if (!isFullAdmin && !isOwner) {
       throw new ForbiddenException(
-        'Chỉ Lớp trưởng, Platform Admin hoặc người tạo sự kiện mới có quyền cập nhật sự kiện này',
+        'Chỉ Lớp trưởng, Super Admin (Platform Admin) hoặc người tạo sự kiện mới có quyền cập nhật sự kiện này',
       );
     }
 

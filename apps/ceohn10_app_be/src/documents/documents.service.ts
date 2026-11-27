@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { DocumentsRepository } from './documents.repository';
 import { CreateDocumentDto, UpdateDocumentDto } from './dto';
+import { assertRecordOwnershipOrPrivilege } from '../auth/ownership.util';
 
 export { CreateDocumentDto, UpdateDocumentDto };
 
@@ -29,6 +30,7 @@ export class DocumentsService {
         ? new Date(r.uploaded_at).toISOString()
         : new Date().toISOString(),
       uploadedBy: r.uploaded_by || 'Ban Thư ký',
+      createdBy: r.created_by || null,
       type: r.type || (safeUrl.endsWith('.docx') ? 'docx' : safeUrl.endsWith('.xlsx') ? 'xlsx' : 'pdf'),
       filePath: safeUrl,
       url: safeUrl,
@@ -94,18 +96,25 @@ export class DocumentsService {
       description,
       docScope,
       enterpriseName,
+      userId,
     );
 
     if (!r) throw new Error('Không thể tạo tài liệu / thư mục');
     return this.mapRow(r);
   }
 
-  async update(id: string, data: UpdateDocumentDto, userId?: string) {
-    if (userId) {
-      const existing = await this.documentsRepo.findFilePath(id);
-      if (!existing) {
-        throw new NotFoundException('Không tìm thấy tài liệu để cập nhật');
-      }
+  async update(id: string, data: UpdateDocumentDto, actor?: any) {
+    const existing = await this.documentsRepo.findFilePath(id);
+    if (!existing) {
+      throw new NotFoundException('Không tìm thấy tài liệu để cập nhật');
+    }
+    if (actor) {
+      assertRecordOwnershipOrPrivilege(
+        typeof actor === 'string' ? { id: actor } : actor,
+        existing.createdBy,
+        existing.uploadedBy,
+        'chỉnh sửa tài liệu',
+      );
     }
     const filePath = data.filePath;
     const isFolder =
@@ -162,12 +171,18 @@ export class DocumentsService {
     return { id, targetFolderId };
   }
 
-  async delete(id: string, userId?: string) {
-    if (userId) {
-      const existing = await this.documentsRepo.findFilePath(id);
-      if (!existing) {
-        throw new NotFoundException('Không tìm thấy tài liệu để xóa');
-      }
+  async delete(id: string, actor?: any) {
+    const existing = await this.documentsRepo.findFilePath(id);
+    if (!existing) {
+      throw new NotFoundException('Không tìm thấy tài liệu để xóa');
+    }
+    if (actor) {
+      assertRecordOwnershipOrPrivilege(
+        typeof actor === 'string' ? { id: actor } : actor,
+        existing.createdBy,
+        existing.uploadedBy,
+        'xóa tài liệu',
+      );
     }
     const ok = await this.documentsRepo.deleteDocument(id);
     return { ok };

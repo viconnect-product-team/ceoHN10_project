@@ -2,6 +2,12 @@
 # BỘ LUẬT DỰ ÁN (PROJECT RULES & AI CODEGEN STANDARDS) - CEO HN10 PROJECT
 # Vai trò: Tech Lead | Định dạng: .cursorrules
 # 27/11/2026 (v12.83) — 3D CAROUSEL LANDING PAGE 7 VIDEO CHUẨN PINTEREST, iOS LIQUID GLASS & HIỆU ỨNG MẶT NƯỚC, BỎ FIX CỨNG TỌA ĐÀM/TIỆC KHI TẠO SỰ KIỆN & PHÂN QUYỀN RBAC ẨN GIAO DIỆN + CHẶN API:
+#   * [PHÂN QUYỀN SỞ HỮU BẢN GHI (OWNER-BASED EDIT/DELETE) (NODE-CORE-001)]:
+#     - Mọi thao tác chỉnh sửa / xóa bản ghi (Tài liệu, Dòng tiền tài chính, Lệnh chuyển quỹ, Sự kiện) chỉ cho phép chính người tạo bản ghi thực hiện, NGOẠI TRỪ tài khoản có vai trò Super Admin (`platform_admin`) hoặc Lớp trưởng (`lop_truong`) mới được sửa/xóa bản ghi của người khác (`assertRecordOwnershipOrPrivilege` ở Backend & `canModifyRecord` ở Frontend).
+#   * [QUẢN LÝ TÀI LIỆU MINIO, XEM NHƯ DRIVE & SỬA NHƯ WORD (NODE-CRM-014)]:
+#     - Tài liệu upload lưu trữ trực tiếp trên MinIO (`upload.service.ts`), hỗ trợ xem trực tiếp như Google Drive (`UniversalDocumentViewerModal.tsx`) và tích hợp trình soạn thảo Word A4 trực tiếp lưu đè lên MinIO.
+#   * [BÁO CÁO TÀI CHÍNH NHẬP TAY BIẾN ĐỘNG QUỸ & MINH BẠCH NGƯỜI CHUYỂN (NODE-CRM-011)]:
+#     - Hỗ trợ nhập tay khoản Thu/Chi (`POST /finance-init/manual-cashflow`) cập nhật số dư Quỹ Tổng / Quỹ Ban tức thì, tùy chọn tự động chuyển thẳng về Quỹ Tổng, kèm Sổ chi tiết dòng tiền minh bạch hiển thị rõ thông tin người đã chuyển tiền thanh toán phí sự kiện (`GET /finance-init/detailed-ledger`).
 #   * [LANDING PAGE 7 VIDEO 3D CAROUSEL KHÔNG CHỮ TRÊN VIDEO, KHÔNG BORDER & RESPONSIVE MOBILE (NODE-CRM-023)]:
 #     - Giao diện VideoVotingShowcaseLanding.tsx thiết kế theo phong cách triển lãm điện ảnh 3D Perspective Carousel chuẩn Pinterest 900790362966152495: video phát thuần túy KHÔNG có bất kỳ chữ đè nào trên video, loại bỏ toàn bộ đường viền (border/ring/divide) trong toàn bộ landing page, và tối ưu responsive hoàn chỉnh cho màn hình thiết bị di động (h-[230px] sm:h-[430px] lg:h-[520px], overflow-x-auto cho bảng thống kê, vuốt ngang cảm ứng mượt).
 #   * [HIỆU ỨNG CHẠM MẶT NƯỚC CHỈ HIỆN KHI BẤM NÚT, KÍNH TRONG SUỐT NỔI NHƯ GIỌT NƯỚC (NODE-CRM-007)]:

@@ -50,6 +50,8 @@ import { SendDocumentToMessageModal } from "@/components/documents/SendDocumentT
 import { useTableControls } from "@/hooks/use-table-controls";
 import { useUrlState } from "@/hooks/use-url-state";
 import { useRole, PERMISSIONS } from "@/hooks/use-role";
+import { useAuth } from "@/context/AuthContext";
+import { canModifyRecord } from "@/lib/rbac-permission-helpers";
 import { Pagination } from "@/components/dashboard/DataTablePagination";
 import { TruncatedText } from "@/components/dashboard/TruncatedText";
 import {
@@ -170,6 +172,7 @@ function DocsPage() {
   const t = useT();
   const fmt = useFmt();
   const router = useRouter();
+  const { user: currentUser } = useAuth();
   const { isAdmin, isPlatformAdmin, isPresident, isChuTich, isTruongBan, isBanDieuHanh, can } = useRole();
   // Quản trị, chủ tịch, admin, các trưởng ban có quyền xem, chỉnh sửa, upload, xóa tài liệu CEOHN10
   const isLeaderOrAdmin = Boolean(
@@ -867,7 +870,7 @@ function DocsPage() {
           )}
           {(() => {
             const isAssoc = d.docScope === "association" || !d.docScope;
-            const canManageThis = isAssoc ? canWriteAssociation : true;
+            const canManageThis = (isAssoc ? canWriteAssociation : true) && canModifyRecord(currentUser, d.createdBy, d.uploadedBy);
             if (!canManageThis) return null;
             return (
               <>
@@ -1786,7 +1789,7 @@ function DocsPage() {
                                     </button>
                                     {(() => {
                                       const isAssoc = d.docScope === "association" || !d.docScope;
-                                      const canManageThis = isAssoc ? canWriteAssociation : true;
+                                      const canManageThis = (isAssoc ? canWriteAssociation : true) && canModifyRecord(currentUser, d.createdBy, d.uploadedBy);
                                       if (!canManageThis) return null;
                                       return (
                                         <>
@@ -2025,11 +2028,20 @@ function DocsPage() {
           onMove={onMoveDoc}
         />
 
-        {/* Modal Xem Chi Tiết & Mở Đọc Tài Liệu Đa Định Dạng (Word, Excel, PDF, Image, Code) */}
+        {/* Modal Xem Chi Tiết & Mở Đọc / Chỉnh sửa như Word & Lưu MinIO */}
         <UniversalDocumentViewerModal
           isOpen={Boolean(previewDoc)}
           onClose={() => setPreviewDoc(null)}
           document={previewDoc}
+          canEdit={
+            previewDoc
+              ? ((previewDoc.docScope === "association" || !previewDoc.docScope) ? canWriteAssociation : true) &&
+                canModifyRecord(currentUser, previewDoc.createdBy, previewDoc.uploadedBy)
+              : false
+          }
+          onDocumentSaved={() => {
+            void router.invalidate();
+          }}
         />
 
         {/* Modal Gửi Tài Liệu Vào Tin Nhắn CRM / Học viên */}

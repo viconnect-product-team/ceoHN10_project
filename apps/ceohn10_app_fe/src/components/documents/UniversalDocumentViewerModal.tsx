@@ -24,16 +24,32 @@ import {
   Layers,
   AlertCircle,
   Eye,
+  Pencil,
+  Save,
+  Bold,
+  Italic,
+  Underline,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  List,
+  ListOrdered,
+  Undo2,
+  Redo2,
+  Heading1,
+  Heading2,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
-import { resolveMediaUrl } from "@/lib/api-client";
+import { fetchNestApi, getNestApiUrl, resolveMediaUrl } from "@/lib/api-client";
 import { type Document } from "@/lib/documents.functions";
 
 interface UniversalDocumentViewerModalProps {
   isOpen: boolean;
   onClose: () => void;
   document: Document | null;
+  canEdit?: boolean;
+  onDocumentSaved?: () => void;
 }
 
 interface ExcelSheetData {
@@ -45,11 +61,18 @@ export function UniversalDocumentViewerModal({
   isOpen,
   onClose,
   document: doc,
+  canEdit = true,
+  onDocumentSaved,
 }: UniversalDocumentViewerModalProps) {
   const [activeTab, setActiveTab] = useState<"viewer" | "info">("viewer");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Word Editor State (Chỉnh sửa tài liệu như Word & lưu lên MinIO)
+  const [isEditingWord, setIsEditingWord] = useState(false);
+  const [savingWord, setSavingWord] = useState(false);
+  const wordEditorRef = useRef<HTMLDivElement | null>(null);
 
   // Excel state
   const [excelSheets, setExcelSheets] = useState<ExcelSheetData[]>([]);
@@ -178,9 +201,18 @@ export function UniversalDocumentViewerModal({
                   }
                 } catch { }
 
-                // Text decode fallback
+                // Text / Word-HTML decode fallback (giữ nguyên định dạng Word HTML nếu lưu từ trình soạn thảo)
                 const decoder = new TextDecoder("utf-8", { fatal: false });
                 const rawStr = decoder.decode(buffer);
+                if (rawStr.includes("<html") && rawStr.includes("<body")) {
+                  const bodyMatch = rawStr.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+                  if (bodyMatch && bodyMatch[1]) {
+                    if (isCancelled) return;
+                    setDocxHtml(bodyMatch[1]);
+                    setDocxText(bodyMatch[1].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim());
+                    return;
+                  }
+                }
                 const xmlMatch = rawStr.match(/<w:document[\s\S]*?<\/w:document>/);
                 if (xmlMatch) {
                   // Strip XML tags to reveal actual paragraphs
@@ -299,6 +331,95 @@ export function UniversalDocumentViewerModal({
     }
   };
 
+  const execWordCmd = (cmd: string, value?: string) => {
+    window.document.execCommand(cmd, false, value);
+    wordEditorRef.current?.focus();
+  };
+
+  const handleSaveWordToMinio = async () => {
+    if (!doc) return;
+    const editedBodyHtml = wordEditorRef.current?.innerHTML || docxHtml || "";
+    const plainText = wordEditorRef.current?.innerText || editedBodyHtml.replace(/<[^>]+>/g, " ").trim();
+    if (!plainText.trim()) {
+      toast.error("Nội dung tài liệu không được để trống!");
+      return;
+    }
+
+    setSavingWord(true);
+    toast.loading("Đang lưu tài liệu Word lên MinIO...", { id: "save-word-minio" });
+    try {
+      const wordHtmlDoc = `<!DOCTYPE html>
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="utf-8" />
+<title>${doc.name}</title>
+<style>
+  @page { size: A4; margin: 20mm; }
+  body { font-family: "Times New Roman", Georgia, serif; font-size: 13pt; line-height: 1.6; color: #0f172a; }
+  h1 { font-size: 18pt; font-weight: bold; margin-bottom: 10px; }
+  h2 { font-size: 15pt; font-weight: bold; margin-bottom: 8px; }
+  p { margin-bottom: 10px; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+  td, th { border: 1px solid #cbd5e1; padding: 6px 10px; }
+</style>
+</head>
+<body>${editedBodyHtml}</body>
+</html>`;
+
+      const blob = new Blob(["\ufeff", wordHtmlDoc], { type: "application/msword;charset=utf-8" });
+      const baseName = doc.name.replace(/\.[^/.]+$/, "");
+      const uploadFileName = `${baseName}.doc`;
+      const formData = new FormData();
+      formData.append("file", blob, uploadFileName);
+
+      const token =
+        typeof window !== "undefined"
+          ? localStorage.getItem("ceohn10_token") || localStorage.getItem("token") || ""
+          : "";
+      const headers: Record<string, string> = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      const uploadRes = await fetch(getNestApiUrl("/upload/file"), {
+        method: "POST",
+        headers,
+        body: formData,
+      });
+
+      if (!uploadRes.ok) {
+        throw new Error(`Upload MinIO thất bại (HTTP ${uploadRes.status})`);
+      }
+      const uploadData = await uploadRes.json();
+      const newMinioUrl = uploadData.url || uploadData.fileUrl || uploadData.path;
+      if (!newMinioUrl) {
+        throw new Error("Không nhận được đường dẫn MinIO sau khi tải lên");
+      }
+
+      const sizeText =
+        blob.size < 1024 * 1024
+          ? `${Math.max(1, Math.round(blob.size / 1024))} KB`
+          : `${(blob.size / (1024 * 1024)).toFixed(1)} MB`;
+
+      await fetchNestApi(`/documents/${encodeURIComponent(doc.id)}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          filePath: newMinioUrl,
+          size: sizeText,
+          type: doc.type === "txt" ? "doc" : doc.type || "doc",
+        }),
+      });
+
+      setDocxHtml(editedBodyHtml);
+      setDocxText(plainText);
+      setIsEditingWord(false);
+      toast.success("Đã lưu tài liệu Word lên MinIO thành công!", { id: "save-word-minio" });
+      onDocumentSaved?.();
+    } catch (err: any) {
+      toast.error(err?.message || "Không thể lưu tài liệu lên MinIO", { id: "save-word-minio" });
+    } finally {
+      setSavingWord(false);
+    }
+  };
+
   // Google Docs & Microsoft Office online embed URLs
   const officeEmbedUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(fileUrl || "")}`;
   const googleEmbedUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl || "")}&embedded=true`;
@@ -413,42 +534,105 @@ export function UniversalDocumentViewerModal({
 
         {/* ── TOOLBAR / SUB-HEADER ── */}
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-6 py-2 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs">
-          {/* Mode Switcher for Word Documents */}
-          {docType === "word" ? (
-            <div className="flex items-center gap-2">
-              <span className="text-slate-500 font-medium">Chế độ xem:</span>
-              <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-200 dark:border-slate-700">
-                <button
-                  type="button"
-                  onClick={() => setWordViewerMode("native")}
-                  className={`px-2.5 py-1 rounded-md font-bold transition ${wordViewerMode === "native"
-                      ? "bg-[#334155] text-white shadow-xs"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                    }`}
-                >
-                  Văn bản số (Native)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setWordViewerMode("office")}
-                  className={`px-2.5 py-1 rounded-md font-bold transition ${wordViewerMode === "office"
-                      ? "bg-[#334155] text-white shadow-xs"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                    }`}
-                >
-                  Office Online
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setWordViewerMode("google")}
-                  className={`px-2.5 py-1 rounded-md font-bold transition ${wordViewerMode === "google"
-                      ? "bg-[#334155] text-white shadow-xs"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                    }`}
-                >
-                  Google Docs
-                </button>
-              </div>
+          {/* Mode Switcher & Word Editor Toggle */}
+          {docType === "word" || docType === "text" ? (
+            <div className="flex flex-wrap items-center gap-2">
+              {docType === "word" && !isEditingWord && (
+                <>
+                  <span className="text-slate-500 font-medium">Chế độ xem:</span>
+                  <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-200 dark:border-slate-700">
+                    <button
+                      type="button"
+                      onClick={() => setWordViewerMode("native")}
+                      className={`px-2.5 py-1 rounded-md font-bold transition ${wordViewerMode === "native"
+                          ? "bg-[#334155] text-white shadow-xs"
+                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                        }`}
+                    >
+                      Văn bản số (Native)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setWordViewerMode("office")}
+                      className={`px-2.5 py-1 rounded-md font-bold transition ${wordViewerMode === "office"
+                          ? "bg-[#334155] text-white shadow-xs"
+                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                        }`}
+                    >
+                      Office Online
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setWordViewerMode("google")}
+                      className={`px-2.5 py-1 rounded-md font-bold transition ${wordViewerMode === "google"
+                          ? "bg-[#334155] text-white shadow-xs"
+                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                        }`}
+                    >
+                      Google Docs
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {canEdit && (
+                !isEditingWord ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!docxHtml && docxText) {
+                        setDocxHtml(
+                          docxText
+                            .split("\n")
+                            .map((line) => `<p class="mb-3">${line || "<br/>"}</p>`)
+                            .join("")
+                        );
+                      }
+                      setWordViewerMode("native");
+                      setIsEditingWord(true);
+                    }}
+                    className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold flex items-center gap-1.5 shadow-xs cursor-pointer transition"
+                  >
+                    <Pencil className="size-3.5" />
+                    <span>Chỉnh sửa như Word</span>
+                  </button>
+                ) : (
+                  <div className="flex flex-wrap items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <button type="button" onClick={() => execWordCmd("undo")} className="p-1.5 rounded hover:bg-white text-slate-700 cursor-pointer" title="Hoàn tác"><Undo2 className="size-3.5" /></button>
+                    <button type="button" onClick={() => execWordCmd("redo")} className="p-1.5 rounded hover:bg-white text-slate-700 cursor-pointer" title="Làm lại"><Redo2 className="size-3.5" /></button>
+                    <span className="w-px h-4 bg-slate-300 mx-0.5" />
+                    <button type="button" onClick={() => execWordCmd("formatBlock", "<h1>")} className="p-1.5 rounded hover:bg-white text-slate-700 cursor-pointer" title="Tiêu đề 1"><Heading1 className="size-3.5" /></button>
+                    <button type="button" onClick={() => execWordCmd("formatBlock", "<h2>")} className="p-1.5 rounded hover:bg-white text-slate-700 cursor-pointer" title="Tiêu đề 2"><Heading2 className="size-3.5" /></button>
+                    <button type="button" onClick={() => execWordCmd("bold")} className="p-1.5 rounded hover:bg-white text-slate-700 cursor-pointer" title="In đậm"><Bold className="size-3.5" /></button>
+                    <button type="button" onClick={() => execWordCmd("italic")} className="p-1.5 rounded hover:bg-white text-slate-700 cursor-pointer" title="In nghiêng"><Italic className="size-3.5" /></button>
+                    <button type="button" onClick={() => execWordCmd("underline")} className="p-1.5 rounded hover:bg-white text-slate-700 cursor-pointer" title="Gạch chân"><Underline className="size-3.5" /></button>
+                    <span className="w-px h-4 bg-slate-300 mx-0.5" />
+                    <button type="button" onClick={() => execWordCmd("justifyLeft")} className="p-1.5 rounded hover:bg-white text-slate-700 cursor-pointer" title="Căn trái"><AlignLeft className="size-3.5" /></button>
+                    <button type="button" onClick={() => execWordCmd("justifyCenter")} className="p-1.5 rounded hover:bg-white text-slate-700 cursor-pointer" title="Căn giữa"><AlignCenter className="size-3.5" /></button>
+                    <button type="button" onClick={() => execWordCmd("justifyRight")} className="p-1.5 rounded hover:bg-white text-slate-700 cursor-pointer" title="Căn phải"><AlignRight className="size-3.5" /></button>
+                    <span className="w-px h-4 bg-slate-300 mx-0.5" />
+                    <button type="button" onClick={() => execWordCmd("insertUnorderedList")} className="p-1.5 rounded hover:bg-white text-slate-700 cursor-pointer" title="Danh sách dấu chấm"><List className="size-3.5" /></button>
+                    <button type="button" onClick={() => execWordCmd("insertOrderedList")} className="p-1.5 rounded hover:bg-white text-slate-700 cursor-pointer" title="Danh sách số"><ListOrdered className="size-3.5" /></button>
+                    <span className="w-px h-4 bg-slate-300 mx-0.5" />
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingWord(false)}
+                      className="px-2.5 py-1 rounded-lg text-slate-600 hover:bg-white font-semibold cursor-pointer"
+                    >
+                      Hủy
+                    </button>
+                    <button
+                      type="button"
+                      disabled={savingWord}
+                      onClick={handleSaveWordToMinio}
+                      className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                    >
+                      <Save className="size-3.5" />
+                      <span>{savingWord ? "Đang lưu..." : "Lưu lên MinIO"}</span>
+                    </button>
+                  </div>
+                )
+              )}
             </div>
           ) : docType === "excel" ? (
             <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -599,22 +783,22 @@ export function UniversalDocumentViewerModal({
                 <span className="font-mono text-[10.5px]">Định dạng: Microsoft Excel (.xlsx/.xls)</span>
               </div>
             </div>
-          ) : docType === "word" ? (
-            /* ── WORD VIEWER (NATIVE A4 DOCUMENT / OFFICE ONLINE / GOOGLE DOCS) ── */
-            wordViewerMode === "office" && fileUrl && fileUrl.startsWith("http") ? (
+          ) : docType === "word" || isEditingWord ? (
+            /* ── WORD VIEWER & EDITOR (NATIVE A4 DOCUMENT / OFFICE ONLINE / GOOGLE DOCS) ── */
+            wordViewerMode === "office" && fileUrl && fileUrl.startsWith("http") && !isEditingWord ? (
               <iframe
                 src={officeEmbedUrl}
                 className="w-full h-full rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm bg-white"
                 title="Office Viewer"
               />
-            ) : wordViewerMode === "google" && fileUrl && fileUrl.startsWith("http") ? (
+            ) : wordViewerMode === "google" && fileUrl && fileUrl.startsWith("http") && !isEditingWord ? (
               <iframe
                 src={googleEmbedUrl}
                 className="w-full h-full rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm bg-white"
                 title="Google Docs Viewer"
               />
             ) : (
-              /* Native A4 Paper Layout */
+              /* Native A4 Paper Layout (Read or Word-Like Rich Editor) */
               <div
                 className="w-full max-w-4xl bg-white dark:bg-slate-900 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 p-8 sm:p-14 my-4 transition-all"
                 style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: "top center" }}
@@ -626,20 +810,30 @@ export function UniversalDocumentViewerModal({
                       {doc.name.replace(/\.[^/.]+$/, "")}
                     </h1>
                     <p className="text-xs text-slate-500 mt-1">
-                      CLB DOANH NHÂN CEO HN10 (HANOIBA) • TÀI LIỆU LƯU HÀNH
+                      CLB DOANH NHÂN CEO HN10 (HANOIBA) • {isEditingWord ? "CHẾ ĐỘ SOẠN THẢO WORD" : "TÀI LIỆU LƯU HÀNH"}
                     </p>
                   </div>
                   <div className="text-right text-xs text-slate-400">
                     <div>Ngày: {doc.uploadedAt ? new Date(doc.uploadedAt).toLocaleDateString("vi-VN") : "Hôm nay"}</div>
-                    <div className="font-semibold text-slate-600 dark:text-slate-300">Bản chuẩn chính thức</div>
+                    <div className="font-semibold text-slate-600 dark:text-slate-300">Lưu trữ MinIO</div>
                   </div>
                 </div>
 
-                {/* Nội dung tài liệu Word */}
-                <div
-                  className="prose dark:prose-invert max-w-none text-sm sm:text-base leading-relaxed font-serif"
-                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(docxHtml) }}
-                />
+                {/* Nội dung tài liệu Word (Chỉnh sửa trực tiếp như Word khi bật isEditingWord) */}
+                {isEditingWord ? (
+                  <div
+                    ref={wordEditorRef}
+                    contentEditable
+                    suppressContentEditableWarning
+                    className="min-h-[520px] outline-none prose dark:prose-invert max-w-none text-sm sm:text-base leading-relaxed font-serif p-4 rounded-xl border-2 border-dashed border-blue-300 bg-blue-50/20 focus:bg-white focus:border-blue-500 transition"
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(docxHtml) }}
+                  />
+                ) : (
+                  <div
+                    className="prose dark:prose-invert max-w-none text-sm sm:text-base leading-relaxed font-serif"
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(docxHtml) }}
+                  />
+                )}
 
                 {/* Chân trang tài liệu */}
                 <div className="mt-16 pt-6 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center text-xs text-slate-400 font-sans">

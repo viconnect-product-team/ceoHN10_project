@@ -1191,3 +1191,38 @@ export function hasPermission(
 
 
 
+
+/**
+ * Kiểm tra quyền sở hữu bản ghi (Owner-based Edit/Delete):
+ * Chỉ người tạo mới được chỉnh sửa/xóa bản ghi của mình, trừ Super Admin (`platform_admin`) và Lớp trưởng (`lop_truong`).
+ */
+export function canModifyRecord(
+  user: any,
+  createdByUserId?: string | null,
+  createdByName?: string | null
+): boolean {
+  if (!user) return false;
+  const email = String(user.email || user.username || "").toLowerCase().trim();
+  if (email === "admin@ceohn10.vn") return true;
+
+  const role = String(user.role || user.executiveRole || user.executive_role || "").toLowerCase().trim();
+  const roles: string[] = Array.isArray(user.roles)
+    ? user.roles.map((r: any) => String(r || "").toLowerCase().trim())
+    : [];
+  const allRoles = new Set([role, ...roles].filter(Boolean));
+
+  if (allRoles.has("platform_admin") || allRoles.has("lop_truong") || Boolean(user.isPlatformAdmin) || Boolean(user.isPresident)) {
+    return true;
+  }
+
+  const actorId = String(user.id || user.sub || user.userId || "").trim();
+  const actorName = String(user.name || "").toLowerCase().trim();
+  const ownerId = String(createdByUserId || "").trim();
+  const ownerName = String(createdByName || "").toLowerCase().trim();
+
+  if (!ownerId && !ownerName) return true;
+  if (ownerId && actorId && ownerId === actorId) return true;
+  if (ownerId && email && ownerId.toLowerCase() === email) return true;
+  if (ownerName && actorName && ownerName === actorName) return true;
+  return false;
+}

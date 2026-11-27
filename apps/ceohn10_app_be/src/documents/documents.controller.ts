@@ -43,8 +43,7 @@ export class DocumentsController {
     @Param('id') id: string,
     @Body() data: UpdateDocumentDto,
   ) {
-    const userId = req.user?.id || req.user?.sub;
-    return this.documentsService.update(id, data, userId);
+    return this.documentsService.update(id, data, req.user);
   }
 
   @Patch(':id/star')
@@ -78,8 +77,7 @@ export class DocumentsController {
 
   @Delete(':id')
   async delete(@Request() req: any, @Param('id') id: string) {
-    const userId = req.user?.id || req.user?.sub;
-    return this.documentsService.delete(id, userId);
+    return this.documentsService.delete(id, req.user);
   }
 
   @Get(':id/url')
