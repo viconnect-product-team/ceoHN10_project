@@ -56,17 +56,21 @@ export function usePermissions() {
   const roleState = useRole();
 
   const userEmail = (user?.email || (user as any)?.username || "").toLowerCase().trim();
+  const hasCustomPerms = Array.isArray((user as any)?.customPermissions) && (user as any).customPermissions.length > 0;
+  const userCustomPerms: string[] = hasCustomPerms ? (user as any).customPermissions : [];
 
-  // 1. Quản trị viên tối cao: admin@ceohn10.vn hoặc platform_admin
+  // 1. Quản trị viên tối cao: chỉ áp dụng khi KHÔNG bị giới hạn bởi customPermissions
   const isSuperAdmin =
-    userEmail === "admin@ceohn10.vn" ||
-    roleState.isPlatformAdmin ||
-    roleState.isSuperAdmin ||
-    roleState.isChuTich ||
-    roleState.roles.includes("platform_admin") ||
-    roleState.roles.includes("superadmin");
+    !hasCustomPerms &&
+    (userEmail === "admin@ceohn10.vn" ||
+      userEmail === "admin@viconnect.vn" ||
+      userEmail === "admin@connect.vn" ||
+      roleState.isPlatformAdmin ||
+      roleState.isSuperAdmin ||
+      roleState.roles.includes("platform_admin") ||
+      roleState.roles.includes("superadmin"));
 
-  const isPlatformAdmin = userEmail === "admin@ceohn10.vn" || roleState.isPlatformAdmin;
+  const isPlatformAdmin = !hasCustomPerms && (userEmail === "admin@ceohn10.vn" || roleState.isPlatformAdmin);
 
   // 2. Xác định Phân Quyền Dữ Liệu (Data Scope)
   const dataScope: DataScopeLevel = useMemo(() => {
@@ -99,43 +103,75 @@ export function usePermissions() {
   // 3. Phân Quyền Thao Tác (Action Permissions)
   const can = useMemo(() => {
     return (actionCode: string): boolean => {
-      // Superadmin có full quyền tất cả các thao tác
-      if (isSuperAdmin) return true;
-
-      // Kiểm tra quyền theo vai trò cụ thể
       const code = actionCode.toUpperCase().trim();
 
+      // Ưu tiên 1: Nếu tài khoản có customPermissions (Tích quyền cụ thể), chỉ mở thao tác thuộc module đã tích!
+      if (hasCustomPerms) {
+        if (userCustomPerms.includes(code) || userCustomPerms.includes(actionCode)) return true;
+        if (user?.permissionsHash && user.permissionsHash[code] !== undefined) {
+          return Boolean(user.permissionsHash[code]);
+        }
+        if (code.startsWith("MEM_")) return userCustomPerms.includes("/members");
+        if (code.startsWith("EVT_") || code.startsWith("EREG_") || code.startsWith("CHK_") || code.startsWith("LKD_")) {
+          return userCustomPerms.some((p) => ["/events", "/event-registrations", "/event-checkin", "/checkin-qr", "/lucky-draw"].includes(p));
+        }
+        if (code.startsWith("CLS_") || code.startsWith("TRN_")) return userCustomPerms.includes("/classes");
+        if (code.startsWith("FIN_") || code.startsWith("FEE_") || code.startsWith("INC_") || code.startsWith("EXP_") || code.startsWith("FRP_")) {
+          return userCustomPerms.some((p) => ["/finance-report", "/income", "/expenses", "/fees"].includes(p));
+        }
+        if (code.startsWith("SPN_")) return userCustomPerms.includes("/sponsors") || userCustomPerms.includes("/finance-report");
+        if (code.startsWith("NTF_") || code.startsWith("EML_")) return userCustomPerms.includes("/notifications") || userCustomPerms.includes("/email-marketing");
+        if (code.startsWith("DOC_")) return userCustomPerms.includes("/documents");
+        if (code.startsWith("SYS_") || code.startsWith("PRM_") || code.startsWith("ACC_")) {
+          return userCustomPerms.some((p) => ["/permissions", "/account-settings", "/settings", "/master"].includes(p));
+        }
+        return false;
+      }
+
+      // Ưu tiên 2: Kiểm tra trực tiếp permissionsHash do Backend tính toán từ Ma Trận RBAC
+      if (user?.permissionsHash && typeof user.permissionsHash === "object" && Object.keys(user.permissionsHash).length > 0) {
+        if (user.permissionsHash[code] !== undefined) {
+          return Boolean(user.permissionsHash[code]);
+        }
+        if (user.permissionsHash[actionCode] !== undefined) {
+          return Boolean(user.permissionsHash[actionCode]);
+        }
+      }
+
+      // Superadmin không bị giới hạn có full quyền
+      if (isSuperAdmin) return true;
+
       // Quyền thành viên / học viên
-      if (code === "MEM_VIEW") return true;
-      if (code === "MEM_ADD") return roleState.canManageMembers || roleState.isBanDieuHanh;
-      if (code === "MEM_EDIT") return roleState.canManageMembers || roleState.isBanDieuHanh;
-      if (code === "MEM_DELETE") return roleState.isAdmin || roleState.isBQT;
-      if (code === "MEM_APPROVE") return roleState.canApproveMembers || roleState.isTongThuKy;
-      if (code === "MEM_EXPORT") return roleState.canManageMembers || roleState.isBanDieuHanh;
+      if (code === "MEM_VIEW") return roleState.can("MEM_VIEW") || roleState.canManageMembers || roleState.isBanDieuHanh;
+      if (code === "MEM_ADD") return roleState.can("MEM_ADD") && (roleState.canManageMembers || roleState.isBanDieuHanh);
+      if (code === "MEM_EDIT") return roleState.can("MEM_EDIT") && (roleState.canManageMembers || roleState.isBanDieuHanh);
+      if (code === "MEM_DELETE") return roleState.can("MEM_DELETE") && (roleState.isAdmin || roleState.isBQT);
+      if (code === "MEM_APPROVE") return roleState.can("MEM_APPROVE") && (roleState.canApproveMembers || roleState.isTongThuKy);
+      if (code === "MEM_EXPORT") return roleState.can("MEM_EXPORT") && (roleState.canManageMembers || roleState.isBanDieuHanh);
 
       // Quyền tài chính
-      if (code === "FIN_VIEW") return roleState.canManageFinance || roleState.isBQT;
-      if (code === "FIN_ROW_ADD") return roleState.canManageFinance || roleState.isTruongBanTaiChinh;
-      if (code === "FIN_ROW_EDIT") return roleState.canManageFinance || roleState.isTruongBanTaiChinh;
-      if (code === "FIN_ROW_DELETE") return roleState.isBQT || roleState.isTruongBanTaiChinh;
-      if (code === "FIN_COL_ADD") return roleState.isBQT || roleState.isTruongBanTaiChinh;
-      if (code === "FIN_COL_DELETE") return roleState.isBQT || roleState.isTruongBanTaiChinh;
-      if (code === "FRP_EXPORT") return roleState.canManageFinance || roleState.isBQT;
+      if (code === "FIN_VIEW") return roleState.can("FIN_VIEW") && (roleState.canManageFinance || roleState.isBQT);
+      if (code === "FIN_ROW_ADD") return roleState.can("FIN_ROW_ADD") && (roleState.canManageFinance || roleState.isTruongBanTaiChinh);
+      if (code === "FIN_ROW_EDIT") return roleState.can("FIN_ROW_EDIT") && (roleState.canManageFinance || roleState.isTruongBanTaiChinh);
+      if (code === "FIN_ROW_DELETE") return roleState.can("FIN_ROW_DELETE") && (roleState.isBQT || roleState.isTruongBanTaiChinh);
+      if (code === "FIN_COL_ADD") return roleState.can("FIN_COL_ADD") && (roleState.isBQT || roleState.isTruongBanTaiChinh);
+      if (code === "FIN_COL_DELETE") return roleState.can("FIN_COL_DELETE") && (roleState.isBQT || roleState.isTruongBanTaiChinh);
+      if (code === "FRP_EXPORT") return roleState.can("FRP_EXPORT") && (roleState.canManageFinance || roleState.isBQT);
 
       // Quyền sự kiện
-      if (code === "EVT_VIEW") return true;
-      if (code === "EVT_ADD") return roleState.canManageEvents || roleState.isTruongBanTruyenThong;
-      if (code === "EVT_EDIT") return roleState.canManageEvents || roleState.isTruongBanTruyenThong;
-      if (code === "EVT_DELETE") return roleState.isBQT || roleState.isTruongBanTruyenThong;
-      if (code === "CHK_SCAN") return roleState.canScanQR || roleState.canManageEvents;
-      if (code === "EVT_EXPORT") return roleState.canManageEvents || roleState.isBanDieuHanh;
+      if (code === "EVT_VIEW") return roleState.can("EVT_VIEW") || roleState.canManageEvents;
+      if (code === "EVT_ADD") return roleState.can("EVT_ADD") && (roleState.canManageEvents || roleState.isTruongBanTruyenThong);
+      if (code === "EVT_EDIT") return roleState.can("EVT_EDIT") && (roleState.canManageEvents || roleState.isTruongBanTruyenThong);
+      if (code === "EVT_DELETE") return roleState.can("EVT_DELETE") && (roleState.isBQT || roleState.isTruongBanTruyenThong);
+      if (code === "CHK_SCAN") return roleState.can("CHK_SCAN") && (roleState.canScanQR || roleState.canManageEvents);
+      if (code === "EVT_EXPORT") return roleState.can("EVT_EXPORT") && (roleState.canManageEvents || roleState.isBanDieuHanh);
 
       // Quyền lớp học
-      if (code === "CLS_VIEW") return true;
-      if (code === "CLS_ADD") return roleState.isBQT || roleState.isBanDieuHanh;
-      if (code === "CLS_EDIT") return roleState.isBQT || roleState.isBanDieuHanh;
-      if (code === "CLS_DELETE") return roleState.isBQT;
-      if (code === "CLS_ATTEND") return roleState.canScanQR || roleState.isBanDieuHanh;
+      if (code === "CLS_VIEW") return roleState.can("CLS_VIEW");
+      if (code === "CLS_ADD") return roleState.can("CLS_ADD") && (roleState.isBQT || roleState.isBanDieuHanh);
+      if (code === "CLS_EDIT") return roleState.can("CLS_EDIT") && (roleState.isBQT || roleState.isBanDieuHanh);
+      if (code === "CLS_DELETE") return roleState.can("CLS_DELETE") && roleState.isBQT;
+      if (code === "CLS_ATTEND") return roleState.can("CLS_ATTEND") && (roleState.canScanQR || roleState.isBanDieuHanh);
 
       // Quyền hệ thống tối cao
       if (
@@ -151,7 +187,7 @@ export function usePermissions() {
       // Fallback kiểm tra qua permissions list của roleState
       return roleState.can(code);
     };
-  }, [isSuperAdmin, roleState]);
+  }, [isSuperAdmin, roleState, hasCustomPerms, userCustomPerms, user?.permissionsHash]);
 
   const canAny = useMemo(() => {
     return (...actions: string[]): boolean => actions.some((act) => can(act));

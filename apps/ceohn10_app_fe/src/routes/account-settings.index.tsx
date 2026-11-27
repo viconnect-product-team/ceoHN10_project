@@ -47,6 +47,7 @@ import { RbacAuditLogsSection } from "@/components/rbac/RbacAuditLogsSection";
 import {
   ROLE_OPTIONS,
   DEPARTMENT_OPTIONS,
+  GRANULAR_PERMISSION_CATEGORIES,
   normalizeDept,
   normalizeRole,
   getRolesForDepartment,
@@ -181,6 +182,8 @@ function AccountManagementPage() {
   const [editDepartment, setEditDepartment] = useState("Ban Gắn kết & Đời sống");
   const [editRole, setEditRole] = useState("member");
   const [editStatus, setEditStatus] = useState("active");
+  const [editPermMode, setEditPermMode] = useState<"role" | "granular">("role");
+  const [editCustomPerms, setEditCustomPerms] = useState<string[]>([]);
   const [adminNewPassword, setAdminNewPassword] = useState("");
 
   const departmentList = useMemo(() => {
@@ -551,7 +554,8 @@ function AccountManagementPage() {
       const targetId = targetUser.id;
       const targetEmail = editEmail.trim() || targetUser.email || "";
 
-      // 1. Cập nhật thông tin và vai trò người dùng qua /users/:id
+      // 1. Cập nhật thông tin, vai trò và quyền cụ thể (customPermissions) qua /users/:id
+      const nextCustomPerms = editPermMode === "granular" ? editCustomPerms : [];
       const res = await fetchNestApi(`/users/${targetId}`, {
         method: "PUT",
         body: JSON.stringify({
@@ -561,6 +565,7 @@ function AccountManagementPage() {
           executiveRole: editRole,
           department: editDepartment,
           account_status: editStatus,
+          customPermissions: nextCustomPerms,
         }),
       });
 
@@ -1193,6 +1198,9 @@ function AccountManagementPage() {
                       setEditDepartment(initDept);
                       setEditRole(initRole);
                       setEditStatus(u.account_status || "active");
+                      const existingCustom = Array.isArray(u.customPermissions) ? u.customPermissions : [];
+                      setEditCustomPerms(existingCustom);
+                      setEditPermMode(existingCustom.length > 0 ? "granular" : "role");
                       setEditModalOpen(true);
                     }}
                     className="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-border text-blue-600 hover:bg-blue-50 transition cursor-pointer"
@@ -1486,6 +1494,84 @@ function AccountManagementPage() {
                   <option value="active">Kích hoạt (Active)</option>
                   <option value="suspended">Tạm khóa (Suspended)</option>
                 </select>
+              </div>
+
+              {/* CHỌN QUYỀN CỤ THỂ CHO TÀI KHOẢN (ẨN MENU & CHẶN API NGOÀI QUYỀN) */}
+              <div className="pt-2 border-t border-border space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="font-bold text-foreground">Phương thức phân quyền chức năng:</label>
+                  <div className="flex items-center gap-1 p-0.5 bg-muted rounded-lg border border-border text-[11px]">
+                    <button
+                      type="button"
+                      onClick={() => setEditPermMode("role")}
+                      className={`px-2.5 py-1 rounded-md font-bold transition cursor-pointer ${
+                        editPermMode === "role" ? "bg-[#003B95] text-white" : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      Theo Chức Danh
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditPermMode("granular")}
+                      className={`px-2.5 py-1 rounded-md font-bold transition cursor-pointer ${
+                        editPermMode === "granular" ? "bg-[#003B95] text-white" : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      Tích Quyền Cụ Thể
+                    </button>
+                  </div>
+                </div>
+
+                {editPermMode === "granular" ? (
+                  <div className="p-3 rounded-xl border border-border bg-muted/30 max-h-52 overflow-y-auto space-y-3">
+                    <div className="text-[11px] text-muted-foreground">
+                      Tích chọn các chức năng tài khoản này được phép hiển thị trên Sidebar &amp; thao tác API (các mục không tích sẽ tự động ẩn):
+                    </div>
+                    {GRANULAR_PERMISSION_CATEGORIES.map((cat) => (
+                      <div key={cat.category} className="space-y-1.5">
+                        <div className="text-[11px] font-bold text-foreground uppercase tracking-wider">
+                          {cat.category}
+                        </div>
+                        <div className="grid grid-cols-2 gap-1.5">
+                          {cat.items.map((p) => {
+                            const isChecked = editCustomPerms.includes(p.key);
+                            return (
+                              <label
+                                key={p.key}
+                                className={`flex items-start gap-1.5 p-2 rounded-lg border text-left cursor-pointer transition ${
+                                  isChecked
+                                    ? "bg-blue-50 border-blue-300 text-blue-950 dark:bg-blue-950/40 dark:text-blue-200"
+                                    : "bg-card border-border text-muted-foreground hover:bg-muted/50"
+                                }`}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={isChecked}
+                                  onChange={(e) => {
+                                    if (e.target.checked) {
+                                      setEditCustomPerms((prev) => [...prev, p.key]);
+                                    } else {
+                                      setEditCustomPerms((prev) => prev.filter((k) => k !== p.key));
+                                    }
+                                  }}
+                                  className="mt-0.5 rounded text-[#003B95]"
+                                />
+                                <div className="min-w-0 flex-1 leading-tight">
+                                  <div className="text-[11px] font-bold truncate">{p.name}</div>
+                                  <div className="text-[9.5px] opacity-75 truncate">{p.desc}</div>
+                                </div>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-2.5 rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 text-[11px] text-blue-900 dark:text-blue-200">
+                    Tài khoản sẽ được áp dụng quyền tự động theo Ma trận RBAC của vai trò <strong>{getRoleBadgeLabel(editRole)}</strong> thuộc <strong>{editDepartment}</strong>.
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-end gap-2 pt-3 border-t border-border">

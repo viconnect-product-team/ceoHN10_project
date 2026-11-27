@@ -61,19 +61,19 @@ export function EventPartsEditor({
 }) {
   const safeParts = Array.isArray(parts) ? parts : [];
 
-  const addPart = () => {
+  const addPart = (customName?: string, isPartyPreset?: boolean) => {
     const idx = safeParts.length + 1;
     onChangeParts([
       ...safeParts,
       {
         id: `part_${Date.now()}_${idx}`,
-        name: `Phần ${idx}: Chương trình`,
+        name: customName ?? "",
         capacity: 100,
         fee: 0,
         guestFee: 0,
         isPaid: false,
-        isParty: false,
-        items: [{ time: "18:30", title: "Hoạt động chính" }],
+        isParty: Boolean(isPartyPreset),
+        items: [{ time: "", title: "" }],
       },
     ]);
   };
@@ -115,19 +115,19 @@ export function EventPartsEditor({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h4 className="text-xs font-bold uppercase tracking-wider text-foreground">
-            Cấu Hình Hội Trường &amp; Các Phần Chương Trình (Thư Mời / RSVP)
+            Cấu Hình Hội Trường &amp; Các Phần Chương Trình ({safeParts.length} phần)
           </h4>
           <p className="text-[11px] text-muted-foreground mt-0.5">
-            Chia rõ từng phần (VD: Phần 1 Lễ Khai Giảng, Phần 2 Dự Tiệc). Mỗi phần có mốc thời gian và mức phí vé riêng (0đ = Miễn phí).
+            Không tự động cố định Tọa đàm hay Tiệc. Bạn bấm thêm phần nào thì giao diện cấu hình phần đó mới hiển thị ra.
           </p>
         </div>
         <button
           type="button"
-          onClick={() => onChangeParts(createDefaultCeoHn10Parts())}
-          className="inline-flex items-center gap-1 rounded-lg border border-blue-300 bg-blue-50 px-2.5 py-1 text-[11px] font-bold text-blue-700 hover:bg-blue-100 cursor-pointer"
+          onClick={() => addPart("", false)}
+          className="inline-flex items-center gap-1 rounded-lg bg-[#003B95] px-3 py-1.5 text-[11px] font-bold text-white hover:bg-[#002b70] cursor-pointer shadow-xs"
         >
-          <Sparkles className="h-3 w-3" />
-          Nạp mẫu Lễ + Tiệc
+          <Plus className="h-3.5 w-3.5" />
+          + Thêm phần chương trình
         </button>
       </div>
 
@@ -145,6 +145,37 @@ export function EventPartsEditor({
       </div>
 
       <div className="space-y-3">
+        {safeParts.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-border bg-card/60 p-4 text-center space-y-2.5">
+            <p className="text-xs text-muted-foreground">
+              Chưa có phần chương trình nào được cố định. Bấm chọn để thêm phần bạn muốn cấu hình:
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => addPart("", false)}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-[#003B95] px-3.5 py-2 text-xs font-bold text-white hover:bg-[#002b70] cursor-pointer shadow-xs transition"
+              >
+                <Plus className="h-3.5 w-3.5" /> + Thêm Phần Tùy Chỉnh
+              </button>
+              <button
+                type="button"
+                onClick={() => addPart("Phiên Chuyên Đề / Tọa Đàm", false)}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-blue-300 bg-blue-50 px-3 py-2 text-xs font-bold text-[#003B95] hover:bg-blue-100 cursor-pointer transition"
+              >
+                <Plus className="h-3.5 w-3.5" /> + Thêm Phần Chuyên Đề
+              </button>
+              <button
+                type="button"
+                onClick={() => addPart("Tiệc Giao Lưu & Kết Nối", true)}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-900 hover:bg-amber-100 cursor-pointer transition"
+              >
+                <Utensils className="h-3.5 w-3.5" /> + Thêm Phần Tiệc
+              </button>
+            </div>
+          </div>
+        ) : null}
+
         {safeParts.map((part, pIdx) => (
           <div
             key={part.id || pIdx}
@@ -314,13 +345,24 @@ export function EventPartsEditor({
           </div>
         ))}
 
-        <button
-          type="button"
-          onClick={addPart}
-          className="w-full py-2 rounded-xl border border-dashed border-border hover:border-[#003B95] text-xs font-bold text-muted-foreground hover:text-[#003B95] flex items-center justify-center gap-1.5 cursor-pointer transition"
-        >
-          <Plus className="h-4 w-4" /> Thêm Phần Chương Trình Mới
-        </button>
+        {safeParts.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => addPart("", false)}
+              className="flex-1 py-2 rounded-xl border border-dashed border-border hover:border-[#003B95] text-xs font-bold text-muted-foreground hover:text-[#003B95] flex items-center justify-center gap-1.5 cursor-pointer transition"
+            >
+              <Plus className="h-4 w-4" /> + Thêm Phần Chương Trình Mới
+            </button>
+            <button
+              type="button"
+              onClick={() => addPart("Tiệc Giao Lưu & Kết Nối", true)}
+              className="py-2 px-3.5 rounded-xl border border-dashed border-amber-300 hover:border-amber-500 text-xs font-bold text-amber-800 hover:bg-amber-50 flex items-center justify-center gap-1.5 cursor-pointer transition"
+            >
+              <Utensils className="h-3.5 w-3.5" /> + Thêm Phần Tiệc
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

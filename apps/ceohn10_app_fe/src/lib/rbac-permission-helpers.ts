@@ -664,7 +664,6 @@ export function getDefaultPermissionsForRole(role: string): string[] {
  * Kiểm tra 1 route có được phép hiển thị trên Sidebar/CRM theo ma trận phân quyền RBAC CSDL hay không
  */
 export function isRouteAllowedByMatrix(route: string, roleKey: SystemRoleKey, user?: any): boolean {
-  // Làm sạch route (bỏ query parameters & hash fragment: ví dụ /permissions?tab=matrix -> /permissions)
   const cleanRoute = (route || "").split("?")[0].split("#")[0];
 
   // Trang Tổng quan luôn mở cho toàn bộ tài khoản đăng nhập
@@ -672,93 +671,68 @@ export function isRouteAllowedByMatrix(route: string, roleKey: SystemRoleKey, us
     return true;
   }
 
-  // 1. Phân hệ Phân Quyền & Quản Trị Người Dùng (/accounts & /permissions):
-  // Chỉ mở quyền truy cập cho Quản trị viên và Ban Điều Hành (xử lý tiếp ở isTopAdmin)
+  // 0. ƯU TIÊN CAO NHẤT: Nếu tài khoản được gán quyền cụ thể (customPermissions), CHỈ HIỂN THỊ ĐÚNG các menu đã tích chọn!
+  if (user?.customPermissions && Array.isArray(user.customPermissions) && user.customPermissions.length > 0) {
+    if (user.customPermissions.includes(route) || user.customPermissions.includes(cleanRoute)) {
+      return true;
+    }
+    const hasMatch = user.customPermissions.some((p: string) => {
+      const cleanP = String(p || "").split("?")[0].split("#")[0].replace(/\/+$/, "");
+      if (!cleanP || cleanP === "/") return false;
+      if (cleanRoute === cleanP || cleanRoute.startsWith(cleanP + "/") || cleanP.startsWith(cleanRoute + "/")) {
+        return true;
+      }
+      if (
+        cleanP === "/events" &&
+        ["/event-registrations", "/event-checkin", "/checkin-qr", "/lucky-draw", "/voting", "/feedback"].includes(cleanRoute)
+      ) {
+        return true;
+      }
+      if (
+        cleanP === "/finance-report" &&
+        ["/income", "/expenses", "/fees", "/sponsors"].includes(cleanRoute)
+      ) {
+        return true;
+      }
+      return false;
+    });
+    return hasMatch;
+  }
 
-  // ĐẶC QUYỀN QUẢN TRỊ TỐI CAO (PLATFORM ADMIN / ADMIN / LỚP TRƯỞNG / BAN ĐIỀU HÀNH / TRƯỞNG BAN)
-  // Đảm bảo các tài khoản quản trị và điều hành luôn luôn thấy đầy đủ toàn bộ các chức năng của CEO HN10
-  const isTopAdmin =
-    (roleKey as string) === "quan_tri" ||
-    (roleKey as string) === "admin" ||
-    (roleKey as string) === "chu_tich" ||
-    (roleKey as string) === "pho_chu_tich" ||
-    String(roleKey).startsWith("lop_pho_") ||
-    String(roleKey).startsWith("truong_team_") ||
-    String(roleKey).startsWith("pho_team_") ||
-    String(roleKey).startsWith("tb_") ||
-    String(roleKey).startsWith("truong_ban_") ||
-    (roleKey as string) === "tong_thu_ky" ||
-    (roleKey as string) === "ban_dieu_hanh" ||
-    (roleKey as string) === "truong_ban_dieu_hanh" ||
-    user?.isPlatformAdmin === true ||
-    user?.isAdmin === true ||
-    user?.isPresident === true ||
-    user?.role === "admin" ||
-    user?.role === "quan_tri" ||
-    user?.role === "ADM" ||
-    user?.role === "chu_tich" ||
-    user?.role === "president" ||
-    user?.role === "lop_truong" ||
-    user?.role === "pho_chu_tich" ||
-    String(user?.role).startsWith("lop_pho_") ||
-    String(user?.role).startsWith("truong_ban_") ||
-    user?.email === "admin@ceohn10.vn" ||
-    user?.email === "admin@viconnect.vn" ||
-    user?.email === "infor@viconnect.vn" ||
-    user?.email === "admin.hn10@ceohn10.vn" ||
-    user?.email === "loptruong.hn10@ceohn10.vn" ||
-    user?.email === "btt.hn10@ceohn10.vn" ||
-    user?.email === "btc.hn10@ceohn10.vn" ||
-    user?.email?.toLowerCase().includes("admin") ||
-    user?.email?.toLowerCase().includes("loptruong");
+  // 1. KIỂM TRA TRỰC TIẾP allowedRoutes DO BACKEND TÍNH TỪ CSDL (/users/me):
+  // Đảm bảo ẩn hoàn toàn các giao diện/chức năng mà vai trò hoặc tài khoản không được phân quyền
+  const isUnrestrictedRootAdmin =
+    (user?.email === "admin@ceohn10.vn" ||
+      user?.email === "admin@viconnect.vn" ||
+      user?.email === "admin@connect.vn" ||
+      user?.isPlatformAdmin === true ||
+      (roleKey as string) === "quan_tri" ||
+      (roleKey as string) === "platform_admin" ||
+      ((roleKey as string) === "admin" && user?.isAdmin === true)) &&
+    (!user?.customPermissions || user.customPermissions.length === 0);
 
-  if (isTopAdmin) {
-    // Nếu là module lớp học, tôn trọng cấu hình tenant (chỉ ẩn trên tenant không bật classes)
+  if (isUnrestrictedRootAdmin) {
     if (cleanRoute === "/classes" || cleanRoute.startsWith("/classes")) {
       return isModuleEnabledForTenant("classes");
     }
     return true;
   }
 
-  // 2. Phân hệ Lớp Học Doanh Trí: Kiểm tra module "classes" cho hệ thống hiện tại
-  if (cleanRoute === "/classes" || cleanRoute.startsWith("/classes")) {
-    return isModuleEnabledForTenant("classes");
-  }
-
-  // 3. Phân hệ Tài Chính: Kiểm tra module "finance"
-  if (cleanRoute === "/finance-report" || cleanRoute.startsWith("/finance")) {
-    return isModuleEnabledForTenant("finance");
-  }
-
-  // 0. Luồng tùy biến: Kiểm tra customPermissions cụ thể của tài khoản (nếu được admin tích chọn khi tạo tài khoản)
-  if (user?.customPermissions && Array.isArray(user.customPermissions) && user.customPermissions.length > 0) {
-    if (user.customPermissions.includes(route) || user.customPermissions.includes(cleanRoute)) {
-      return true;
-    }
-    const hasMatch = user.customPermissions.some(
-      (p: string) => (p !== "/" && cleanRoute.startsWith(p.split("?")[0])) || (p !== "/" && p.startsWith(cleanRoute))
-    );
-    if (hasMatch) return true;
-    return false;
-  }
-
-  // 1. Luồng chuẩn API: Ưu tiên kiểm tra trực tiếp allowedRoutes do Backend tính từ CSDL
   if (user?.allowedRoutes && Array.isArray(user.allowedRoutes) && user.allowedRoutes.length > 0) {
     if (user.allowedRoutes.includes(cleanRoute)) {
       return true;
     }
     const hasPrefixMatch = user.allowedRoutes.some(
-      (r: string) => r !== "/" && (cleanRoute.startsWith(r) || r.startsWith(cleanRoute))
+      (r: string) => r !== "/" && (cleanRoute.startsWith(r + "/") || r.startsWith(cleanRoute + "/"))
     );
     if (hasPrefixMatch) {
       return true;
     }
-    // Nếu Backend đã trả allowedRoutes nhưng không có route này -> không được phép
     return false;
   }
 
   // 2. Kiểm tra permissionsHash do Backend tính từ CSDL
-  if (user?.permissionsHash && typeof user.permissionsHash === "object") {
+  if (user?.permissionsHash && typeof user.permissionsHash === "object" && Object.keys(user.permissionsHash).length > 0) {
     if (user.permissionsHash[cleanRoute] !== undefined) {
       return Boolean(user.permissionsHash[cleanRoute]);
     }
@@ -891,33 +865,6 @@ export function isRouteAllowedByMatrix(route: string, roleKey: SystemRoleKey, us
     sRole === "chu_tich" ||
     sRole === "president" ||
     (roleKey as string) === "platform_admin"
-  ) {
-    return true;
-  }
-
-  // 5. Quyền hiển thị cơ bản cho thành viên
-  if (
-    cleanRoute === "/members" ||
-    cleanRoute === "/events" ||
-    cleanRoute === "/events-overview" ||
-    cleanRoute === "/voting" ||
-    cleanRoute === "/feedback" ||
-    cleanRoute === "/event-registrations" ||
-    cleanRoute === "/checkin-qr" ||
-    cleanRoute === "/templates" ||
-    cleanRoute === "/lucky-draw" ||
-    cleanRoute === "/classes" ||
-    cleanRoute === "/sponsors" ||
-    cleanRoute === "/sponsor-report" ||
-    cleanRoute === "/analytics" ||
-    cleanRoute === "/income" ||
-    cleanRoute === "/expenses" ||
-    cleanRoute === "/finance-report" ||
-    cleanRoute === "/notifications" ||
-    cleanRoute === "/email-marketing" ||
-    cleanRoute === "/meetings" ||
-    cleanRoute === "/documents" ||
-    cleanRoute === "/ai-assistant"
   ) {
     return true;
   }

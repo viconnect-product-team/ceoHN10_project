@@ -131,6 +131,7 @@ const crmNotifications: Item[] = [
 const crmSystemDocs: Item[] = [
   { key: "nav.documents" as TKey, icon: FolderOpen, to: "/documents", label: "Tài liệu & Biểu mẫu" },
   { key: "nav.templates" as TKey, icon: LayoutTemplate, to: "/templates", label: "Quản lý mẫu trang" },
+  { key: "nav.landingWebs" as TKey, icon: Globe, to: "/admin/landing-webs", label: "Quản lý landing page" },
 ];
 
 const COLLAPSE_KEY = "vba.sidebar.collapsed";
@@ -497,47 +498,27 @@ export function Sidebar({
   const isAllowed = useCallback(
     (route?: string): boolean => {
       if (!route) return true;
-      if (
-        isPlatformAdmin ||
-        isAdmin ||
-        isChuTich ||
-        (currentRoleKey as string) === "quan_tri" ||
-        (currentRoleKey as string) === "admin" ||
-        (currentRoleKey as string) === "chu_tich" ||
-        (currentRoleKey as string) === "pho_chu_tich" ||
-        String(currentRoleKey).startsWith("lop_pho_") ||
-        String(currentRoleKey).startsWith("truong_team_") ||
-        String(currentRoleKey).startsWith("pho_team_") ||
-        String(currentRoleKey).startsWith("tb_") ||
-        String(currentRoleKey).startsWith("truong_ban_") ||
-        (currentRoleKey as string) === "tong_thu_ky" ||
-        (currentRoleKey as string) === "ban_dieu_hanh" ||
-        (currentRoleKey as string) === "truong_ban_dieu_hanh" ||
-        user?.isPlatformAdmin === true ||
-        user?.isAdmin === true ||
-        user?.isPresident === true ||
-        user?.role === "admin" ||
-        user?.role === "quan_tri" ||
-        user?.role === "ADM" ||
-        user?.role === "chu_tich" ||
-        user?.role === "president" ||
-        user?.role === "lop_truong" ||
-        user?.role === "pho_chu_tich" ||
-        String(user?.role).startsWith("lop_pho_") ||
-        String(user?.role).startsWith("truong_ban_") ||
-        user?.email === "admin@ceohn10.vn" ||
-        user?.email === "admin@viconnect.vn" ||
-        user?.email === "infor@viconnect.vn" ||
-        user?.email === "admin.hn10@ceohn10.vn" ||
-        user?.email === "loptruong.hn10@ceohn10.vn" ||
-        user?.email === "btt.hn10@ceohn10.vn" ||
-        user?.email === "btc.hn10@ceohn10.vn" ||
-        user?.email?.toLowerCase().includes("admin") ||
-        user?.email?.toLowerCase().includes("loptruong")
-      ) {
-        if (route === "/accounts" || route === "/permissions") return false;
+      const cleanRoute = route.split("?")[0].split("#")[0];
+      if (cleanRoute === "/") return true;
+
+      // Nếu tài khoản có customPermissions (được tích quyền cụ thể), BẮT BUỘC kiểm tra qua isRouteAllowedByMatrix để ẩn các menu không được cấp
+      if (Array.isArray(user?.customPermissions) && user.customPermissions.length > 0) {
+        return isRouteAllowedByMatrix(route, currentRoleKey, user);
+      }
+
+      // Chỉ tài khoản Super Platform Admin không bị giới hạn mới được mở toàn bộ menu
+      const userEmail = (user?.email || "").toLowerCase().trim();
+      const isUnrestrictedSuperAdmin =
+        (userEmail === "admin@ceohn10.vn" ||
+          userEmail === "admin@viconnect.vn" ||
+          userEmail === "admin@connect.vn" ||
+          user?.isPlatformAdmin === true) &&
+        (!user?.customPermissions || user.customPermissions.length === 0);
+
+      if (isUnrestrictedSuperAdmin) {
         return true;
       }
+
       return isRouteAllowedByMatrix(route, currentRoleKey, user);
     },
     [currentRoleKey, isPlatformAdmin, isAdmin, isChuTich, matrixRevision, user]

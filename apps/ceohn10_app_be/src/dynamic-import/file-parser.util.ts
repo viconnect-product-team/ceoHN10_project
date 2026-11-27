@@ -170,7 +170,7 @@ export function matchStandardCrmField(
 ): { key: string; label: string; isCustom: boolean; confidence: number; defaultType?: DynamicFieldType } {
   const norm = colHeader.toLowerCase().trim();
 
-  // MEMBER (Học viên / Hội viên)
+  // MEMBER (Học viên / Hội viên - Tương thích 100% Larksuite Base CEO HN9/HN10)
   if (entityType === 'member') {
     if (/họ\s*(?:và|&)?\s*tên|họ_tên|học\s*viên|hội\s*viên|full\s*name|^tên$|^name$/i.test(norm)) {
       return { key: 'name', label: 'Họ và tên', isCustom: false, confidence: 0.98, defaultType: 'text' };
@@ -191,15 +191,42 @@ export function matchStandardCrmField(
       return { key: 'position', label: 'Chức vụ', isCustom: false, confidence: 0.95, defaultType: 'text' };
     }
     if (/ngành\s*(?:nghề)?|lĩnh\s*vực|industry|sector/i.test(norm)) {
-      return { key: 'industry', label: 'Ngành nghề', isCustom: false, confidence: 0.92, defaultType: 'select' };
+      return { key: 'industry', label: 'Ngành nghề / Lĩnh vực', isCustom: false, confidence: 0.92, defaultType: 'select' };
     }
     if (/ban\s*(?:chuyên\s*môn)?|phòng\s*ban|department/i.test(norm)) {
       return { key: 'department', label: 'Ban chuyên môn', isCustom: false, confidence: 0.92, defaultType: 'select' };
     }
     if (/địa\s*chỉ|tỉnh\s*\/?\s*thành|khu\s*vực|address|region/i.test(norm)) {
-      return { key: 'address', label: 'Địa chỉ', isCustom: false, confidence: 0.9, defaultType: 'text' };
+      return { key: 'address', label: 'Địa chỉ doanh nghiệp', isCustom: false, confidence: 0.9, defaultType: 'text' };
     }
-    if (/ngày\s*(?:sinh|gia\s*nhập|tham\s*gia)|joined_?at|dob/i.test(norm)) {
+    if (/ngày\s*sinh|năm\s*sinh|sinh\s*nhật|dob|birth/i.test(norm)) {
+      return { key: 'dob', label: 'Ngày sinh', isCustom: true, confidence: 0.95, defaultType: 'date' };
+    }
+    if (/giới\s*tính|gender|sex/i.test(norm)) {
+      return { key: 'gender', label: 'Giới tính', isCustom: true, confidence: 0.95, defaultType: 'select' };
+    }
+    if (/mã\s*số\s*thuế|mst|tax/i.test(norm)) {
+      return { key: 'tax_code', label: 'Mã số thuế', isCustom: true, confidence: 0.95, defaultType: 'text' };
+    }
+    if (/quy\s*mô|nhân\s*sự|doanh\s*thu|company_?size/i.test(norm)) {
+      return { key: 'company_size', label: 'Quy mô doanh nghiệp', isCustom: true, confidence: 0.92, defaultType: 'text' };
+    }
+    if (/sản\s*phẩm|dịch\s*vụ|chủ\s*lực|main_?product/i.test(norm)) {
+      return { key: 'main_products', label: 'Sản phẩm / Dịch vụ chủ lực', isCustom: true, confidence: 0.92, defaultType: 'text' };
+    }
+    if (/website|web|fanpage|trang\s*web/i.test(norm)) {
+      return { key: 'website', label: 'Website / Fanpage', isCustom: true, confidence: 0.92, defaultType: 'url' };
+    }
+    if (/nhu\s*cầu|kết\s*nối|hợp\s*tác|b2b/i.test(norm)) {
+      return { key: 'b2b_needs', label: 'Nhu cầu kết nối B2B', isCustom: true, confidence: 0.9, defaultType: 'text' };
+    }
+    if (/người\s*giới\s*thiệu|giới\s*thiệu|referrer/i.test(norm)) {
+      return { key: 'referrer', label: 'Người giới thiệu', isCustom: true, confidence: 0.9, defaultType: 'text' };
+    }
+    if (/vai\s*trò|chức\s*danh\s*clb|ban\s*chấp\s*hành|club_?role/i.test(norm)) {
+      return { key: 'club_role', label: 'Vai trò trong CLB', isCustom: true, confidence: 0.9, defaultType: 'text' };
+    }
+    if (/ngày\s*(?:gia\s*nhập|tham\s*gia|vào\s*clb)|joined_?at/i.test(norm)) {
       return { key: 'joined_at', label: 'Ngày tham gia', isCustom: false, confidence: 0.9, defaultType: 'date' };
     }
     if (/trạng\s*thái|status/i.test(norm)) {

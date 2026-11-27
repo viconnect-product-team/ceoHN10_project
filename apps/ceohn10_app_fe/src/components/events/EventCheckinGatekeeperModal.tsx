@@ -384,178 +384,76 @@ export function EventCheckinGatekeeperModal({
 
         {/* Content Area */}
         <div className="mt-4 overflow-y-auto pr-1 flex-1 space-y-4">
-          {/* TAB 1: QR STANDEE */}
+          {/* TAB 1: QR STANDEE DUY NHẤT (MÃ CHECK-IN) */}
           {activeTab === "qr_standee" && (
             <div className="space-y-4">
-              {/* Mode Switcher: 2 Mã Check-in Riêng Biệt */}
-              <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-secondary/50 border border-border">
-                <button
-                  type="button"
-                  onClick={() => setQrTarget("unregistered")}
-                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-bold transition cursor-pointer ${qrTarget === "unregistered"
-                      ? "bg-blue-600 text-white shadow-sm"
-                      : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                    }`}
-                >
-                  <Globe className="h-3.5 w-3.5" />
-                  <span>MÃ 1: Khách Chưa Đăng Ký (Tại Cửa)</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setQrTarget("registered")}
-                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-bold transition cursor-pointer ${qrTarget === "registered"
-                      ? "bg-emerald-600 text-white shadow-sm"
-                      : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                    }`}
-                >
-                  <ShieldCheck className="h-3.5 w-3.5" />
-                  <span>MÃ 2: Đại Biểu Đã Đăng Ký (Check-in)</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setQrTarget("both")}
-                  className={`hidden sm:flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold transition cursor-pointer ${qrTarget === "both"
-                      ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm"
-                      : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                    }`}
-                >
-                  <span>Xem Cả 2 Mã</span>
-                </button>
+              <div className="flex flex-col items-center text-center p-5 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border-2 border-emerald-500 dark:border-emerald-700 shadow-xs relative">
+                <div className="absolute top-3 right-3">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-600 text-white shadow-2xs">
+                    MÃ QR CHECK-IN DUY NHẤT
+                  </span>
+                </div>
+
+                <div className="p-3 bg-white rounded-2xl shadow-md border border-slate-200 mt-2">
+                  <QrCanvas
+                    value={preRegisteredCheckinUrl}
+                    size={210}
+                  />
+                </div>
+
+                <div className="mt-3 text-sm font-bold text-emerald-950 dark:text-emerald-200 flex items-center gap-1.5">
+                  <span>Mã QR Check-in Sự Kiện</span>
+                </div>
+                <p className="mt-1 text-[11.5px] text-muted-foreground max-w-lg leading-relaxed">
+                  Khi quét mã này sẽ mở cổng 2 phần: <strong>Phần 1</strong> (nhập Mã học viên hoặc Mã vé để Check-in) và <strong>Phần 2</strong> (danh mục Khách mới đến điền thông tin đăng ký vé &amp; thanh toán tự động Check-in).
+                </p>
+
+                <div className="mt-2.5 w-full max-w-md p-2 rounded-xl bg-white dark:bg-slate-800 border border-emerald-300 dark:border-emerald-800 text-[11px] font-mono text-slate-800 dark:text-slate-200 flex items-center justify-between gap-2 overflow-hidden">
+                  <span className="truncate">{preRegisteredCheckinUrl}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(preRegisteredCheckinUrl);
+                      toast.success("Đã sao chép link Mã QR Check-in!");
+                    }}
+                    className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-emerald-600 transition shrink-0 cursor-pointer"
+                    title="Sao chép link"
+                  >
+                    <Copy className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+
+                <div className="mt-3 flex flex-wrap gap-2 justify-center">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(preRegisteredCheckinUrl);
+                      toast.success("Đã sao chép liên kết Mã QR Check-in!");
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition cursor-pointer"
+                  >
+                    <Copy className="h-3.5 w-3.5" />
+                    <span>Sao Chép Link Check-in</span>
+                  </button>
+                  <a
+                    href={preRegisteredCheckinUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-900 bg-white border border-slate-300 hover:bg-slate-100 shadow-2xs transition cursor-pointer dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                    <span>Mở Cổng Check-in</span>
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => window.print()}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-900 bg-white border border-slate-300 hover:bg-slate-100 shadow-2xs transition cursor-pointer dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700"
+                  >
+                    <Printer className="h-3.5 w-3.5" />
+                    <span>In Standee A4</span>
+                  </button>
+                </div>
               </div>
-
-              {/* VIEW 1: MÃ 1 - DÀNH CHO KHÁCH CHƯA ĐĂNG KÝ (QUÉT MỞ FORM & KÈM SEPAY VIETQR) */}
-              {(qrTarget === "unregistered" || qrTarget === "both") && (
-                <div className="flex flex-col items-center text-center p-4 rounded-2xl bg-blue-50/60 dark:bg-blue-950/20 border-2 border-blue-400 dark:border-blue-800 shadow-xs relative">
-                  <div className="absolute top-3 right-3">
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black bg-blue-600 text-white shadow-2xs">
-                      MÃ 1: CHƯA ĐĂNG KÝ
-                    </span>
-                  </div>
-
-                  <div className="p-3 bg-white rounded-2xl shadow-md border border-slate-200 mt-2">
-                    <QrCanvas
-                      value={walkinGuestUrl}
-                      size={qrTarget === "both" ? 170 : 210}
-                    />
-                  </div>
-
-                  <div className="mt-3 text-sm font-bold text-blue-950 dark:text-blue-200 flex items-center gap-1.5">
-                    <span>MÃ 1: Quét Đăng Ký Tại Cửa Sự Kiện (Chưa Đăng Ký Trước)</span>
-                  </div>
-                  <p className="mt-1 text-[11.5px] text-muted-foreground max-w-lg leading-relaxed">
-                    Khách dùng <strong>Zalo</strong> hoặc <strong>Camera điện thoại</strong> quét mã này để mở ngay biểu mẫu đăng ký. Nếu sự kiện có phí sẽ kèm mã VietQR (SePay) thanh toán phí vé; nếu sự kiện miễn phí chỉ cần điền: Họ tên, Email, SĐT, Công ty/Doanh nghiệp, Chức danh.
-                  </p>
-
-                  <div className="mt-2.5 w-full max-w-md p-2 rounded-xl bg-white dark:bg-slate-800 border border-blue-200 dark:border-blue-900 text-[11px] font-mono text-slate-800 dark:text-slate-200 flex items-center justify-between gap-2 overflow-hidden">
-                    <span className="truncate">{walkinGuestUrl}</span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        navigator.clipboard.writeText(walkinGuestUrl);
-                        toast.success("Đã sao chép link Mã 1 Đăng ký tại cửa!");
-                      }}
-                      className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-blue-600 transition shrink-0 cursor-pointer"
-                      title="Sao chép link"
-                    >
-                      <Copy className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-
-                  <div className="mt-3 flex flex-wrap gap-2 justify-center">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        navigator.clipboard.writeText(walkinGuestUrl);
-                        toast.success("Đã sao chép liên kết Mã 1 mở qua Zalo!");
-                      }}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition cursor-pointer"
-                    >
-                      <Copy className="h-3.5 w-3.5" />
-                      <span>Sao Chép Link Mã 1</span>
-                    </button>
-                    <a
-                      href={walkinGuestUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-900 bg-white border border-slate-300 hover:bg-slate-100 shadow-2xs transition cursor-pointer dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700"
-                    >
-                      <ExternalLink className="h-3.5 w-3.5" />
-                      <span>Mở Thử Form Đăng Ký</span>
-                    </a>
-                  </div>
-                </div>
-              )}
-
-              {/* VIEW 2: MÃ 2 - DÀNH CHO ĐẠI BIỂU ĐÃ ĐĂNG KÝ TRƯỚC (CỔNG CHECK-IN NHẬP MÃ / TẢI ẢNH QR) */}
-              {(qrTarget === "registered" || qrTarget === "both") && (
-                <div className="flex flex-col items-center text-center p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border-2 border-emerald-500 dark:border-emerald-700 shadow-xs relative">
-                  <div className="absolute top-3 right-3">
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-600 text-white shadow-2xs">
-                      MÃ 2: ĐÃ ĐĂNG KÝ
-                    </span>
-                  </div>
-
-                  <div className="p-3 bg-white rounded-2xl shadow-md border border-slate-200 mt-2">
-                    <QrCanvas
-                      value={preRegisteredCheckinUrl}
-                      size={qrTarget === "both" ? 170 : 210}
-                    />
-                  </div>
-
-                  <div className="mt-3 text-sm font-bold text-emerald-950 dark:text-emerald-200 flex items-center gap-1.5">
-                    <span>MÃ 2: Cổng Check-in Cho Đại Biểu Đã Đăng Ký Từ Trước</span>
-                  </div>
-                  <p className="mt-1 text-[11.5px] text-muted-foreground max-w-lg leading-relaxed">
-                    Đại biểu đã có mã vé chỉ cần quét mã này bằng Zalo / Camera để mở cổng Check-in. Tại đây đại biểu có thể <strong>nhập mã vé</strong> hoặc <strong>tải ảnh mã QR lên</strong> và bấm nút xác nhận Check-in. Hệ thống sẽ tự động so sánh với dữ liệu để phân biệt khách đã đăng ký trước vs khách mới.
-                  </p>
-
-                  <div className="mt-2.5 w-full max-w-md p-2 rounded-xl bg-white dark:bg-slate-800 border border-emerald-300 dark:border-emerald-800 text-[11px] font-mono text-slate-800 dark:text-slate-200 flex items-center justify-between gap-2 overflow-hidden">
-                    <span className="truncate">{preRegisteredCheckinUrl}</span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        navigator.clipboard.writeText(preRegisteredCheckinUrl);
-                        toast.success("Đã sao chép link Mã 2 Check-in!");
-                      }}
-                      className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-emerald-600 transition shrink-0 cursor-pointer"
-                      title="Sao chép link"
-                    >
-                      <Copy className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-
-                  <div className="mt-3 flex flex-wrap gap-2 justify-center">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        navigator.clipboard.writeText(preRegisteredCheckinUrl);
-                        toast.success("Đã sao chép liên kết Mã 2 Check-in!");
-                      }}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition cursor-pointer"
-                    >
-                      <Copy className="h-3.5 w-3.5" />
-                      <span>Sao Chép Link Mã 2</span>
-                    </button>
-                    <a
-                      href={preRegisteredCheckinUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-900 bg-white border border-slate-300 hover:bg-slate-100 shadow-2xs transition cursor-pointer dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700"
-                    >
-                      <ExternalLink className="h-3.5 w-3.5" />
-                      <span>Mở Cổng Check-in</span>
-                    </a>
-                    <button
-                      type="button"
-                      onClick={() => window.print()}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-900 bg-white border border-slate-300 hover:bg-slate-100 shadow-2xs transition cursor-pointer dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700"
-                    >
-                      <Printer className="h-3.5 w-3.5" />
-                      <span>In Standee A4 / Roll-up 2 Mã</span>
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           )}
 

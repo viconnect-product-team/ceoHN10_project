@@ -486,15 +486,15 @@ export function useRole(): RoleState {
     }
   };
 
+  const hasCustomPerms = Array.isArray((user as any)?.customPermissions) && (user as any).customPermissions.length > 0;
+  const userCustomPerms: string[] = hasCustomPerms ? (user as any).customPermissions : [];
+
   const isExplicitNonAdminRole =
-    srsRole !== "admin" &&
-    srsRole !== "ADM" &&
-    srsRole !== "quan_tri" &&
-    (srsRole as string) !== "platform_admin" &&
-    srsRole !== "chu_tich" &&
-    (srsRole as string) !== "president" &&
-    srsRole !== "ban_dieu_hanh" &&
-    srsRole !== "BQT";
+    hasCustomPerms ||
+    (srsRole !== "admin" &&
+      srsRole !== "ADM" &&
+      srsRole !== "quan_tri" &&
+      (srsRole as string) !== "platform_admin");
 
   const isPresident =
     !isExplicitNonAdminRole &&
@@ -628,25 +628,68 @@ export function useRole(): RoleState {
         }
       }
 
-      // 0. Toàn quyền tối cao cho Quản trị viên (quan_tri / admin / platform_admin) và Chủ tịch (chu_tich / president)
-      // CHỈ ÁP DỤNG KHI KHÔNG BỊ PHÂN VAI TRÒ CỤ THỂ KHÁC ADMIN
+      // 0. Nếu tài khoản có customPermissions (Tích quyền cụ thể) hoặc permissionsHash từ Backend:
+      // Bắt buộc kiểm tra chặt chẽ để ẩn mọi nút thao tác không được cấp quyền!
+      if (hasCustomPerms) {
+        if (userCustomPerms.includes(permission)) return true;
+        if (user?.permissionsHash && user.permissionsHash[permission] !== undefined) {
+          return Boolean(user.permissionsHash[permission]);
+        }
+        const pUpper = String(permission).toUpperCase();
+        if (user?.permissionsHash && user.permissionsHash[pUpper] !== undefined) {
+          return Boolean(user.permissionsHash[pUpper]);
+        }
+        if (pUpper.startsWith("MEM_") || String(permission).startsWith("member:")) {
+          return userCustomPerms.includes("/members");
+        }
+        if (
+          pUpper.startsWith("EVT_") ||
+          pUpper.startsWith("EREG_") ||
+          pUpper.startsWith("CHK_") ||
+          pUpper.startsWith("LKD_") ||
+          String(permission).startsWith("event:")
+        ) {
+          return userCustomPerms.some((p) => ["/events", "/event-registrations", "/event-checkin", "/checkin-qr", "/lucky-draw"].includes(p));
+        }
+        if (pUpper.startsWith("CLS_") || pUpper.startsWith("TRN_") || String(permission).startsWith("training:")) {
+          return userCustomPerms.includes("/classes");
+        }
+        if (pUpper.startsWith("FIN_") || pUpper.startsWith("FEE_") || String(permission).startsWith("finance:")) {
+          return userCustomPerms.includes("/finance-report");
+        }
+        if (pUpper.startsWith("NTF_") || pUpper.startsWith("EML_") || String(permission).startsWith("media:")) {
+          return userCustomPerms.includes("/notifications") || userCustomPerms.includes("/email-marketing");
+        }
+        if (pUpper.startsWith("DOC_") || String(permission).startsWith("document:")) {
+          return userCustomPerms.includes("/documents");
+        }
+        return false;
+      }
+
+      if (user?.permissionsHash && typeof user.permissionsHash === "object" && Object.keys(user.permissionsHash).length > 0) {
+        if (user.permissionsHash[permission] !== undefined) {
+          return Boolean(user.permissionsHash[permission]);
+        }
+        const pUpper = String(permission).toUpperCase();
+        if (user.permissionsHash[pUpper] !== undefined) {
+          return Boolean(user.permissionsHash[pUpper]);
+        }
+      }
+
+      // 0.5. Toàn quyền tối cao cho Quản trị viên không bị giới hạn bởi customPermissions
       const userEmail = String(user?.email || "").toLowerCase();
       const roleStr = String(srsRole || "");
       const isRoleAdmin =
         !isExplicitNonAdminRole &&
+        !hasCustomPerms &&
         (isPlatformAdmin ||
           isAdmin ||
-          isPresident ||
-          isChuTich ||
           roleStr === "quan_tri" ||
           roleStr === "admin" ||
-          roleStr === "chu_tich" ||
-          roleStr === "president" ||
-          roleStr === "BQT" ||
           roleStr === "ADM" ||
           user?.permissions?.includes("*") ||
           user?.permissions?.includes("admin:full_access") ||
-          ((userEmail === "admin@viconnect.vn" || userEmail === "admin@connect.vn" || userEmail === "admin1@connect.vn") &&
+          ((userEmail === "admin@ceohn10.vn" || userEmail === "admin@viconnect.vn" || userEmail === "admin@connect.vn") &&
             (!roleStr || roleStr === "admin" || roleStr === "quan_tri" || roleStr === "ADM")));
 
       if (isRoleAdmin) {

@@ -484,14 +484,6 @@ function EventDetailPage() {
           {/* CTAs (desktop) */}
           <div className="hidden flex-wrap items-center gap-2 md:flex">
             <button
-              type="button"
-              onClick={() => setInvitationModalOpen(true)}
-              className="inline-flex items-center gap-2 rounded-xl border border-blue-500/40 bg-blue-500/10 px-4 py-2 text-sm font-bold text-[#003B95] dark:text-blue-300 hover:bg-blue-500/20 transition cursor-pointer shadow-2xs"
-            >
-              <Mail className="h-4 w-4" aria-hidden="true" />
-              Gửi Thư Mời Đa Kênh
-            </button>
-            <button
               onClick={onShare}
               className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
             >
@@ -504,7 +496,7 @@ function EventDetailPage() {
               className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted transition shadow-xs cursor-pointer"
             >
               <QrCode className="h-4 w-4 text-amber-500" aria-hidden="true" />
-              Cấu Hình &amp; Tải 2 Mã QR Check-in
+              Cấu Hình &amp; Tải Mã QR Check-in
             </button>
             {(() => {
               const rawDrive = (event as any)?.photoGalleryUrl || (event as any)?.photo_gallery_url || (event as any)?.driveUrl;
@@ -704,10 +696,10 @@ function EventDetailPage() {
           <section className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)] space-y-3">
             <div className="flex items-center gap-2 text-foreground font-bold text-xs uppercase tracking-wider">
               <QrCode className="h-4 w-4 text-amber-500" />
-              <span>Mã QR Đăng Ký &amp; Check-in</span>
+              <span>Mã QR Check-in</span>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Mã QR đăng ký sự kiện và mã QR check-in soát vé tại cửa được thiết lập và quản lý trực tiếp tại đây.
+              Hệ thống sử dụng duy nhất 1 Mã QR Check-in cho sự kiện.
             </p>
             <button
               type="button"
@@ -882,11 +874,6 @@ function EventDetailPage() {
         onClose={() => setIsQrSetupOpen(false)}
         onUpdated={() => router.invalidate()}
       />
-      <EventInvitationBuilderModal
-        open={invitationModalOpen}
-        event={event}
-        onClose={() => setInvitationModalOpen(false)}
-      />
     </AppShell>
   );
 }
@@ -970,7 +957,7 @@ function TicketsSection({
               className="inline-flex items-center gap-1.5 rounded-lg border border-[#003B95]/40 bg-blue-50 px-2.5 py-1.5 text-xs font-semibold text-[#003B95] transition-colors hover:bg-blue-100"
             >
               <QrCode className="h-3.5 w-3.5" aria-hidden="true" />
-              <span>Cấu hình 2 Mã QR &amp; Biểu mẫu</span>
+              <span>Cấu hình Mã QR Check-in &amp; Biểu mẫu</span>
             </Link>
           )}
         </div>

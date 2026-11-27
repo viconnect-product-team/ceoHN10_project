@@ -349,6 +349,12 @@ export class EventsService extends BaseService implements OnModuleInit {
       venue: r.location ?? '',
       venueName: r.venue_name ?? '',
       parts: parseJsonArraySafe(r.parts),
+      customFields: parseJsonArraySafe(r.custom_fields),
+      formFieldsConfig: r.form_fields_config
+        ? typeof r.form_fields_config === 'string'
+          ? (() => { try { return JSON.parse(r.form_fields_config); } catch { return null; } })()
+          : r.form_fields_config
+        : null,
       capacity: r.capacity ?? 0,
       registered: r.registered ?? 0,
       status,
@@ -1267,6 +1273,11 @@ export class EventsService extends BaseService implements OnModuleInit {
           ? (data as any).dynamicFields
           : parseJsonArraySafe(current.custom_fields),
     );
+    const formFieldsConfigJson = JSON.stringify(
+      (data as any).formFieldsConfig !== undefined
+        ? (data as any).formFieldsConfig
+        : current.form_fields_config || null,
+    );
     const isPaid =
       (data as any).isPaid !== undefined
         ? Boolean((data as any).isPaid)
@@ -1293,6 +1304,7 @@ export class EventsService extends BaseService implements OnModuleInit {
         ADD COLUMN IF NOT EXISTS is_fixed boolean DEFAULT false,
         ADD COLUMN IF NOT EXISTS recurrence_rule text,
         ADD COLUMN IF NOT EXISTS custom_fields jsonb,
+        ADD COLUMN IF NOT EXISTS form_fields_config jsonb,
         ADD COLUMN IF NOT EXISTS photo_gallery_url text,
         ADD COLUMN IF NOT EXISTS banner text,
         ADD COLUMN IF NOT EXISTS qr_scanners jsonb,
@@ -1314,6 +1326,7 @@ export class EventsService extends BaseService implements OnModuleInit {
           venue_name = ${venueName},
           parts = ${partsJson}::jsonb,
           custom_fields = ${customFieldsJson}::jsonb,
+          form_fields_config = ${formFieldsConfigJson}::jsonb,
           is_paid = ${isPaid},
           is_fixed = ${isFixed},
           recurrence_rule = ${recurrenceRule},
@@ -4375,7 +4388,7 @@ export class EventsService extends BaseService implements OnModuleInit {
         ? event.association_id
         : 'c1983000-0000-4000-8000-000000001983';
 
-    const checkinNow = guestData?.isCheckinNow === true || guestData?.status === 'attended';
+    const checkinNow = guestData?.isCheckinNow === true || guestData?.autoCheckin === true || guestData?.status === 'attended';
     const initialGuestStatus = checkinNow ? 'attended' : (isFree ? 'confirmed' : 'pending');
     const guestPaymentStatus = isFree ? 'free' : (guestData?.paymentStatus || 'pending');
 
@@ -4520,7 +4533,7 @@ export class EventsService extends BaseService implements OnModuleInit {
 
         await this.prisma.$executeRaw`
           INSERT INTO public.event_registrations (
-            id, event_id, member_code, member_name, email, phone, company, position, note, registered_at, status, ticket_type, ticket_count, association_id, payment_status, payment_amount, lucky_number, qr_payload, registered_by, created_at, updated_at
+            id, event_id, member_code, member_name, email, phone, company, position, note, registered_at, status, ticket_type, ticket_count, association_id, payment_status, payment_amount, lucky_number, qr_payload, registered_by, checked_in_at, created_at, updated_at
           ) VALUES (
             ${attRegId},
             ${resolvedEventId},
@@ -4541,6 +4554,7 @@ export class EventsService extends BaseService implements OnModuleInit {
             ${attLucky},
             ${attQrPayload},
             ${regId},
+            ${checkinNow ? new Date() : null},
             now(),
             now()
           )
@@ -4982,113 +4996,74 @@ export class EventsService extends BaseService implements OnModuleInit {
     return str;
   }
 
-  async getTicketStatus(ticketCode: string) {
+  async getTicketStatus(ticketCode: string, eventId?: string) {
     const clean = this.resolveCleanTicketCode(ticketCode);
     if (!clean) {
       throw new BadRequestException('Mã vé không được để trống hoặc không hợp lệ');
     }
-    const rows = await this.prisma.$queryRaw<any[]>`
-      SELECT r.*, e.name as event_name, e.title as event_title, e.date as event_date, e.location as event_location, e.start_time, e.end_time
-      FROM public.event_registrations r
-      LEFT JOIN public.events e ON e.id = r.event_id
-      WHERE r.id = ${clean} 
-         OR UPPER(TRIM(COALESCE(r.member_code, ''))) = UPPER(${clean})
-         OR r.lucky_number = ${clean}
-         OR r.phone = ${clean}
-         OR LOWER(TRIM(COALESCE(r.email, ''))) = LOWER(${clean})
-         OR (r.qr_payload IS NOT NULL AND r.qr_payload = ${clean})
-         OR (r.qr_code IS NOT NULL AND r.qr_code = ${clean})
-      ORDER BY r.created_at DESC
-      LIMIT 1
-    `.catch(() => []);
+    const filterEventId = eventId && eventId !== 'latest' ? String(eventId).trim() : '';
+    const rows = filterEventId
+      ? await this.prisma.$queryRaw<any[]>`
+          SELECT r.*, e.name as event_name, e.title as event_title, e.date as event_date, e.location as event_location, e.start_time, e.end_time, e.agenda as event_agenda
+          FROM public.event_registrations r
+          LEFT JOIN public.events e ON e.id = r.event_id
+          WHERE r.event_id = ${filterEventId}
+            AND (
+              r.id = ${clean}
+              OR UPPER(TRIM(COALESCE(r.member_code, ''))) = UPPER(${clean})
+              OR r.lucky_number = ${clean}
+              OR r.phone = ${clean}
+              OR LOWER(TRIM(COALESCE(r.email, ''))) = LOWER(${clean})
+              OR (r.qr_payload IS NOT NULL AND r.qr_payload = ${clean})
+              OR (r.qr_code IS NOT NULL AND r.qr_code = ${clean})
+            )
+          ORDER BY r.created_at DESC
+          LIMIT 1
+        `.catch(() => [])
+      : await this.prisma.$queryRaw<any[]>`
+          SELECT r.*, e.name as event_name, e.title as event_title, e.date as event_date, e.location as event_location, e.start_time, e.end_time, e.agenda as event_agenda
+          FROM public.event_registrations r
+          LEFT JOIN public.events e ON e.id = r.event_id
+          WHERE r.id = ${clean}
+             OR UPPER(TRIM(COALESCE(r.member_code, ''))) = UPPER(${clean})
+             OR r.lucky_number = ${clean}
+             OR r.phone = ${clean}
+             OR LOWER(TRIM(COALESCE(r.email, ''))) = LOWER(${clean})
+             OR (r.qr_payload IS NOT NULL AND r.qr_payload = ${clean})
+             OR (r.qr_code IS NOT NULL AND r.qr_code = ${clean})
+          ORDER BY r.created_at DESC
+          LIMIT 1
+        `.catch(() => []);
 
     if (rows.length === 0) {
-      // KIỂM TRA SỰ KIỆN MIỄN PHÍ: Nếu không tìm thấy vé nhưng có sự kiện miễn phí,
-      // cho phép tự động cấp vé & CHECK-IN PASS cho khách mới không nằm trong danh sách đăng ký trước giờ G
-      const freeEventRows = await this.prisma.$queryRaw<any[]>`
-        SELECT * FROM public.events
-        WHERE (ticket_price = 0 OR fee = 0 OR type = 'charity' OR type = 'khai_giang')
-        ORDER BY created_at DESC
+      // Kiểm tra xem mã nhập vào có phải Mã Học Viên trong danh sách CLB không (để báo chưa đăng ký sự kiện)
+      const memberRows = await this.prisma.$queryRaw<any[]>`
+        SELECT code, name, contact, email, phone, company_name, position
+        FROM public.members
+        WHERE UPPER(TRIM(COALESCE(code, ''))) = UPPER(${clean})
+           OR LOWER(TRIM(COALESCE(email, ''))) = LOWER(${clean})
         LIMIT 1
       `.catch(() => []);
 
-      if (freeEventRows.length > 0) {
-        const freeEvt = freeEventRows[0];
-        const lastReg = await this.prisma.$queryRaw<any[]>`
-          SELECT id FROM public.event_registrations WHERE id ~ '^[0-9]+$' ORDER BY CAST(id AS BIGINT) DESC LIMIT 1
-        `.catch(() => []);
-        const nextId = lastReg.length > 0 ? (BigInt(lastReg[0].id) + 1n).toString() : `8${Math.floor(1000 + Math.random() * 9000)}`;
-        const luckyNum = String(Math.floor(1000 + Math.random() * 9000));
-        const memberCode = clean.startsWith('GUEST-') || clean.startsWith('HN10-') || clean.startsWith('WALKIN-') ? clean.toUpperCase() : `WALKIN-${luckyNum}`;
-        const memberName = clean.startsWith('WALKIN-') || clean.match(/^[0-9]+$/) ? `Khách Mới Giờ G #${luckyNum}` : clean;
-
-        await this.prisma.$executeRaw`
-          INSERT INTO public.event_registrations (
-            id, event_id, member_code, member_name, email, phone, company, position, note,
-            registered_at, status, ticket_type, ticket_count, association_id, payment_status,
-            payment_amount, lucky_number, is_walkin, registration_origin, created_at, updated_at
-          ) VALUES (
-            ${nextId},
-            ${freeEvt.id},
-            ${memberCode},
-            ${memberName},
-            ${clean.includes('@') ? clean.toLowerCase() : `walkin.${nextId}@ceohn10.vn`},
-            ${clean.match(/^[0-9]{9,11}$/) ? clean : ''},
-            'Khách vãng lai giờ G',
-            'Đại biểu mới',
-            'Khách tham gia không nằm trong danh sách đăng ký trước giờ G',
-            now()::date,
-            'confirmed',
-            'Vé Miễn Phí (Tại Cửa)',
-            1,
-            ${freeEvt.association_id || 'c1983000-0000-4000-8000-000000001983'}::uuid,
-            'free',
-            0,
-            ${luckyNum},
-            true,
-            'walkin_unannounced',
-            now(),
-            now()
-          )
-        `.catch(() => {});
-
+      if (memberRows.length > 0) {
+        const m = memberRows[0];
+        const fullName = m.contact || m.name || '';
         return {
-          found: true,
-          autoPassWalkIn: true,
-          message: 'Sự kiện miễn phí: Tự động cấp vé & Cho phép Check-in Pass cho khách mới không nằm trong danh sách trước giờ G!',
-          ticket: {
-            id: nextId,
-            eventId: freeEvt.id,
-            eventTitle: freeEvt.name || freeEvt.title || 'Sự kiện CEO HN10',
-            eventDate: freeEvt.date ? new Date(freeEvt.date).toLocaleDateString('vi-VN') : 'Hôm nay',
-            eventTime: `${freeEvt.start_time || '08:30'} - ${freeEvt.end_time || '12:00'}`,
-            eventLocation: freeEvt.location || 'Hà Nội',
-            memberName,
-            memberCode,
-            phone: clean.match(/^[0-9]{9,11}$/) ? clean : '',
-            email: clean.includes('@') ? clean.toLowerCase() : `walkin.${nextId}@ceohn10.vn`,
-            company: 'Khách vãng lai giờ G',
-            position: 'Đại biểu mới',
-            ticketType: 'Vé Miễn Phí (Tại Cửa)',
-            ticketCount: 1,
-            paymentStatus: 'free',
-            paymentAmount: 0,
-            luckyNumber: luckyNum,
-            seatAssignment: 'Khu vực tự do',
-            isWalkIn: true,
-            isWalkInAfterGHour: true,
-            attendeeType: 'WALK_IN_UNANNOUNCED',
-            attendeeTypeLabel: 'Khách không nằm trong danh sách đăng ký trước giờ G',
-            registrationOrigin: 'walkin_unannounced',
-            isCheckedIn: false,
-            checkedInAt: null,
-            isCheckedOut: false,
-            checkedOutAt: null,
+          found: false,
+          notRegisteredForEvent: true,
+          member: {
+            code: m.code || clean.toUpperCase(),
+            fullName,
+            email: m.email || '',
+            phone: m.phone || '',
+            company: m.company_name || m.name || '',
+            position: m.position || '',
           },
+          message: `Học viên ${fullName} (${m.code || clean.toUpperCase()}) chưa đăng ký sự kiện này. Vui lòng chọn danh mục Khách mới để đăng ký vé!`,
         };
       }
 
-      return { found: false, message: 'Không tìm thấy vé hoặc mã đăng ký trên hệ thống.' };
+      return { found: false, message: 'Không tìm thấy vé hoặc mã học viên đã đăng ký trong sự kiện này.' };
     }
 
     const reg = rows[0];
@@ -5120,6 +5095,7 @@ export class EventsService extends BaseService implements OnModuleInit {
         paymentAmount: Number(reg.payment_amount || 0),
         luckyNumber: reg.lucky_number,
         seatAssignment: reg.seat_assignment,
+        eventAgenda: parseJsonArraySafe(reg.event_agenda),
         isWalkIn,
         isWalkInAfterGHour,
         attendeeType,
@@ -5201,11 +5177,31 @@ export class EventsService extends BaseService implements OnModuleInit {
     }
     const checkinTimeliness = isLate ? 'late' : 'on_time';
 
+    // Sinh Sticker Số May Mắn Ngẫu Nhiên 4 chữ số nếu khách chưa có để lưu vào màn Quay Thưởng
+    let assignedLuckyNumber = reg.lucky_number ? String(reg.lucky_number).trim() : '';
+    if (!assignedLuckyNumber) {
+      for (let attempt = 0; attempt < 10; attempt++) {
+        const candidate = String(Math.floor(1000 + Math.random() * 9000));
+        const dup = await this.prisma.$queryRaw<any[]>`
+          SELECT id FROM public.event_registrations
+          WHERE event_id = ${reg.event_id} AND lucky_number = ${candidate}
+          LIMIT 1
+        `.catch(() => []);
+        if (dup.length === 0) {
+          assignedLuckyNumber = candidate;
+          break;
+        }
+      }
+      if (!assignedLuckyNumber) {
+        assignedLuckyNumber = String(Math.floor(1000 + Math.random() * 9000));
+      }
+    }
+
     await this.prisma.$executeRawUnsafe(`
       UPDATE public.event_registrations
-      SET checked_in_at = NOW(), status = 'attended', attended_parts = $1::jsonb, is_late = $2, checkin_timeliness = $3, updated_at = NOW()
-      WHERE id = $4
-    `, partsJson, isLate, checkinTimeliness, reg.id);
+      SET checked_in_at = NOW(), status = 'attended', attended_parts = $1::jsonb, is_late = $2, checkin_timeliness = $3, lucky_number = $4, updated_at = NOW()
+      WHERE id = $5
+    `, partsJson, isLate, checkinTimeliness, assignedLuckyNumber, reg.id);
 
     // UC-EVT-05-1: Gửi email xác nhận điểm danh check-in thành công cho đại biểu
     if (reg.email && reg.email.includes('@') && this.mailService) {
@@ -5275,7 +5271,7 @@ export class EventsService extends BaseService implements OnModuleInit {
         company: reg.company,
         position: reg.position,
         seatAssignment: reg.seat_assignment,
-        luckyNumber: reg.lucky_number,
+        luckyNumber: assignedLuckyNumber,
         isWalkIn,
         isLate,
         checkinTimeliness,
@@ -5899,10 +5895,17 @@ export class EventsService extends BaseService implements OnModuleInit {
    */
   async getCheckedInCandidates(eventId: string) {
     if (!eventId) throw new BadRequestException('Mã sự kiện không được để trống');
+    let targetEventId = eventId;
+    if (eventId === 'latest') {
+      const latestEv = await this.prisma.$queryRaw<any[]>`
+        SELECT id FROM public.events WHERE COALESCE(is_deleted, false) = false ORDER BY date DESC NULLS LAST, created_at DESC LIMIT 1
+      `.catch(() => []);
+      if (latestEv.length > 0) targetEventId = latestEv[0].id;
+    }
     const rows = await this.prisma.$queryRaw<any[]>`
-      SELECT id, member_code, member_name, phone, email, company, position, lucky_number, checked_in_at, is_walkin, attended_parts
+      SELECT id, member_code, member_name, phone, email, company, position, lucky_number, seat_assignment, checked_in_at, is_walkin, attended_parts
       FROM public.event_registrations
-      WHERE event_id = ${eventId}
+      WHERE event_id = ${targetEventId}
         AND (
           checked_in_at IS NOT NULL 
           OR status = 'attended'
@@ -5911,20 +5914,33 @@ export class EventsService extends BaseService implements OnModuleInit {
       ORDER BY checked_in_at DESC NULLS LAST, id ASC
     `.catch(() => []);
 
-    const candidates = rows.map((r: any) => ({
-      id: r.id,
-      code: r.lucky_number || r.member_code || `MB-${r.id}`,
-      name: r.member_name || 'Đại biểu',
-      company: r.company || 'Doanh nghiệp CEO HN10',
-      position: r.position || '',
-      phone: r.phone || '',
-      email: r.email || '',
-      isWalkIn: Boolean(r.is_walkin),
-      attendedParts: parseJsonArraySafe(r.attended_parts),
-      checkedInAt: r.checked_in_at ? new Date(r.checked_in_at).toLocaleString('vi-VN') : '',
-    }));
+    const candidates: any[] = [];
+    for (const r of rows) {
+      let luckyNum = r.lucky_number ? String(r.lucky_number).trim() : '';
+      if (!luckyNum) {
+        luckyNum = String(Math.floor(1000 + Math.random() * 9000));
+        await this.prisma.$executeRaw`
+          UPDATE public.event_registrations SET lucky_number = ${luckyNum} WHERE id = ${r.id}
+        `.catch(() => {});
+      }
+      candidates.push({
+        id: r.id,
+        code: luckyNum,
+        luckyNumber: luckyNum,
+        memberCode: r.member_code || `GUEST-${luckyNum}`,
+        name: r.member_name || 'Đại biểu',
+        company: r.company || 'Doanh nghiệp CEO HN10',
+        position: r.position || '',
+        seatAssignment: r.seat_assignment || 'Bàn VIP',
+        phone: r.phone || '',
+        email: r.email || '',
+        isWalkIn: Boolean(r.is_walkin),
+        attendedParts: parseJsonArraySafe(r.attended_parts),
+        checkedInAt: r.checked_in_at ? new Date(r.checked_in_at).toLocaleString('vi-VN') : '',
+      });
+    }
 
-    return { ok: true, eventId, total: candidates.length, candidates };
+    return { ok: true, eventId: targetEventId, total: candidates.length, candidates };
   }
 
   /**

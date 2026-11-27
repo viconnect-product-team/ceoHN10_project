@@ -369,11 +369,37 @@ export function LuckyDrawLandingBanner({
                 <MapPin className="w-3.5 h-3.5 text-amber-500" />
                 <span className="truncate max-w-[280px] sm:max-w-md">{currentEvent.location}</span>
               </div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-secondary/80 border border-border">
-                <Ticket className="w-3.5 h-3.5 text-emerald-500" />
-                <span>{currentEvent.candidates?.length || 0} Đại biểu tham dự</span>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-800 dark:text-amber-300 font-bold">
+                <Ticket className="w-3.5 h-3.5 text-amber-500" />
+                <span>{currentEvent.candidates?.length || 0} Sticker Số May Mắn đã Check-in</span>
               </div>
             </div>
+
+            {/* Danh sách Sticker Số May Mắn đã lưu từ màn Check-in */}
+            {currentEvent.candidates && currentEvent.candidates.length > 0 && (
+              <div className="pt-2 space-y-1.5">
+                <div className="text-[11px] font-black uppercase tracking-wider text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Danh sách Sticker Số May Mắn khách mời đã Check-in trực tiếp:</span>
+                </div>
+                <div className="flex flex-wrap items-center gap-1.5 max-h-20 overflow-y-auto pr-1">
+                  {currentEvent.candidates.slice(0, 18).map((cand, cIdx) => (
+                    <span
+                      key={cand.id || cIdx}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-xs font-bold text-foreground"
+                    >
+                      <strong className="font-mono text-amber-600 dark:text-amber-400">#{cand.code}</strong>
+                      <span className="truncate max-w-[130px]">{cand.name}</span>
+                    </span>
+                  ))}
+                  {currentEvent.candidates.length > 18 && (
+                    <span className="px-2 py-1 rounded-lg bg-secondary text-[11px] font-bold text-muted-foreground">
+                      +{currentEvent.candidates.length - 18} sticker khác
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Call to action card */}

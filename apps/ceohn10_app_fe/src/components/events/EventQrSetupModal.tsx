@@ -14,6 +14,7 @@ import {
 import { QrCanvas } from "@/components/member/QrCanvas";
 import { toast } from "sonner";
 import { fetchNestApi } from "@/lib/api-client";
+import { getPublicAppOrigin } from "@/lib/qr";
 import { formatVnd } from "@/lib/fees-data";
 
 interface EventQrSetupModalProps {
@@ -29,7 +30,6 @@ export function EventQrSetupModal({
   onClose,
   onUpdated,
 }: EventQrSetupModalProps) {
-  const [copiedRegLink, setCopiedRegLink] = useState(false);
   const [copiedCheckinLink, setCopiedCheckinLink] = useState(false);
   const [isPaidEvent, setIsPaidEvent] = useState(false);
   const [ticketPrice, setTicketPrice] = useState(0);
@@ -46,21 +46,14 @@ export function EventQrSetupModal({
 
   if (!isOpen || !event) return null;
 
-  const origin = typeof window !== "undefined" ? window.location.origin : "https://ceohn10.viconnect.vn";
-  const regUrl = `${origin}/guest-event-register/${event.id}`;
-  const checkinUrl = `${origin}/guest-event-register/${event.id}?checkin=true`;
+  const origin = getPublicAppOrigin();
+  const checkinUrl = `${origin}/event-checkin?eventId=${event.id}`;
 
-  const copyToClipboard = (text: string, type: "reg" | "checkin") => {
+  const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    if (type === "reg") {
-      setCopiedRegLink(true);
-      setTimeout(() => setCopiedRegLink(false), 2000);
-      toast.success("Đã sao chép link đăng ký sự kiện!");
-    } else {
-      setCopiedCheckinLink(true);
-      setTimeout(() => setCopiedCheckinLink(false), 2000);
-      toast.success("Đã sao chép link điểm danh check-in tại cửa!");
-    }
+    setCopiedCheckinLink(true);
+    setTimeout(() => setCopiedCheckinLink(false), 2000);
+    toast.success("Đã sao chép link Mã QR Check-in!");
   };
 
   const handleDownloadQr = (elementId: string, filename: string) => {
@@ -81,15 +74,16 @@ export function EventQrSetupModal({
     try {
       const finalPrice = isPaidEvent ? ticketPrice : 0;
       await fetchNestApi(`/events/${event.id}`, {
-        method: "PATCH",
+        method: "PUT",
         body: JSON.stringify({
           ticket_price: finalPrice,
           ticketPrice: finalPrice,
+          fee: finalPrice,
           is_paid: isPaidEvent,
           isPaid: isPaidEvent,
         }),
       });
-      toast.success("Đã lưu cấu hình mã QR & Biểu mẫu sự kiện thành công!");
+      toast.success("Đã lưu cấu hình Mã QR Check-in & Phí sự kiện thành công!");
       if (onUpdated) onUpdated();
       onClose();
     } catch {
@@ -101,7 +95,7 @@ export function EventQrSetupModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs">
-      <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-3xl bg-card border border-border shadow-2xl p-6 md:p-8 space-y-6">
+      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-card border border-border shadow-2xl p-6 md:p-8 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border/80 pb-4">
           <div className="flex items-center gap-3">
@@ -110,7 +104,7 @@ export function EventQrSetupModal({
             </div>
             <div>
               <h2 className="text-lg font-bold text-foreground">
-                Cấu Hình 2 Mã QR Check-in &amp; Đăng Ký
+                Mã QR Check-in Sự Kiện (Duy Nhất)
               </h2>
               <p className="text-xs text-muted-foreground mt-0.5">
                 Sự kiện: <span className="font-semibold text-foreground">{event.name}</span>
@@ -126,102 +120,55 @@ export function EventQrSetupModal({
           </button>
         </div>
 
-        {/* 2 Mã QR Trực Quan: Đăng Ký vs Check-in */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Card 1: Mã QR Đăng Ký Sự Kiện */}
-          <div className="rounded-2xl border border-border bg-muted/20 p-5 flex flex-col items-center text-center space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-emerald-500" />
-              <h3 className="text-sm font-bold text-foreground">1. Mã QR Đăng Ký (Công Khai)</h3>
-            </div>
-            <p className="text-xs text-muted-foreground max-w-xs leading-relaxed">
-              Dành cho khách mời &amp; học viên quét để xem thư mời Paxlaw, chọn vé và đăng ký tham gia.
-            </p>
+        {/* Duy nhất 1 Mã QR Check-in */}
+        <div className="rounded-2xl border-2 border-amber-500/30 bg-amber-500/5 p-6 flex flex-col items-center text-center space-y-4">
+          <div className="flex items-center gap-2">
+            <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
+            <h3 className="text-base font-bold text-foreground">Mã QR Check-in Sự Kiện</h3>
+          </div>
+          <p className="text-xs text-muted-foreground max-w-md leading-relaxed">
+            Khi quét mã này sẽ mở cổng 2 phần: <strong>Phần 1</strong> (nhập Mã học viên hoặc Mã vé để Check-in) và <strong>Phần 2</strong> (danh mục Khách mới đến đăng ký vé &amp; thanh toán tự động Check-in).
+          </p>
 
-            <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
-              <QrCanvas
-                value={regUrl}
-                size={180}
-                id="qr-reg-canvas"
-                className="mx-auto"
-              />
-            </div>
-
-            <div className="w-full flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => handleDownloadQr("qr-reg-canvas", `QR_DangKy_${event.id}`)}
-                className="flex-1 py-2 px-3 rounded-xl border border-border bg-card hover:bg-muted text-xs font-semibold text-foreground flex items-center justify-center gap-1.5 shadow-xs transition cursor-pointer"
-              >
-                <Download className="size-3.5" />
-                <span>Tải Ảnh QR</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => copyToClipboard(regUrl, "reg")}
-                className="flex-1 py-2 px-3 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-xs font-semibold flex items-center justify-center gap-1.5 shadow-xs hover:bg-slate-800 transition cursor-pointer"
-              >
-                {copiedRegLink ? <Check className="size-3.5 text-emerald-400" /> : <Copy className="size-3.5" />}
-                <span>{copiedRegLink ? "Đã copy link" : "Copy Link"}</span>
-              </button>
-              <a
-                href={regUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="p-2 rounded-xl border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground transition"
-                title="Mở trang đăng ký"
-              >
-                <ExternalLink className="size-4" />
-              </a>
-            </div>
+          <div className="p-4 bg-white rounded-2xl border border-amber-200 shadow-sm">
+            <QrCanvas
+              value={checkinUrl}
+              size={200}
+              id="qr-checkin-canvas"
+              className="mx-auto"
+            />
           </div>
 
-          {/* Card 2: Mã QR Soát Vé Check-in Điểm Danh */}
-          <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-5 flex flex-col items-center text-center space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-amber-500" />
-              <h3 className="text-sm font-bold text-foreground">2. Mã QR Check-in (Bàn Lễ Tân)</h3>
-            </div>
-            <p className="text-xs text-muted-foreground max-w-xs leading-relaxed">
-              In đặt tại cửa đón tiếp. Đại biểu quét mã này để hoàn tất điểm danh check-in và nhận số quay thưởng.
-            </p>
+          <code className="w-full max-w-md truncate rounded-xl bg-muted px-3 py-1.5 font-mono text-[11px] text-foreground">
+            {checkinUrl}
+          </code>
 
-            <div className="p-4 bg-white rounded-2xl border border-amber-200 shadow-sm">
-              <QrCanvas
-                value={checkinUrl}
-                size={180}
-                id="qr-checkin-canvas"
-                className="mx-auto"
-              />
-            </div>
-
-            <div className="w-full flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => handleDownloadQr("qr-checkin-canvas", `QR_Checkin_LeTan_${event.id}`)}
-                className="flex-1 py-2 px-3 rounded-xl border border-border bg-card hover:bg-muted text-xs font-semibold text-foreground flex items-center justify-center gap-1.5 shadow-xs transition cursor-pointer"
-              >
-                <Download className="size-3.5" />
-                <span>Tải Ảnh QR</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => copyToClipboard(checkinUrl, "checkin")}
-                className="flex-1 py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs transition cursor-pointer"
-              >
-                {copiedCheckinLink ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
-                <span>{copiedCheckinLink ? "Đã copy link" : "Copy Link"}</span>
-              </button>
-              <a
-                href={checkinUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="p-2 rounded-xl border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground transition"
-                title="Mở cổng check-in"
-              >
-                <ExternalLink className="size-4" />
-              </a>
-            </div>
+          <div className="w-full max-w-md flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => handleDownloadQr("qr-checkin-canvas", `QR_Checkin_${event.id}`)}
+              className="flex-1 py-2.5 px-3 rounded-xl border border-border bg-card hover:bg-muted text-xs font-semibold text-foreground flex items-center justify-center gap-1.5 shadow-xs transition cursor-pointer"
+            >
+              <Download className="size-3.5" />
+              <span>Tải Ảnh QR</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => copyToClipboard(checkinUrl)}
+              className="flex-1 py-2.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs transition cursor-pointer"
+            >
+              {copiedCheckinLink ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+              <span>{copiedCheckinLink ? "Đã copy link" : "Copy Link"}</span>
+            </button>
+            <a
+              href={checkinUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="p-2.5 rounded-xl border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground transition"
+              title="Mở cổng check-in"
+            >
+              <ExternalLink className="size-4" />
+            </a>
           </div>
         </div>
 

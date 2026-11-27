@@ -525,9 +525,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             permissions: Array.isArray(fresh.permissions) ? fresh.permissions : sess.user.permissions,
             permissionsHash: fresh.permissionsHash || sess.user.permissionsHash || {},
             allowedRoutes: Array.isArray(fresh.allowedRoutes) ? fresh.allowedRoutes : (sess.user.allowedRoutes || []),
+            customPermissions: Array.isArray(fresh.customPermissions) ? fresh.customPermissions : [],
+            dataScope: fresh.dataScope || sess.user.dataScope || 'department',
             roles: Array.isArray(fresh.roles) ? fresh.roles : sess.user.roles,
             role: fresh.role || sess.user.role,
+            executiveRole: fresh.executive_role || fresh.executiveRole || sess.user.executiveRole,
+            executive_role: fresh.executive_role || fresh.executiveRole || sess.user.executive_role,
             department: fresh.department || sess.user.department,
+            isAdmin: Boolean(fresh.isAdmin),
+            isPlatformAdmin: Boolean(fresh.isPlatformAdmin),
+            isPresident: Boolean(fresh.isPresident),
+            isExecutive: Boolean(fresh.isExecutive),
+            isDepartmentLeader: Boolean(fresh.isDepartmentLeader),
           };
           setUser(enrichedUser);
           try {

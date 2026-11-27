@@ -433,8 +433,11 @@ export class EventsController {
   // ── 1-TIME CHECKIN, CHECKOUT & TICKET LOOKUP (WEB/ZALO/APP) ───────────────
 
   @Get('ticket-status/:ticketCode')
-  async getTicketStatus(@Param('ticketCode') ticketCode: string) {
-    return this.eventsService.getTicketStatus(ticketCode);
+  async getTicketStatus(
+    @Param('ticketCode') ticketCode: string,
+    @Query('eventId') eventId?: string,
+  ) {
+    return this.eventsService.getTicketStatus(ticketCode, eventId);
   }
 
   @Post('ticket-checkin')

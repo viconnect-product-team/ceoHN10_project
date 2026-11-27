@@ -397,8 +397,9 @@ export class DynamicImportService implements OnModuleInit {
       throw new BadRequestException('Không có dòng dữ liệu nào để import.');
     }
 
-    // 1. Đảm bảo Schema & Tạo các trường động mới vào dynamic_form_fields
-    const customMappings = mappings.filter((m) => m.isCustomField);
+    // 1. Đảm bảo Schema & Tạo tất cả các trường từ file import vào dynamic_form_fields để Bảng Học Viên tự động sinh đủ các cột đúng theo file đã import
+    const strictFixedMemberTableCols = new Set(['code', 'name', 'department', 'industry', 'region', 'type', 'status', 'payment_status', 'joined_at']);
+    const customMappings = mappings.filter((m) => m.isCustomField || (entityType === 'member' && !strictFixedMemberTableCols.has(m.targetFieldKey)));
     let newFieldsCount = 0;
 
     try {
@@ -492,6 +493,10 @@ export class DynamicImportService implements OnModuleInit {
             customData[m.targetFieldKey] = val !== undefined ? val : null;
           } else {
             coreData[m.targetFieldKey] = val !== undefined ? val : null;
+            // Lưu đồng thời các trường mở rộng vào customData để Table Học Viên luôn hiển thị đủ mọi cột từ file import
+            if (entityType === 'member' && !strictFixedMemberTableCols.has(m.targetFieldKey) && val !== undefined && val !== '') {
+              customData[m.targetFieldKey] = val;
+            }
           }
         });
 
@@ -602,19 +607,22 @@ export class DynamicImportService implements OnModuleInit {
 
           await this.prisma.$executeRawUnsafe(
             `INSERT INTO public.members (
-              id, user_id, code, name, contact, email, phone, status, address, company_name, executive_role, department, card_visibility_settings, custom_data, created_at, updated_at
+              id, user_id, code, name, contact, email, phone, status, address, company_name, position, department, about, card_visibility_settings, custom_data, created_at, updated_at
             ) VALUES (
-              $1, $2::uuid, $3, $4, $5, $6, $7, 'active', $8, $9, 'member', 'Ban Gắn kết & Đời sống', $10::jsonb, $11::jsonb, NOW(), NOW()
+              $1, $2::uuid, $3, $4, $5, $6, $7, 'active', $8, $9, $10, $11, $12, $13::jsonb, $14::jsonb, NOW(), NOW()
             )`,
             memberId,
             assignedUserId,
             genCode,
             name,
-            name,
+            coreData.position || coreData.company || name,
             email,
             phone,
             coreData.address || '',
             coreData.company || '',
+            coreData.position || '',
+            coreData.department || 'Ban Gắn kết & Đời sống',
+            coreData.about || '',
             appOnlySettings,
             JSON.stringify(customData),
           );

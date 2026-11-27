@@ -1,6 +1,27 @@
 # ==============================================================================
 # BỘ LUẬT DỰ ÁN (PROJECT RULES & AI CODEGEN STANDARDS) - CEO HN10 PROJECT
 # Vai trò: Tech Lead | Định dạng: .cursorrules
+# 27/11/2026 (v12.83) — 3D CAROUSEL LANDING PAGE 7 VIDEO CHUẨN PINTEREST, iOS LIQUID GLASS & HIỆU ỨNG MẶT NƯỚC, BỎ FIX CỨNG TỌA ĐÀM/TIỆC KHI TẠO SỰ KIỆN & PHÂN QUYỀN RBAC ẨN GIAO DIỆN + CHẶN API:
+#   * [LANDING PAGE 7 VIDEO 3D CAROUSEL KHÔNG CHỮ TRÊN VIDEO, KHÔNG BORDER & RESPONSIVE MOBILE (NODE-CRM-023)]:
+#     - Giao diện VideoVotingShowcaseLanding.tsx thiết kế theo phong cách triển lãm điện ảnh 3D Perspective Carousel chuẩn Pinterest 900790362966152495: video phát thuần túy KHÔNG có bất kỳ chữ đè nào trên video, loại bỏ toàn bộ đường viền (border/ring/divide) trong toàn bộ landing page, và tối ưu responsive hoàn chỉnh cho màn hình thiết bị di động (h-[230px] sm:h-[430px] lg:h-[520px], overflow-x-auto cho bảng thống kê, vuốt ngang cảm ứng mượt).
+#   * [HIỆU ỨNG CHẠM MẶT NƯỚC CHỈ HIỆN KHI BẤM NÚT, KÍNH TRONG SUỐT NỔI NHƯ GIỌT NƯỚC (NODE-CRM-007)]:
+#     - Cổng /event-checkin và /guest-event-register/$eventId sử dụng lớp nền có ảnh chìm kết hợp khối kính trong suốt nổi khối lồi như giọt nước (radial-gradient highlight + convex droplet shadow); hiệu ứng gợn sóng mặt nước (triggerWaterRipple) chỉ kích hoạt khi bấm vào nút.
+#     - Đã gỡ bỏ hoàn toàn phần Timeline sự kiện; Header chỉ hiển thị duy nhất Logo CEO HN10 (/hn10-logo-2.png) cùng Tên sự kiện (bỏ text 'CLB DOANH NHÂN CEO HN10 · CỔNG CHECK-IN SỰ KIỆN'); gỡ bỏ nút 'Chụp & Album sự kiện', nút 'Màn Quay Thưởng Sticker' và ẩn hoàn toàn chế độ Online/Offline khỏi giao diện.
+#   * [KHÔNG FIX CỨNG TỌA ĐÀM HAY TIỆC KHI TẠO SỰ KIỆN MỚI (NODE-CRM-005)]:
+#     - EventWizard.tsx và EventPartsEditor.tsx khởi tạo danh sách phần chương trình rỗng (parts = []). Chỉ khi người dùng bấm '+ Thêm phần chương trình' thì giao diện cấu hình phần đó mới hiển thị.
+#   * [PHÂN QUYỀN RBAC TÀI KHOẢN: LƯU QUYỀN CỤ THỂ, ẨN GIAO DIỆN & CHẶN API (NODE-CRM-013, NODE-CRM-014, NODE-CORE-002)]:
+#     - Hỗ trợ chọn quyền theo Chức danh (Role) hoặc Tích quyền cụ thể (customPermissions) tại cả /master?tab=accounts và /account-settings?tab=users.
+#     - Khi tài khoản được gán quyền cụ thể hoặc vai trò giới hạn, Sidebar.tsx, usePermissions.ts và useRole.ts tự động ẩn toàn bộ menu và nút thao tác không được cấp phép; RolesGuard ở Backend chặn và trả về 403 Forbidden cho mọi request API nằm ngoài phạm vi quyền được gán.
+# 27/11/2026 (v12.82) — QUẢN LÝ LANDING PAGE 7 VIDEO TRƯỢT NGANG & VOTING QR REALTIME, CHECK-IN LIQUID GLASS THEO TIMELINE KÈM STICKER SỐ MAY MẮN & BẢNG HỌC VIÊN CHUẨN LARKSUITE BASE:
+#   * [QUẢN LÝ LANDING PAGE 7 VIDEO SLIDES & REALTIME VOTING (NODE-CRM-023)]:
+#     - Hiển thị trên Sidebar CRM nhóm Cài đặt hệ thống (/admin/landing-webs), hỗ trợ chỉnh sửa text tự do, tải 7 video trượt ngang (1 video/slide) chuẩn Pinterest 900790362966152495.
+#     - Mỗi slide video có phần bình chọn (voting) riêng ngay bên dưới video kèm khung thời gian mở/đóng cổng đếm vote (votingStartAt, votingEndAt).
+#     - Bấm 'Áp dụng & Xuất bản QR' sẽ public ra ngoài kèm mã QR công khai (/landing/video-voting). Mỗi người quét QR phải điền Tên & Email, mỗi người chỉ được vote 1 lần duy nhất (lưu bảng landing_video_votes), có màn thống kê tỷ lệ % lựa chọn realtime.
+#   * [FORM CHECK-IN SỰ KIỆN LUXURY WHITE LIQUID GLASS & STICKER SỐ MAY MẮN (NODE-CRM-007, NODE-CRM-015)]:
+#     - Hiển thị Timeline lịch trình chính thức của sự kiện đang chọn; chia 3 danh mục nằm ngang (grid-cols-3) ngay cả trên màn hình điện thoại; giao diện Luxury White nền sáng chữ đen sắc nét kèm hiệu ứng Liquid Glass.
+#     - Mỗi khách mời tới check-in được cấp 1 Sticker Số May Mắn ngẫu nhiên 4 chữ số (#XXXX) và tự động lưu trực tiếp vào danh sách ứng viên Màn Quay Thưởng (/lucky-draw).
+#   * [BẢNG HỌC VIÊN TỰ ĐỘNG SINH CỘT TƯƠNG THÍCH LARKSUITE BASE (NODE-CRM-003, NODE-CRM-026)]:
+#     - Bảng Học viên (/members) mặc định chế độ Table, tự động ánh xạ và sinh đầy đủ các cột tương thích Larksuite Base CEO (Chức vụ, Tên Doanh nghiệp, Ngày sinh, Giới tính, Mã số thuế, Quy mô, Sản phẩm chủ lực, Địa chỉ, Website, Nhu cầu B2B, Vai trò CLB, Người giới thiệu, Ghi chú...) và mọi cột phát sinh theo đúng file Excel/CSV người dùng đã import.
 # 25/11/2026 (v12.81) — CHUẨN HÓA 9 ROLES & 7 BAN CHUYÊN TRÁCH, TÁCH BIỆT QUYỀN APP CEOHN10 VS CRM, IMPORT FILE THEO CHỨC NĂNG TỰ SINH CỘT, ĐỒNG NHẤT CỘT THAO TÁC CĂN GIỮA & LOGO SIDEBAR KHÔNG NỀN:
 #   * [CHUẨN HÓA 9 ROLES & 7 BAN CHUYÊN TRÁCH TOÀN HỆ THỐNG]:
 #     - Xóa sạch toàn bộ role cũ (chu_tich, ban_dieu_hanh, thanh_vien_ban_*, tong_thu_ky, ban_thu_ky) và ban cũ trong code & CSDL PostgreSQL.

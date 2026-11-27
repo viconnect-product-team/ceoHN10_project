@@ -373,7 +373,7 @@ function MembersPage() {
 
   const { favorites, pinned, recent, saved } = useMemberPrefs();
 
-  const [view, setView] = useUrlState<"cards" | "table">("view", "cards");
+  const [view, setView] = useUrlState<"cards" | "table">("view", "table");
   const [q, setQ] = useUrlState<string>("q", "");
   const [industry, setIndustry] = useUrlState<IndustryKey | "all">("industry", "all");
   const [region, setRegion] = useUrlState<RegionKey | "all">("region", "all");
@@ -445,39 +445,73 @@ function MembersPage() {
 
   const dynamicFields: DynamicFieldDef[] = schemaQuery.data || [];
 
-  // Lọc các trường động tùy biến không thuộc tập trường chuẩn cốt lõi và tự động gom cả các trường từ customData của các bản ghi đã import
+  // Bộ cột chuẩn tương thích 100% Larksuite Base CEO (https://lopceohn9.sg.larksuite.com/base/YL3Hbuc0laJG6CsyRB8lWr4Lgpd)
+  const LARKSUITE_COMPATIBLE_COLUMNS: DynamicFieldDef[] = [
+    { id: "lark_position", field_name: "position", field_label: "Chức vụ", field_type: "text", is_required: false, is_enabled: true, order_index: 10 },
+    { id: "lark_company", field_name: "company", field_label: "Tên Doanh nghiệp", field_type: "text", is_required: false, is_enabled: true, order_index: 11 },
+    { id: "lark_phone", field_name: "phone", field_label: "Số điện thoại", field_type: "text", is_required: false, is_enabled: true, order_index: 12 },
+    { id: "lark_email", field_name: "email", field_label: "Email", field_type: "text", is_required: false, is_enabled: true, order_index: 13 },
+    { id: "lark_dob", field_name: "dob", field_label: "Ngày sinh", field_type: "text", is_required: false, is_enabled: true, order_index: 14 },
+    { id: "lark_gender", field_name: "gender", field_label: "Giới tính", field_type: "text", is_required: false, is_enabled: true, order_index: 15 },
+    { id: "lark_tax_code", field_name: "tax_code", field_label: "Mã số thuế", field_type: "text", is_required: false, is_enabled: true, order_index: 16 },
+    { id: "lark_company_size", field_name: "company_size", field_label: "Quy mô nhân sự", field_type: "text", is_required: false, is_enabled: true, order_index: 17 },
+    { id: "lark_main_products", field_name: "main_products", field_label: "Sản phẩm / Dịch vụ chủ lực", field_type: "text", is_required: false, is_enabled: true, order_index: 18 },
+    { id: "lark_address", field_name: "address", field_label: "Địa chỉ doanh nghiệp", field_type: "text", is_required: false, is_enabled: true, order_index: 19 },
+    { id: "lark_website", field_name: "website", field_label: "Website / Fanpage", field_type: "text", is_required: false, is_enabled: true, order_index: 20 },
+    { id: "lark_b2b_needs", field_name: "b2b_needs", field_label: "Nhu cầu kết nối B2B", field_type: "text", is_required: false, is_enabled: true, order_index: 21 },
+    { id: "lark_club_role", field_name: "club_role", field_label: "Vai trò CLB", field_type: "text", is_required: false, is_enabled: true, order_index: 22 },
+    { id: "lark_referrer", field_name: "referrer", field_label: "Người giới thiệu", field_type: "text", is_required: false, is_enabled: true, order_index: 23 },
+    { id: "lark_about", field_name: "about", field_label: "Ghi chú", field_type: "text", is_required: false, is_enabled: true, order_index: 24 },
+  ];
+
+  // Lọc các trường động tùy biến & tự động hợp nhất bộ cột tương thích Larksuite + mọi cột phát sinh từ file import
   const customDynamicFieldDefs = useMemo(() => {
-    const standardKeys = new Set([
+    const fixedTableKeys = new Set([
       "code",
       "name",
-      "phone",
-      "email",
-      "contact",
       "level",
       "region",
       "status",
       "paymentStatus",
+      "payment_status",
       "feePaid",
-      "address",
-      "about",
       "department",
+      "industry",
+      "joined_at",
+      "joinedAt",
     ]);
-    const list: DynamicFieldDef[] = [...dynamicFields.filter((df) => {
-      const k = df.field_name || (df as any).field_key;
-      return !standardKeys.has(k);
-    })];
-    const existingKeys = new Set(list.map((df) => df.field_name || (df as any).field_key));
+    const list: DynamicFieldDef[] = [];
+    const existingKeys = new Set<string>();
 
+    // 1. Ưu tiên các trường đã cấu hình trong Dynamic Schema từ Database / Import
+    dynamicFields.forEach((df) => {
+      const k = df.field_name || (df as any).field_key;
+      if (k && !fixedTableKeys.has(k) && !existingKeys.has(k)) {
+        existingKeys.add(k);
+        list.push(df);
+      }
+    });
+
+    // 2. Bổ sung bộ cột chuẩn tương thích Larksuite Base CEO
+    LARKSUITE_COMPATIBLE_COLUMNS.forEach((larkCol) => {
+      const k = larkCol.field_name;
+      if (k && !fixedTableKeys.has(k) && !existingKeys.has(k)) {
+        existingKeys.add(k);
+        list.push(larkCol);
+      }
+    });
+
+    // 3. Tự động phát hiện và sinh cột cho bất kỳ trường mới nào trong customData của file đã import
     members.forEach((m) => {
       const custom = (m as any).customData || (m as any).custom_data;
       if (custom && typeof custom === "object") {
         Object.keys(custom).forEach((k) => {
-          if (!standardKeys.has(k) && !existingKeys.has(k)) {
+          if (!fixedTableKeys.has(k) && !existingKeys.has(k)) {
             existingKeys.add(k);
             list.push({
               id: `auto_${k}`,
               field_name: k,
-              field_label: k.replace(/_/g, " "),
+              field_label: k.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
               field_type: "text",
               is_required: false,
               is_enabled: true,
@@ -1734,17 +1768,27 @@ function MembersPage() {
                         )}
                       </div>
                     </td>
-                    {/* Render các giá trị của cột dữ liệu động tùy biến */}
+                    {/* Render các giá trị của cột dữ liệu động tương thích Larksuite Base & File Import */}
                     {visibleDynamicCols.map((colKey) => {
                       const custom = (m as any).customData || (m as any).custom_data || {};
-                      const rawVal = custom[colKey];
-                      const valStr = rawVal != null ? String(rawVal) : "—";
+                      let rawVal = custom[colKey];
+                      if (rawVal === undefined || rawVal === null || rawVal === "") {
+                        if (colKey === "position") rawVal = (m as any).position || m.contact;
+                        else if (colKey === "company") rawVal = (m as any).company_name || (m as any).company || m.contact;
+                        else if (colKey === "phone") rawVal = m.phone;
+                        else if (colKey === "email") rawVal = m.email;
+                        else if (colKey === "address") rawVal = m.address;
+                        else if (colKey === "about") rawVal = m.about;
+                        else if (colKey === "club_role") rawVal = (m as any).executive_role || (m as any).clubRole;
+                        else rawVal = (m as any)[colKey];
+                      }
+                      const valStr = rawVal != null && String(rawVal).trim() !== "" ? String(rawVal) : "—";
                       return (
                         <td
                           key={colKey}
                           className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap text-slate-800 dark:text-slate-200 bg-blue-50/10 dark:bg-blue-950/10"
                         >
-                          <TruncatedText text={valStr} maxWidth="max-w-[200px]" />
+                          <TruncatedText text={valStr} maxWidth="max-w-[220px]" />
                         </td>
                       );
                     })}

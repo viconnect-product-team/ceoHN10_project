@@ -19,11 +19,12 @@ import {
   CreateLandingWebDto,
   ApplySubdomainDto,
   TestApiConnectorDto,
+  CastLandingVideoVoteDto,
 } from './dto/landing.dto';
 
 @Controller('admin/landing-webs')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('admin', 'president', 'vice_president', 'superadmin')
+@Roles('admin', 'president', 'vice_president', 'superadmin', 'platform_admin', 'quan_tri', 'lop_truong', 'lop_pho', 'truong_ban_chuyen_trach')
 export class LandingAdminController {
   constructor(private readonly landingService: LandingService) {}
 
@@ -69,6 +70,11 @@ export class LandingAdminController {
   async testApi(@Body() body: TestApiConnectorDto) {
     return this.landingService.testApiConnector(body as any);
   }
+
+  @Get(':id/vote-stats')
+  async getAdminVoteStats(@Param('id') id: string) {
+    return this.landingService.getVideoVotingStats(id);
+  }
 }
 
 @Controller(['public/landing-webs', 'api/public/landing-webs'])
@@ -78,5 +84,19 @@ export class LandingPublicController {
   @Get(':slugOrSubdomain')
   async getPublic(@Param('slugOrSubdomain') slugOrSubdomain: string) {
     return this.landingService.getPublicLandingWeb(slugOrSubdomain);
+  }
+
+  @Get(':slugOrSubdomain/vote-stats')
+  async getVoteStats(@Param('slugOrSubdomain') slugOrSubdomain: string) {
+    return this.landingService.getVideoVotingStats(slugOrSubdomain);
+  }
+
+  @Post(':slugOrSubdomain/vote')
+  @HttpCode(HttpStatus.OK)
+  async castVote(
+    @Param('slugOrSubdomain') slugOrSubdomain: string,
+    @Body() body: CastLandingVideoVoteDto,
+  ) {
+    return this.landingService.castVideoVote(slugOrSubdomain, body);
   }
 }

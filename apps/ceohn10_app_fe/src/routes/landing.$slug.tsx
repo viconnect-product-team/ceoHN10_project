@@ -9,8 +9,44 @@ import {
 import { StartupMobileShowcaseLanding } from "@/components/landing/StartupMobileShowcaseLanding";
 import { ForgeLuxuryAtelierLanding } from "@/components/landing/ForgeLuxuryAtelierLanding";
 import { ModernLuxuryEstateLanding } from "@/components/landing/ModernLuxuryEstateLanding";
+import {
+  VideoVotingShowcaseLanding,
+  DEFAULT_VIDEO_VOTING_7_SLIDES,
+} from "@/components/landing/VideoVotingShowcaseLanding";
 import { EcosystemPitchPosters } from "@/components/showcase/EcosystemPitchPosters";
 import { Globe, ArrowLeft } from "lucide-react";
+
+const FALLBACK_VIDEO_VOTING_CONFIG: LandingWebConfig = {
+  id: "lw_video_voting_7slides_default",
+  name: "Trình Chiếu 7 Video & Bình Chọn Realtime (Pinterest 900790362966152495)",
+  slug: "video-voting",
+  subdomain: "video-voting",
+  isPublished: true,
+  template: "video_voting_showcase",
+  votingStartAt: new Date(Date.now() - 3600 * 1000).toISOString(),
+  votingEndAt: new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString(),
+  theme: {
+    primaryColor: "#ecad29",
+    secondaryColor: "#0B0F19",
+    textColor: "#FFFFFF",
+    backgroundColor: "#07090E",
+    fontFamily: "Inter, Oswald, sans-serif",
+  },
+  brand: {
+    logoText: "CEO HN10 VIDEO SHOWCASE & VOTING",
+    logoIcon: "film",
+    contactPhone: "0983.1010.10",
+    contactEmail: "contact@ceohn10.viconnect.vn",
+  },
+  navMenu: [],
+  slides: DEFAULT_VIDEO_VOTING_7_SLIDES,
+  subScreens: [],
+  apiConfig: {
+    enabled: false,
+    endpointUrl: "",
+    rootPath: "",
+  },
+};
 
 const FALLBACK_V1_CONFIG: LandingWebConfig = {
   id: "lw_timed_cards_opening_default",
@@ -221,10 +257,12 @@ function PublicLandingPage() {
     );
   }
 
-  // Active configuration: prioritize server data, fallback to predefined templates for web-v1, web-v2, web-v3, web-v4
+  // Active configuration: prioritize server data, fallback to predefined templates
   const effectiveConfig =
     landingWeb ||
-    (["web-v4", "web4", "web-4", "v4", "estate", "real-estate", "residence", "luxury-estate"].includes(cleanSlug)
+    (["video-voting", "video-vote", "voting", "web-v5", "v5", "900790362966152495"].includes(cleanSlug)
+      ? FALLBACK_VIDEO_VOTING_CONFIG
+      : ["web-v4", "web4", "web-4", "v4", "estate", "real-estate", "residence", "luxury-estate"].includes(cleanSlug)
       ? FALLBACK_V4_CONFIG
       : ["web-v3", "web3", "web-3", "v3", "forge-atelier", "luxury-atelier"].includes(cleanSlug)
         ? FALLBACK_V3_CONFIG
@@ -257,6 +295,10 @@ function PublicLandingPage() {
         </a>
       </div>
     );
+  }
+
+  if (effectiveConfig.template === "video_voting_showcase") {
+    return <VideoVotingShowcaseLanding config={effectiveConfig} />;
   }
 
   if (effectiveConfig.template === "modern_luxury_estate") {

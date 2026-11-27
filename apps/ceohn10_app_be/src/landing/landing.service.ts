@@ -2,8 +2,15 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  OnModuleInit,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+
+export interface LandingVoteOption {
+  id: string;
+  label: string;
+  description?: string;
+}
 
 export interface LandingMenuItem {
   id: string;
@@ -24,6 +31,9 @@ export interface LandingSlide {
   title2: string;
   description: string;
   image: string;
+  videoUrl?: string;
+  votingQuestion?: string;
+  votingOptions?: LandingVoteOption[];
   bookmarkAction?: string;
   ctaText: string;
   ctaLink?: string;
@@ -159,7 +169,13 @@ export interface LandingWebConfig {
   template:
   | 'timed_cards_opening'
   | 'ceohn10_executive'
-  | 'startup_mobile_showcase';
+  | 'startup_mobile_showcase'
+  | 'forge_luxury_atelier'
+  | 'modern_luxury_estate'
+  | 'video_voting_showcase';
+  votingStartAt?: string;
+  votingEndAt?: string;
+  votingDurationMinutes?: number;
   theme: {
     primaryColor: string;
     secondaryColor?: string;
@@ -693,9 +709,155 @@ const DEFAULT_SUB_SCREENS: LandingSubScreen[] = [
 
 const SETTINGS_KEY = 'crm_landing_webs_configs';
 
+export const DEFAULT_VIDEO_VOTING_7_SLIDES: LandingSlide[] = [
+  {
+    id: 'vslide-1',
+    place: 'MÀN 01 · TẦM NHÌN CHIẾN LƯỢC CEO HN10',
+    title1: 'KHỞI NGUỒN',
+    title2: 'THỊNH VƯỢNG',
+    description:
+      'Hành trình kiến tạo hệ sinh thái doanh nhân CEO HN10 tiên phong đổi mới, số hóa quản trị và mở rộng liên minh thương mại đa ngành trên toàn quốc.',
+    image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1600&q=85',
+    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-city-traffic-at-night-11-large.mp4',
+    votingQuestion: 'Bạn đánh giá thế nào về định hướng Chiến lược & Tầm nhìn ở Video Màn 01?',
+    votingOptions: [
+      { id: 'opt-1-1', label: 'Đột phá & Truyền cảm hứng mạnh mẽ', description: 'Tầm nhìn sắc bén, dẫn dắt xu thế' },
+      { id: 'opt-1-2', label: 'Thực tiễn & Bám sát nhu cầu doanh nghiệp', description: 'Dễ dàng áp dụng vào vận hành' },
+      { id: 'opt-1-3', label: 'Sáng tạo & Khác biệt vượt trội', description: 'Tạo dấu ấn thương hiệu độc bản' },
+    ],
+    ctaText: 'Bình Chọn Video 01',
+    ctaLink: '#vote',
+  },
+  {
+    id: 'vslide-2',
+    place: 'MÀN 02 · CHUYỂN ĐỔI SỐ & AI DOANH NGHIỆP',
+    title1: 'CÔNG NGHỆ',
+    title2: 'TIÊN PHONG',
+    description:
+      'Ứng dụng Trí tuệ nhân tạo (AI), Big Data và nền tảng quản trị thông minh giúp các doanh nghiệp thành viên tối ưu 40% hiệu suất vận hành.',
+    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1600&q=85',
+    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-blue-circuits-99-large.mp4',
+    votingQuestion: 'Giải pháp công nghệ nào trong Video Màn 02 ấn tượng nhất với bạn?',
+    votingOptions: [
+      { id: 'opt-2-1', label: 'Hệ sinh thái AI & Tự động hóa quy trình', description: 'Tối ưu nhân sự và tốc độ xử lý' },
+      { id: 'opt-2-2', label: 'Nền tảng Web CRM & App Mobile CEO HN10', description: 'Kết nối dữ liệu xuyên suốt 24/7' },
+      { id: 'opt-2-3', label: 'Phân tích dữ liệu & Báo cáo tài chính Realtime', description: 'Minh bạch và chính xác tuyệt đối' },
+    ],
+    ctaText: 'Bình Chọn Video 02',
+    ctaLink: '#vote',
+  },
+  {
+    id: 'vslide-3',
+    place: 'MÀN 03 · LIÊN MINH GIAO THƯƠNG B2B',
+    title1: 'KẾT NỐI',
+    title2: 'ĐỈNH CAO',
+    description:
+      'Thúc đẩy các thương vụ B2B Matching trăm tỷ nội khối, nơi chữ Tín và tình đồng niên trở thành bảo chứng vững chắc nhất cho mọi hợp đồng.',
+    image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1600&q=85',
+    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-business-people-shaking-hands-in-an-office-4822-large.mp4',
+    votingQuestion: 'Giá trị kết nối giao thương nào ở Video Màn 03 bạn tâm đắc nhất?',
+    votingOptions: [
+      { id: 'opt-3-1', label: 'Sàn giao thương B2B & Đặc quyền nội khối', description: 'Ưu đãi chéo 15-30% giữa các học viên' },
+      { id: 'opt-3-2', label: 'Phiên kết nối Business Matching 1-on-1', description: 'Gặp gỡ trực tiếp chủ doanh nghiệp' },
+      { id: 'opt-3-3', label: 'Liên minh đấu thầu & Hợp tác liên ngành', description: 'Cùng thực hiện các dự án quy mô lớn' },
+    ],
+    ctaText: 'Bình Chọn Video 03',
+    ctaLink: '#vote',
+  },
+  {
+    id: 'vslide-4',
+    place: 'MÀN 04 · ĐÀO TẠO LÃNH ĐẠO THỰC CHIẾN',
+    title1: 'TRÍ TUỆ',
+    title2: 'BẢN LĨNH',
+    description:
+      'Chương trình 30 chuyên đề đào tạo CEO chuyên sâu cùng các chuyên gia đầu ngành, kết hợp thăm quan thực tế doanh nghiệp (Company Tour).',
+    image: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1600&q=85',
+    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-people-working-in-a-modern-office-4347-large.mp4',
+    votingQuestion: 'Hoạt động đào tạo nào trong Video Màn 04 mang lại giá trị cao nhất?',
+    votingOptions: [
+      { id: 'opt-4-1', label: 'Chuyên đề Quản trị chiến lược & Tài chính', description: 'Nâng tầm tư duy điều hành vĩ mô' },
+      { id: 'opt-4-2', label: 'CEO Talk & Chia sẻ bài học thực chiến', description: 'Kinh nghiệm xương máu từ thương trường' },
+      { id: 'opt-4-3', label: 'Business Tour thăm quan nhà máy/trụ sở', description: 'Học hỏi mô hình vận hành trực tiếp' },
+    ],
+    ctaText: 'Bình Chọn Video 04',
+    ctaLink: '#vote',
+  },
+  {
+    id: 'vslide-5',
+    place: 'MÀN 05 · VĂN HÓA & ĐỜI SỐNG DOANH NHÂN',
+    title1: 'GẮN KẾT',
+    title2: 'TÌNH THÂN',
+    description:
+      'Những khoảnh khắc sẻ chia ấm áp trong các kỳ Gala, sinh nhật tháng, giải Golf và hoạt động thể thao gắn kết đại gia đình CEO HN10.',
+    image: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1600&q=85',
+    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-friends-toasting-with-champagne-at-a-party-4636-large.mp4',
+    votingQuestion: 'Cảm xúc của bạn khi xem Video Màn 05 — Văn hóa Gắn kết?',
+    votingOptions: [
+      { id: 'opt-5-1', label: 'Ấm áp, chân thành như một gia đình lớn', description: 'Văn hóa sẻ chia không khoảng cách' },
+      { id: 'opt-5-2', label: 'Sôi động, đẳng cấp và giàu năng lượng', description: 'Các sự kiện Gala & thể thao rực rỡ' },
+      { id: 'opt-5-3', label: 'Tự hào là một mảnh ghép của CEO HN10', description: 'Tinh thần đồng đội gắn bó bền chặt' },
+    ],
+    ctaText: 'Bình Chọn Video 05',
+    ctaLink: '#vote',
+  },
+  {
+    id: 'vslide-6',
+    place: 'MÀN 06 · TRÁCH NHIỆM XÃ HỘI & THIỆN NGUYỆN',
+    title1: 'LAN TỎA',
+    title2: 'NHÂN VĂN',
+    description:
+      'Kinh doanh gắn liền với phụng sự xã hội: Xây trường vùng cao, trao học bổng khuyến học và đồng hành cùng những hoàn cảnh khó khăn.',
+    image: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1600&q=85',
+    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-sunrise-over-the-mountains-4100-large.mp4',
+    votingQuestion: 'Dự án cộng đồng nào trong Video Màn 06 chạm đến trái tim bạn nhất?',
+    votingOptions: [
+      { id: 'opt-6-1', label: 'Điểm trường vùng cao & Áo ấm cho em', description: 'Ươm mầm tri thức cho trẻ em nghèo' },
+      { id: 'opt-6-2', label: 'Quỹ học bổng & Khởi nghiệp trẻ', description: 'Tiếp sức thế hệ kế cận vững vàng' },
+      { id: 'opt-6-3', label: 'Cứu trợ khẩn cấp & Xây nhà tình nghĩa', description: 'Lá lành đùm lá rách kịp thời' },
+    ],
+    ctaText: 'Bình Chọn Video 06',
+    ctaLink: '#vote',
+  },
+  {
+    id: 'vslide-7',
+    place: 'MÀN 07 · KHÁT VỌNG VƯƠN TẦM QUỐC TẾ',
+    title1: 'VƯƠN RA',
+    title2: 'BIỂN LỚN',
+    description:
+      'Đưa thương hiệu doanh nghiệp CEO HN10 vươn tầm khu vực và thế giới, chinh phục những đỉnh cao mới trong kỷ nguyên kinh tế số toàn cầu.',
+    image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1600&q=85',
+    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-flying-through-clouds-in-the-sky-4164-large.mp4',
+    votingQuestion: 'Bạn kỳ vọng bước tiến nào nhất ở Video Màn 07 — Vươn tầm quốc tế?',
+    votingOptions: [
+      { id: 'opt-7-1', label: 'Xúc tiến xuất khẩu & Thương mại xuyên biên giới', description: 'Đưa sản phẩm Việt ra thế giới' },
+      { id: 'opt-7-2', label: 'Hợp tác gọi vốn & M&A với quỹ đầu tư quốc tế', description: 'Nâng cao năng lực tài chính toàn cầu' },
+      { id: 'opt-7-3', label: 'Mạng lưới kết nối CEO kiều bào & Quốc tế', description: 'Mở rộng biên giới hợp tác chiến lược' },
+    ],
+    ctaText: 'Bình Chọn Video 07',
+    ctaLink: '#vote',
+  },
+];
+
 @Injectable()
-export class LandingService {
+export class LandingService implements OnModuleInit {
   constructor(private readonly prisma: PrismaService) { }
+
+  async onModuleInit() {
+    await this.prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS public.landing_video_votes (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        landing_id TEXT NOT NULL,
+        slide_id TEXT NOT NULL,
+        option_id TEXT NOT NULL,
+        option_label TEXT,
+        voter_name TEXT NOT NULL,
+        voter_email TEXT NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+      CREATE INDEX IF NOT EXISTS idx_landing_video_votes_landing ON public.landing_video_votes(landing_id);
+      CREATE INDEX IF NOT EXISTS idx_landing_video_votes_email ON public.landing_video_votes(landing_id, LOWER(voter_email));
+    `).catch(() => {});
+  }
 
   /**
    * Lấy toàn bộ danh sách Landing Web đã cấu hình
@@ -767,6 +929,30 @@ export class LandingService {
       }
     }
 
+    // Đảm bảo luôn có Mẫu Video Voting 7 Màn (Pinterest 900790362966152495 - crm.ceohn10.viconnect.vn/landing/video-voting)
+    const t5Idx = list.findIndex(
+      (w) => w.template === 'video_voting_showcase' || w.slug === 'video-voting',
+    );
+    if (t5Idx === -1) {
+      const t5 = this.generateDefaultTemplate(
+        'video_voting_showcase',
+        'Trình Chiếu 7 Video & Bình Chọn Realtime (Pinterest 900790362966152495)',
+        'video-voting',
+      );
+      list.unshift(t5);
+      modified = true;
+    } else {
+      if (!list[t5Idx].slides || list[t5Idx].slides.length < 7) {
+        const existingSlides = list[t5Idx].slides || [];
+        const mergedSlides: LandingSlide[] = [];
+        for (let i = 0; i < 7; i++) {
+          mergedSlides.push(existingSlides[i] || DEFAULT_VIDEO_VOTING_7_SLIDES[i]);
+        }
+        list[t5Idx].slides = mergedSlides;
+        modified = true;
+      }
+    }
+
     if (modified || list.length === 0) {
       await this.saveAllLandingWebs(list);
     }
@@ -814,7 +1000,10 @@ export class LandingService {
     template?:
     | 'timed_cards_opening'
     | 'ceohn10_executive'
-    | 'startup_mobile_showcase';
+    | 'startup_mobile_showcase'
+    | 'forge_luxury_atelier'
+    | 'modern_luxury_estate'
+    | 'video_voting_showcase';
   }): Promise<LandingWebConfig> {
     const list = await this.getAllLandingWebs();
 
@@ -993,6 +1182,23 @@ export class LandingService {
             'Ứng Dụng Di Động CEO HN10 — Startup Mobile Showcase (Mẫu 2)',
             'web-v2',
           );
+      } else if (
+        [
+          'video-voting',
+          'video-vote',
+          'voting',
+          'web-v5',
+          'v5',
+          '900790362966152495',
+        ].includes(target)
+      ) {
+        matched =
+          list.find((w) => w.template === 'video_voting_showcase') ||
+          this.generateDefaultTemplate(
+            'video_voting_showcase',
+            'Trình Chiếu 7 Video & Bình Chọn Realtime (Pinterest 900790362966152495)',
+            'video-voting',
+          );
       }
     }
 
@@ -1157,39 +1363,252 @@ export class LandingService {
   }
 
   /**
+   * Bình chọn cho Video Slide trên Landing Page
+   * - Mỗi người (theo email) chỉ được vote 1 lần duy nhất
+   * - Phải điền Tên và Email để lưu lại vào CSDL
+   * - Kiểm tra thời gian bình chọn đã set up
+   */
+  async castVideoVote(
+    slugOrId: string,
+    payload: {
+      slideId: string;
+      optionId: string;
+      voterName: string;
+      voterEmail: string;
+    },
+  ) {
+    const voterName = (payload.voterName || '').trim();
+    const voterEmail = (payload.voterEmail || '').trim().toLowerCase();
+    const slideId = (payload.slideId || '').trim();
+    const optionId = (payload.optionId || '').trim();
+
+    if (!voterName || !voterEmail) {
+      throw new BadRequestException(
+        'Vui lòng điền đầy đủ Họ tên và Email để hệ thống ghi nhận lượt bình chọn!',
+      );
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(voterEmail)) {
+      throw new BadRequestException('Địa chỉ Email không hợp lệ.');
+    }
+    if (!slideId || !optionId) {
+      throw new BadRequestException('Vui lòng chọn một phương án bình chọn.');
+    }
+
+    const list = await this.getAllLandingWebs();
+    const target = (slugOrId || '').toLowerCase().trim();
+    let landing =
+      list.find(
+        (w) =>
+          w.id === slugOrId ||
+          (w.slug && w.slug.toLowerCase() === target) ||
+          (w.subdomain && w.subdomain.toLowerCase() === target),
+      ) || list.find((w) => w.template === 'video_voting_showcase');
+
+    if (!landing) {
+      landing = this.generateDefaultTemplate(
+        'video_voting_showcase',
+        'Trình Chiếu 7 Video & Bình Chọn Realtime (Pinterest 900790362966152495)',
+        'video-voting',
+      );
+    }
+
+    const now = Date.now();
+    if (landing.votingStartAt) {
+      const startMs = new Date(landing.votingStartAt).getTime();
+      if (!isNaN(startMs) && now < startMs) {
+        throw new BadRequestException(
+          `Chưa đến thời gian mở cổng bình chọn (Bắt đầu lúc: ${new Date(startMs).toLocaleString('vi-VN')}).`,
+        );
+      }
+    }
+    if (landing.votingEndAt) {
+      const endMs = new Date(landing.votingEndAt).getTime();
+      if (!isNaN(endMs) && now > endMs) {
+        throw new BadRequestException(
+          `Thời gian bình chọn đã kết thúc lúc ${new Date(endMs).toLocaleString('vi-VN')}.`,
+        );
+      }
+    }
+
+    // Kiểm tra mỗi người chỉ được vote 1 lần duy nhất trên landing page này
+    const existingVotes = await this.prisma.$queryRawUnsafe<any[]>(
+      `SELECT id, slide_id, option_id, option_label, created_at
+       FROM public.landing_video_votes
+       WHERE landing_id = $1 AND LOWER(voter_email) = $2
+       LIMIT 1`,
+      landing.id,
+      voterEmail,
+    ).catch(() => []);
+
+    if (existingVotes.length > 0) {
+      throw new BadRequestException(
+        `Email "${voterEmail}" đã thực hiện bình chọn trước đó! Mỗi người chỉ được bình chọn 1 lần duy nhất.`,
+      );
+    }
+
+    const slide = (landing.slides || []).find((s) => s.id === slideId);
+    const opt = (slide?.votingOptions || []).find((o) => o.id === optionId);
+    const optionLabel = opt?.label || optionId;
+
+    await this.prisma.$executeRawUnsafe(
+      `INSERT INTO public.landing_video_votes (
+        id, landing_id, slide_id, option_id, option_label, voter_name, voter_email, created_at
+      ) VALUES (
+        gen_random_uuid(), $1, $2, $3, $4, $5, $6, NOW()
+      )`,
+      landing.id,
+      slideId,
+      optionId,
+      optionLabel,
+      voterName,
+      voterEmail,
+    );
+
+    const stats = await this.getVideoVotingStats(landing.id);
+    return {
+      ok: true,
+      message: `Cảm ơn ${voterName}! Hệ thống đã ghi nhận lựa chọn bình chọn của bạn.`,
+      stats,
+    };
+  }
+
+  /**
+   * Thống kê kết quả bình chọn video theo thời gian thực (Realtime tỷ lệ lựa chọn & danh sách người vote)
+   */
+  async getVideoVotingStats(slugOrId: string) {
+    const list = await this.getAllLandingWebs();
+    const target = (slugOrId || '').toLowerCase().trim();
+    let landing =
+      list.find(
+        (w) =>
+          w.id === slugOrId ||
+          (w.slug && w.slug.toLowerCase() === target) ||
+          (w.subdomain && w.subdomain.toLowerCase() === target),
+      ) || list.find((w) => w.template === 'video_voting_showcase');
+
+    if (!landing) {
+      landing = this.generateDefaultTemplate(
+        'video_voting_showcase',
+        'Trình Chiếu 7 Video & Bình Chọn Realtime (Pinterest 900790362966152495)',
+        'video-voting',
+      );
+    }
+
+    const rows = await this.prisma.$queryRawUnsafe<any[]>(
+      `SELECT id, slide_id, option_id, option_label, voter_name, voter_email, created_at
+       FROM public.landing_video_votes
+       WHERE landing_id = $1
+       ORDER BY created_at DESC`,
+      landing.id,
+    ).catch(() => []);
+
+    // Lọc các lượt vote nằm trong khoảng thời gian đã cài đặt (nếu có)
+    const startMs = landing.votingStartAt ? new Date(landing.votingStartAt).getTime() : null;
+    const endMs = landing.votingEndAt ? new Date(landing.votingEndAt).getTime() : null;
+
+    const validVotes = rows.filter((r) => {
+      const t = new Date(r.created_at).getTime();
+      if (startMs && !isNaN(startMs) && t < startMs) return false;
+      if (endMs && !isNaN(endMs) && t > endMs) return false;
+      return true;
+    });
+
+    const slideStats = (landing.slides || []).map((slide, idx) => {
+      const votesForSlide = validVotes.filter((v) => v.slide_id === slide.id);
+      const totalSlideVotes = votesForSlide.length;
+      const options = (slide.votingOptions || []).map((opt) => {
+        const count = votesForSlide.filter((v) => v.option_id === opt.id).length;
+        const percentage = totalSlideVotes > 0 ? Math.round((count / totalSlideVotes) * 1000) / 10 : 0;
+        return {
+          id: opt.id,
+          label: opt.label,
+          description: opt.description || '',
+          count,
+          percentage,
+        };
+      });
+
+      return {
+        slideId: slide.id,
+        slideNumber: idx + 1,
+        place: slide.place,
+        title: `${slide.title1} ${slide.title2}`.trim(),
+        videoUrl: slide.videoUrl || '',
+        image: slide.image || '',
+        votingQuestion: slide.votingQuestion || `Bình chọn cho Video Màn 0${idx + 1}`,
+        totalVotes: totalSlideVotes,
+        options,
+      };
+    });
+
+    return {
+      landingId: landing.id,
+      slug: landing.slug,
+      name: landing.name,
+      isPublished: landing.isPublished,
+      votingStartAt: landing.votingStartAt || null,
+      votingEndAt: landing.votingEndAt || null,
+      totalVoters: validVotes.length,
+      allTimeVoters: rows.length,
+      slideStats,
+      recentVoters: validVotes.slice(0, 50).map((v) => ({
+        id: v.id,
+        slideId: v.slide_id,
+        optionId: v.option_id,
+        optionLabel: v.option_label,
+        voterName: v.voter_name,
+        voterEmail: v.voter_email,
+        createdAt: v.created_at,
+      })),
+    };
+  }
+
+  /**
    * Tạo cấu hình mẫu chuẩn
    */
   private generateDefaultTemplate(
     template:
       | 'timed_cards_opening'
       | 'ceohn10_executive'
-      | 'startup_mobile_showcase',
+      | 'startup_mobile_showcase'
+      | 'forge_luxury_atelier'
+      | 'modern_luxury_estate'
+      | 'video_voting_showcase',
     name: string,
     slug?: string,
     subdomain?: string,
   ): LandingWebConfig {
     const isCeo = template === 'ceohn10_executive';
     const isStartupMobile = template === 'startup_mobile_showcase';
+    const isVideoVoting = template === 'video_voting_showcase';
     const now = new Date().toISOString();
-    const id = `lw_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    const endDefault = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
+    const id = isVideoVoting
+      ? 'lw_video_voting_7slides_default'
+      : `lw_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 
     return {
       id,
       name,
-      slug: slug || (isStartupMobile ? 'web-v2' : 'web-v1'),
-      subdomain: subdomain || (isStartupMobile ? 'web-v2' : 'web-v1'),
+      slug: slug || (isVideoVoting ? 'video-voting' : isStartupMobile ? 'web-v2' : 'web-v1'),
+      subdomain: subdomain || (isVideoVoting ? 'video-voting' : isStartupMobile ? 'web-v2' : 'web-v1'),
       isPublished: true,
       template,
+      votingStartAt: isVideoVoting ? now : undefined,
+      votingEndAt: isVideoVoting ? endDefault : undefined,
+      votingDurationMinutes: isVideoVoting ? 120 : undefined,
       theme: {
-        primaryColor: isCeo || isStartupMobile ? '#003B95' : '#ecad29',
-        secondaryColor: isCeo || isStartupMobile ? '#ecad29' : '#1a1a1a',
+        primaryColor: isVideoVoting ? '#ecad29' : isCeo || isStartupMobile ? '#003B95' : '#ecad29',
+        secondaryColor: isVideoVoting ? '#0B0F19' : isCeo || isStartupMobile ? '#ecad29' : '#1a1a1a',
         textColor: isStartupMobile ? '#0F172A' : '#FFFFFF',
-        backgroundColor: isStartupMobile ? '#F8FAFC' : '#111317',
+        backgroundColor: isStartupMobile ? '#F8FAFC' : '#0B0F19',
         fontFamily: 'Inter, Oswald, sans-serif',
       },
       brand: {
         logoText:
-          isCeo || isStartupMobile
+          isVideoVoting
+            ? 'CEO HN10 VIDEO SHOWCASE & VOTING'
+            : isCeo || isStartupMobile
             ? 'CLB Doanh Nhân CEO HN10'
             : 'Globe Express',
         logoIcon: isStartupMobile ? 'smartphone' : isCeo ? 'shield' : 'globe',
@@ -1261,7 +1680,9 @@ export class LandingService {
             },
           ]
           : DEFAULT_TIMED_CARDS_NAV,
-      slides: isCeo
+      slides: isVideoVoting
+        ? JSON.parse(JSON.stringify(DEFAULT_VIDEO_VOTING_7_SLIDES))
+        : isCeo
         ? [
           {
             id: 's-1',

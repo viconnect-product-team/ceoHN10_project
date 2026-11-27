@@ -183,6 +183,19 @@ function StandaloneGuestEventRegistrationPage() {
 
   const [ticketCount, setTicketCount] = useState(1);
   const [note, setNote] = useState("");
+  const [customFieldValues, setCustomFieldValues] = useState<Record<string, any>>({});
+  const regFormCfg = (event as any).formFieldsConfig || {};
+  const customRegFields: Array<{
+    id: string;
+    label: string;
+    type: string;
+    required?: boolean;
+    optionsText?: string;
+  }> = Array.isArray(regFormCfg.registrationCustomFields)
+    ? regFormCfg.registrationCustomFields
+    : Array.isArray((event as any).customFields)
+      ? (event as any).customFields
+      : [];
   const [isCheckinNow, setIsCheckinNow] = useState(() => {
     if (typeof window !== "undefined") {
       const sp = new URLSearchParams(window.location.search);
@@ -191,11 +204,83 @@ function StandaloneGuestEventRegistrationPage() {
     return false;
   });
 
-  // Danh mục các phần tham gia sự kiện (Event Parts / Sessions)
-  const availableParts: string[] = (Array.isArray(event.parts) && event.parts.length > 0)
+  // Danh mục các phần tham gia sự kiện (Chỉ lấy theo cấu hình người dùng thêm, không fix cứng Tọa đàm/Tiệc)
+  const availableParts: string[] = Array.isArray(event.parts) && event.parts.length > 0
     ? event.parts
-    : ["Tọa đàm / Hội nghị Chuyên Đề", "Tiệc Gala Dinner & Kết Nối Giao Thương"];
+        .map((p: any) => (typeof p === "string" ? p : p?.name || p?.title || ""))
+        .filter(Boolean)
+    : [];
   const [selectedParts, setSelectedParts] = useState<string[]>(availableParts);
+
+  // Lấy danh sách Timeline sự kiện (có thu gọn scroll khi dài quá 5 mục)
+  const eventTimelineList: Array<{ time?: string; title?: string; speaker?: string }> = (() => {
+    const src = (event as any).agenda || (event as any).timeline;
+    if (Array.isArray(src) && src.length > 0) return src;
+    if (typeof src === "string" && src.trim().startsWith("[")) {
+      try {
+        const parsed = JSON.parse(src);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch {}
+    }
+    if (Array.isArray(event.parts) && event.parts.length > 0) {
+      const items: Array<{ time?: string; title?: string; speaker?: string }> = [];
+      for (const p of event.parts) {
+        if (Array.isArray(p?.timeline) && p.timeline.length > 0) {
+          for (const t of p.timeline) {
+            items.push({
+              time: [t.startTime, t.endTime].filter(Boolean).join(" - ") || t.time,
+              title: t.title || t.content || p.name,
+              speaker: t.speaker || p.name,
+            });
+          }
+        } else if (p?.name) {
+          items.push({
+            time: [p.startTime, p.endTime].filter(Boolean).join(" - ") || "Theo lịch trình",
+            title: p.name,
+            speaker: p.hallName || "",
+          });
+        }
+      }
+      if (items.length > 0) return items;
+    }
+    return [];
+  })();
+
+  // Hiệu ứng chạm mặt nước iOS chân thực (3 vòng sóng nước đồng tâm + độ nảy mặt nước)
+  const triggerWaterRipple = (e: React.MouseEvent<HTMLElement> | React.PointerEvent<HTMLElement>) => {
+    const target = e.currentTarget;
+    const rect = target.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    target.classList.remove("ios-water-surface-bounce");
+    void target.offsetWidth;
+    target.classList.add("ios-water-surface-bounce");
+
+    const wave = document.createElement("span");
+    wave.className = "ios-water-ripple-wave";
+    wave.style.left = `${x}px`;
+    wave.style.top = `${y}px`;
+    target.appendChild(wave);
+
+    const ring1 = document.createElement("span");
+    ring1.className = "ios-water-ripple-ring";
+    ring1.style.left = `${x}px`;
+    ring1.style.top = `${y}px`;
+    target.appendChild(ring1);
+
+    const ring2 = document.createElement("span");
+    ring2.className = "ios-water-ripple-ring ios-water-ripple-ring-delay-1";
+    ring2.style.left = `${x}px`;
+    ring2.style.top = `${y}px`;
+    target.appendChild(ring2);
+
+    setTimeout(() => {
+      wave.remove();
+      ring1.remove();
+      ring2.remove();
+    }, 1050);
+  };
 
   // Danh sách người tham gia cùng (multi-attendees)
   type AdditionalAttendee = {
@@ -452,8 +537,8 @@ function StandaloneGuestEventRegistrationPage() {
           ticketCount: totalAttendeesCount,
           ticketPrice,
           note: note.trim(),
+          customFieldValues,
           attendees: allAttendees,
-          attendedParts: selectedParts,
           isCheckinNow: isCheckinNow,
         }),
       }).catch((err: any) => {
@@ -1096,83 +1181,233 @@ function StandaloneGuestEventRegistrationPage() {
     );
   }
 
-  // 3. FORM VIEW (THƯ MỜI & ĐĂNG KÝ SỰ KIỆN THEME SÁNG SANG TRỌNG)
+  const submergedEventBg =
+    (event as any).image ||
+    (event as any).banner ||
+    (event as any).cover_image ||
+    "/skyline_perspective_dark.jpg";
+
+  // 3. FORM VIEW (THƯ MỜI & ĐĂNG KÝ SỰ KIỆN THEME LUXURY TRẮNG TEXT ĐEN & iOS LIQUID GLASS TRONG SUỐT + CHẠM MẶT NƯỚC)
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-blue-50/40 py-8 sm:py-14 px-4 font-sans text-slate-800">
-      <div className="max-w-2xl mx-auto space-y-6">
-        {/* THIỆP MỜI SANG TRỌNG THEME SÁNG */}
-        <div className="rounded-3xl border border-amber-200/90 bg-white shadow-xl shadow-slate-200/70 overflow-hidden relative">
-          {/* Viền kim loại vàng hoàng gia */}
-          <div className="h-2 bg-gradient-to-r from-[#003B95] via-amber-400 to-[#003B95]" />
+    <div className="min-h-screen relative overflow-x-hidden py-8 sm:py-14 px-4 font-sans text-slate-950 bg-[#dbe4f0]">
+      <style>{`
+        @keyframes iosWaterSurfaceBounce {
+          0% { transform: scale(1); }
+          25% { transform: scale(0.985) translateY(1.5px); }
+          55% { transform: scale(1.006) translateY(-1px); }
+          100% { transform: scale(1); }
+        }
+        .ios-water-surface-bounce {
+          animation: iosWaterSurfaceBounce 0.62s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        @keyframes iosWaterWave {
+          0% {
+            width: 6px;
+            height: 6px;
+            opacity: 0.95;
+            transform: translate(-50%, -50%) scale(0.2);
+          }
+          100% {
+            width: 420px;
+            height: 420px;
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(1.35);
+          }
+        }
+        @keyframes iosWaterRing {
+          0% {
+            width: 8px;
+            height: 8px;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(0.25);
+          }
+          100% {
+            width: 360px;
+            height: 360px;
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(1.45);
+          }
+        }
+        .ios-liquid-glass {
+          position: relative;
+          overflow: hidden;
+          background: radial-gradient(
+            130% 100% at 12% 8%,
+            rgba(255, 255, 255, 0.46) 0%,
+            rgba(255, 255, 255, 0.14) 45%,
+            rgba(255, 255, 255, 0.22) 100%
+          );
+          backdrop-filter: blur(15px) saturate(200%) brightness(106%);
+          -webkit-backdrop-filter: blur(15px) saturate(200%) brightness(106%);
+          border: 1px solid rgba(255, 255, 255, 0.72);
+          box-shadow:
+            0 24px 48px -12px rgba(15, 23, 42, 0.25),
+            0 10px 22px -6px rgba(15, 23, 42, 0.12),
+            inset 0 2px 6px rgba(255, 255, 255, 0.98),
+            inset 0 -3px 8px rgba(15, 23, 42, 0.08),
+            inset 0 0 22px rgba(255, 255, 255, 0.28);
+        }
+        .ios-liquid-pill {
+          position: relative;
+          overflow: hidden;
+          background: radial-gradient(
+            120% 90% at 15% 10%,
+            rgba(255, 255, 255, 0.5) 0%,
+            rgba(255, 255, 255, 0.16) 55%,
+            rgba(255, 255, 255, 0.24) 100%
+          );
+          backdrop-filter: blur(12px) saturate(195%);
+          -webkit-backdrop-filter: blur(12px) saturate(195%);
+          border: 1px solid rgba(255, 255, 255, 0.78);
+          box-shadow:
+            0 10px 24px -6px rgba(15, 23, 42, 0.16),
+            inset 0 2px 4px rgba(255, 255, 255, 0.98),
+            inset 0 -2px 4px rgba(15, 23, 42, 0.06);
+        }
+        .ios-liquid-input {
+          background: rgba(255, 255, 255, 0.34);
+          backdrop-filter: blur(12px) saturate(180%);
+          -webkit-backdrop-filter: blur(12px) saturate(180%);
+          border: 1.5px solid rgba(255, 255, 255, 0.9);
+          box-shadow:
+            inset 0 2px 4px rgba(255, 255, 255, 0.85),
+            0 4px 14px rgba(15, 23, 42, 0.06);
+        }
+        .ios-liquid-input:focus {
+          background: rgba(255, 255, 255, 0.55);
+          border-color: rgba(255, 255, 255, 1);
+          box-shadow:
+            0 0 0 3px rgba(255, 255, 255, 0.55),
+            inset 0 1.5px 3px rgba(255, 255, 255, 1);
+        }
+        .ios-water-btn {
+          position: relative;
+          overflow: hidden;
+          transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease;
+        }
+        .ios-water-btn:active {
+          transform: scale(0.96);
+        }
+        .ios-water-ripple-wave {
+          position: absolute;
+          pointer-events: none;
+          border-radius: 9999px;
+          background: radial-gradient(
+            circle,
+            rgba(255, 255, 255, 0.95) 0%,
+            rgba(186, 230, 253, 0.78) 32%,
+            rgba(125, 211, 252, 0.38) 56%,
+            rgba(255, 255, 255, 0) 76%
+          );
+          animation: iosWaterWave 0.95s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          z-index: 30;
+        }
+        .ios-water-ripple-ring {
+          position: absolute;
+          pointer-events: none;
+          border-radius: 9999px;
+          border: 2px solid rgba(255, 255, 255, 0.96);
+          box-shadow:
+            0 0 18px rgba(125, 211, 252, 0.85),
+            inset 0 0 12px rgba(255, 255, 255, 0.95);
+          animation: iosWaterRing 0.92s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          z-index: 31;
+        }
+        .ios-water-ripple-ring-delay-1 {
+          animation-delay: 0.12s;
+          border-width: 1.5px;
+          opacity: 0;
+        }
+      `}</style>
 
+      {/* Nền có ảnh chìm sang trọng phía sau lớp kính trong suốt Liquid Glass */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105"
+          style={{
+            backgroundImage: `url("${submergedEventBg}"), url("/skyline_perspective_dark.jpg")`,
+            filter: "saturate(120%) contrast(106%) brightness(104%)",
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(155deg, rgba(248, 250, 252, 0.38) 0%, rgba(241, 245, 249, 0.32) 45%, rgba(226, 232, 240, 0.42) 100%)",
+          }}
+        />
+        <div
+          className="absolute -top-24 -left-16 w-[480px] h-[480px] rounded-full opacity-65 blur-3xl"
+          style={{
+            background: "radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(186,230,253,0.4) 60%, transparent 100%)",
+          }}
+        />
+        <div
+          className="absolute top-1/3 -right-20 w-[500px] h-[500px] rounded-full opacity-60 blur-3xl"
+          style={{
+            background: "radial-gradient(circle, rgba(254,240,138,0.45) 0%, rgba(226,232,240,0.4) 65%, transparent 100%)",
+          }}
+        />
+      </div>
+
+      <div className="relative z-10 max-w-2xl mx-auto space-y-5">
+        {/* HEADER SỰ KIỆN CHỈ CÓ LOGO CEO HN10 CÙNG TÊN SỰ KIỆN (LIQUID GLASS TRONG SUỐT, ĐÃ BỎ TIMELINE) */}
+        <div className="ios-liquid-glass rounded-3xl overflow-hidden relative">
           <div className="p-6 sm:p-10 text-center space-y-5 relative">
-            {/* Logo & Tổ Chức */}
-            <div className="flex flex-col items-center justify-center gap-1.5">
-              <div className="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center shadow-xs">
-                <Award className="w-7 h-7 text-amber-600" />
+            {/* Logo CEO HN10 & Tên Sự Kiện */}
+            <div className="flex flex-col items-center justify-center gap-2.5">
+              <div className="ios-liquid-pill px-4 py-1.5 rounded-2xl inline-flex items-center justify-center">
+                <img
+                  src="/hn10-logo-2.png"
+                  alt="CEO HN10"
+                  className="h-8 sm:h-10 w-auto object-contain brightness-0"
+                />
               </div>
-              <div className="text-[11px] font-black tracking-[0.22em] text-[#003B95] uppercase">
-                HANOIBA · CEOHN10 DOANH NGHIỆP TRẺ HÀ NỘI
-              </div>
-              <div className="text-xs font-bold tracking-widest text-slate-600 uppercase">
-                CLB DOANH NHÂN CEO HN10
-              </div>
-            </div>
-
-            {/* Tiêu đề */}
-            <div className="space-y-1 pt-1">
-              <div className="text-[11px] font-semibold tracking-[0.28em] text-amber-600 uppercase">
-                ✦ EVENT REGISTRATION ✦
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-serif font-black tracking-wide text-[#003B95] leading-tight">
-                ĐĂNG KÝ THAM DỰ SỰ KIỆN
-              </h2>
-            </div>
-
-            {/* Khung tôn vinh danh tính đại biểu */}
-            <div className="bg-gradient-to-r from-blue-50/80 via-amber-50/70 to-blue-50/80 border border-amber-300/80 rounded-2xl py-3.5 px-6 shadow-xs mx-auto max-w-lg">
-              <span className="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-amber-700 block mb-1">
-                TRÂN TRỌNG KÍNH MỜI
-              </span>
-              <div className="text-xl sm:text-2xl font-serif font-black text-slate-900 uppercase">
-                {inviteeName || fullName || "QUÝ ĐẠI BIỂU & DOANH NHÂN"}
-              </div>
-            </div>
-
-            {/* Tên Sự Kiện */}
-            <div className="space-y-1.5 pt-1">
-              <h1 className="text-xl sm:text-2xl font-bold text-slate-900 font-serif leading-snug">
+              <h1
+                className="text-2xl sm:text-3xl font-black text-slate-950 uppercase tracking-tight leading-snug"
+                style={{ textShadow: "0 1px 2px rgba(255,255,255,0.85)" }}
+              >
                 {event.name}
               </h1>
               {event.subtitle && (
-                <p className="text-xs sm:text-sm text-slate-500 italic max-w-lg mx-auto">
+                <p className="text-xs sm:text-sm text-slate-800 font-semibold italic max-w-lg mx-auto">
                   {event.subtitle}
                 </p>
               )}
             </div>
 
+            {/* Khung tôn vinh danh tính đại biểu */}
+            <div className="ios-liquid-pill rounded-2xl py-3.5 px-6 mx-auto max-w-lg">
+              <span className="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-slate-800 block mb-1">
+                TRÂN TRỌNG KÍNH MỜI
+              </span>
+              <div className="text-xl sm:text-2xl font-serif font-black text-slate-950 uppercase">
+                {inviteeName || fullName || "QUÝ ĐẠI BIỂU & DOANH NHÂN"}
+              </div>
+            </div>
+
             {/* Thông Tin Thời Gian, Địa Điểm */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left pt-1">
-              <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 space-y-1.5">
-                <div className="flex items-center gap-2 text-[#003B95] text-xs font-bold uppercase tracking-wider">
-                  <Calendar className="w-4 h-4 text-[#003B95]" />
+              <div className="ios-liquid-pill rounded-2xl p-4 space-y-1.5">
+                <div className="flex items-center gap-2 text-slate-950 text-xs font-black uppercase tracking-wider">
+                  <Calendar className="w-4 h-4 text-slate-950" />
                   <span>Thời gian tổ chức</span>
                 </div>
-                <div className="text-xs sm:text-sm font-semibold text-slate-900">
+                <div className="text-xs sm:text-sm font-bold text-slate-950">
                   {event.date || "Theo thông báo từ BTC"}
                 </div>
-                <div className="text-[11px] text-slate-500 flex items-center gap-1">
-                  <Clock className="w-3 h-3 text-slate-400" />
+                <div className="text-[11px] text-slate-800 font-medium flex items-center gap-1">
+                  <Clock className="w-3 h-3 text-slate-700" />
                   <span>Đón khách &amp; Check-in: 30 phút trước khai mạc</span>
                 </div>
               </div>
 
-              <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 space-y-1.5">
-                <div className="flex items-center gap-2 text-[#003B95] text-xs font-bold uppercase tracking-wider">
-                  <MapPin className="w-4 h-4 text-[#003B95]" />
+              <div className="ios-liquid-pill rounded-2xl p-4 space-y-1.5">
+                <div className="flex items-center gap-2 text-slate-950 text-xs font-black uppercase tracking-wider">
+                  <MapPin className="w-4 h-4 text-slate-950" />
                   <span>Địa điểm diễn ra</span>
                 </div>
-                <div className="text-xs sm:text-sm font-semibold text-slate-900 truncate">
+                <div className="text-xs sm:text-sm font-bold text-slate-950 truncate">
                   {event.location || "Trung tâm Hội nghị"}
                 </div>
                 {event.location && (
@@ -1180,7 +1415,7 @@ function StandaloneGuestEventRegistrationPage() {
                     href={`https://maps.google.com/?q=${encodeURIComponent(event.location)}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#003B95] hover:underline"
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-950 hover:underline"
                   >
                     <Compass className="w-3 h-3" />
                     <span>Xem bản đồ đường đi</span>
@@ -1190,22 +1425,22 @@ function StandaloneGuestEventRegistrationPage() {
             </div>
 
             {/* Fee & Dress Code */}
-            <div className="bg-amber-50/80 rounded-2xl p-4 border border-amber-200 text-xs text-left flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="ios-liquid-pill rounded-2xl p-4 text-xs text-left flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
-                <span className="font-bold text-amber-800 uppercase tracking-wide block">
+                <span className="font-black text-slate-950 uppercase tracking-wide block">
                   Quy định trang phục (Dress Code):
                 </span>
-                <span className="text-slate-600 text-[11px]">
+                <span className="text-slate-800 font-medium text-[11px]">
                   Trang phục lịch sự, Vest, Áo dài hoặc Doanh nhân công sở.
                 </span>
               </div>
               <div className="shrink-0">
                 {isFree ? (
-                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-full font-bold text-xs uppercase tracking-wide">
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-400/35 text-emerald-950 border border-white/85 rounded-full font-black text-xs uppercase tracking-wide">
                     ✦ Miễn Phí (0 đ)
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 text-amber-900 border border-amber-300 rounded-full font-bold text-xs uppercase tracking-wide">
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-amber-400/35 text-amber-950 border border-white/85 rounded-full font-black text-xs uppercase tracking-wide">
                     {new Intl.NumberFormat("vi-VN").format(ticketPrice)} đ / vé
                   </span>
                 )}
@@ -1227,174 +1462,174 @@ function StandaloneGuestEventRegistrationPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* TRƯỜNG 1: HỌ VÀ TÊN */}
-          <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-7 space-y-3">
-            <label className="block text-sm sm:text-base font-bold text-slate-800">
-              1. Họ và tên của Quý Khách mời / Đại biểu <span className="text-rose-500">*</span>
+          {/* MÃ HỌC VIÊN (TỰ ĐỘNG TRA CỨU & ĐIỀN THÔNG TIN HỌC VIÊN) */}
+          <div className="ios-liquid-glass rounded-3xl p-6 sm:p-7 space-y-3">
+            <label className="block text-sm sm:text-base font-black text-slate-950">
+              Mã học viên CEO HN10 (Tự động điền thông tin nếu đã là Học viên)
             </label>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-800 font-medium">
+              Nhập mã học viên (VD: <span className="font-mono font-bold text-slate-950">HN10-1234</span>) rồi bấm <strong>Tra cứu</strong> để hệ thống tự động điền Họ tên, SĐT, Email, Công ty và Chức vụ.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-2 pt-1">
+              <div className="relative flex-1">
+                <Tag className="w-4 h-4 text-slate-800 absolute left-3.5 top-3.5" />
+                <input
+                  type="text"
+                  placeholder="Nhập mã học viên (VD: HN10-1234)..."
+                  value={memberCode}
+                  onChange={(e) => setMemberCode(e.target.value.toUpperCase())}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      void handleLookupMemberCode(memberCode);
+                    }
+                  }}
+                  className="w-full pl-10 pr-4 py-3 rounded-xl ios-liquid-input text-sm font-mono uppercase text-slate-950 placeholder:text-slate-600 focus:outline-none transition"
+                />
+              </div>
+              <button
+                type="button"
+                disabled={isSearchingCode}
+                onPointerDown={triggerWaterRipple}
+                onClick={() => void handleLookupMemberCode(memberCode)}
+                className="ios-water-btn px-5 py-3 rounded-xl bg-slate-950 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm shadow-sm disabled:opacity-50 cursor-pointer transition shrink-0"
+              >
+                {isSearchingCode ? "Đang tra cứu..." : "Tra cứu & Tự điền"}
+              </button>
+            </div>
+            {codeLookupSuccess && (
+              <div className="text-xs font-semibold text-emerald-950 ios-liquid-pill rounded-xl px-3 py-2 flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-700" />
+                <span>{codeLookupSuccess}</span>
+              </div>
+            )}
+          </div>
+
+          {/* TRƯỜNG 1: HỌ VÀ TÊN */}
+          <div className="ios-liquid-glass rounded-3xl p-6 sm:p-7 space-y-3">
+            <label className="block text-sm sm:text-base font-black text-slate-950">
+              1. Họ và tên của Quý Khách mời / Đại biểu <span className="text-rose-600">*</span>
+            </label>
+            <p className="text-xs text-slate-800 font-medium">
               Tên sẽ được in trên thẻ đeo đại biểu và số thứ tự Lucky Draw.
             </p>
             <div className="relative pt-1">
-              <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-4" />
+              <User className="w-4 h-4 text-slate-700 absolute left-3.5 top-4" />
               <input
                 type="text"
                 required
                 placeholder="Ví dụ: Nguyễn Văn Hoàng"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#003B95] bg-slate-50/60 transition"
+                className="w-full pl-10 pr-4 py-3 rounded-xl ios-liquid-input text-sm text-slate-950 placeholder:text-slate-600 focus:outline-none transition"
               />
             </div>
           </div>
 
           {/* TRƯỜNG 2: SỐ ĐIỆN THOẠI */}
-          <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-7 space-y-3">
-            <label className="block text-sm sm:text-base font-bold text-slate-800">
-              2. Số điện thoại liên hệ (Ưu tiên số dùng Zalo) <span className="text-rose-500">*</span>
+          <div className="ios-liquid-glass rounded-3xl p-6 sm:p-7 space-y-3">
+            <label className="block text-sm sm:text-base font-black text-slate-950">
+              2. Số điện thoại liên hệ (Ưu tiên số dùng Zalo) <span className="text-rose-600">*</span>
             </label>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-800 font-medium">
               Dùng để Ban Truyền Thông gửi tin nhắn nhắc lịch và hỗ trợ check-in tại bàn lễ tân.
             </p>
             <div className="relative pt-1">
-              <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-4" />
+              <Phone className="w-4 h-4 text-slate-700 absolute left-3.5 top-4" />
               <input
                 type="tel"
                 required
                 placeholder="0983xxxxxx"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#003B95] bg-slate-50/60 transition"
+                className="w-full pl-10 pr-4 py-3 rounded-xl ios-liquid-input text-sm text-slate-950 placeholder:text-slate-600 focus:outline-none transition"
               />
             </div>
           </div>
 
           {/* TRƯỜNG 3: EMAIL */}
-          <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-7 space-y-3">
-            <label className="block text-sm sm:text-base font-bold text-slate-800">
-              3. Địa chỉ Email chính thức nhận vé & mã QR <span className="text-rose-500">*</span>
+          <div className="ios-liquid-glass rounded-3xl p-6 sm:p-7 space-y-3">
+            <label className="block text-sm sm:text-base font-black text-slate-950">
+              3. Địa chỉ Email chính thức nhận vé & mã QR <span className="text-rose-600">*</span>
             </label>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-800 font-medium">
               Hệ thống sẽ gửi vé điện tử E-Ticket (kèm thông tin thanh toán SePay) qua địa chỉ email này.
             </p>
             <div className="relative pt-1">
-              <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-4" />
+              <Mail className="w-4 h-4 text-slate-700 absolute left-3.5 top-4" />
               <input
                 type="email"
                 required
                 placeholder="hoang.nguyen@congty.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#003B95] bg-slate-50/60 transition"
+                className="w-full pl-10 pr-4 py-3 rounded-xl ios-liquid-input text-sm text-slate-950 placeholder:text-slate-600 focus:outline-none transition"
               />
             </div>
           </div>
 
           {/* TRƯỜNG 4 & 5: DOANH NGHIỆP & CHỨC VỤ */}
-          <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-7 space-y-4">
+          <div className="ios-liquid-glass rounded-3xl p-6 sm:p-7 space-y-4">
             <div>
-              <label className="block text-sm sm:text-base font-bold text-slate-800">
+              <label className="block text-sm sm:text-base font-black text-slate-950">
                 4. Thông tin Doanh nghiệp & Chức vụ
               </label>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-slate-800 font-medium mt-1">
                 Phục vụ sắp xếp vị trí bàn đại biểu và giới thiệu kết nối giao thương B2B.
               </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
               <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1">
+                <label className="block text-xs font-bold text-slate-900 mb-1">
                   Tên Doanh nghiệp / Tổ chức
                 </label>
                 <div className="relative">
-                  <Building2 className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+                  <Building2 className="w-4 h-4 text-slate-700 absolute left-3.5 top-3.5" />
                   <input
                     type="text"
                     placeholder="Công ty CP Tập Đoàn..."
                     value={company}
                     onChange={(e) => setCompany(e.target.value)}
-                    className="w-full pl-10 pr-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#003B95] bg-slate-50/60"
+                    className="w-full pl-10 pr-3 py-2.5 rounded-xl ios-liquid-input text-sm text-slate-950 placeholder:text-slate-600 focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1">
+                <label className="block text-xs font-bold text-slate-900 mb-1">
                   Chức vụ / Vị trí
                 </label>
                 <div className="relative">
-                  <Briefcase className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+                  <Briefcase className="w-4 h-4 text-slate-700 absolute left-3.5 top-3.5" />
                   <input
                     type="text"
                     placeholder="Chủ tịch, CEO, Giám Đốc..."
                     value={position}
                     onChange={(e) => setPosition(e.target.value)}
-                    className="w-full pl-10 pr-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#003B95] bg-slate-50/60"
+                    className="w-full pl-10 pr-3 py-2.5 rounded-xl ios-liquid-input text-sm text-slate-950 placeholder:text-slate-600 focus:outline-none"
                   />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* TRƯỜNG CHỌN PHẦN THAM GIA SỰ KIỆN (EVENT SESSIONS / PARTS) */}
-          <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-7 space-y-3">
-            <div>
-              <label className="block text-sm sm:text-base font-bold text-slate-800">
-                5. Quý Đại Biểu Tham Dự Phần Nào Của Sự Kiện? <span className="text-rose-500">*</span>
-              </label>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Quý Anh/Chị có thể tích chọn 1 hoặc nhiều phần theo nhu cầu tham dự thực tế.
-              </p>
-            </div>
-
-            <div className="space-y-2.5 pt-1">
-              {availableParts.map((part) => {
-                const isSelected = selectedParts.includes(part);
-                return (
-                  <div
-                    key={part}
-                    onClick={() => {
-                      setSelectedParts((prev) =>
-                        prev.includes(part)
-                          ? (prev.length > 1 ? prev.filter((p) => p !== part) : prev)
-                          : [...prev, part]
-                      );
-                    }}
-                    className={`flex items-center gap-3 p-3.5 rounded-2xl border transition cursor-pointer select-none ${
-                      isSelected
-                        ? "border-[#003B95] bg-blue-50/60 text-[#003B95] ring-1 ring-[#003B95]"
-                        : "border-slate-200 hover:bg-slate-50 text-slate-700"
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={() => {}}
-                      className="w-4 h-4 rounded text-[#003B95] focus:ring-[#003B95] pointer-events-none"
-                    />
-                    <span className="text-xs sm:text-sm font-bold flex-1">{part}</span>
-                    {isSelected && <Check className="w-4 h-4 text-[#003B95]" />}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
           {/* ĐĂNG KÝ NHIỀU NGƯỜI (MULTI-ATTENDEE / ĐOÀN THAM DỰ) */}
-          <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-7 space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+          <div className="ios-liquid-glass rounded-3xl p-6 sm:p-7 space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/60 pb-3">
               <div>
-                <label className="block text-sm sm:text-base font-bold text-slate-800">
-                  6. Danh sách người tham gia cùng (Tùy chọn)
+                <label className="block text-sm sm:text-base font-black text-slate-950">
+                  5. Danh sách người tham gia cùng (Tùy chọn)
                 </label>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-800 font-medium mt-0.5">
                   Quý Anh/Chị có thể đăng ký thêm đồng nghiệp, đối tác hoặc người đi cùng trong 1 lần đăng ký.
                 </p>
               </div>
               <button
                 type="button"
+                onPointerDown={triggerWaterRipple}
                 onClick={addAttendee}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#003B95] border border-blue-200 text-xs font-bold transition shadow-2xs cursor-pointer"
+                className="ios-water-btn ios-liquid-pill inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-slate-950 text-xs font-black transition cursor-pointer"
               >
                 <span>+ Thêm người tham gia cùng</span>
               </button>
@@ -1543,11 +1778,11 @@ function StandaloneGuestEventRegistrationPage() {
           </div>
 
           {/* TRƯỜNG 6: GHI CHÚ / KẾT NỐI B2B */}
-          <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-7 space-y-3">
-            <label className="block text-sm sm:text-base font-bold text-slate-800">
+          <div className="ios-liquid-glass rounded-3xl p-6 sm:p-7 space-y-3">
+            <label className="block text-sm sm:text-base font-black text-slate-950">
               6. Mong muốn kết nối B2B hoặc Ghi chú cho Ban Tổ Chức
             </label>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-800 font-medium">
               Quý khách có thể ghi ngành nghề mong muốn tìm đối tác hoặc yêu cầu đón tiếp đặc biệt (không bắt buộc).
             </p>
             <textarea
@@ -1555,20 +1790,89 @@ function StandaloneGuestEventRegistrationPage() {
               placeholder="Ví dụ: Mong muốn kết nối các doanh nghiệp ngành F&B, Xây dựng; Yêu cầu vị trí gần màn hình..."
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="w-full p-3.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#003B95] bg-slate-50/60"
+              className="w-full p-3.5 rounded-xl ios-liquid-input text-sm text-slate-950 placeholder:text-slate-600 focus:outline-none"
             />
           </div>
+
+          {/* CÁC TRƯỜNG TÙY CHỈNH DO BAN TỔ CHỨC CẤU HÌNH */}
+          {customRegFields.length > 0 && (
+            <div className="ios-liquid-glass rounded-3xl p-6 sm:p-7 space-y-4">
+              <div className="border-b border-white/60 pb-2">
+                <span className="block text-sm sm:text-base font-black text-slate-950">
+                  7. Thông tin bổ sung theo yêu cầu Ban Tổ Chức
+                </span>
+              </div>
+              <div className="space-y-3">
+                {customRegFields.map((cf) => {
+                  const val = customFieldValues[cf.id] ?? "";
+                  const setVal = (v: any) =>
+                    setCustomFieldValues((prev) => ({ ...prev, [cf.id]: v }));
+                  const opts = String(cf.optionsText || "")
+                    .split(",")
+                    .map((s) => s.trim())
+                    .filter(Boolean);
+                  return (
+                    <div key={cf.id}>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        {cf.label} {cf.required && <span className="text-rose-500">*</span>}
+                      </label>
+                      {cf.type === "textarea" ? (
+                        <textarea
+                          rows={2}
+                          required={Boolean(cf.required)}
+                          value={val}
+                          onChange={(e) => setVal(e.target.value)}
+                          className="w-full p-3 rounded-xl border border-slate-200 text-sm bg-slate-50/60"
+                        />
+                      ) : cf.type === "select" ? (
+                        <select
+                          required={Boolean(cf.required)}
+                          value={val}
+                          onChange={(e) => setVal(e.target.value)}
+                          className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50/60"
+                        >
+                          <option value="">-- Chọn --</option>
+                          {opts.map((o) => (
+                            <option key={o} value={o}>{o}</option>
+                          ))}
+                        </select>
+                      ) : cf.type === "checkbox" ? (
+                        <label className="inline-flex items-center gap-2 text-xs text-slate-700 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={Boolean(val)}
+                            onChange={(e) => setVal(e.target.checked)}
+                            className="rounded text-[#003B95]"
+                          />
+                          <span>Xác nhận</span>
+                        </label>
+                      ) : (
+                        <input
+                          type={cf.type === "number" || cf.type === "date" || cf.type === "email" ? cf.type : "text"}
+                          required={Boolean(cf.required)}
+                          value={val}
+                          onChange={(e) => setVal(e.target.value)}
+                          className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50/60"
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Submit Button */}
           <div className="pt-2">
             <button
               type="submit"
+              onClick={(e) => triggerWaterRipple(e)}
               disabled={submitting || isFull}
-              className={`w-full py-4 px-6 rounded-2xl font-black text-sm sm:text-base text-white shadow-lg transition flex items-center justify-center gap-2 cursor-pointer ${isFull
+              className={`ios-water-btn w-full py-4 px-6 rounded-2xl font-black text-sm sm:text-base text-white shadow-lg transition flex items-center justify-center gap-2 cursor-pointer ${isFull
                   ? "bg-slate-400 cursor-not-allowed"
                   : isCheckinNow
                   ? "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-700/30 ring-2 ring-emerald-400"
-                  : "bg-[#003B95] hover:bg-[#002B70] shadow-blue-900/30"
+                  : "bg-slate-950 hover:bg-slate-800 shadow-slate-900/25"
                 }`}
             >
               {submitting ? (

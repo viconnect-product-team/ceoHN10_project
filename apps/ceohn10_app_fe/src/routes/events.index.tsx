@@ -1229,17 +1229,6 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
                                 <QrCode className="h-4 w-4" />
                               </button>
                             )}
-                            <button
-                              type="button"
-                              title="Gửi thư mời đa kênh (Word/Excel/Zalo/Email)"
-                              onClick={(evt) => {
-                                evt.stopPropagation();
-                                handleOpenBroadcastModal(e);
-                              }}
-                              className="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-amber-500/40 bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 transition cursor-pointer"
-                            >
-                              <Mail className="h-4 w-4" />
-                            </button>
                             {can(PERMISSIONS.EVENT_DELETE) && (
                               <button
                                 onClick={() => onDelete(e)}
@@ -1424,12 +1413,6 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
           onClose={() => setOmnichannelModalOpen(false)}
           invitationData={omnichannelEventData}
           onSuccess={() => router.invalidate()}
-        />
-
-        <EventInvitationBuilderModal
-          open={!!invitationModalEvent}
-          event={invitationModalEvent}
-          onClose={() => setInvitationModalEvent(null)}
         />
       </div>
     </AppShell>

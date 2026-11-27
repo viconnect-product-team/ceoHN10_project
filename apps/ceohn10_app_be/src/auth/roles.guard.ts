@@ -72,7 +72,7 @@ export class RolesGuard implements CanActivate {
 
         // Kiểm tra vai trò ban điều hành & chức vụ trong bảng members
         const memberRows = await this.prisma.$queryRaw<any[]>`
-          SELECT id::text, executive_role::text, department::text, status::text 
+          SELECT id::text, executive_role::text, department::text, status::text, card_visibility_settings
           FROM public.members 
           WHERE user_id = ${user.id}::uuid OR id::text = ${user.id}::text 
           LIMIT 1
@@ -84,6 +84,13 @@ export class RolesGuard implements CanActivate {
           if (m.department) {
             userDepartment = m.department;
             dbRoles.push(m.department);
+          }
+          if (
+            m.card_visibility_settings &&
+            typeof m.card_visibility_settings === 'object' &&
+            Array.isArray((m.card_visibility_settings as any).customPermissions)
+          ) {
+            (request as any).dbCustomPermissions = (m.card_visibility_settings as any).customPermissions;
           }
           // Nếu Học viên bị đình chỉ hoặc vô hiệu hóa trong DB, lập tức chặn
           if (
@@ -162,17 +169,20 @@ export class RolesGuard implements CanActivate {
       String(r).toLowerCase().trim(),
     );
 
+    const dbCustomPerms: string[] = Array.isArray((request as any).dbCustomPermissions)
+      ? (request as any).dbCustomPermissions
+      : [];
+    const hasCustomPerms = dbCustomPerms.length > 0;
+
     const isSuperAdmin =
-      userEmail === 'admin@ceohn10.vn' ||
-      normalizedUserRoles.includes('admin_platform') ||
-      normalizedUserRoles.includes('platform_admin') ||
-      normalizedUserRoles.includes('lop_truong') ||
-      normalizedUserRoles.includes('superadmin') ||
-      normalizedUserRoles.includes('adm') ||
-      normalizedUserRoles.includes('quan_tri') ||
-      normalizedUserRoles.includes('chu_tich') ||
-      normalizedUserRoles.includes('chủ tịch') ||
-      normalizedUserRoles.includes('president');
+      !hasCustomPerms &&
+      (userEmail === 'admin@ceohn10.vn' ||
+        userEmail === 'admin@viconnect.vn' ||
+        userEmail === 'admin@connect.vn' ||
+        normalizedUserRoles.includes('admin_platform') ||
+        normalizedUserRoles.includes('platform_admin') ||
+        normalizedUserRoles.includes('superadmin') ||
+        normalizedUserRoles.includes('quan_tri'));
 
     // 3. Phân quyền Dữ Liệu (Data Scope Resolution)
     let scopeLevel: 'ALL' | 'DEPARTMENT' | 'CLASS' | 'SELF' = 'SELF';
@@ -218,9 +228,42 @@ export class RolesGuard implements CanActivate {
       }
     }
 
-    // SuperAdmin bypass toàn bộ kiểm tra roles và permissions
+    // SuperAdmin không bị giới hạn bởi customPermissions thì bypass
     if (isSuperAdmin) {
       return true;
+    }
+
+    // 3.5. Nếu tài khoản có gán customPermissions (Tích quyền cụ thể), chặn ngay lập tức nếu request nằm ngoài quyền đã tích
+    if (hasCustomPerms) {
+      const reqPath = String(request.path || request.url || '').split('?')[0].toLowerCase();
+      const allowedModuleChecks: Array<{ apiPrefix: string; permMatch: string[] }> = [
+        { apiPrefix: '/api/members', permMatch: ['/members', 'MEM_'] },
+        { apiPrefix: '/api/events', permMatch: ['/events', '/event-registrations', '/event-checkin', '/checkin-qr', '/lucky-draw', 'EVT_', 'EREG_', 'CHK_', 'LKD_'] },
+        { apiPrefix: '/api/trainings', permMatch: ['/classes', 'CLS_', 'TRN_'] },
+        { apiPrefix: '/api/sponsors', permMatch: ['/sponsors', '/finance-report', 'SPN_', 'FIN_'] },
+        { apiPrefix: '/api/documents', permMatch: ['/documents', 'DOC_'] },
+        { apiPrefix: '/api/voting', permMatch: ['/voting', '/events', 'VOTE_'] },
+      ];
+      const isSelfEndpoint =
+        reqPath.includes('/me') ||
+        reqPath.includes('/my-') ||
+        reqPath.includes('/directory') ||
+        reqPath.includes('/account-statuses');
+
+      if (!isSelfEndpoint) {
+        for (const mod of allowedModuleChecks) {
+          if (reqPath.startsWith(mod.apiPrefix) || reqPath.startsWith(mod.apiPrefix.replace('/api', ''))) {
+            const hasModulePerm = dbCustomPerms.some((cp) =>
+              mod.permMatch.some((pm) => cp === pm || cp.startsWith(pm)),
+            );
+            if (!hasModulePerm) {
+              throw new ForbiddenException(
+                'Tài khoản của bạn không được phân quyền thao tác trên phân hệ này.',
+              );
+            }
+          }
+        }
+      }
     }
 
     // 4. Kiểm tra Phân Quyền Chức Năng (Roles / Functional Permissions)

@@ -152,7 +152,7 @@ function EventWizardDialog({
   }, []);
   const defaultTpl = EVENT_TYPE_TEMPLATES[(initialType as EventTypeKey) || "khai_giang"] || EVENT_TYPE_TEMPLATES.khai_giang;
 
-  const defaultParts = createDefaultCeoHn10Parts();
+  const defaultParts: EventPartConfig[] = [];
   const editAny = editingEvent as any;
   const editParts: EventPartConfig[] =
     Array.isArray(editAny?.parts) && editAny.parts.length > 0
@@ -175,7 +175,7 @@ function EventWizardDialog({
         startTime: editAny?.startTime || parsedTimeParts[0] || "08:30",
         endTime: editAny?.endTime || parsedTimeParts[1] || "11:30",
         location: editingEvent.location || "",
-        capacity: String(editingEvent.capacity ?? initialPartsCap),
+        capacity: String(editingEvent.capacity ?? (initialPartsCap || 100)),
         type: (editingEvent.type as EventType) || "khai_giang",
         status: (editingEvent.status as EventStatus) || "upcoming",
         imageUrl: editAny?.image || editAny?.imageUrl || editAny?.banner || defaultTpl.bgImage,
@@ -202,7 +202,7 @@ function EventWizardDialog({
       startTime: "08:30",
       endTime: "11:30",
       location: initialType === "charity" ? defaultTpl.defaultLocation : "",
-      capacity: initialType === "charity" ? defaultTpl.defaultCapacity : String(initialPartsCap),
+      capacity: initialType === "charity" ? defaultTpl.defaultCapacity : "100",
       type: initialType || "khai_giang",
       status: "upcoming",
       imageUrl: defaultTpl.bgImage,
@@ -213,7 +213,7 @@ function EventWizardDialog({
       recurrenceRule: "Hàng tháng",
       isPaid: false,
       venueName: "",
-      parts: defaultParts,
+      parts: [],
       customFields: [],
     };
   });
@@ -1250,11 +1250,11 @@ function InfoStep({
         </div>
       </div>
 
-      {/* Cấu hình các phần chương trình (ẩn ô giá ở Bước 1, tự nhận biết ở Bước 2) */}
+      {/* Cấu hình các phần chương trình (Không tự động fix cứng; bấm thêm mới hiện ra để cấu hình) */}
       <EventPartsEditor
         venueName={info.venueName || ""}
         onChangeVenueName={(v) => setInfo({ ...info, venueName: v })}
-        parts={Array.isArray(info.parts) ? info.parts : createDefaultCeoHn10Parts()}
+        parts={Array.isArray(info.parts) ? info.parts : []}
         onChangeParts={(nextParts) => {
           const sumCap = nextParts.reduce((s, p) => s + (Number(p.capacity) || 0), 0);
           setInfo({

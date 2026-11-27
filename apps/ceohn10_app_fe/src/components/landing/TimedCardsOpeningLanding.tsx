@@ -35,6 +35,12 @@ export interface LandingMenuItem {
   children?: LandingMenuItem[];
 }
 
+export interface LandingVoteOption {
+  id: string;
+  label: string;
+  description?: string;
+}
+
 export interface LandingSlide {
   id: string;
   place: string;
@@ -42,6 +48,9 @@ export interface LandingSlide {
   title2: string;
   description: string;
   image: string;
+  videoUrl?: string;
+  votingQuestion?: string;
+  votingOptions?: LandingVoteOption[];
   bookmarkAction?: string;
   ctaText: string;
   ctaLink?: string;
@@ -565,7 +574,16 @@ export interface LandingWebConfig {
   slug?: string;
   subdomain?: string;
   isPublished?: boolean;
-  template?: 'timed_cards_opening' | 'ceohn10_executive' | 'startup_mobile_showcase' | 'forge_luxury_atelier' | 'modern_luxury_estate';
+  template?:
+    | 'timed_cards_opening'
+    | 'ceohn10_executive'
+    | 'startup_mobile_showcase'
+    | 'forge_luxury_atelier'
+    | 'modern_luxury_estate'
+    | 'video_voting_showcase';
+  votingStartAt?: string;
+  votingEndAt?: string;
+  votingDurationMinutes?: number;
   theme?: {
     primaryColor: string;
     secondaryColor?: string;

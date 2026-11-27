@@ -433,26 +433,32 @@ function MasterAdminPortal() {
     dataScope: "self",
     department: "Ban Gắn kết & Đời sống",
   });
+  const [editPermMode, setEditPermMode] = useState<"role" | "granular">("role");
+  const [editSelectedPerms, setEditSelectedPerms] = useState<string[]>([]);
 
   const handleOpenEditRbac = (acc: any) => {
     setEditingUser(acc);
     setEditRbacData({
       name: acc.name || "",
-      role: acc.role || "member",
+      role: acc.executiveRole || acc.role || "member",
       dataScope:
         acc.dataScope ||
         acc.data_scope ||
-        (acc.role === "platform_admin" || acc.role === "admin" ? "all" : "self"),
+        (acc.role === "platform_admin" || acc.role === "admin" ? "all" : "department"),
       department: COMMITTEE_7_OPTIONS.includes(acc.department)
         ? acc.department
         : "Ban Gắn kết & Đời sống",
     });
+    const existingCustom: string[] = Array.isArray(acc.customPermissions) ? acc.customPermissions : [];
+    setEditSelectedPerms(existingCustom);
+    setEditPermMode(existingCustom.length > 0 ? "granular" : "role");
     setShowEditRbacModal(true);
   };
 
   const handleSaveEditRbac = async () => {
     if (!editingUser) return;
     try {
+      const nextCustomPerms = editPermMode === "granular" ? editSelectedPerms : [];
       await fetchNestApi(`/users/${editingUser.id}`, {
         method: "PUT",
         body: JSON.stringify({
@@ -461,9 +467,19 @@ function MasterAdminPortal() {
           executiveRole: editRbacData.role,
           dataScope: editRbacData.dataScope,
           department: editRbacData.department,
+          customPermissions: nextCustomPerms,
         }),
       });
-      toast.success(`Đã cập nhật phân quyền và phạm vi dữ liệu cho ${editingUser.name || editingUser.email}`);
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("role-changed"));
+        window.dispatchEvent(new Event("crm_permissions_updated"));
+        window.dispatchEvent(new Event("vba_auth_changed"));
+      }
+      toast.success(
+        editPermMode === "granular"
+          ? `Đã lưu ${nextCustomPerms.length} quyền cụ thể cho tài khoản ${editingUser.name || editingUser.email}! Các chức năng ngoài quyền sẽ tự động ẩn.`
+          : `Đã cập nhật phân quyền vai trò cho ${editingUser.name || editingUser.email}!`
+      );
       setShowEditRbacModal(false);
       accountsQ.refetch();
     } catch (err: any) {
@@ -3260,14 +3276,94 @@ function MasterAdminPortal() {
               </Select>
             </div>
 
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600 space-y-1">
-              <div className="font-bold text-slate-700 flex items-center gap-1.5">
-                <Shield className="w-3.5 h-3.5 text-[#002B70]" />
-                <span>Quy chuẩn phân quyền động Scope-based RBAC:</span>
+            {/* CHỌN QUYỀN TRUY CẬP CỤ THỂ CHO TÀI KHOẢN (ẨN MENU & CHẶN API NGOÀI QUYỀN) */}
+            <div className="pt-2 border-t border-slate-200">
+              <div className="flex items-center justify-between mb-2">
+                <Label className="text-xs font-bold text-slate-900">
+                  Phương thức phân quyền chức năng:
+                </Label>
+                <div className="flex items-center gap-1 p-0.5 bg-slate-100 rounded-lg border border-slate-200 text-[11px]">
+                  <button
+                    type="button"
+                    onClick={() => setEditPermMode("role")}
+                    className={`px-2 py-0.5 rounded font-bold transition cursor-pointer ${
+                      editPermMode === "role"
+                        ? "bg-[#002B70] text-white shadow-2xs"
+                        : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    Theo Chức Danh (Role)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditPermMode("granular")}
+                    className={`px-2 py-0.5 rounded font-bold transition cursor-pointer ${
+                      editPermMode === "granular"
+                        ? "bg-[#002B70] text-white shadow-2xs"
+                        : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    Tích Quyền Cụ Thể (Custom)
+                  </button>
+                </div>
               </div>
-              <p>
-                Người dùng sẽ chỉ có quyền truy cập, xem hoặc chỉnh sửa các tài nguyên tương ứng với phạm vi đã cấu hình. Mọi thao tác truy cập dữ liệu ngoài phạm vi sẽ bị Backend NestJS từ chối (403 Forbidden).
-              </p>
+
+              {editPermMode === "granular" ? (
+                <div className="p-2.5 rounded-xl border border-slate-200 bg-slate-50 max-h-52 overflow-y-auto space-y-3">
+                  <div className="text-[10px] text-slate-500 italic">
+                    Tích chọn các chức năng tài khoản này được phép thấy trên Sidebar &amp; thao tác API (các mục không tích sẽ tự động ẩn hoàn toàn):
+                  </div>
+                  {GRANULAR_PERMISSION_CATEGORIES.map((cat) => (
+                    <div key={cat.category} className="space-y-1">
+                      <div className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">
+                        {cat.category}
+                      </div>
+                      <div className="grid grid-cols-2 gap-1.5 pl-1">
+                        {cat.items.map((p) => {
+                          const isChecked = editSelectedPerms.includes(p.key);
+                          return (
+                            <label
+                              key={p.key}
+                              className={`flex items-start gap-1.5 p-1.5 rounded-lg border text-left cursor-pointer transition ${
+                                isChecked
+                                  ? "bg-blue-50 border-blue-200 text-blue-900"
+                                  : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                              }`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setEditSelectedPerms((prev) => [...prev, p.key]);
+                                  } else {
+                                    setEditSelectedPerms((prev) => prev.filter((k) => k !== p.key));
+                                  }
+                                }}
+                                className="mt-0.5 rounded text-[#002B70]"
+                              />
+                              <div className="min-w-0 flex-1 leading-tight">
+                                <div className="text-[11px] font-bold truncate">{p.name}</div>
+                                <div className="text-[9px] text-slate-400 truncate">{p.desc}</div>
+                              </div>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600 space-y-1">
+                  <div className="font-bold text-slate-700 flex items-center gap-1.5">
+                    <Shield className="w-3.5 h-3.5 text-[#002B70]" />
+                    <span>Phân quyền tự động theo Vai trò &amp; Ban chuyên trách:</span>
+                  </div>
+                  <p>
+                    Tài khoản sẽ chỉ hiển thị các menu và thao tác API thuộc quyền của vai trò <strong>{editRbacData.role}</strong> trong <strong>{editRbacData.department}</strong>.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 

@@ -31,6 +31,7 @@ import {
   MessageSquare,
   HelpCircle,
   Star,
+  Video,
 } from "lucide-react";
 import { AppShell } from "@/components/dashboard/AppShell";
 import { useServerData } from "@/hooks/use-server-data";
@@ -56,6 +57,46 @@ import {
 } from "@/components/landing/TimedCardsOpeningLanding";
 import { StartupMobileShowcaseLanding } from "@/components/landing/StartupMobileShowcaseLanding";
 import { ForgeLuxuryAtelierLanding } from "@/components/landing/ForgeLuxuryAtelierLanding";
+import {
+  VideoVotingShowcaseLanding,
+  DEFAULT_VIDEO_VOTING_7_SLIDES,
+} from "@/components/landing/VideoVotingShowcaseLanding";
+import { getQrUrl } from "@/lib/qr";
+import { fetchNestApi } from "@/lib/api-client";
+import { QrCode, Film, BarChart3, Clock, Vote } from "lucide-react";
+
+export const DEFAULT_VIDEO_VOTING_TEMPLATE: LandingWebConfig = {
+  id: "lw_video_voting_7slides_default",
+  name: "Mẫu Chủ Đạo: Trình Chiếu 7 Video Trượt Ngang & Bình Chọn Realtime (Pinterest 900790362966152495)",
+  slug: "video-voting",
+  subdomain: "video-voting",
+  isPublished: true,
+  template: "video_voting_showcase",
+  votingStartAt: new Date(Date.now() - 3600 * 1000).toISOString().slice(0, 16),
+  votingEndAt: new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString().slice(0, 16),
+  votingDurationMinutes: 120,
+  theme: {
+    primaryColor: "#ecad29",
+    secondaryColor: "#0B0F19",
+    textColor: "#FFFFFF",
+    backgroundColor: "#07090E",
+    fontFamily: "Inter, Oswald, sans-serif",
+  },
+  brand: {
+    logoText: "CEO HN10 VIDEO SHOWCASE & VOTING",
+    logoIcon: "film",
+    contactPhone: "0983.1010.10",
+    contactEmail: "contact@ceohn10.viconnect.vn",
+  },
+  navMenu: [],
+  slides: JSON.parse(JSON.stringify(DEFAULT_VIDEO_VOTING_7_SLIDES)),
+  subScreens: [],
+  apiConfig: {
+    enabled: false,
+    endpointUrl: "",
+    rootPath: "",
+  },
+};
 
 export const DEFAULT_TIMED_CARDS_TEMPLATE: LandingWebConfig = {
   id: "lw_timed_cards_opening_default",
@@ -333,11 +374,111 @@ function LandingImageUploadField({
   );
 }
 
+function LandingVideoUploadField({
+  label,
+  value,
+  onChange,
+  folder = "landing_videos",
+  placeholder = "https://... (.mp4, .webm) hoặc bấm tải video lên",
+  helperText,
+}: {
+  label: string;
+  value: string;
+  onChange: (url: string) => void;
+  folder?: string;
+  placeholder?: string;
+  helperText?: string;
+}) {
+  const [uploading, setUploading] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const cleanName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+      const url = await uploadFileToNest(file, `${folder}_${Date.now()}_${cleanName}`);
+      onChange(url);
+      toast.success("Tải video lên thành công!");
+    } catch (err: any) {
+      console.error("Video upload failed:", err);
+      toast.error(err?.message || "Tải video thất bại, vui lòng thử lại!");
+    } finally {
+      setUploading(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  };
+
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between">
+        <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+          <Film className="size-3.5 text-[#003B95]" />
+          <span>{label}</span>
+        </label>
+        {helperText && <span className="text-[10px] text-slate-400">{helperText}</span>}
+      </div>
+
+      <div className="flex items-center gap-2">
+        <input
+          type="text"
+          value={value || ""}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className="flex-1 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-mono text-slate-900 dark:text-white"
+        />
+
+        <input
+          ref={inputRef}
+          type="file"
+          accept="video/mp4,video/webm,video/quicktime,video/*"
+          className="hidden"
+          onChange={handleFileChange}
+        />
+
+        <button
+          type="button"
+          disabled={uploading}
+          onClick={() => inputRef.current?.click()}
+          className="px-3 py-1.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white text-xs font-bold transition flex items-center gap-1.5 shrink-0 cursor-pointer disabled:opacity-50"
+        >
+          {uploading ? (
+            <div className="size-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <Upload className="size-3.5" />
+          )}
+          <span>{uploading ? "Đang tải video..." : "Tải Video Lên"}</span>
+        </button>
+
+        {value && (
+          <button
+            type="button"
+            onClick={() => onChange("")}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition cursor-pointer"
+            title="Xóa video"
+          >
+            <X className="size-3.5" />
+          </button>
+        )}
+      </div>
+
+      {value && (
+        <div className="mt-1 rounded-xl overflow-hidden border border-slate-200 bg-black w-56 h-32">
+          <video
+            src={resolveMediaUrl(value) || value}
+            muted
+            controls
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
 export const Route = createFileRoute("/admin/landing-webs")({
   ssr: false,
-  beforeLoad: () => {
-    throw redirect({ to: "/" });
-  },
   component: AdminLandingWebsPage,
 });
 
@@ -351,11 +492,14 @@ function AdminLandingWebsPage() {
 
   const { data: landingWebs = [], loading, reload } = useServerData<LandingWebConfig[]>(() => listFn(), []);
 
-  // Đảm bảo luôn hiển thị đầy đủ cả 3 mẫu thiết kế chuẩn Pinterest trong danh sách
+  // Đảm bảo luôn hiển thị đầy đủ mẫu 7 Video Voting (Pinterest 900790362966152495) và các mẫu thiết kế chuẩn Pinterest
   const displayLandingWebs = useMemo(() => {
     const list = [...landingWebs];
+    if (!list.some((w) => w.template === "video_voting_showcase" || w.slug === "video-voting")) {
+      list.unshift(DEFAULT_VIDEO_VOTING_TEMPLATE);
+    }
     if (!list.some((w) => w.template === "timed_cards_opening")) {
-      list.unshift(DEFAULT_TIMED_CARDS_TEMPLATE);
+      list.push(DEFAULT_TIMED_CARDS_TEMPLATE);
     }
     if (!list.some((w) => w.template === "startup_mobile_showcase")) {
       list.push(DEFAULT_STARTUP_MOBILE_TEMPLATE);
@@ -372,13 +516,21 @@ function AdminLandingWebsPage() {
   const [editItem, setEditItem] = useState<LandingWebConfig | null>(null);
   const [subdomainModalItem, setSubdomainModalItem] = useState<LandingWebConfig | null>(null);
   const [deleteModalItem, setDeleteModalItem] = useState<LandingWebConfig | null>(null);
+  const [publishedQrItem, setPublishedQrItem] = useState<LandingWebConfig | null>(null);
+  const [statsModalItem, setStatsModalItem] = useState<LandingWebConfig | null>(null);
+  const [liveVoteStats, setLiveVoteStats] = useState<any>(null);
 
   // Form states for Create Modal
   const [createForm, setCreateForm] = useState({
     name: "",
     slug: "",
     subdomain: "",
-    template: "timed_cards_opening" as "timed_cards_opening" | "ceohn10_executive" | "startup_mobile_showcase" | "forge_luxury_atelier",
+    template: "video_voting_showcase" as
+      | "video_voting_showcase"
+      | "timed_cards_opening"
+      | "ceohn10_executive"
+      | "startup_mobile_showcase"
+      | "forge_luxury_atelier",
   });
   const [creating, setCreating] = useState(false);
 
@@ -397,7 +549,30 @@ function AdminLandingWebsPage() {
 
   const handleOpenEdit = (web: LandingWebConfig) => {
     const clone: LandingWebConfig = JSON.parse(JSON.stringify(web));
-    if (clone.template === "forge_luxury_atelier") {
+    if (clone.template === "video_voting_showcase" || clone.slug === "video-voting") {
+      const rawSlides = Array.isArray(clone.slides) ? clone.slides : [];
+      const ensured7Slides: LandingSlide[] = [];
+      for (let i = 0; i < 7; i++) {
+        const existing = rawSlides[i] || DEFAULT_VIDEO_VOTING_7_SLIDES[i];
+        ensured7Slides.push({
+          ...DEFAULT_VIDEO_VOTING_7_SLIDES[i],
+          ...existing,
+          id: existing.id || `vslide-${i + 1}`,
+          votingOptions:
+            Array.isArray(existing.votingOptions) && existing.votingOptions.length > 0
+              ? existing.votingOptions
+              : JSON.parse(JSON.stringify(DEFAULT_VIDEO_VOTING_7_SLIDES[i].votingOptions)),
+        });
+      }
+      clone.slides = ensured7Slides;
+      if (!clone.votingStartAt) {
+        clone.votingStartAt = new Date().toISOString().slice(0, 16);
+      }
+      if (!clone.votingEndAt) {
+        clone.votingEndAt = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString().slice(0, 16);
+      }
+      setActiveBuilderTab("slides");
+    } else if (clone.template === "forge_luxury_atelier") {
       if (!clone.forgeAtelierConfig) {
         clone.forgeAtelierConfig = JSON.parse(JSON.stringify(DEFAULT_FORGE_LUXURY_ATELIER_CONFIG));
       }
@@ -448,12 +623,30 @@ function AdminLandingWebsPage() {
   const handleSaveDynamicConfig = async () => {
     if (!editItem) return;
     try {
-      await updateFn({ data: { id: editItem.id!, config: editItem } });
-      toast.success("Lưu cấu hình Landing Web thành công!");
+      const toSave: LandingWebConfig = {
+        ...editItem,
+        isPublished: true,
+      };
+      await updateFn({ data: { id: toSave.id!, config: toSave } });
+      toast.success("Đã Áp dụng & Xuất bản Landing Page công khai thành công! Quét mã QR để xem và bình chọn ngay.");
       await reload();
       setEditItem(null);
+      setPublishedQrItem(toSave);
     } catch (err: any) {
       toast.error(err?.message || "Lỗi khi cập nhật cấu hình");
+    }
+  };
+
+  const handleOpenVoteStatsModal = async (web: LandingWebConfig) => {
+    setStatsModalItem(web);
+    setLiveVoteStats(null);
+    try {
+      const res = await fetchNestApi<any>(
+        `/public/landing-webs/${encodeURIComponent(web.slug || web.id || "video-voting")}/vote-stats`
+      );
+      if (res) setLiveVoteStats(res);
+    } catch {
+      // ignore
     }
   };
 
@@ -543,17 +736,17 @@ function AdminLandingWebsPage() {
               type="button"
               onClick={() => {
                 setCreateForm({
-                  name: `Landing Web Mới #${totalCount + 1}`,
-                  slug: `landing-${Date.now().toString().slice(-4)}`,
+                  name: `Landing Video Voting #${totalCount + 1}`,
+                  slug: `video-voting-${Date.now().toString().slice(-4)}`,
                   subdomain: "",
-                  template: "timed_cards_opening",
+                  template: "video_voting_showcase",
                 });
                 setCreateModalOpen(true);
               }}
               className="px-4 py-2.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white font-bold text-xs shadow-md transition flex items-center gap-2 cursor-pointer"
             >
               <Plus className="size-4" />
-              <span>Tạo Mới Landing Web</span>
+              <span>Tạo Mới Landing Page</span>
             </button>
           </div>
         </div>
@@ -637,6 +830,7 @@ function AdminLandingWebsPage() {
                 const firstImg = web.slides?.[0]?.image || "https://assets.codepen.io/3685267/timed-cards-1.jpg";
                 const isTimedCards = web.template === "timed_cards_opening";
                 const isStartupMobile = web.template === "startup_mobile_showcase";
+                const isVideoVoting = web.template === "video_voting_showcase" || web.slug === "video-voting";
 
                 return (
                   <div
@@ -662,7 +856,9 @@ function AdminLandingWebsPage() {
                                 web.theme?.primaryColor || (isStartupMobile ? "#003B95" : "#ecad29"),
                             }}
                           >
-                            {isStartupMobile
+                            {isVideoVoting
+                              ? "7 Video Slides & Realtime Voting"
+                              : isStartupMobile
                               ? "Startup Mobile Showcase"
                               : isTimedCards
                                 ? "Timed Cards Opening"
@@ -683,13 +879,17 @@ function AdminLandingWebsPage() {
                         <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs">
                           <div className="flex items-center gap-1.5 font-bold truncate">
                             <Layers className="size-3.5 text-amber-400" />
-                            <span>{web.slides?.length || 0} thẻ trình diễn</span>
+                            <span>{web.slides?.length || 0} màn trình chiếu</span>
                           </div>
-                          {web.apiConfig?.enabled && (
+                          {isVideoVoting ? (
+                            <span className="px-2 py-0.5 rounded-md bg-amber-500 text-slate-950 text-[10px] font-black">
+                              QR Voting 1 Lượt/Người
+                            </span>
+                          ) : web.apiConfig?.enabled ? (
                             <span className="px-2 py-0.5 rounded-md bg-slate-700 text-white text-[10px] font-bold">
                               API Connected
                             </span>
-                          )}
+                          ) : null}
                         </div>
                       </div>
 
@@ -712,8 +912,8 @@ function AdminLandingWebsPage() {
                               <span>URL:</span>
                             </span>
                             {(() => {
-                              const pathSlug = web.slug || (web.template === "startup_mobile_showcase" ? "web-v2" : "web-v1");
-                              const fullUrl = `https://crm.ceohn10.viconnect.vn/landing/${pathSlug}`;
+                              const pathSlug = web.slug || (isVideoVoting ? "video-voting" : web.template === "startup_mobile_showcase" ? "web-v2" : "web-v1");
+                              const fullUrl = typeof window !== "undefined" ? `${window.location.origin}/landing/${pathSlug}` : `https://crm.ceohn10.viconnect.vn/landing/${pathSlug}`;
                               return (
                                 <button
                                   type="button"
@@ -724,7 +924,7 @@ function AdminLandingWebsPage() {
                                   className="font-mono text-blue-600 dark:text-blue-400 font-bold hover:underline flex items-center gap-1 cursor-pointer truncate max-w-[210px]"
                                   title="Sao chép đường dẫn trực tiếp"
                                 >
-                                  <span className="truncate">crm.ceohn10.viconnect.vn/landing/{pathSlug}</span>
+                                  <span className="truncate">/landing/{pathSlug}</span>
                                   <Copy className="size-3 shrink-0" />
                                 </button>
                               );
@@ -735,7 +935,7 @@ function AdminLandingWebsPage() {
                     </div>
 
                     {/* Card Actions Footer */}
-                    <div className="p-4 pt-0 border-t border-slate-100 dark:border-slate-800/80 grid grid-cols-4 gap-1.5 mt-2">
+                    <div className="p-4 pt-0 border-t border-slate-100 dark:border-slate-800/80 grid grid-cols-5 gap-1.5 mt-2">
                       {/* Xem Trực Tiếp */}
                       <button
                         type="button"
@@ -752,24 +952,32 @@ function AdminLandingWebsPage() {
                         type="button"
                         onClick={() => handleOpenEdit(web)}
                         className="col-span-1 py-2 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer shadow-xs"
-                        title="Tùy biến cấu hình Dynamic & Cây Menu"
+                        title="Chỉnh sửa text, tải 7 video & cài đặt lựa chọn voting"
                       >
                         <Sliders className="size-3.5" />
                         <span className="hidden sm:inline">Sửa</span>
                       </button>
 
-                      {/* Cấu hình URL Domain Path */}
+                      {/* Mã QR Công Khai */}
                       <button
                         type="button"
-                        onClick={() => {
-                          setSubdomainModalItem(web);
-                          setSubdomainInput(web.slug || (web.template === "startup_mobile_showcase" ? "web-v2" : "web-v1"));
-                        }}
-                        className="col-span-1 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/20 text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer"
-                        title="Cấu hình đường dẫn URL Domain chính"
+                        onClick={() => setPublishedQrItem(web)}
+                        className="col-span-1 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer shadow-xs"
+                        title="Hiện mã QR Code công khai để ai quét cũng vào xem và bình chọn được"
                       >
-                        <Globe className="size-3.5" />
-                        <span className="hidden sm:inline">Path</span>
+                        <QrCode className="size-3.5" />
+                        <span className="hidden sm:inline">QR</span>
+                      </button>
+
+                      {/* Thống kê Voting Realtime */}
+                      <button
+                        type="button"
+                        onClick={() => void handleOpenVoteStatsModal(web)}
+                        className="col-span-1 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-700 dark:text-amber-300 border border-amber-500/30 text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer"
+                        title="Xem màn thống kê tỷ lệ voting video realtime"
+                      >
+                        <BarChart3 className="size-3.5" />
+                        <span className="hidden sm:inline">Vote</span>
                       </button>
 
                       {/* Xóa */}
@@ -780,7 +988,6 @@ function AdminLandingWebsPage() {
                         title="Xóa Landing Web"
                       >
                         <Trash2 className="size-3.5" />
-                        <span className="hidden sm:inline">Xóa</span>
                       </button>
                     </div>
                   </div>
@@ -854,7 +1061,27 @@ function AdminLandingWebsPage() {
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2">
                   Chọn Bản Mẫu Thiết Kế (Template) *
                 </label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Template 0: Pinterest 900790362966152495 - 7 Video Slides Trượt Ngang & Voting Realtime */}
+                  <div
+                    onClick={() => setCreateForm({ ...createForm, template: "video_voting_showcase" })}
+                    className={`p-3 rounded-2xl border-2 transition cursor-pointer ${createForm.template === "video_voting_showcase"
+                        ? "border-amber-500 bg-amber-500/15"
+                        : "border-slate-200 dark:border-slate-800 hover:border-slate-300"
+                      }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+                        <Video className="size-3.5 text-amber-500" />
+                        <span>7 Video Trượt Ngang &amp; Voting Realtime</span>
+                      </span>
+                      <span className="size-2 rounded-full bg-amber-500" />
+                    </div>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">
+                      Chuẩn Pinterest 900790362966152495: 7 màn video trượt ngang, bình chọn ngay dưới mỗi video, đếm thời gian, mỗi người vote 1 lần kèm QR và thống kê % realtime.
+                    </p>
+                  </div>
+
                   {/* Template 1: Pinterest 160088961741878822 */}
                   <div
                     onClick={() => setCreateForm({ ...createForm, template: "timed_cards_opening" })}
@@ -932,7 +1159,17 @@ function AdminLandingWebsPage() {
       {/* ================= MODAL XEM TRỰC TIẾP (LIVE PREVIEW) ================= */}
       {previewItem && (
         <div className="fixed inset-0 z-90 bg-white light [color-scheme:light]">
-          {previewItem.template === "forge_luxury_atelier" ? (
+          {previewItem.template === "video_voting_showcase" || previewItem.slug === "video-voting" ? (
+            <VideoVotingShowcaseLanding
+              config={previewItem}
+              previewMode={true}
+              onClosePreview={() => setPreviewItem(null)}
+              onEditConfig={() => {
+                handleOpenEdit(previewItem);
+                setPreviewItem(null);
+              }}
+            />
+          ) : previewItem.template === "forge_luxury_atelier" ? (
             <div className="relative w-full h-full overflow-y-auto">
               <div className="fixed top-4 right-4 z-[999] flex items-center gap-2 bg-slate-900/90 backdrop-blur-md p-1.5 rounded-2xl border border-slate-700 shadow-2xl">
                 <a
@@ -1034,10 +1271,10 @@ function AdminLandingWebsPage() {
                 <button
                   type="button"
                   onClick={handleSaveDynamicConfig}
-                  className="px-4 py-1.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white text-xs font-bold shadow-md transition flex items-center gap-1.5 cursor-pointer"
+                  className="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md transition flex items-center gap-1.5 cursor-pointer"
                 >
-                  <Check className="size-3.5" />
-                  <span>Lưu Thay Đổi</span>
+                  <QrCode className="size-3.5" />
+                  <span>Áp Dụng &amp; Xuất Bản QR</span>
                 </button>
                 <button
                   type="button"
@@ -2429,6 +2666,46 @@ function AdminLandingWebsPage() {
                       Kích hoạt xuất bản công khai trang này
                     </label>
                   </div>
+
+                  {/* CÀI ĐẶT THỜI GIAN ĐẾM VOTING (BẮT ĐẦU - KẾT THÚC) */}
+                  <div className="p-4 rounded-2xl border border-amber-500/30 bg-amber-500/5 space-y-3 mt-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-black text-slate-900 dark:text-white flex items-center gap-2">
+                        <Clock className="size-4 text-amber-500" />
+                        <span>Cấu Hình Thời Gian Mở Cổng &amp; Đếm Lượt Bình Chọn (Voting Time Window)</span>
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px] font-bold">
+                        Mỗi người chỉ được vote 1 lần duy nhất
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Khi bấm <strong>"Áp dụng &amp; Xuất bản QR"</strong>, Landing Page sẽ chạy công khai và hệ thống chỉ đếm lượt người bình chọn trong khung thời gian đã thiết lập dưới đây:
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                          Thời gian Bắt Đầu Tính Lượt Vote
+                        </label>
+                        <input
+                          type="datetime-local"
+                          value={(editItem.votingStartAt || "").slice(0, 16)}
+                          onChange={(e) => setEditItem({ ...editItem, votingStartAt: e.target.value })}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-xs font-bold text-slate-900 dark:text-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                          Thời gian Kết Thúc Đóng Cổng Vote
+                        </label>
+                        <input
+                          type="datetime-local"
+                          value={(editItem.votingEndAt || "").slice(0, 16)}
+                          onChange={(e) => setEditItem({ ...editItem, votingEndAt: e.target.value })}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-xs font-bold text-slate-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -2598,47 +2875,116 @@ function AdminLandingWebsPage() {
                 </div>
               )}
 
-              {/* TAB 3: THẺ TRÌNH DIỄN (SLIDES) */}
+              {/* TAB 3: THẺ TRÌNH DIỄN (7 VIDEO SLIDES & VOTING OPTIONS) */}
               {activeBuilderTab === "slides" && (
                 <div className="space-y-4">
+                  {/* Khung cài đặt thời gian đếm người bình chọn nhanh ngay tại tab Slides */}
+                  <div className="p-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 space-y-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <Clock className="size-4 text-amber-500" />
+                        <span className="text-xs font-black text-slate-900 dark:text-white">
+                          Thiết Lập Thời Gian Đếm Người Bình Chọn Video (Voting Schedule)
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const ensured7: LandingSlide[] = [];
+                          for (let i = 0; i < 7; i++) {
+                            const cur = editItem.slides?.[i] || DEFAULT_VIDEO_VOTING_7_SLIDES[i];
+                            ensured7.push({
+                              ...DEFAULT_VIDEO_VOTING_7_SLIDES[i],
+                              ...cur,
+                              id: cur.id || `vslide-${i + 1}`,
+                              votingOptions:
+                                Array.isArray(cur.votingOptions) && cur.votingOptions.length > 0
+                                  ? cur.votingOptions
+                                  : JSON.parse(JSON.stringify(DEFAULT_VIDEO_VOTING_7_SLIDES[i].votingOptions)),
+                            });
+                          }
+                          setEditItem({ ...editItem, slides: ensured7 });
+                          toast.success("Đã chuẩn hóa đủ 7 màn trình chiếu Video & Lựa chọn Voting!");
+                        }}
+                        className="px-3 py-1 rounded-lg bg-amber-500 text-slate-950 text-[11px] font-black cursor-pointer hover:bg-amber-400 transition"
+                      >
+                        Chuẩn Hóa Đủ 7 Màn Video Trượt Ngang
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                          Bắt đầu mở bình chọn (Start Time)
+                        </label>
+                        <input
+                          type="datetime-local"
+                          value={(editItem.votingStartAt || "").slice(0, 16)}
+                          onChange={(e) => setEditItem({ ...editItem, votingStartAt: e.target.value })}
+                          className="w-full px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-xs font-bold text-slate-900 dark:text-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                          Kết thúc đóng bình chọn (End Time)
+                        </label>
+                        <input
+                          type="datetime-local"
+                          value={(editItem.votingEndAt || "").slice(0, 16)}
+                          onChange={(e) => setEditItem({ ...editItem, votingEndAt: e.target.value })}
+                          className="w-full px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-xs font-bold text-slate-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-sm font-black text-slate-900 dark:text-white">Danh Sách Thẻ Trình Diễn</h4>
+                      <h4 className="text-sm font-black text-slate-900 dark:text-white">
+                        Danh Sách {editItem.slides?.length || 0} Màn Video Trượt Ngang &amp; Cấu Hình Lựa Chọn Voting
+                      </h4>
                       <p className="text-xs text-slate-400">
-                        Mỗi thẻ sẽ bung ra làm hình nền toàn màn hình kèm hiệu ứng chữ kép (Title 1, Title 2) khi timer chạy hoặc người dùng bấm chọn.
+                        Mỗi màn tương ứng 1 video trượt ngang cho 1 slide. Hỗ trợ tải video trực tiếp từ máy tính và cấu hình các lựa chọn voting ngay bên dưới mỗi video.
                       </p>
                     </div>
                     <button
                       type="button"
                       onClick={() => {
+                        const nextNum = (editItem.slides?.length || 0) + 1;
                         const newSlide: LandingSlide = {
-                          id: `slide-${Date.now().toString().slice(-4)}`,
-                          place: "VIỆT NAM",
-                          title1: "TIÊU ĐỀ",
-                          title2: "NỔI BẬT",
-                          description: "Mô tả nội dung thẻ trình diễn mới.",
+                          id: `vslide-${Date.now().toString().slice(-4)}`,
+                          place: `MÀN 0${nextNum} • VIDEO SHOWCASE`,
+                          title1: `VIDEO MÀN 0${nextNum}`,
+                          title2: "TRÌNH CHIẾU",
+                          description: "Mô tả nội dung màn trình chiếu video mới.",
                           image: "https://assets.codepen.io/3685267/timed-cards-1.jpg",
-                          ctaText: "Khám Phá Ngay",
+                          videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-city-traffic-at-night-11-large.mp4",
+                          ctaText: "Bình Chọn Ngay",
+                          votingQuestion: `Bạn đánh giá thế nào về Video Màn 0${nextNum}?`,
+                          votingOptions: [
+                            { id: `v${nextNum}-opt-1`, label: "Lựa chọn 1: Xuất sắc & Ấn tượng nhất", description: "Nội dung truyền tải đắt giá" },
+                            { id: `v${nextNum}-opt-2`, label: "Lựa chọn 2: Sáng tạo & Đột phá", description: "Hình ảnh và thông điệp mới mẻ" },
+                            { id: `v${nextNum}-opt-3`, label: "Lựa chọn 3: Giàu giá trị thực tiễn", description: "Ứng dụng cao cho doanh nghiệp" },
+                          ],
                         };
                         setEditItem({ ...editItem, slides: [...(editItem.slides || []), newSlide] });
                       }}
                       className="px-3 py-1.5 rounded-xl bg-[#003B95] text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer"
                     >
                       <Plus className="size-3.5" />
-                      <span>Thêm Thẻ Mới</span>
+                      <span>Thêm Màn Video</span>
                     </button>
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="space-y-5">
                     {(editItem.slides || []).map((slide, sIdx) => (
-                      <div key={slide.id} className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 space-y-3">
+                      <div key={slide.id} className="p-4 sm:p-5 rounded-3xl border-2 border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/50 space-y-4">
                         <div className="flex items-start justify-between gap-3">
-                          <span className="size-7 rounded-xl bg-amber-500/20 text-amber-500 text-xs font-black grid place-items-center shrink-0">
-                            #{sIdx + 1}
+                          <span className="px-3 py-1.5 rounded-xl bg-amber-500 text-slate-950 text-xs font-black shrink-0">
+                            MÀN 0{sIdx + 1} / {editItem.slides.length}
                           </span>
                           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 flex-1">
                             <div>
-                              <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">Địa điểm (Place)</label>
+                              <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">Nhãn phụ đề (Place / Tag)</label>
                               <input
                                 type="text"
                                 value={slide.place}
@@ -2651,7 +2997,7 @@ function AdminLandingWebsPage() {
                               />
                             </div>
                             <div>
-                              <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">Dòng chữ 1 (Title 1)</label>
+                              <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">Tiêu đề chính 1 (Title 1)</label>
                               <input
                                 type="text"
                                 value={slide.title1}
@@ -2664,7 +3010,7 @@ function AdminLandingWebsPage() {
                               />
                             </div>
                             <div>
-                              <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">Dòng chữ 2 (Title 2)</label>
+                              <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">Tiêu đề điểm nhấn 2 (Title 2)</label>
                               <input
                                 type="text"
                                 value={slide.title2}
@@ -2689,34 +3035,8 @@ function AdminLandingWebsPage() {
                           </button>
                         </div>
 
-                        <div className="space-y-3">
-                          <LandingImageUploadField
-                            label="Ảnh Nền Thẻ Trình Diễn (Slide Card Image)"
-                            value={slide.image}
-                            onChange={(url) => {
-                              const copy = [...editItem.slides];
-                              copy[sIdx].image = url;
-                              setEditItem({ ...editItem, slides: copy });
-                            }}
-                            previewAspect="video"
-                          />
-                          <div>
-                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">Nút Thao Tác (CTA Text)</label>
-                            <input
-                              type="text"
-                              value={slide.ctaText}
-                              onChange={(e) => {
-                                const copy = [...editItem.slides];
-                                copy[sIdx].ctaText = e.target.value;
-                                setEditItem({ ...editItem, slides: copy });
-                              }}
-                              className="w-full px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold"
-                            />
-                          </div>
-                        </div>
-
                         <div>
-                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">Đoạn Mô Tả (Description)</label>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">Đoạn Mô Tả Nội Dung Video (Chỉnh sửa text tự do)</label>
                           <textarea
                             rows={2}
                             value={slide.description}
@@ -2727,6 +3047,132 @@ function AdminLandingWebsPage() {
                             }}
                             className="w-full px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs"
                           />
+                        </div>
+
+                        {/* TẢI VIDEO & ẢNH POSTER CHO MÀN SLIDE */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <LandingVideoUploadField
+                            label={`Video Trình Chiếu Màn 0${sIdx + 1} (Tải file MP4/WebM/MOV hoặc dán link)`}
+                            value={slide.videoUrl || ""}
+                            onChange={(url) => {
+                              const copy = [...editItem.slides];
+                              copy[sIdx].videoUrl = url;
+                              setEditItem({ ...editItem, slides: copy });
+                            }}
+                            helperText="Hỗ trợ tải video trực tiếp lên hệ thống (tối đa 500MB)"
+                          />
+
+                          <LandingImageUploadField
+                            label={`Ảnh Poster / Thumbnail Màn 0${sIdx + 1}`}
+                            value={slide.image}
+                            onChange={(url) => {
+                              const copy = [...editItem.slides];
+                              copy[sIdx].image = url;
+                              setEditItem({ ...editItem, slides: copy });
+                            }}
+                            previewAspect="video"
+                          />
+                        </div>
+
+                        {/* CẤU HÌNH CÂU HỎI & CÁC LỰA CHỌN VOTING NGAY DƯỚI VIDEO */}
+                        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-amber-500/30 space-y-3">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <span className="text-xs font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+                              <BarChart3 className="size-4 text-amber-500" />
+                              <span>Thiết Lập Phần Voting Ngay Dưới Video Màn 0{sIdx + 1}</span>
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const copy = [...editItem.slides];
+                                const curOpts = Array.isArray(copy[sIdx].votingOptions) ? [...copy[sIdx].votingOptions!] : [];
+                                curOpts.push({
+                                  id: `v${sIdx + 1}-opt-${Date.now().toString().slice(-3)}`,
+                                  label: `Lựa chọn bình chọn #${curOpts.length + 1}`,
+                                  description: "Mô tả ngắn cho phương án bình chọn",
+                                });
+                                copy[sIdx].votingOptions = curOpts;
+                                setEditItem({ ...editItem, slides: copy });
+                              }}
+                              className="px-2.5 py-1 rounded-lg bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 text-[11px] font-bold flex items-center gap-1 cursor-pointer"
+                            >
+                              <Plus className="size-3" />
+                              <span>Thêm Lựa Chọn Voting</span>
+                            </button>
+                          </div>
+
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
+                              Câu Hỏi Bình Chọn Hiển Thị Dưới Video
+                            </label>
+                            <input
+                              type="text"
+                              value={slide.votingQuestion || ""}
+                              onChange={(e) => {
+                                const copy = [...editItem.slides];
+                                copy[sIdx].votingQuestion = e.target.value;
+                                setEditItem({ ...editItem, slides: copy });
+                              }}
+                              placeholder={`Bạn ấn tượng nhất với điểm nào trong Video Màn 0${sIdx + 1}?`}
+                              className="w-full px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-xs font-bold text-slate-900 dark:text-white"
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            {(slide.votingOptions || []).map((opt, oIdx) => (
+                              <div key={opt.id || oIdx} className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+                                <div className="sm:col-span-1 flex items-center gap-1.5">
+                                  <span className="size-6 rounded-lg bg-amber-500/20 text-amber-600 dark:text-amber-400 text-[11px] font-black grid place-items-center">
+                                    {String.fromCharCode(65 + oIdx)}
+                                  </span>
+                                </div>
+                                <div className="sm:col-span-5">
+                                  <input
+                                    type="text"
+                                    value={opt.label}
+                                    onChange={(e) => {
+                                      const copy = [...editItem.slides];
+                                      const opts = [...(copy[sIdx].votingOptions || [])];
+                                      opts[oIdx] = { ...opts[oIdx], label: e.target.value };
+                                      copy[sIdx].votingOptions = opts;
+                                      setEditItem({ ...editItem, slides: copy });
+                                    }}
+                                    placeholder="Tên lựa chọn voting..."
+                                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-900 dark:text-white"
+                                  />
+                                </div>
+                                <div className="sm:col-span-5">
+                                  <input
+                                    type="text"
+                                    value={opt.description || ""}
+                                    onChange={(e) => {
+                                      const copy = [...editItem.slides];
+                                      const opts = [...(copy[sIdx].votingOptions || [])];
+                                      opts[oIdx] = { ...opts[oIdx], description: e.target.value };
+                                      copy[sIdx].votingOptions = opts;
+                                      setEditItem({ ...editItem, slides: copy });
+                                    }}
+                                    placeholder="Mô tả phụ (tùy chọn)..."
+                                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-600 dark:text-slate-300"
+                                  />
+                                </div>
+                                <div className="sm:col-span-1 flex justify-end">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const copy = [...editItem.slides];
+                                      copy[sIdx].votingOptions = (copy[sIdx].votingOptions || []).filter((_, i) => i !== oIdx);
+                                      setEditItem({ ...editItem, slides: copy });
+                                    }}
+                                    className="size-7 grid place-items-center rounded-lg text-rose-500 hover:bg-rose-500/10 cursor-pointer"
+                                    title="Xóa phương án này"
+                                  >
+                                    <X className="size-3.5" />
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -3050,10 +3496,233 @@ function AdminLandingWebsPage() {
                 <button
                   type="button"
                   onClick={handleSaveDynamicConfig}
-                  className="px-5 py-2 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white font-bold transition cursor-pointer shadow-md"
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition cursor-pointer shadow-md flex items-center gap-1.5"
                 >
-                  Lưu Cấu Hình
+                  <QrCode className="size-4" />
+                  <span>Áp Dụng &amp; Xuất Bản Ra Mã QR Công Khai</span>
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= MODAL MÃ QR CÔNG KHAI KHI BẤM ÁP DỤNG ================= */}
+      {publishedQrItem && (
+        <div className="fixed inset-0 z-90 grid place-items-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="relative w-full max-w-md rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-6 text-center space-y-4 animate-in zoom-in-95 duration-200">
+            <button
+              type="button"
+              onClick={() => setPublishedQrItem(null)}
+              className="absolute top-4 right-4 size-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white grid place-items-center cursor-pointer"
+            >
+              <X className="size-4" />
+            </button>
+
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 text-[11px] font-black uppercase tracking-wider">
+              <CheckCircle2 className="size-3.5" />
+              <span>Đã Áp Dụng &amp; Public Ra Ngoài</span>
+            </div>
+
+            <h3 className="text-lg font-black text-slate-900 dark:text-white">
+              Quét Mã QR Để Xem &amp; Bình Chọn Landing Page
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Bất kỳ ai quét mã QR này đều có thể truy cập trực tiếp vào trang <strong className="text-slate-900 dark:text-white">{publishedQrItem.name}</strong> để xem 7 màn video trượt ngang và tham gia bình chọn (1 người / 1 lượt).
+            </p>
+
+            {(() => {
+              const pathSlug =
+                publishedQrItem.slug ||
+                (publishedQrItem.template === "video_voting_showcase" ? "video-voting" : "web-v1");
+              const publicUrl =
+                typeof window !== "undefined"
+                  ? `${window.location.origin}/landing/${pathSlug}`
+                  : `https://crm.ceohn10.viconnect.vn/landing/${pathSlug}`;
+              const qrImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=12&data=${encodeURIComponent(
+                publicUrl
+              )}`;
+
+              return (
+                <>
+                  <div className="p-4 rounded-3xl bg-white border-2 border-slate-200 shadow-inner inline-block mx-auto">
+                    <img
+                      src={qrImgUrl}
+                      alt="Landing Page Public QR Code"
+                      className="size-56 object-contain mx-auto"
+                    />
+                  </div>
+
+                  <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-left space-y-2">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                      Đường dẫn công khai (Public Link):
+                    </div>
+                    <div className="flex items-center justify-between gap-2">
+                      <code className="text-xs font-mono font-bold text-blue-600 dark:text-blue-400 truncate">
+                        {publicUrl}
+                      </code>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(publicUrl);
+                          toast.success("Đã sao chép đường dẫn Landing Page!");
+                        }}
+                        className="px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white text-[11px] font-bold shrink-0 cursor-pointer"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2.5 pt-1">
+                    <a
+                      href={publicUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="py-2.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-md transition"
+                    >
+                      <ExternalLink className="size-3.5" />
+                      <span>Mở Trang Công Khai</span>
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const item = publishedQrItem;
+                        setPublishedQrItem(null);
+                        void handleOpenVoteStatsModal(item);
+                      }}
+                      className="py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black flex items-center justify-center gap-1.5 shadow-md transition cursor-pointer"
+                    >
+                      <BarChart3 className="size-3.5" />
+                      <span>Thống Kê Voting</span>
+                    </button>
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        </div>
+      )}
+
+      {/* ================= MODAL THỐNG KÊ VOTING VIDEO REALTIME ================= */}
+      {statsModalItem && (
+        <div className="fixed inset-0 z-90 grid place-items-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="relative w-full max-w-4xl max-h-[90vh] rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/60 dark:bg-slate-950/40">
+              <div className="flex items-center gap-3">
+                <div className="size-10 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 grid place-items-center">
+                  <BarChart3 className="size-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900 dark:text-white">
+                    Màn Thống Kê Voting Video Realtime Theo Tỷ Lệ Lựa Chọn (%)
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Trang: <strong className="text-slate-800 dark:text-white">{statsModalItem.name}</strong> • Tổng số người đã bình chọn hợp lệ:{" "}
+                    <strong className="text-emerald-600 dark:text-emerald-400">{liveVoteStats?.totalVotes ?? 0} người</strong>
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => void handleOpenVoteStatsModal(statsModalItem)}
+                  className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 flex items-center gap-1.5 cursor-pointer"
+                >
+                  <RotateCcw className="size-3.5" />
+                  <span>Cập nhật Realtime</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setStatsModalItem(null)}
+                  className="size-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white grid place-items-center cursor-pointer"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-5 overflow-y-auto space-y-5 flex-1">
+              {/* Tỷ lệ % theo từng màn video */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {(liveVoteStats?.slides || statsModalItem.slides || []).map((sl: any, idx: number) => {
+                  const slideTitle = sl.slideTitle || `${sl.title1 || ""} ${sl.title2 || ""}`.trim() || `Video Màn 0${idx + 1}`;
+                  const totalSlideVotes = sl.totalSlideVotes ?? 0;
+                  const options = sl.options || sl.votingOptions || [];
+                  return (
+                    <div key={sl.slideId || sl.id || idx} className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-black text-slate-900 dark:text-white">
+                          Màn 0{idx + 1}: {slideTitle}
+                        </span>
+                        <span className="px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 text-[11px] font-black">
+                          {totalSlideVotes} lượt vote
+                        </span>
+                      </div>
+                      <div className="space-y-2">
+                        {options.map((opt: any, oIdx: number) => {
+                          const pct = opt.percentage ?? 0;
+                          const cnt = opt.count ?? 0;
+                          return (
+                            <div key={opt.optionId || opt.id || oIdx} className="space-y-1">
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="font-bold text-slate-700 dark:text-slate-200">{opt.label}</span>
+                                <span className="font-black text-amber-600 dark:text-amber-400">
+                                  {pct}% ({cnt} phiếu)
+                                </span>
+                              </div>
+                              <div className="h-2 w-full rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+                                <div
+                                  className="h-full rounded-full bg-amber-500 transition-all duration-500"
+                                  style={{ width: `${Math.min(100, pct)}%` }}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Danh sách người quét QR đã điền Tên & Email để vote */}
+              <div className="space-y-2.5">
+                <h4 className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                  Danh Sách Người Quét QR Đã Điền Tên &amp; Email Bình Chọn ({liveVoteStats?.recentVoters?.length || 0})
+                </h4>
+                {(!liveVoteStats?.recentVoters || liveVoteStats.recentVoters.length === 0) ? (
+                  <div className="p-6 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 text-center text-xs text-slate-400">
+                    Chưa có lượt bình chọn nào được ghi nhận. Hãy quét mã QR để thử nghiệm bình chọn!
+                  </div>
+                ) : (
+                  <div className="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <table className="w-full text-left border-collapse text-xs">
+                      <thead>
+                        <tr className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold">
+                          <th className="py-2.5 px-3">Họ và Tên</th>
+                          <th className="py-2.5 px-3">Email (Định danh 1 lượt)</th>
+                          <th className="py-2.5 px-3">Màn Video</th>
+                          <th className="py-2.5 px-3">Phương Án Đã Chọn</th>
+                          <th className="py-2.5 px-3">Thời Gian Vote</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                        {liveVoteStats.recentVoters.map((v: any, i: number) => (
+                          <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                            <td className="py-2 px-3 font-bold text-slate-900 dark:text-white">{v.voterName}</td>
+                            <td className="py-2 px-3 font-mono text-slate-600 dark:text-slate-300">{v.voterEmail}</td>
+                            <td className="py-2 px-3 text-slate-700 dark:text-slate-300">{v.slideId}</td>
+                            <td className="py-2 px-3 font-bold text-amber-600 dark:text-amber-400">{v.optionLabel}</td>
+                            <td className="py-2 px-3 text-slate-500">
+                              {v.votedAt ? new Date(v.votedAt).toLocaleString("vi-VN") : "-"}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             </div>
           </div>

@@ -115,7 +115,7 @@ export class AuthorizationController {
   }
 
   /**
-   * Lấy danh sách phân công chức vụ theo Scope của một User
+   * Lấy danh sách phân công chức vụ theo Scope của một User hoặc tất cả ('all')
    */
   @Get('user-assignments/:userId')
   async getUserAssignments(@Param('userId') userId: string) {
@@ -123,16 +123,19 @@ export class AuthorizationController {
   }
 
   /**
-   * Gán chức vụ mới cho người dùng theo Scope
+   * Gán chức vụ mới cho người dùng theo Scope (hỗ trợ cả userId/roleIdOrCode và userIdentifier/roleCode)
    */
   @Post('assign-role')
   @UseGuards(JwtAuthGuard)
   async assignRole(
-    @Body() dto: {
-      userId: string;
-      roleIdOrCode: string;
-      scopeType: string;
-      scopeId: string;
+    @Body()
+    dto: {
+      userId?: string;
+      userIdentifier?: string;
+      roleIdOrCode?: string;
+      roleCode?: string;
+      scopeType?: string;
+      scopeId?: string;
       startDate?: string;
       endDate?: string;
       notes?: string;
@@ -140,7 +143,15 @@ export class AuthorizationController {
     @Req() req: any,
   ) {
     const actorId = req.user?.id;
-    return this.authzService.assignRole(actorId, dto);
+    return this.authzService.assignRole(actorId, {
+      userId: dto.userId || dto.userIdentifier || '',
+      roleIdOrCode: dto.roleIdOrCode || dto.roleCode || 'MEMBER',
+      scopeType: dto.scopeType || 'ORGANIZATION',
+      scopeId: dto.scopeId || 'all',
+      startDate: dto.startDate,
+      endDate: dto.endDate,
+      notes: dto.notes,
+    });
   }
 
   /**
@@ -149,7 +160,7 @@ export class AuthorizationController {
   @Post('revoke-assignment')
   @UseGuards(JwtAuthGuard)
   async revokeRoleAssignment(
-    @Body() dto: { assignmentId: string },
+    @Body() dto: { assignmentId: string; reason?: string },
     @Req() req: any,
   ) {
     const actorId = req.user?.id;

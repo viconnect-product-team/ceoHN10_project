@@ -30,6 +30,10 @@ import {
   Download,
   CloudUpload,
   HardDrive,
+  Clock,
+  Ticket,
+  Dices,
+  MapPin,
 } from "lucide-react";
 import { fetchNestApi } from "@/lib/api-client";
 import { toast } from "sonner";
@@ -42,6 +46,25 @@ export const Route = createFileRoute("/event-checkin")({
 });
 
 function PublicEventCheckinGatePage() {
+  const [activeCategory, setActiveCategory] = useState<"member" | "ticket" | "walkin">("member");
+  const [memberCodeInput, setMemberCodeInput] = useState("");
+  const [unregisteredMember, setUnregisteredMember] = useState<any>(null);
+  const [thankYouSuccess, setThankYouSuccess] = useState<{
+    name: string;
+    subtitle: string;
+    luckyNumber?: string;
+    seatAssignment?: string;
+  } | null>(null);
+  const [walkinQrResult, setWalkinQrResult] = useState<{
+    regId: string;
+    amount: number;
+    vietQrUrl: string;
+    transferContent: string;
+    bankName: string;
+    bankAccount: string;
+    bankOwner: string;
+    fullName: string;
+  } | null>(null);
   const [ticketInput, setTicketInput] = useState("");
   const [currentTicket, setCurrentTicket] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -57,6 +80,7 @@ function PublicEventCheckinGatePage() {
 
   // Danh sách sự kiện & Sự kiện đang chọn để Check-in (Yêu cầu 4)
   const [eventsList, setEventsList] = useState<any[]>([]);
+  const [selectedEventObj, setSelectedEventObj] = useState<any>(null);
   const [selectedEventId, setSelectedEventId] = useState<string>("latest");
   const [selectedEventName, setSelectedEventName] = useState<string>("DẠ TIỆC TẤT NIÊN YEAR END PARTY 2026 - CEO HN10");
   const [selectedEventFee, setSelectedEventFee] = useState<number>(500000);
@@ -71,7 +95,7 @@ function PublicEventCheckinGatePage() {
     email: "",
     company: "",
     position: "",
-    selectedParts: ["Tọa đàm / Hội nghị Chuyên Đề", "Tiệc Gala Dinner & Kết Nối"] as string[],
+    selectedParts: [] as string[],
   });
   const [additionalWalkins, setAdditionalWalkins] = useState<Array<{
     id: string;
@@ -229,6 +253,7 @@ function PublicEventCheckinGatePage() {
           const matched =
             (urlEventId && list.find((e: any) => e.id === urlEventId || e.slug === urlEventId)) ||
             list[0];
+          setSelectedEventObj(matched);
           setSelectedEventId(matched.id);
           setSelectedEventName(matched.name || matched.title || "Sự kiện CLB CEO HN10");
           const fee = Number(matched.fee || matched.ticket_price || matched.ticketPrice || 0);
@@ -246,6 +271,7 @@ function PublicEventCheckinGatePage() {
     setSelectedEventId(eventId);
     const found = eventsList.find((e) => e.id === eventId);
     if (found) {
+      setSelectedEventObj(found);
       setSelectedEventName(found.name || found.title || "Sự kiện CLB CEO HN10");
       const fee = Number(found.fee || found.ticket_price || found.ticketPrice || 0);
       setSelectedEventFee(fee);
@@ -314,6 +340,39 @@ function PublicEventCheckinGatePage() {
     }
   };
 
+  // Auto-polling 3s khi khách mới đang chờ thanh toán VietQR
+  useEffect(() => {
+    if (!walkinQrResult?.regId) return;
+    const timer = setInterval(async () => {
+      try {
+        const qp = selectedEventId && selectedEventId !== "latest" ? `?eventId=${encodeURIComponent(selectedEventId)}` : "";
+        const st = await fetchNestApi<any>(`/events/ticket-status/${encodeURIComponent(walkinQrResult.regId)}${qp}`);
+        if (st?.found && st?.ticket && (st.ticket.paymentStatus === "paid" || st.ticket.status === "confirmed")) {
+          // Tự động đánh dấu Check-in khi thanh toán thành công
+          let finalLucky = st.ticket.luckyNumber;
+          if (!st.ticket.isCheckedIn) {
+            const chkRes = await fetchNestApi<any>("/events/ticket-checkin", {
+              method: "POST",
+              body: JSON.stringify({ ticketCode: walkinQrResult.regId, method: "sepay_walkin_auto" }),
+            }).catch(() => null);
+            if (chkRes?.ticket?.luckyNumber) finalLucky = chkRes.ticket.luckyNumber;
+          }
+          clearInterval(timer);
+          setThankYouSuccess({
+            name: walkinQrResult.fullName,
+            subtitle: "Thanh toán thành công! Đã dán Sticker Số May Mắn và lưu vào Màn Quay Thưởng.",
+            luckyNumber: finalLucky,
+            seatAssignment: st.ticket.seatAssignment,
+          });
+          setWalkinQrResult(null);
+          setWalkinModalOpen(false);
+          toast.success(`Thanh toán thành công! Cảm ơn ${walkinQrResult.fullName} đã tham gia sự kiện!`);
+        }
+      } catch {}
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [walkinQrResult, selectedEventId]);
+
   const lookupTicket = async (codeToSearch: string) => {
     if (!codeToSearch || !codeToSearch.trim()) {
       toast.info("Vui lòng nhập mã vé hoặc mã học viên để tra cứu");
@@ -322,6 +381,8 @@ function PublicEventCheckinGatePage() {
     const clean = codeToSearch.trim();
     setLoading(true);
     setSelectedFeeQr(null);
+    setUnregisteredMember(null);
+    setThankYouSuccess(null);
 
     const effectiveOffline = !isOnline || forceOffline;
     if (effectiveOffline) {
@@ -366,18 +427,25 @@ function PublicEventCheckinGatePage() {
     }
 
     try {
+      const evQuery = selectedEventId && selectedEventId !== "latest" ? `?eventId=${encodeURIComponent(selectedEventId)}` : "";
       const res = await fetchNestApi<any>(
-        `/events/ticket-status/${encodeURIComponent(clean)}`
+        `/events/ticket-status/${encodeURIComponent(clean)}${evQuery}`
       );
       if (res && res.found && res.ticket) {
         setCurrentTicket(res.ticket);
+        setUnregisteredMember(null);
         toast.success(`Tìm thấy thông tin vé: ${res.ticket.memberName}`);
         if (res.ticket.eventId) {
           loadEventFees(res.ticket.eventId);
         }
+      } else if (res && res.notRegisteredForEvent && res.member) {
+        setCurrentTicket(null);
+        setUnregisteredMember(res.member);
+        toast.warning(res.message || "Học viên chưa đăng ký sự kiện này!");
       } else {
         setCurrentTicket(null);
-        toast.error(res?.message || "Không tìm thấy vé với mã này trên hệ thống.");
+        setUnregisteredMember(null);
+        toast.error(res?.message || "Không tìm thấy vé với mã này trong sự kiện.");
       }
     } catch (err: any) {
       // Fallback local search
@@ -478,12 +546,20 @@ function PublicEventCheckinGatePage() {
         }),
       });
       if (res && res.ok) {
-        toast.success(res.message || "Check-in thành công!");
+        const assignedLucky = res.ticket?.luckyNumber || currentTicket.luckyNumber || String(Math.floor(1000 + Math.random() * 9000));
+        toast.success(res.message || `Check-in thành công! Sticker số may mắn: #${assignedLucky}`);
         setCurrentTicket({
           ...currentTicket,
           isCheckedIn: true,
+          luckyNumber: assignedLucky,
           checkedInAt: res.checkedInAt || new Date().toLocaleString("vi-VN"),
           attendedParts: res.ticket?.attendedParts || selectedCheckinParts,
+        });
+        setThankYouSuccess({
+          name: currentTicket.memberName || "Quý đại biểu",
+          subtitle: "Check-in thành công! Khách mời đã được cấp Sticker Số May Mắn & lưu trực tiếp vào Màn Quay Thưởng.",
+          luckyNumber: assignedLucky,
+          seatAssignment: res.ticket?.seatAssignment || currentTicket.seatAssignment,
         });
       } else if (res && res.alreadyCheckedIn) {
         toast.error(res.message);
@@ -571,23 +647,59 @@ function PublicEventCheckinGatePage() {
       });
 
       if (res && res.ok) {
-        if (isInstantCheckin) {
-          toast.success(`Đã đăng ký và CHECK-IN THÀNH CÔNG cho khách mới: ${walkinForm.fullName}!`);
-        } else {
-          toast.success(`Đã gửi email thông báo phí kèm mã VietQR tới ${walkinForm.email}. Hệ thống sẽ TỰ ĐỘNG CHECK-IN ngay khi nhận được thanh toán!`);
+        const regId = res.registrationId || res.id || `REG-${Date.now().toString().slice(-6)}`;
+        const assignedLucky = res.luckyNumber || res.createdTickets?.[0]?.luckyNumber || String(Math.floor(1000 + Math.random() * 9000));
+        if (selectedEventIsFree || selectedEventFee <= 0 || isInstantCheckin) {
+          // Đảm bảo kích hoạt ticket-checkin để lưu checked_in_at và đồng bộ sang màn quay thưởng
+          await fetchNestApi("/events/ticket-checkin", {
+            method: "POST",
+            body: JSON.stringify({
+              ticketCode: regId,
+              method: "walkin_gate_auto",
+              attendedParts: walkinForm.selectedParts,
+            }),
+          }).catch(() => {});
         }
-        setWalkinModalOpen(false);
-        setWalkinForm({
-          fullName: "",
-          phone: "",
-          email: "",
-          company: "",
-          position: "",
-          selectedParts: ["Tọa đàm / Hội nghị Chuyên Đề", "Tiệc Gala Dinner & Kết Nối"],
-        });
-        setAdditionalWalkins([]);
-        if (res.registrationId) {
-          lookupTicket(res.registrationId);
+        if (selectedEventIsFree || selectedEventFee <= 0) {
+          setThankYouSuccess({
+            name: walkinForm.fullName.trim(),
+            subtitle: "Đăng ký & Check-in thành công! Đã cấp Sticker Số May Mắn và lưu vào Màn Quay Thưởng.",
+            luckyNumber: assignedLucky,
+          });
+          toast.success(`Check-in thành công cho ${walkinForm.fullName}! Số may mắn: #${assignedLucky}`);
+          setWalkinModalOpen(false);
+          setWalkinForm({
+            fullName: "",
+            phone: "",
+            email: "",
+            company: "",
+            position: "",
+            selectedParts: [],
+          });
+          setAdditionalWalkins([]);
+          lookupTicket(regId);
+        } else {
+          // Sự kiện có phí: Hiện luôn mã QR thanh toán VietQR & chờ thanh toán thành công -> Tự Check-in
+          const activeEv = eventsList.find((ev) => ev.id === targetEventId);
+          const bankAccount = activeEv?.bank_account || activeEv?.bankAccount || "0983101010";
+          const bankName = activeEv?.bank_name || activeEv?.bankName || "MB Bank";
+          const bankOwner = activeEv?.bank_owner || activeEv?.bankOwner || "CLB DOANH NHAN CEO HN10";
+          const totalPay = selectedEventFee * allWalkins.length;
+          const transferContent = `EV_${regId}`;
+          const vietQrUrl =
+            res.vietQrUrl ||
+            `https://img.vietqr.io/image/970422-${encodeURIComponent(bankAccount)}-compact2.png?amount=${totalPay}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(bankOwner)}`;
+          setWalkinQrResult({
+            regId,
+            amount: totalPay,
+            vietQrUrl,
+            transferContent,
+            bankName,
+            bankAccount,
+            bankOwner,
+            fullName: walkinForm.fullName.trim(),
+          });
+          toast.info("Vui lòng quét mã QR để thanh toán vé. Thanh toán xong hệ thống tự động Check-in!");
         }
       } else {
         toast.error(res?.message || "Không thể đăng ký lúc này");
@@ -688,270 +800,997 @@ function PublicEventCheckinGatePage() {
     }
   };
 
+  // Lấy danh sách các phần chương trình đã cấu hình của sự kiện (không fix cứng Tọa đàm/Tiệc)
+  const configuredEventParts: string[] = (() => {
+    const rawParts = currentTicket?.eventParts || selectedEventObj?.parts;
+    if (Array.isArray(rawParts) && rawParts.length > 0) {
+      return rawParts
+        .map((p: any) => (typeof p === "string" ? p : p?.name || p?.title || ""))
+        .filter(Boolean);
+    }
+    return [];
+  })();
+
+  // Lấy Timeline (Agenda) đúng theo sự kiện đang chọn (tổng hợp cả timeline của từng phần nếu có)
+  const rawEventAgenda: Array<{ time?: string; title?: string; speaker?: string; description?: string }> = (() => {
+    const source = currentTicket?.eventAgenda || selectedEventObj?.agenda;
+    if (Array.isArray(source) && source.length > 0) return source;
+    if (typeof source === "string" && source.trim().startsWith("[")) {
+      try {
+        const parsed = JSON.parse(source);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch {}
+    }
+    // Nếu sự kiện có cấu hình timeline trong các parts thì gom lại
+    if (Array.isArray(selectedEventObj?.parts) && selectedEventObj.parts.length > 0) {
+      const fromParts: Array<{ time?: string; title?: string; speaker?: string; description?: string }> = [];
+      for (const p of selectedEventObj.parts) {
+        if (Array.isArray(p?.timeline) && p.timeline.length > 0) {
+          for (const tItem of p.timeline) {
+            fromParts.push({
+              time: [tItem.startTime, tItem.endTime].filter(Boolean).join(" - ") || tItem.time || p.startTime,
+              title: tItem.title || tItem.content || p.name,
+              speaker: tItem.speaker || p.name,
+              description: tItem.description,
+            });
+          }
+        } else if (p?.name) {
+          fromParts.push({
+            time: [p.startTime, p.endTime].filter(Boolean).join(" - ") || "Theo lịch trình",
+            title: p.name,
+            speaker: p.hallName || selectedEventObj?.venueName || "",
+          });
+        }
+      }
+      if (fromParts.length > 0) return fromParts;
+    }
+    const baseStart = selectedEventObj?.start_time || selectedEventObj?.startTime || "08:00";
+    const baseEnd = selectedEventObj?.end_time || selectedEventObj?.endTime || "12:00";
+    return [
+      {
+        time: `${baseStart} - 08:45`,
+        title: "Đón tiếp Đại biểu · Quét QR Check-in & Dán Sticker Số May Mắn",
+        speaker: "Ban Lễ Tân & Thư Ký CLB CEO HN10",
+      },
+      {
+        time: "08:45 - 10:30",
+        title: "Khai mạc & Nội dung Trọng Tâm Sự Kiện",
+        speaker: "Ban Chủ Tịch & Khách Mời",
+      },
+      {
+        time: `10:30 - ${baseEnd}`,
+        title: "Giao Lưu Kết Nối & Quay Thưởng Sticker Số May Mắn",
+        speaker: "Toàn thể Hội viên & Khách mời",
+      },
+    ];
+  })();
+
+  // Hiệu ứng chạm mặt nước iOS chân thực (3 vòng sóng nước đồng tâm + khúc xạ ánh sáng + độ nảy mặt nước)
+  const triggerWaterRipple = (e: React.MouseEvent<HTMLElement> | React.PointerEvent<HTMLElement>) => {
+    const target = e.currentTarget;
+    const rect = target.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    target.classList.remove("ios-water-surface-bounce");
+    void target.offsetWidth;
+    target.classList.add("ios-water-surface-bounce");
+
+    const drop = document.createElement("span");
+    drop.className = "ios-water-ripple-wave";
+    drop.style.left = `${x}px`;
+    drop.style.top = `${y}px`;
+    target.appendChild(drop);
+
+    const ring1 = document.createElement("span");
+    ring1.className = "ios-water-ripple-ring";
+    ring1.style.left = `${x}px`;
+    ring1.style.top = `${y}px`;
+    target.appendChild(ring1);
+
+    const ring2 = document.createElement("span");
+    ring2.className = "ios-water-ripple-ring ios-water-ripple-ring-delay-1";
+    ring2.style.left = `${x}px`;
+    ring2.style.top = `${y}px`;
+    target.appendChild(ring2);
+
+    const ring3 = document.createElement("span");
+    ring3.className = "ios-water-ripple-ring ios-water-ripple-ring-delay-2";
+    ring3.style.left = `${x}px`;
+    ring3.style.top = `${y}px`;
+    target.appendChild(ring3);
+
+    setTimeout(() => {
+      drop.remove();
+      ring1.remove();
+      ring2.remove();
+      ring3.remove();
+    }, 1150);
+  };
+
+  const submergedBgImage =
+    selectedEventObj?.image ||
+    selectedEventObj?.banner ||
+    selectedEventObj?.cover_image ||
+    "/skyline_perspective_dark.jpg";
+
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans">
-      {/* Top Header - Chuẩn Theme Sáng (Yêu cầu 4) */}
-      <header className="border-b border-slate-200 bg-white/95 backdrop-blur sticky top-0 z-20 px-4 py-3 sm:px-6 shadow-xs">
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center font-black text-white shadow-md shadow-blue-500/20 shrink-0">
-              <QrCode className="w-5 h-5" />
+    <div className="min-h-screen w-full relative overflow-x-hidden flex flex-col text-slate-950 font-sans selection:bg-slate-900 selection:text-white bg-[#dbe4f0]">
+      <style>{`
+        @keyframes iosCausticFloat {
+          0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+          50% { transform: translate3d(20px, -16px, 0) scale(1.06); }
+        }
+        @keyframes iosWaterSurfaceBounce {
+          0% { transform: scale(1); }
+          25% { transform: scale(0.978) translateY(1.5px); }
+          55% { transform: scale(1.01) translateY(-1px); }
+          80% { transform: scale(0.996); }
+          100% { transform: scale(1); }
+        }
+        .ios-water-surface-bounce {
+          animation: iosWaterSurfaceBounce 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        @keyframes iosWaterWave {
+          0% {
+            width: 6px;
+            height: 6px;
+            opacity: 0.95;
+            transform: translate(-50%, -50%) scale(0.2);
+          }
+          50% {
+            opacity: 0.65;
+          }
+          100% {
+            width: 420px;
+            height: 420px;
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(1.35);
+          }
+        }
+        @keyframes iosWaterRing {
+          0% {
+            width: 8px;
+            height: 8px;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(0.25);
+          }
+          70% {
+            opacity: 0.55;
+          }
+          100% {
+            width: 360px;
+            height: 360px;
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(1.45);
+          }
+        }
+        .ios-liquid-glass {
+          position: relative;
+          overflow: hidden;
+          background: radial-gradient(
+            130% 100% at 12% 8%,
+            rgba(255, 255, 255, 0.46) 0%,
+            rgba(255, 255, 255, 0.14) 45%,
+            rgba(255, 255, 255, 0.22) 100%
+          );
+          backdrop-filter: blur(15px) saturate(200%) brightness(106%);
+          -webkit-backdrop-filter: blur(15px) saturate(200%) brightness(106%);
+          border: 1px solid rgba(255, 255, 255, 0.72);
+          box-shadow:
+            0 24px 48px -12px rgba(15, 23, 42, 0.25),
+            0 10px 22px -6px rgba(15, 23, 42, 0.12),
+            inset 0 2px 6px rgba(255, 255, 255, 0.98),
+            inset 0 -3px 8px rgba(15, 23, 42, 0.08),
+            inset 0 0 22px rgba(255, 255, 255, 0.28);
+        }
+        .ios-liquid-glass-active {
+          position: relative;
+          overflow: hidden;
+          background: radial-gradient(
+            130% 100% at 12% 8%,
+            rgba(255, 255, 255, 0.64) 0%,
+            rgba(255, 255, 255, 0.28) 50%,
+            rgba(255, 255, 255, 0.38) 100%
+          );
+          backdrop-filter: blur(16px) saturate(215%) brightness(108%);
+          -webkit-backdrop-filter: blur(16px) saturate(215%) brightness(108%);
+          border: 1.5px solid rgba(255, 255, 255, 0.96);
+          box-shadow:
+            0 26px 52px -10px rgba(15, 23, 42, 0.28),
+            0 8px 20px -4px rgba(15, 23, 42, 0.14),
+            inset 0 2.5px 6px rgba(255, 255, 255, 1),
+            inset 0 -3px 8px rgba(14, 165, 233, 0.16),
+            inset 0 0 28px rgba(255, 255, 255, 0.42);
+        }
+        .ios-liquid-pill {
+          position: relative;
+          overflow: hidden;
+          background: radial-gradient(
+            120% 90% at 15% 10%,
+            rgba(255, 255, 255, 0.5) 0%,
+            rgba(255, 255, 255, 0.16) 55%,
+            rgba(255, 255, 255, 0.24) 100%
+          );
+          backdrop-filter: blur(12px) saturate(195%);
+          -webkit-backdrop-filter: blur(12px) saturate(195%);
+          border: 1px solid rgba(255, 255, 255, 0.78);
+          box-shadow:
+            0 10px 24px -6px rgba(15, 23, 42, 0.16),
+            inset 0 2px 4px rgba(255, 255, 255, 0.98),
+            inset 0 -2px 4px rgba(15, 23, 42, 0.06);
+        }
+        .ios-liquid-input {
+          background: rgba(255, 255, 255, 0.32);
+          backdrop-filter: blur(12px) saturate(180%);
+          -webkit-backdrop-filter: blur(12px) saturate(180%);
+          border: 1.5px solid rgba(255, 255, 255, 0.9);
+          box-shadow:
+            inset 0 2px 4px rgba(255, 255, 255, 0.85),
+            0 4px 14px rgba(15, 23, 42, 0.06);
+        }
+        .ios-liquid-input:focus {
+          background: rgba(255, 255, 255, 0.52);
+          border-color: rgba(255, 255, 255, 1);
+          box-shadow:
+            0 0 0 3px rgba(255, 255, 255, 0.55),
+            inset 0 1.5px 3px rgba(255, 255, 255, 1);
+        }
+        .ios-water-btn {
+          position: relative;
+          overflow: hidden;
+          transition:
+            transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+            box-shadow 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+            background 0.32s ease;
+        }
+        .ios-water-btn:active {
+          transform: scale(0.96);
+        }
+        .ios-water-ripple-wave {
+          position: absolute;
+          pointer-events: none;
+          border-radius: 9999px;
+          background: radial-gradient(
+            circle,
+            rgba(255, 255, 255, 0.95) 0%,
+            rgba(186, 230, 253, 0.78) 32%,
+            rgba(125, 211, 252, 0.38) 56%,
+            rgba(255, 255, 255, 0) 76%
+          );
+          animation: iosWaterWave 0.95s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          z-index: 30;
+        }
+        .ios-water-ripple-ring {
+          position: absolute;
+          pointer-events: none;
+          border-radius: 9999px;
+          border: 2px solid rgba(255, 255, 255, 0.96);
+          box-shadow:
+            0 0 18px rgba(125, 211, 252, 0.85),
+            inset 0 0 12px rgba(255, 255, 255, 0.95);
+          animation: iosWaterRing 0.92s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          z-index: 31;
+        }
+        .ios-water-ripple-ring-delay-1 {
+          animation-delay: 0.11s;
+          border-width: 1.5px;
+          opacity: 0;
+        }
+        .ios-water-ripple-ring-delay-2 {
+          animation-delay: 0.22s;
+          border-width: 1px;
+          opacity: 0;
+        }
+      `}</style>
+
+      {/* NỀN CÓ ẢNH CHÌM SANG TRỌNG + LỚP PHỦ TRONG SUỐT ĐỂ KÍNH LIQUID GLASS KHÚC XẠ RÕ NÉT */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105 transition-all duration-700"
+          style={{
+            backgroundImage: `url("${submergedBgImage}"), url("/skyline_perspective_dark.jpg")`,
+            filter: "saturate(120%) contrast(106%) brightness(104%)",
+          }}
+        />
+        {/* Lớp voan ngọc trai siêu trong suốt (0.32 - 0.42) để nhìn rõ ảnh chìm phía dưới lớp kính mà chữ đen vẫn nổi bật */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(155deg, rgba(248, 250, 252, 0.38) 0%, rgba(241, 245, 249, 0.32) 50%, rgba(226, 232, 240, 0.42) 100%)",
+          }}
+        />
+        <div
+          className="absolute -top-24 -left-16 w-[500px] h-[500px] rounded-full opacity-65 blur-3xl"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(186,230,253,0.4) 55%, transparent 100%)",
+            animation: "iosCausticFloat 12s ease-in-out infinite",
+          }}
+        />
+        <div
+          className="absolute bottom-0 right-0 w-[540px] h-[540px] rounded-full opacity-60 blur-3xl"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(254,243,199,0.45) 0%, rgba(255,255,255,0.5) 60%, transparent 100%)",
+            animation: "iosCausticFloat 15s ease-in-out infinite reverse",
+          }}
+        />
+      </div>
+
+      {/* Main Content */}
+      <main className="relative z-10 flex-1 max-w-4xl w-full mx-auto px-3 sm:px-6 py-5 sm:py-8 space-y-4 flex flex-col justify-center">
+        {/* HEADER CHỈ CÓ LOGO CEO HN10 CÙNG TÊN SỰ KIỆN & THÔNG TIN (ĐÃ BỎ TIMELINE) */}
+        <div className="ios-liquid-glass rounded-3xl p-4 sm:p-6 text-center space-y-3.5 relative overflow-hidden">
+          <div className="flex flex-col items-center justify-center gap-2">
+            <div className="ios-liquid-pill px-4 py-1.5 rounded-2xl inline-flex items-center justify-center">
+              <img
+                src="/hn10-logo-2.png"
+                alt="CEO HN10"
+                className="h-7 sm:h-9 w-auto object-contain brightness-0"
+              />
             </div>
-            <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs font-bold text-blue-700 uppercase tracking-wider flex items-center gap-1">
-                  <Calendar className="w-3.5 h-3.5" />
-                  Sự kiện đang Check-in:
-                </span>
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                  selectedEventIsFree ? "bg-emerald-100 text-emerald-800 border border-emerald-200" : "bg-amber-100 text-amber-800 border border-amber-200"
-                }`}>
-                  {selectedEventIsFree ? "MIỄN PHÍ" : `CÓ PHÍ (${new Intl.NumberFormat("vi-VN").format(selectedEventFee)} VNĐ)`}
-                </span>
-              </div>
-              <h1 className="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight mt-0.5">
-                {selectedEventName}
-              </h1>
-            </div>
+
+            <h1
+              className="text-xl sm:text-3xl font-black uppercase tracking-tight text-slate-950 leading-tight break-words"
+              style={{ textShadow: "0 1px 2px rgba(255,255,255,0.85)" }}
+            >
+              {selectedEventName}
+            </h1>
           </div>
-          <div className="flex items-center gap-2 self-end sm:self-center">
+
+          <div className="flex flex-wrap items-center justify-center gap-2 text-xs">
+            {(selectedEventObj?.date || selectedEventObj?.time) && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full ios-liquid-pill text-slate-950 font-bold">
+                <Calendar className="w-3.5 h-3.5 text-slate-900" />
+                <span>
+                  {[
+                    selectedEventObj?.date
+                      ? String(selectedEventObj.date).slice(0, 10)
+                      : null,
+                    selectedEventObj?.time ||
+                      [selectedEventObj?.start_time, selectedEventObj?.end_time].filter(Boolean).join(" - "),
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </span>
+              </span>
+            )}
+            {(selectedEventObj?.venueName || selectedEventObj?.venue_name || selectedEventObj?.location) && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full ios-liquid-pill text-slate-950 font-bold">
+                <MapPin className="w-3.5 h-3.5 text-slate-900" />
+                <span>
+                  {[selectedEventObj?.venueName || selectedEventObj?.venue_name, selectedEventObj?.location]
+                    .filter(Boolean)
+                    .join(" - ")}
+                </span>
+              </span>
+            )}
+            <span
+              className={`inline-flex items-center px-3 py-1 rounded-full font-black border backdrop-blur-md ${
+                selectedEventIsFree
+                  ? "bg-emerald-400/35 text-emerald-950 border-white/85"
+                  : "bg-amber-400/35 text-amber-950 border-white/85"
+              }`}
+            >
+              {selectedEventIsFree
+                ? "Miễn phí tham dự"
+                : `Phí: ${new Intl.NumberFormat("vi-VN").format(selectedEventFee)} VNĐ`}
+            </span>
+
             {eventsList.length > 1 && (
               <select
                 value={selectedEventId}
                 onChange={(e) => handleSelectEvent(e.target.value)}
-                className="text-xs font-semibold bg-slate-50 border border-slate-300 rounded-xl px-2.5 py-1.5 text-slate-800 outline-none cursor-pointer max-w-[170px] truncate"
+                className="text-xs font-bold ios-liquid-pill rounded-full px-3 py-1 text-slate-950 outline-none cursor-pointer max-w-[230px] truncate hover:border-white transition"
                 title="Đổi sự kiện để check-in"
               >
                 {eventsList.map((evt) => (
-                  <option key={evt.id} value={evt.id}>
+                  <option key={evt.id} value={evt.id} className="text-slate-950 bg-white">
                     {evt.name || evt.title}
                   </option>
                 ))}
               </select>
             )}
-            <button
-              type="button"
-              onClick={() => setPhotoModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition cursor-pointer"
-              title="Chụp ảnh trực tiếp hoặc xem album ảnh sự kiện"
-            >
-              <Camera className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Chụp &amp; Album</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setWalkinModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs transition cursor-pointer"
-              title="Mở form đăng ký check-in nhanh cho khách mới chưa có vé"
-            >
-              <UserPlus className="w-3.5 h-3.5" />
-              <span>+ Khách Mới</span>
-            </button>
-            <a
-              href="/events"
-              className="text-xs text-slate-600 hover:text-slate-900 transition px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 font-medium"
-            >
-              Về CRM
-            </a>
           </div>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 space-y-5">
-        {/* PHÂN LOẠI CHECK-IN RÕ RÀNG: ĐÃ ĐĂNG KÝ TRƯỚC vs KHÁCH ĐĂNG KÝ MỚI */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="p-3.5 rounded-2xl border-2 border-[#003B95] bg-blue-50/70 flex items-center gap-3 shadow-xs">
-            <div className="w-9 h-9 rounded-xl bg-[#003B95] text-white flex items-center justify-center shrink-0">
-              <QrCode className="w-5 h-5" />
+        {/* 3 DANH MỤC NẰM NGANG NGAY CẢ TRÊN MÀN ĐIỆN THOẠI + KÍNH TRONG SUỐT & CHẠM MẶT NƯỚC */}
+        <div className="grid grid-cols-3 gap-2 sm:gap-3.5">
+          <button
+            type="button"
+            onPointerDown={triggerWaterRipple}
+            onClick={() => {
+              setActiveCategory("member");
+              setUnregisteredMember(null);
+            }}
+            className={`ios-water-btn group rounded-2xl p-2.5 sm:p-4 text-left cursor-pointer text-slate-950 ${
+              activeCategory === "member"
+                ? "ios-liquid-glass-active scale-[1.02]"
+                : "ios-liquid-glass hover:bg-white/35"
+            }`}
+          >
+            <div className="flex items-center justify-between gap-1 mb-1 sm:mb-1.5">
+              <span
+                className={`inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-lg text-[10px] sm:text-xs font-black ${
+                  activeCategory === "member"
+                    ? "bg-slate-950 text-white shadow-sm"
+                    : "ios-liquid-pill text-slate-950"
+                }`}
+              >
+                01
+              </span>
+              <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-900" />
             </div>
-            <div>
-              <div className="text-xs font-black text-[#003B95] uppercase tracking-wide">
-                1. Đã đăng ký trước (Mặc định)
-              </div>
-              <div className="text-[11px] text-slate-600">
-                Chỉ cần nhập Mã vé đã đăng ký hoặc Tải ảnh QR vé từ email
-              </div>
+            <div
+              className="text-[11px] sm:text-sm font-black tracking-tight leading-tight text-slate-950"
+              style={{ textShadow: "0 1px 1px rgba(255,255,255,0.8)" }}
+            >
+              Học viên CEO HN10
             </div>
-          </div>
+            <div className="text-[9.5px] sm:text-[11px] mt-0.5 leading-tight line-clamp-2 text-slate-800 font-semibold">
+              Nhập mã HV tra cứu &amp; nhận Sticker số may mắn
+            </div>
+          </button>
 
           <button
             type="button"
-            onClick={() => setWalkinModalOpen(true)}
-            className="p-3.5 rounded-2xl border-2 border-emerald-200 hover:border-emerald-500 bg-white hover:bg-emerald-50/50 flex items-center gap-3 text-left transition shadow-xs cursor-pointer"
+            onPointerDown={triggerWaterRipple}
+            onClick={() => {
+              setActiveCategory("ticket");
+              setUnregisteredMember(null);
+            }}
+            className={`ios-water-btn group rounded-2xl p-2.5 sm:p-4 text-left cursor-pointer text-slate-950 ${
+              activeCategory === "ticket"
+                ? "ios-liquid-glass-active scale-[1.02]"
+                : "ios-liquid-glass hover:bg-white/35"
+            }`}
           >
-            <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
-              <UserPlus className="w-5 h-5" />
+            <div className="flex items-center justify-between gap-1 mb-1 sm:mb-1.5">
+              <span
+                className={`inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-lg text-[10px] sm:text-xs font-black ${
+                  activeCategory === "ticket"
+                    ? "bg-slate-950 text-white shadow-sm"
+                    : "ios-liquid-pill text-slate-950"
+                }`}
+              >
+                02
+              </span>
+              <QrCode className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-900" />
             </div>
-            <div>
-              <div className="text-xs font-black text-emerald-800 uppercase tracking-wide">
-                2. Khách đăng ký mới (Chưa đăng ký trước)
-              </div>
-              <div className="text-[11px] text-slate-600">
-                Bấm vào đây để mở form đăng ký mới &amp; check-in tại quầy
-              </div>
+            <div
+              className="text-[11px] sm:text-sm font-black tracking-tight leading-tight text-slate-950"
+              style={{ textShadow: "0 1px 1px rgba(255,255,255,0.8)" }}
+            >
+              Khách đã có Mã Vé
+            </div>
+            <div className="text-[9.5px] sm:text-[11px] mt-0.5 leading-tight line-clamp-2 text-slate-800 font-semibold">
+              Nhập mã vé hoặc tải ảnh QR vé để Check-in
+            </div>
+          </button>
+
+          <button
+            type="button"
+            onPointerDown={triggerWaterRipple}
+            onClick={() => {
+              setActiveCategory("walkin");
+              setUnregisteredMember(null);
+              setWalkinQrResult(null);
+            }}
+            className={`ios-water-btn group rounded-2xl p-2.5 sm:p-4 text-left cursor-pointer text-slate-950 ${
+              activeCategory === "walkin"
+                ? "ios-liquid-glass-active scale-[1.02]"
+                : "ios-liquid-glass hover:bg-white/35"
+            }`}
+          >
+            <div className="flex items-center justify-between gap-1 mb-1 sm:mb-1.5">
+              <span
+                className={`inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-lg text-[10px] sm:text-xs font-black ${
+                  activeCategory === "walkin"
+                    ? "bg-slate-950 text-white shadow-sm"
+                    : "ios-liquid-pill text-slate-950"
+                }`}
+              >
+                03
+              </span>
+              <UserPlus className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-900" />
+            </div>
+            <div
+              className="text-[11px] sm:text-sm font-black tracking-tight leading-tight text-slate-950"
+              style={{ textShadow: "0 1px 1px rgba(255,255,255,0.8)" }}
+            >
+              Khách mới đến
+            </div>
+            <div className="text-[9.5px] sm:text-[11px] mt-0.5 leading-tight line-clamp-2 text-slate-800 font-semibold">
+              Đăng ký tại quầy &amp; cấp Sticker số may mắn
             </div>
           </button>
         </div>
 
-        {/* Search / Scan Box & Upload QR Image (Mặc định chỉ cần Mã vé hoặc Tải ảnh QR vé email) */}
-        <div className="p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3">
-          <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-              <Search className="w-4 h-4 text-[#003B95]" />
-              <span>Nhập Mã Vé đã đăng ký hoặc Tải ảnh mã QR vé gửi về Email:</span>
-            </label>
-            <span className="text-[11px] text-slate-500">
-              Đối soát tự động với danh sách sự kiện
-            </span>
-          </div>
+        {/* KHUNG NỘI DUNG TƯƠNG ỨNG VỚI DANH MỤC ĐANG CHỌN (TRUE iOS LIQUID GLASS PANEL) */}
+        <div className="ios-liquid-glass rounded-3xl text-slate-950 p-5 sm:p-7 space-y-4">
+          {activeCategory === "member" && (
+            <div className="space-y-3">
+              <div>
+                <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+                  Tra Cứu &amp; Check-in Dành Cho Học Viên
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Nhập mã học viên (VD: HN10-1234) để hệ thống kiểm tra dữ liệu đăng ký đúng sự kiện này.
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2.5">
+                <input
+                  type="text"
+                  placeholder="Nhập mã học viên (VD: HN10-1234)..."
+                  value={memberCodeInput}
+                  onChange={(e) => setMemberCodeInput(e.target.value.toUpperCase())}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") lookupTicket(memberCodeInput);
+                  }}
+                  className="flex-1 h-11 rounded-xl ios-liquid-input px-4 text-sm text-slate-950 font-mono uppercase placeholder:text-slate-500 focus:outline-none transition"
+                />
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    triggerWaterRipple(e);
+                    lookupTicket(memberCodeInput);
+                  }}
+                  disabled={loading}
+                  className="ios-water-btn h-11 px-6 rounded-xl bg-slate-950 hover:bg-slate-800 text-white font-bold text-sm shadow-md disabled:opacity-60 cursor-pointer shrink-0 transition"
+                >
+                  {loading ? "Đang tra cứu..." : "Tra cứu & Check-in"}
+                </button>
+              </div>
+            </div>
+          )}
 
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleQrImageUpload}
-          />
+          {activeCategory === "ticket" && (
+            <div className="space-y-3">
+              <div>
+                <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+                  Check-in Bằng Mã Vé Sự Kiện
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Nhập mã vé (VD: REG-...) hoặc tải lên ảnh chứa mã QR vé của Quý đại biểu.
+                </p>
+              </div>
 
-          <div className="flex flex-col sm:flex-row gap-2">
-            <input
-              type="text"
-              placeholder="Nhập mã vé đã đăng ký (VD: REG-..., HN10-0001)..."
-              value={ticketInput}
-              onChange={(e) => setTicketInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") lookupTicket(ticketInput);
-              }}
-              className="flex-1 rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 font-mono placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#003B95] transition"
-            />
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isDecodingImage || loading}
-              className="px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs sm:text-sm shadow-2xs transition disabled:opacity-60 flex items-center justify-center gap-1.5 cursor-pointer"
-              title="Tải ảnh mã QR vé từ email hoặc ảnh chụp màn hình"
-            >
-              {isDecodingImage ? (
-                <RefreshCw className="w-4 h-4 animate-spin text-amber-600" />
-              ) : (
-                <Upload className="w-4 h-4 text-[#003B95]" />
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleQrImageUpload}
+              />
+
+              <div className="flex flex-col sm:flex-row gap-2.5">
+                <input
+                  type="text"
+                  placeholder="Nhập mã vé (VD: REG-...)..."
+                  value={ticketInput}
+                  onChange={(e) => setTicketInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") lookupTicket(ticketInput);
+                  }}
+                  className="flex-1 h-11 rounded-xl ios-liquid-input px-4 text-sm text-slate-950 font-mono placeholder:text-slate-500 focus:outline-none transition"
+                />
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      triggerWaterRipple(e);
+                      fileInputRef.current?.click();
+                    }}
+                    disabled={isDecodingImage || loading}
+                    className="ios-water-btn ios-liquid-pill h-11 px-4 rounded-xl hover:bg-white/75 text-slate-900 font-bold text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer shrink-0 transition"
+                    title="Tải ảnh mã QR vé"
+                  >
+                    <Upload className="w-4 h-4 text-slate-700" />
+                    <span>Ảnh QR</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      triggerWaterRipple(e);
+                      lookupTicket(ticketInput);
+                    }}
+                    disabled={loading || isDecodingImage}
+                    className="ios-water-btn h-11 px-6 rounded-xl bg-slate-950 hover:bg-slate-800 text-white font-bold text-sm shadow-md disabled:opacity-60 cursor-pointer shrink-0 transition"
+                  >
+                    {loading ? "Đang kiểm tra..." : "Check-in"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeCategory === "walkin" && (
+            <form onSubmit={handleWalkinSubmit} className="space-y-4 text-xs">
+              <div className="border-b border-slate-200 pb-3">
+                <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+                  Đăng Ký Vé &amp; Check-in Khách Mới Đến
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Điền thông tin tham dự sự kiện <strong className="text-slate-800">{selectedEventName}</strong>. Thanh toán thành công sẽ tự động hoàn tất Check-in.
+                </p>
+              </div>
+
+              {!selectedEventIsFree && (
+                <div className="p-3.5 rounded-2xl border border-amber-200 bg-amber-50/70 space-y-2">
+                  <div className="text-xs font-bold text-amber-950 flex items-center justify-between">
+                    <span>Phí sự kiện: {new Intl.NumberFormat("vi-VN").format(selectedEventFee)} VNĐ / đại biểu</span>
+                    <span className="text-[10px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full font-bold">
+                      Có phí
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                    <label
+                      className={`p-2.5 rounded-xl border flex items-start gap-2 cursor-pointer transition ${
+                        walkinPaymentMethod === "cash_instant"
+                          ? "bg-white border-slate-900 ring-1 ring-slate-900 shadow-2xs"
+                          : "bg-white/60 border-slate-200"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="walkinPayment"
+                        checked={walkinPaymentMethod === "cash_instant"}
+                        onChange={() => setWalkinPaymentMethod("cash_instant")}
+                        className="mt-0.5 text-slate-900"
+                      />
+                      <div>
+                        <div className="font-bold text-slate-900 text-xs">1. Quét mã VietQR tại chỗ</div>
+                        <div className="text-[10px] text-slate-500">Hiển thị QR thanh toán &amp; tự động Check-in</div>
+                      </div>
+                    </label>
+
+                    <label
+                      className={`p-2.5 rounded-xl border flex items-start gap-2 cursor-pointer transition ${
+                        walkinPaymentMethod === "email_invoice"
+                          ? "bg-white border-amber-600 ring-1 ring-amber-500 shadow-2xs"
+                          : "bg-white/60 border-slate-200"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="walkinPayment"
+                        checked={walkinPaymentMethod === "email_invoice"}
+                        onChange={() => setWalkinPaymentMethod("email_invoice")}
+                        className="mt-0.5 text-amber-600"
+                      />
+                      <div>
+                        <div className="font-bold text-slate-900 text-xs">2. Gửi mail thông báo phí</div>
+                        <div className="text-[10px] text-slate-500">Gửi mail kèm VietQR, tự động check-in khi thanh toán</div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
               )}
-              <span>Tải ảnh QR vé</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => lookupTicket(ticketInput)}
-              disabled={loading || isDecodingImage}
-              className="px-5 py-2.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white font-bold text-xs sm:text-sm shadow-sm transition disabled:opacity-60 flex items-center justify-center gap-1.5 cursor-pointer"
-            >
-              {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-              <span>Check-in</span>
-            </button>
-          </div>
+
+              {walkinQrResult && (
+                <div className="p-4 rounded-2xl border-2 border-amber-400 bg-amber-50 text-center space-y-3">
+                  <div className="text-sm font-black text-amber-900">
+                    Quét mã VietQR thanh toán vé ({walkinQrResult.amount.toLocaleString("vi-VN")} đ)
+                  </div>
+                  <img
+                    src={walkinQrResult.vietQrUrl}
+                    alt="VietQR Thanh Toán"
+                    className="w-48 h-48 mx-auto rounded-xl bg-white p-2 border border-amber-200 shadow-sm object-contain"
+                  />
+                  <div className="text-xs text-slate-700 space-y-0.5">
+                    <div>
+                      Ngân hàng: <b>{walkinQrResult.bankName}</b> · STK:{" "}
+                      <b className="font-mono">{walkinQrResult.bankAccount}</b>
+                    </div>
+                    <div>
+                      Nội dung CK: <b className="font-mono text-blue-700">{walkinQrResult.transferContent}</b>
+                    </div>
+                    <div className="text-emerald-700 font-semibold flex items-center justify-center gap-1.5 pt-1">
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Đang chờ thanh toán tự động... Thanh toán xong sẽ tự động Check-in!</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="sm:col-span-2">
+                  <label className="block text-slate-800 font-bold mb-1">
+                    Họ và tên đại biểu *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Nguyễn Văn A"
+                    value={walkinForm.fullName}
+                    onChange={(e) => setWalkinForm({ ...walkinForm, fullName: e.target.value })}
+                    className="w-full h-10 px-3.5 rounded-xl ios-liquid-input text-slate-950 outline-none transition"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-800 font-bold mb-1">Số điện thoại *</label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="0983..."
+                    value={walkinForm.phone}
+                    onChange={(e) => setWalkinForm({ ...walkinForm, phone: e.target.value })}
+                    className="w-full h-10 px-3.5 rounded-xl ios-liquid-input text-slate-950 outline-none transition"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-800 font-bold mb-1">Email *</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="email@congty.com"
+                    value={walkinForm.email}
+                    onChange={(e) => setWalkinForm({ ...walkinForm, email: e.target.value })}
+                    className="w-full h-10 px-3.5 rounded-xl ios-liquid-input text-slate-950 outline-none transition"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-800 font-bold mb-1">
+                    Doanh nghiệp / Công ty
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Tập đoàn..."
+                    value={walkinForm.company}
+                    onChange={(e) => setWalkinForm({ ...walkinForm, company: e.target.value })}
+                    className="w-full h-10 px-3.5 rounded-xl ios-liquid-input text-slate-950 outline-none transition"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-800 font-bold mb-1">Chức danh / Chức vụ</label>
+                  <input
+                    type="text"
+                    placeholder="Giám đốc..."
+                    value={walkinForm.position}
+                    onChange={(e) => setWalkinForm({ ...walkinForm, position: e.target.value })}
+                    className="w-full h-10 px-3.5 rounded-xl ios-liquid-input text-slate-950 outline-none transition"
+                  />
+                </div>
+              </div>
+
+              {(() => {
+                const activeEv = eventsList.find((e) => e.id === selectedEventId);
+                const checkinCustomFields: any[] = Array.isArray(
+                  activeEv?.formFieldsConfig?.checkinCustomFields
+                )
+                  ? activeEv.formFieldsConfig.checkinCustomFields
+                  : [];
+                if (checkinCustomFields.length === 0) return null;
+                return (
+                  <div className="space-y-2.5 pt-2 border-t border-slate-200">
+                    <div className="text-[11px] font-bold uppercase tracking-wider text-slate-700">
+                      Thông tin bổ sung khi Check-in
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      {checkinCustomFields.map((cf: any) => (
+                        <div key={cf.id}>
+                          <label className="block text-slate-700 font-semibold mb-1 text-xs">
+                            {cf.label} {cf.required && <span className="text-rose-500">*</span>}
+                          </label>
+                          {cf.type === "select" ? (
+                            <select
+                              required={Boolean(cf.required)}
+                              value={(walkinForm as any)[`cf_${cf.id}`] || ""}
+                              onChange={(e) =>
+                                setWalkinForm({ ...walkinForm, [`cf_${cf.id}`]: e.target.value } as any)
+                              }
+                              className="w-full h-10 px-3 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-xs outline-none focus:border-slate-900 focus:bg-white"
+                            >
+                              <option value="">-- Chọn --</option>
+                              {String(cf.optionsText || "")
+                                .split(",")
+                                .map((s) => s.trim())
+                                .filter(Boolean)
+                                .map((opt) => (
+                                  <option key={opt} value={opt}>
+                                    {opt}
+                                  </option>
+                                ))}
+                            </select>
+                          ) : (
+                            <input
+                              type={
+                                cf.type === "number" || cf.type === "date" || cf.type === "email"
+                                  ? cf.type
+                                  : "text"
+                              }
+                              required={Boolean(cf.required)}
+                              value={(walkinForm as any)[`cf_${cf.id}`] || ""}
+                              onChange={(e) =>
+                                setWalkinForm({ ...walkinForm, [`cf_${cf.id}`]: e.target.value } as any)
+                              }
+                              className="w-full h-10 px-3 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-xs outline-none focus:border-slate-900 focus:bg-white"
+                            />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Danh sách người đi cùng */}
+              {additionalWalkins.length > 0 && (
+                <div className="pt-2 border-t border-slate-200 space-y-2">
+                  <div className="font-semibold text-slate-700">
+                    Người đi cùng ({additionalWalkins.length}):
+                  </div>
+                  {additionalWalkins.map((w, idx) => (
+                    <div
+                      key={w.id}
+                      className="p-3 rounded-xl border border-slate-200 bg-slate-50 space-y-2"
+                    >
+                      <div className="flex items-center justify-between text-[11px] font-bold text-slate-700">
+                        <span>Đại biểu #{idx + 2}</span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setAdditionalWalkins((prev) => prev.filter((_, i) => i !== idx))
+                          }
+                          className="text-rose-600 hover:underline font-semibold cursor-pointer"
+                        >
+                          Xóa
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <input
+                          type="text"
+                          required
+                          placeholder="Họ tên *"
+                          value={w.fullName}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setAdditionalWalkins((prev) =>
+                              prev.map((it, i) => (i === idx ? { ...it, fullName: val } : it))
+                            );
+                          }}
+                          className="h-9 px-2.5 rounded-lg border border-slate-300 bg-white text-xs text-slate-800"
+                        />
+                        <input
+                          type="tel"
+                          required
+                          placeholder="SĐT *"
+                          value={w.phone}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setAdditionalWalkins((prev) =>
+                              prev.map((it, i) => (i === idx ? { ...it, phone: val } : it))
+                            );
+                          }}
+                          className="h-9 px-2.5 rounded-lg border border-slate-300 bg-white text-xs text-slate-800"
+                        />
+                        <input
+                          type="email"
+                          required
+                          placeholder="Email *"
+                          value={w.email}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setAdditionalWalkins((prev) =>
+                              prev.map((it, i) => (i === idx ? { ...it, email: val } : it))
+                            );
+                          }}
+                          className="h-9 px-2.5 rounded-lg border border-slate-300 bg-white text-xs text-slate-800"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-200">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setAdditionalWalkins((prev) => [
+                      ...prev,
+                      {
+                        id: `walk_${Date.now()}`,
+                        fullName: "",
+                        phone: "",
+                        email: "",
+                        company: walkinForm.company,
+                        position: "",
+                      },
+                    ])
+                  }
+                  className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold border border-slate-300 cursor-pointer transition inline-flex items-center gap-1.5"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>+ Thêm người check-in</span>
+                </button>
+                <button
+                  type="submit"
+                  disabled={submittingWalkin}
+                  className="px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm shadow-md disabled:opacity-50 transition cursor-pointer"
+                >
+                  {submittingWalkin
+                    ? "Đang xử lý..."
+                    : !selectedEventIsFree && walkinPaymentMethod === "email_invoice"
+                    ? "Gửi Mail Thông Báo Phí & Lưu Vé Chờ"
+                    : "Xác Nhận Đăng Ký & Check-in"}
+                </button>
+              </div>
+            </form>
+          )}
         </div>
 
-        {/* Offline & Network Resilience Banner (Khắc phục sự cố mất sóng tại sự kiện) */}
-        <div
-          className={`p-3.5 sm:p-4 rounded-2xl border transition-all ${
-            !isOnline || forceOffline
-              ? "border-amber-300 bg-amber-50 text-amber-900"
-              : "border-slate-200 bg-white text-slate-700"
-          } flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs`}
-        >
-          <div className="flex items-center gap-3">
-            <div
-              className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold ${
-                !isOnline || forceOffline
-                  ? "bg-amber-200 text-amber-900 border border-amber-300"
-                  : "bg-emerald-100 text-emerald-800 border border-emerald-200"
-              }`}
-            >
-              {!isOnline || forceOffline ? <WifiOff className="w-4 h-4" /> : <Wifi className="w-4 h-4" />}
+        {/* TÍCH XANH CẢM ƠN & STICKER SỐ MAY MẮN KHI CHECK-IN THÀNH CÔNG */}
+        {thankYouSuccess && (
+          <div
+            className="p-6 sm:p-8 rounded-3xl border-2 border-emerald-500/60 text-center space-y-4 shadow-2xl animate-in fade-in zoom-in-95"
+            style={{
+              background: "linear-gradient(135deg, rgba(236,253,245,0.92) 0%, rgba(255,255,255,0.92) 100%)",
+              backdropFilter: "blur(24px)",
+            }}
+          >
+            <div className="w-16 h-16 mx-auto rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-lg">
+              <CheckCircle2 className="w-10 h-10" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-900">
-                  {!isOnline || forceOffline
-                    ? "Chế độ Ngoại Tuyến (Offline - Mất Sóng)"
-                    : "Chế độ Trực Tuyến (Online)"}
-                </span>
-                <span
-                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                    !isOnline || forceOffline
-                      ? "bg-amber-500 text-white font-black"
-                      : "bg-emerald-100 text-emerald-800 border border-emerald-200"
-                  }`}
-                >
-                  {!isOnline || forceOffline ? "ĐANG BẢO VỆ CHECK-IN" : "KẾT NỐI SẴN SÀNG"}
-                </span>
+            <div className="space-y-1">
+              <h3 className="text-xl sm:text-2xl font-black text-slate-950">
+                Cảm ơn {thankYouSuccess.name} đã Check-in tham dự sự kiện!
+              </h3>
+              <p className="text-xs sm:text-sm font-semibold text-emerald-800">{thankYouSuccess.subtitle}</p>
+            </div>
+
+            {/* STICKER SỐ MAY MẮN NGẪU NHIÊN DÁN CHO KHÁCH MỜI & LƯU VÀO MÀN QUAY THƯỞNG */}
+            {thankYouSuccess.luckyNumber && (
+              <div className="max-w-md mx-auto p-5 rounded-3xl bg-gradient-to-br from-amber-100 via-white to-amber-50 border-2 border-dashed border-amber-500 shadow-xl space-y-2.5 relative overflow-hidden">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500 text-slate-950 text-[11px] font-black uppercase tracking-wider">
+                  <Ticket className="w-3.5 h-3.5" />
+                  <span>STICKER SỐ MAY MẮN DÁN CHO ĐẠI BIỂU</span>
+                </div>
+                <div className="text-4xl sm:text-5xl font-black font-mono tracking-wider text-slate-950 py-1">
+                  #{thankYouSuccess.luckyNumber}
+                </div>
+                <p className="text-xs text-slate-700 font-semibold leading-relaxed">
+                  Mã số <strong className="text-slate-950">#{thankYouSuccess.luckyNumber}</strong> đã được hệ thống tự động lưu vào danh sách quay thưởng sự kiện.
+                </p>
               </div>
-              <p className="text-[11px] text-slate-500 flex items-center gap-2 mt-0.5">
-                <span className="inline-flex items-center gap-1">
-                  <HardDrive className="w-3 h-3 text-blue-600" />
-                  Đã tải về máy: <strong className="text-slate-800">{cachedTickets.length}</strong> vé
-                </span>
-                <span>•</span>
-                <span className="inline-flex items-center gap-1">
-                  <CloudUpload className="w-3 h-3 text-amber-600" />
-                  Chờ đồng bộ: <strong className="text-amber-700">{offlineQueue.length}</strong> vé
-                </span>
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-            <button
-              type="button"
-              onClick={() => downloadOfflineTickets()}
-              disabled={isDownloadingOffline}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold border border-slate-200 transition disabled:opacity-50 cursor-pointer shadow-2xs"
-              title="Tải toàn bộ danh sách vé của sự kiện về máy để check-in không cần internet"
-            >
-              <Download
-                className={`w-3.5 h-3.5 text-blue-600 ${
-                  isDownloadingOffline ? "animate-bounce" : ""
-                }`}
-              />
-              <span>{isDownloadingOffline ? "Đang tải..." : "Tải trước Vé Offline"}</span>
-            </button>
-
-            {offlineQueue.length > 0 && (
-              <button
-                type="button"
-                onClick={handleSyncOfflineQueue}
-                disabled={isSyncingQueue}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-600/20 transition disabled:opacity-50 animate-pulse cursor-pointer"
-                title="Đẩy toàn bộ vé đã check-in ngoại tuyến lên hệ thống"
-              >
-                <CloudUpload className={`w-3.5 h-3.5 ${isSyncingQueue ? "animate-spin" : ""}`} />
-                <span>
-                  {isSyncingQueue ? "Đang đồng bộ..." : `Đồng bộ lên Cloud (${offlineQueue.length})`}
-                </span>
-              </button>
             )}
+          </div>
+        )}
 
+        {/* THÔNG BÁO KHI HỌC VIÊN CHƯA ĐĂNG KÝ SỰ KIỆN NÀY */}
+        {unregisteredMember && (
+          <div className="p-5 rounded-2xl border-2 border-amber-400 bg-amber-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+            <div className="space-y-1">
+              <div className="text-sm font-black text-amber-900">
+                Học viên {unregisteredMember.fullName} ({unregisteredMember.code}) chưa đăng ký sự kiện này
+              </div>
+              <div className="text-xs text-amber-800">
+                Bấm nút bên cạnh để chuyển sang danh mục Khách mới đến với thông tin đã điền sẵn.
+              </div>
+            </div>
             <button
               type="button"
               onClick={() => {
-                setForceOffline(!forceOffline);
-                toast.info(
-                  !forceOffline
-                    ? "Đã bật giả lập mất sóng (Chế độ Offline)"
-                    : "Đã tắt giả lập mất sóng"
-                );
+                setWalkinForm((prev) => ({
+                  ...prev,
+                  fullName: unregisteredMember.fullName || prev.fullName,
+                  phone: unregisteredMember.phone || prev.phone,
+                  email: unregisteredMember.email || prev.email,
+                  company: unregisteredMember.company || prev.company,
+                  position: unregisteredMember.position || prev.position,
+                }));
+                setWalkinQrResult(null);
+                setActiveCategory("walkin");
+                setUnregisteredMember(null);
               }}
-              className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition cursor-pointer ${
-                forceOffline
-                  ? "bg-amber-600 text-white border-amber-600 font-bold"
-                  : "bg-white text-slate-600 border-slate-300 hover:bg-slate-50"
-              }`}
-              title="Bật/Tắt chế độ ngoại tuyến chủ động để kiểm thử"
+              className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold cursor-pointer shrink-0 transition"
             >
-              {forceOffline ? "⚡ Đang test Offline" : "Test Offline"}
+              Đăng ký vé &amp; Check-in ngay
             </button>
           </div>
-        </div>
+        )}
 
         {/* CẢNH BÁO XUNG ĐỘT QUÉT TRÙNG LẶP OFFLINE (NẾU CÓ) */}
         {syncConflictReport && syncConflictReport.length > 0 && (
@@ -983,32 +1822,45 @@ function PublicEventCheckinGatePage() {
           </div>
         )}
 
-        {/* Ticket Details View */}
+        {/* Ticket Details View (Luxury White & Liquid Glass) */}
         {currentTicket && (
-          <div className="rounded-3xl border border-slate-800 bg-slate-900/90 shadow-2xl overflow-hidden space-y-6 animate-in fade-in zoom-in-95 duration-200">
+          <div
+            className="rounded-3xl overflow-hidden space-y-6 animate-in fade-in zoom-in-95 duration-200 text-slate-950"
+            style={{
+              background: "linear-gradient(145deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.75) 100%)",
+              backdropFilter: "blur(28px) saturate(180%)",
+              WebkitBackdropFilter: "blur(28px) saturate(180%)",
+              border: "1px solid rgba(255,255,255,0.95)",
+              boxShadow: "0 24px 60px -15px rgba(15,23,42,0.1), inset 0 1px 2px rgba(255,255,255,1)",
+            }}
+          >
             {/* Event Header Banner */}
-            <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 p-6 border-b border-slate-800 flex flex-wrap items-center justify-between gap-4">
+            <div className="bg-white/80 p-6 border-b border-slate-200/80 flex flex-wrap items-center justify-between gap-4">
               <div>
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-slate-900 text-white">
                   {currentTicket.eventDate} · {currentTicket.eventTime}
                 </span>
-                <h2 className="text-lg sm:text-xl font-black text-white mt-2">
+                <h2 className="text-lg sm:text-xl font-black text-slate-950 mt-2">
                   {currentTicket.eventTitle}
                 </h2>
-                <p className="text-xs text-slate-300 mt-1 flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5 text-blue-400" />
+                <p className="text-xs text-slate-600 font-semibold mt-1 flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-slate-900" />
                   {currentTicket.eventLocation}
                 </p>
               </div>
 
-              {/* Lucky Draw Box */}
+              {/* Lucky Draw Sticker Box */}
               {currentTicket.luckyNumber && (
-                <div className="bg-slate-950/80 border border-amber-400/40 rounded-2xl p-3 text-center min-w-[110px] shadow-inner">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-amber-400">
-                    Số Quay Thưởng
+                <div className="bg-amber-50 border-2 border-dashed border-amber-500 rounded-2xl p-3 text-center min-w-[140px] shadow-sm">
+                  <div className="text-[10px] font-black uppercase tracking-wider text-amber-900 flex items-center justify-center gap-1">
+                    <Ticket className="w-3 h-3 text-amber-600" />
+                    <span>Sticker Số May Mắn</span>
                   </div>
-                  <div className="text-2xl font-black text-white font-mono mt-0.5">
+                  <div className="text-2xl font-black text-slate-950 font-mono mt-0.5">
                     #{currentTicket.luckyNumber}
+                  </div>
+                  <div className="text-[9.5px] font-bold text-emerald-700 mt-0.5">
+                    Đã lưu vào Màn Quay Thưởng
                   </div>
                 </div>
               )}
@@ -1017,27 +1869,27 @@ function PublicEventCheckinGatePage() {
             {/* ── BẢNG ĐỐI SOÁT & PHÂN BIỆT ĐẠI BIỂU (SO SÁNH VỚI DATABASE) ── */}
             <div className="px-6">
               {currentTicket.isWalkInAfterGHour || currentTicket.registrationOrigin === "walkin_unannounced" || (currentTicket.note && currentTicket.note.includes("trước giờ G")) ? (
-                <div className="rounded-2xl border-2 border-amber-500/80 bg-amber-950/40 p-4 sm:p-5 text-left flex items-start gap-3.5 shadow-lg shadow-amber-950/50">
-                  <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 font-black">
-                    <Sparkles className="w-5 h-5 text-amber-400" />
+                <div className="rounded-2xl border-2 border-amber-400 bg-amber-50 p-4 sm:p-5 text-left flex items-start gap-3.5 shadow-sm">
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-800 flex items-center justify-center shrink-0 font-black">
+                    <Sparkles className="w-5 h-5 text-amber-700" />
                   </div>
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="px-2.5 py-1 rounded-full text-xs font-black bg-amber-600 text-white shadow-xs uppercase tracking-wider">
                         KHÁCH KHÔNG NẰM TRONG DANH SÁCH ĐĂNG KÝ TRƯỚC GIỜ G
                       </span>
-                      <span className="text-xs text-amber-300 font-bold">
+                      <span className="text-xs text-amber-900 font-bold">
                         (Sự kiện miễn phí: Tự động Check-in Pass)
                       </span>
                     </div>
-                    <p className="text-xs text-slate-300 leading-relaxed">
+                    <p className="text-xs text-slate-700 leading-relaxed">
                       Đại biểu đến tham dự trực tiếp chưa có trong danh sách đăng ký trước giờ G. Hệ thống tự động cấp quyền tham dự và Check-in thành công.
                     </p>
                   </div>
                 </div>
               ) : currentTicket.isWalkIn || currentTicket.attendeeType === "WALK_IN_NEW" ? (
-                <div className="rounded-2xl border-2 border-blue-500/60 bg-blue-950/40 p-4 sm:p-5 text-left flex items-start gap-3.5 shadow-lg shadow-blue-950/50">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 font-black">
+                <div className="rounded-2xl border-2 border-blue-400 bg-blue-50 p-4 sm:p-5 text-left flex items-start gap-3.5 shadow-sm">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-700 flex items-center justify-center shrink-0 font-black">
                     <Users className="w-5 h-5" />
                   </div>
                   <div className="flex-1 space-y-1">
@@ -1045,18 +1897,18 @@ function PublicEventCheckinGatePage() {
                       <span className="px-2.5 py-1 rounded-full text-xs font-black bg-blue-600 text-white shadow-xs uppercase tracking-wider">
                         KHÁCH MỚI ĐĂNG KÝ TẠI SỰ KIỆN (WALK-IN)
                       </span>
-                      <span className="text-xs text-blue-300 font-medium">
+                      <span className="text-xs text-blue-900 font-semibold">
                         (Mã 1: Khách quét mã đăng ký tại cửa)
                       </span>
                     </div>
-                    <p className="text-xs text-slate-300 leading-relaxed">
+                    <p className="text-xs text-slate-700 leading-relaxed">
                       Hệ thống đã đối soát danh sách: Khách mời này <strong>chưa đăng ký trước</strong>, đã mở biểu mẫu đăng ký tại cửa sự kiện.
                     </p>
                   </div>
                 </div>
               ) : (
-                <div className="rounded-2xl border-2 border-emerald-500/60 bg-emerald-950/40 p-4 sm:p-5 text-left flex items-start gap-3.5 shadow-lg shadow-emerald-950/50">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 font-black">
+                <div className="rounded-2xl border-2 border-emerald-400 bg-emerald-50 p-4 sm:p-5 text-left flex items-start gap-3.5 shadow-sm">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-700 flex items-center justify-center shrink-0 font-black">
                     <ShieldCheck className="w-5 h-5" />
                   </div>
                   <div className="flex-1 space-y-1">
@@ -1064,11 +1916,11 @@ function PublicEventCheckinGatePage() {
                       <span className="px-2.5 py-1 rounded-full text-xs font-black bg-emerald-600 text-white shadow-xs uppercase tracking-wider">
                         ĐẠI BIỂU ĐÃ ĐĂNG KÝ TỪ TRƯỚC (PRE-REGISTERED)
                       </span>
-                      <span className="text-xs text-emerald-300 font-medium">
+                      <span className="text-xs text-emerald-900 font-semibold">
                         (Mã 2: Có trong danh sách đăng ký chính thức)
                       </span>
                     </div>
-                    <p className="text-xs text-slate-300 leading-relaxed">
+                    <p className="text-xs text-slate-700 leading-relaxed">
                       Hệ thống đã đối soát danh sách: Đại biểu này <strong>đã đăng ký tham gia từ trước</strong> và có mã vé chính thức hợp lệ.
                     </p>
                   </div>
@@ -1079,24 +1931,31 @@ function PublicEventCheckinGatePage() {
             {/* STRICT 1-TIME CHECK-IN ENFORCEMENT ALERT */}
             <div className="px-6">
               {currentTicket.isCheckedIn ? (
-                <div className="rounded-2xl border-2 border-rose-500/50 bg-rose-950/40 p-4 sm:p-5 text-left space-y-2 animate-pulse">
-                  <div className="flex items-center gap-2 text-rose-400 font-black text-sm sm:text-base">
-                    <AlertTriangle className="w-6 h-6 text-rose-400 shrink-0" />
-                    <span>VÉ NÀY ĐÃ ĐƯỢC CHECK-IN LÚC {currentTicket.checkedInAt}!</span>
+                <div className="rounded-2xl border-2 border-emerald-500 bg-emerald-50/90 p-4 sm:p-5 text-left space-y-1.5">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="flex items-center gap-2 text-emerald-900 font-black text-sm sm:text-base">
+                      <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />
+                      <span>ĐÃ CHECK-IN THÀNH CÔNG LÚC {currentTicket.checkedInAt}</span>
+                    </div>
+                    {currentTicket.luckyNumber && (
+                      <span className="px-3 py-1 rounded-full bg-amber-400 text-slate-950 text-xs font-black">
+                        Sticker Số May Mắn: #{currentTicket.luckyNumber}
+                      </span>
+                    )}
                   </div>
-                  <p className="text-xs text-rose-200/90 leading-relaxed pl-8">
-                    ⛔ Cảnh báo bảo mật: Mã vé này đã được sử dụng để vào cửa trước đó. Theo quy chế sự kiện, mỗi vé chỉ được phép check-in duy nhất 1 lần để chống gian lận thẻ vé.
+                  <p className="text-xs text-slate-700 leading-relaxed pl-8">
+                    Đại biểu đã hoàn tất điểm danh và số Sticker may mắn <strong>#{currentTicket.luckyNumber}</strong> đã được đưa vào danh sách quay thưởng sự kiện.
                   </p>
                 </div>
               ) : (
-                <div className="rounded-2xl border border-emerald-500/40 bg-emerald-950/30 p-4 text-left flex items-center gap-3">
-                  <CheckCircle2 className="w-6 h-6 text-emerald-400 shrink-0" />
+                <div className="rounded-2xl border border-emerald-500/40 bg-emerald-50/80 p-4 text-left flex items-center gap-3">
+                  <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />
                   <div>
-                    <div className="font-bold text-emerald-300 text-sm">
-                      Vé Hợp Lệ — Sẵn Sàng Check-in Vào Cửa
+                    <div className="font-black text-emerald-950 text-sm">
+                      Vé Hợp Lệ — Sẵn Sàng Check-in &amp; Cấp Sticker Số May Mắn
                     </div>
-                    <div className="text-xs text-emerald-200/80">
-                      Chưa ghi nhận lượt check-in nào. Ban Tổ Chức có thể bấm nút bên dưới để xác nhận đón tiếp đại biểu.
+                    <div className="text-xs text-emerald-800">
+                      Bấm nút xác nhận bên dưới để điểm danh đại biểu và lưu Sticker số may mắn vào màn quay thưởng.
                     </div>
                   </div>
                 </div>
@@ -1105,114 +1964,103 @@ function PublicEventCheckinGatePage() {
 
             {/* Attendee Info Grid */}
             <div className="px-6 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-              <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800/80 space-y-2">
-                <div className="text-slate-400 font-semibold uppercase text-[10px] tracking-wider">
+              <div className="p-4 rounded-2xl bg-white/80 border border-slate-200 space-y-2 shadow-2xs">
+                <div className="text-slate-500 font-black uppercase text-[10px] tracking-wider">
                   Thông Tin Đại Biểu
                 </div>
-                <div className="text-sm font-bold text-white flex items-center gap-2">
-                  <User className="w-4 h-4 text-blue-400" />
+                <div className="text-sm font-black text-slate-950 flex items-center gap-2">
+                  <User className="w-4 h-4 text-slate-900" />
                   {currentTicket.memberName}
                 </div>
-                <div className="text-slate-300 flex items-center gap-2">
+                <div className="text-slate-700 font-semibold flex items-center gap-2">
                   <Phone className="w-3.5 h-3.5 text-slate-500" />
                   {currentTicket.phone || "—"}
                 </div>
-                <div className="text-slate-300 flex items-center gap-2">
+                <div className="text-slate-700 font-semibold flex items-center gap-2">
                   <Building2 className="w-3.5 h-3.5 text-slate-500" />
                   {currentTicket.company} ({currentTicket.position})
                 </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800/80 space-y-2">
-                <div className="text-slate-400 font-semibold uppercase text-[10px] tracking-wider">
-                  Chi Tiết Mã Vé
+              <div className="p-4 rounded-2xl bg-white/80 border border-slate-200 space-y-2 shadow-2xs">
+                <div className="text-slate-500 font-black uppercase text-[10px] tracking-wider">
+                  Chi Tiết Mã Vé &amp; Số May Mắn
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Mã Vé:</span>
-                  <span className="font-mono font-bold text-amber-400 text-sm">
+                  <span className="text-slate-600">Mã Vé:</span>
+                  <span className="font-mono font-black text-slate-950 text-sm">
                     {currentTicket.id}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Mã Học Viên / Khách:</span>
-                  <span className="font-mono font-bold text-blue-400">
-                    {currentTicket.memberCode || "GUEST"}
+                  <span className="text-slate-600">Sticker Số May Mắn:</span>
+                  <span className="font-mono font-black text-amber-700 bg-amber-100 px-2 py-0.5 rounded-md">
+                    #{currentTicket.luckyNumber || "Tự động cấp khi Check-in"}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Loại Vé:</span>
-                  <span className="font-semibold text-slate-200">
+                  <span className="text-slate-600">Loại Vé:</span>
+                  <span className="font-bold text-slate-900">
                     {currentTicket.ticketType} ({currentTicket.ticketCount || 1} người)
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Vị Trí Chỗ Ngồi:</span>
-                  <span className="font-semibold text-slate-200">
+                  <span className="text-slate-600">Vị Trí Chỗ Ngồi:</span>
+                  <span className="font-bold text-slate-900">
                     {currentTicket.seatAssignment || "Bàn VIP / Khu vực đại biểu"}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Trạng Thái Phí Vé:</span>
+                  <span className="text-slate-600">Trạng Thái Phí Vé:</span>
                   <span
                     className={`font-bold px-2 py-0.5 rounded text-[11px] ${
-                      currentTicket.paymentStatus === "paid"
-                        ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                        : "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                      currentTicket.paymentStatus === "paid" || currentTicket.paymentStatus === "free"
+                        ? "bg-emerald-500/15 text-emerald-900 border border-emerald-500/30"
+                        : "bg-amber-500/15 text-amber-900 border border-amber-500/30"
                     }`}
                   >
                     {currentTicket.paymentStatus === "paid"
                       ? "Đã thanh toán"
+                      : currentTicket.paymentStatus === "free"
+                      ? "Miễn phí"
                       : "Chưa thanh toán"}
                   </span>
                 </div>
-                {currentTicket.isCheckedIn && (
-                  <div className="flex items-center justify-between pt-1 border-t border-slate-800/60">
-                    <span className="text-slate-400">Tiến Độ Điểm Danh:</span>
-                    <span
-                      className={`font-bold px-2 py-0.5 rounded text-[11px] ${
-                        currentTicket.isLate
-                          ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
-                          : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                      }`}
-                    >
-                      {currentTicket.isLate ? "Đi muộn" : "Đúng giờ"}
-                    </span>
-                  </div>
-                )}
               </div>
             </div>
 
-            {/* CHỌN PHẦN THAM GIA SỰ KIỆN KHI SOÁT VÉ */}
-            {!currentTicket.isCheckedIn && (
+            {/* CHỌN PHẦN THAM GIA SỰ KIỆN KHI SOÁT VÉ (CHỈ HIỆN KHI SỰ KIỆN CÓ CẤU HÌNH PHẦN CHƯƠNG TRÌNH) */}
+            {!currentTicket.isCheckedIn && configuredEventParts.length > 0 && (
               <div className="px-6 py-2 space-y-2">
-                <div className="text-xs font-bold text-slate-300 flex items-center justify-between">
-                  <span>Xác nhận phần tham gia của đại biểu:</span>
-                  <span className="text-[11px] text-slate-400">Có thể tích 1 hoặc tất cả</span>
+                <div className="text-xs font-bold text-slate-800 flex items-center justify-between">
+                  <span>Xác nhận phần chương trình tham gia của đại biểu:</span>
+                  <span className="text-[11px] text-slate-500">Theo cấu hình sự kiện</span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {["Tọa đàm / Hội nghị Chuyên Đề", "Tiệc Gala Dinner & Kết Nối"].map((part) => {
+                  {configuredEventParts.map((part) => {
                     const isSelected = selectedCheckinParts.includes(part);
                     return (
                       <div
                         key={part}
-                        onClick={() => {
+                        onClick={(e) => {
+                          triggerWaterRipple(e);
                           setSelectedCheckinParts((prev) =>
                             prev.includes(part)
-                              ? (prev.length > 1 ? prev.filter((p) => p !== part) : prev)
+                              ? prev.filter((p) => p !== part)
                               : [...prev, part]
                           );
                         }}
-                        className={`flex items-center gap-2 p-2.5 rounded-xl border text-xs font-semibold cursor-pointer select-none transition ${
+                        className={`ios-water-btn flex items-center gap-2 p-2.5 rounded-xl border text-xs font-semibold cursor-pointer select-none transition ${
                           isSelected
-                            ? "border-blue-500 bg-blue-950/40 text-blue-300"
-                            : "border-slate-800 bg-slate-950/40 text-slate-400 hover:bg-slate-900"
+                            ? "border-slate-950 bg-slate-950 text-white"
+                            : "ios-liquid-pill text-slate-800 hover:bg-white/80"
                         }`}
                       >
                         <input
                           type="checkbox"
                           checked={isSelected}
                           onChange={() => {}}
-                          className="rounded text-blue-600 pointer-events-none"
+                          className="rounded text-slate-900 pointer-events-none"
                         />
                         <span className="truncate">{part}</span>
                       </div>
@@ -1454,300 +2302,22 @@ function PublicEventCheckinGatePage() {
           </div>
         )}
 
-        {/* MODAL CHỤP & XEM ẢNH TRỰC TIẾP TRONG SỰ KIỆN */}
-        {photoModalOpen && (
-          <EventLivePhotoGalleryModal
-            open={photoModalOpen}
-            eventId={currentTicket?.eventId || "latest"}
-            eventName={currentTicket?.eventTitle || "Sự kiện CLB CEO HN10"}
-            onClose={() => setPhotoModalOpen(false)}
-          />
-        )}
-
-        {/* MODAL ĐĂNG KÝ CHECK-IN KHÁCH MỚI TẠI CỬA (WALK-IN) - Chuẩn Theme Sáng (Yêu cầu 4) */}
-        {walkinModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in">
-            <div className="relative w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-3xl border border-slate-200 bg-white shadow-2xl p-6 space-y-5 text-slate-800">
-              <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold shadow-xs">
-                    <UserPlus className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm sm:text-base font-bold text-slate-900">
-                      Đăng Ký Check-in Khách Mới Tại Cửa
-                    </h3>
-                    <p className="text-[11px] text-slate-500">
-                      Sự kiện: <strong className="text-blue-700">{selectedEventName}</strong>
-                    </p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setWalkinModalOpen(false)}
-                  className="p-1 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Tùy chọn xử lý phí sự kiện cho khách mới (Yêu cầu 4) */}
-              {!selectedEventIsFree && (
-                <div className="p-3.5 rounded-2xl border border-amber-200 bg-amber-50/70 space-y-2">
-                  <div className="text-xs font-bold text-amber-950 flex items-center justify-between">
-                    <span>Phí sự kiện: {new Intl.NumberFormat("vi-VN").format(selectedEventFee)} VNĐ / đại biểu</span>
-                    <span className="text-[10px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full font-bold">
-                      Có phí
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                    <label className={`p-2.5 rounded-xl border flex items-start gap-2 cursor-pointer transition ${
-                      walkinPaymentMethod === 'cash_instant' ? 'bg-white border-blue-500 ring-1 ring-blue-400 shadow-2xs' : 'bg-white/60 border-slate-200'
-                    }`}>
-                      <input
-                        type="radio"
-                        name="walkinPayment"
-                        checked={walkinPaymentMethod === 'cash_instant'}
-                        onChange={() => setWalkinPaymentMethod('cash_instant')}
-                        className="mt-0.5 text-blue-600"
-                      />
-                      <div>
-                        <div className="font-bold text-slate-900 text-xs">1. Thu tiền tại quầy</div>
-                        <div className="text-[10px] text-slate-500">Nộp tiền mặt/chuyển khoản tại quầy &amp; Check-in luôn</div>
-                      </div>
-                    </label>
-
-                    <label className={`p-2.5 rounded-xl border flex items-start gap-2 cursor-pointer transition ${
-                      walkinPaymentMethod === 'email_invoice' ? 'bg-white border-amber-500 ring-1 ring-amber-400 shadow-2xs' : 'bg-white/60 border-slate-200'
-                    }`}>
-                      <input
-                        type="radio"
-                        name="walkinPayment"
-                        checked={walkinPaymentMethod === 'email_invoice'}
-                        onChange={() => setWalkinPaymentMethod('email_invoice')}
-                        className="mt-0.5 text-amber-600"
-                      />
-                      <div>
-                        <div className="font-bold text-slate-900 text-xs">2. Gửi mail thông báo phí</div>
-                        <div className="text-[10px] text-slate-500">Gửi mail kèm VietQR, tự động check-in khi nhận thanh toán</div>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-              )}
-
-              <form onSubmit={handleWalkinSubmit} className="space-y-4 text-xs">
-                <div>
-                  <label className="block text-slate-700 font-semibold mb-1">
-                    Họ và tên khách mời *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Nguyễn Văn A"
-                    value={walkinForm.fullName}
-                    onChange={(e) => setWalkinForm({ ...walkinForm, fullName: e.target.value })}
-                    className="w-full h-9 px-3 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 outline-none focus:border-blue-500 focus:bg-white transition"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-slate-700 font-semibold mb-1">
-                      Số điện thoại *
-                    </label>
-                    <input
-                      type="tel"
-                      required
-                      placeholder="0983..."
-                      value={walkinForm.phone}
-                      onChange={(e) => setWalkinForm({ ...walkinForm, phone: e.target.value })}
-                      className="w-full h-9 px-3 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 outline-none focus:border-blue-500 focus:bg-white transition"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-slate-700 font-semibold mb-1">
-                      Email *
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="email@congty.com"
-                      value={walkinForm.email}
-                      onChange={(e) => setWalkinForm({ ...walkinForm, email: e.target.value })}
-                      className="w-full h-9 px-3 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 outline-none focus:border-blue-500 focus:bg-white transition"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-slate-700 font-semibold mb-1">
-                      Doanh nghiệp / Công ty
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Tập đoàn..."
-                      value={walkinForm.company}
-                      onChange={(e) => setWalkinForm({ ...walkinForm, company: e.target.value })}
-                      className="w-full h-9 px-3 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 outline-none focus:border-blue-500 focus:bg-white transition"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-slate-700 font-semibold mb-1">
-                      Chức danh / Chức vụ
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Giám đốc..."
-                      value={walkinForm.position}
-                      onChange={(e) => setWalkinForm({ ...walkinForm, position: e.target.value })}
-                      className="w-full h-9 px-3 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 outline-none focus:border-blue-500 focus:bg-white transition"
-                    />
-                  </div>
-                </div>
-
-                {/* Chọn phần tham gia sự kiện */}
-                <div>
-                  <label className="block text-slate-700 font-semibold mb-1.5">
-                    Tham gia phần nào của sự kiện?
-                  </label>
-                  <div className="space-y-1.5">
-                    {["Tọa đàm / Hội nghị Chuyên Đề", "Tiệc Gala Dinner & Kết Nối"].map((part) => {
-                      const isChecked = walkinForm.selectedParts.includes(part);
-                      return (
-                        <label
-                          key={part}
-                          className="flex items-center gap-2 p-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 cursor-pointer text-xs text-slate-800 transition"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={isChecked}
-                            onChange={() => {
-                              setWalkinForm((prev) => ({
-                                ...prev,
-                                selectedParts: prev.selectedParts.includes(part)
-                                  ? prev.selectedParts.filter((p) => p !== part)
-                                  : [...prev.selectedParts, part],
-                              }));
-                            }}
-                            className="rounded text-blue-600 focus:ring-blue-500"
-                          />
-                          <span>{part}</span>
-                        </label>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Nút thêm người đi cùng (+) */}
-                <div className="pt-2 border-t border-slate-200 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-slate-700">
-                      Người đi cùng ({additionalWalkins.length}):
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setAdditionalWalkins((prev) => [
-                          ...prev,
-                          {
-                            id: `walk_${Date.now()}`,
-                            fullName: "",
-                            phone: "",
-                            email: "",
-                            company: walkinForm.company,
-                            position: "",
-                          },
-                        ])
-                      }
-                      className="px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-[11px] font-bold border border-blue-200 cursor-pointer transition"
-                    >
-                      + Thêm người đi cùng
-                    </button>
-                  </div>
-
-                  {additionalWalkins.map((w, idx) => (
-                    <div key={w.id} className="p-3 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
-                      <div className="flex items-center justify-between text-[11px] font-bold text-slate-700">
-                        <span>Đại biểu #{idx + 2}</span>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setAdditionalWalkins((prev) => prev.filter((_, i) => i !== idx))
-                          }
-                          className="text-rose-600 hover:underline font-semibold"
-                        >
-                          Xóa
-                        </button>
-                      </div>
-                      <div className="grid grid-cols-3 gap-2">
-                        <input
-                          type="text"
-                          required
-                          placeholder="Họ tên *"
-                          value={w.fullName}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setAdditionalWalkins((prev) =>
-                              prev.map((it, i) => (i === idx ? { ...it, fullName: val } : it))
-                            );
-                          }}
-                          className="h-8 px-2 rounded-lg border border-slate-300 bg-white text-xs text-slate-800"
-                        />
-                        <input
-                          type="tel"
-                          required
-                          placeholder="SĐT *"
-                          value={w.phone}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setAdditionalWalkins((prev) =>
-                              prev.map((it, i) => (i === idx ? { ...it, phone: val } : it))
-                            );
-                          }}
-                          className="h-8 px-2 rounded-lg border border-slate-300 bg-white text-xs text-slate-800"
-                        />
-                        <input
-                          type="email"
-                          required
-                          placeholder="Email *"
-                          value={w.email}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setAdditionalWalkins((prev) =>
-                              prev.map((it, i) => (i === idx ? { ...it, email: val } : it))
-                            );
-                          }}
-                          className="h-8 px-2 rounded-lg border border-slate-300 bg-white text-xs text-slate-800"
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-200">
-                  <button
-                    type="button"
-                    onClick={() => setWalkinModalOpen(false)}
-                    className="px-4 py-2 rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-100 font-semibold transition"
-                  >
-                    Hủy
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={submittingWalkin}
-                    className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-md disabled:opacity-50 transition cursor-pointer"
-                  >
-                    {submittingWalkin
-                      ? "Đang xử lý..."
-                      : (!selectedEventIsFree && walkinPaymentMethod === 'email_invoice')
-                      ? "Gửi Mail Thông Báo Phí & Lưu Vé Chờ"
-                      : "Xác Nhận & Check-in Ngay"}
-                  </button>
-                </div>
-              </form>
-            </div>
+        {/* NÚT THÊM NGƯỜI CHECK-IN GỌN GÀNG (ĐÃ BỎ NÚT CHỤP ẢNH, BỎ NÚT QUAY THƯỞNG & ẨN CHẾ ĐỘ ONLINE/OFFLINE) */}
+        {activeCategory !== "walkin" && (
+          <div className="flex justify-center pt-1">
+            <button
+              type="button"
+              onClick={(e) => {
+                triggerWaterRipple(e);
+                setActiveCategory("walkin");
+                setWalkinQrResult(null);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+              className="ios-water-btn ios-liquid-pill inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-slate-950 hover:bg-white/80 text-xs font-black shadow-sm transition cursor-pointer"
+            >
+              <UserPlus className="w-3.5 h-3.5 text-slate-900" />
+              <span>+ Thêm người check-in</span>
+            </button>
           </div>
         )}
       </main>
