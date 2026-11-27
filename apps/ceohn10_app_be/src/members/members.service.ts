@@ -1756,6 +1756,9 @@ export class MembersService implements OnModuleInit {
 
     // Insert into public.members. The DB trigger trg_set_member_code will automatically
     // assign the sequential code (e.g. HV-00000x or PREFIX-00000x) if code is empty!
+    await this.prisma.$executeRawUnsafe(
+      `ALTER TABLE public.members ADD COLUMN IF NOT EXISTS custom_data JSONB DEFAULT '{}'::jsonb`,
+    ).catch(() => {});
     await this.prisma.$executeRaw`
       INSERT INTO public.members (
         id, code, name, contact, email, phone, type, level, industry, region, status,
@@ -3692,7 +3695,7 @@ Trân trọng cảm ơn Anh/Chị!`;
     }
 
     // Normalize to granular roles: chu_tich, quan_tri, admin, ban_dieu_hanh, tong_thu_ky, ban_thu_ky, truong_ban_*, thanh_vien_ban_*, member
-    const rawRole = (data.executiveRole || '').trim().toLowerCase();
+    const rawRole = (data.executiveRole || (data as any).role || '').trim().toLowerCase();
     let sanitizedRole = 'member';
     if (
       rawRole === 'chu_tich' ||
@@ -3772,6 +3775,9 @@ Trân trọng cảm ơn Anh/Chị!`;
       else if (sanitizedDept.toLowerCase().includes('xúc tiến')) sanitizedRole = 'truong_ban_xuc_tien';
       else if (sanitizedDept.toLowerCase().includes('tài chính')) sanitizedRole = 'truong_ban_tai_chinh';
       else if (sanitizedDept.toLowerCase().includes('thiện nguyện')) sanitizedRole = 'truong_ban_thien_nguyen';
+      else if (sanitizedDept.toLowerCase().includes('công nghệ')) sanitizedRole = 'truong_ban_cong_nghe';
+      else if (sanitizedDept.toLowerCase().includes('học tập')) sanitizedRole = 'truong_ban_hoc_tap';
+      else if (sanitizedDept.toLowerCase().includes('b2b')) sanitizedRole = 'truong_ban_b2b';
       else if (sanitizedDept.toLowerCase().includes('sự kiện')) sanitizedRole = 'truong_ban_su_kien';
       else sanitizedRole = 'truong_ban_su_kien';
     } else if (

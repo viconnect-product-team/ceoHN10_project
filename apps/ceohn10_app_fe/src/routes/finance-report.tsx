@@ -204,6 +204,8 @@ export function FinanceReport() {
         name: f.name,
         leader: f.leader_name || "Trưởng Ban Chuyên Trách",
         totalAllocated: Number(f.current_balance || 0),
+        totalInflow: Number(f.total_inflow || 0),
+        totalOutflow: Number(f.total_outflow || 0),
         transferCount: inTxs.length,
         lastTransferDate: latestTx?.date || new Date().toISOString().slice(0, 10),
         purposeNote: latestTx?.description || f.description || "Chưa có dòng tiền phát sinh",
@@ -636,30 +638,38 @@ export function FinanceReport() {
           </div>
         </div>
 
-        {/* ── 2B. THỐNG KÊ TÀI CHÍNH TRỰC QUAN (BIỂU ĐỒ DỮ LIỆU THẬT) ── */}
+        {/* ── 2B. THỐNG KÊ BIẾN ĐỘNG DÒNG TIỀN VÀO / RA THEO 7 QUỸ BAN ── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="lg:col-span-2 p-5 rounded-3xl bg-white border border-slate-200 shadow-xs">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <BarChart3 className="w-4 h-4 text-[#003B95]" />
-                <h3 className="text-sm font-black text-slate-900">Biểu Đồ Phân Bổ Số Dư Theo 7 Quỹ Ban</h3>
+                <h3 className="text-sm font-black text-slate-900">Biểu Đồ Biến Động Dòng Tiền (Vào / Ra) Theo 7 Quỹ Ban</h3>
               </div>
               <span className="text-[11px] font-semibold text-slate-500">Đơn vị: VNĐ (Dữ liệu thật)</span>
             </div>
             <div className="h-60 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={departments.map((d) => ({ name: d.name.replace("Quỹ ", "").replace("Ban ", ""), balance: d.totalAllocated }))}>
+                <BarChart
+                  data={departments.map((d: any) => ({
+                    name: d.name.replace("Quỹ ", "").replace("Ban ", ""),
+                    inflow: Number(d.totalInflow || 0),
+                    outflow: Number(d.totalOutflow || 0),
+                  }))}
+                >
                   <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                  <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `${Math.round(v / 1000000)}tr`} />
+                  <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => (v >= 1000000 ? `${Math.round(v / 1000000)}tr` : `${Math.round(v / 1000)}k`)} />
                   <RechartsTooltip formatter={(v: any) => `${Number(v || 0).toLocaleString("vi-VN")} đ`} />
-                  <Bar dataKey="balance" name="Số dư Quỹ Ban" fill="#003B95" radius={[8, 8, 0, 0]} />
+                  <Legend wrapperStyle={{ fontSize: "11px" }} />
+                  <Bar dataKey="inflow" name="Tiền Vào" fill="#10B981" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="outflow" name="Tiền Ra" fill="#EF4444" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
 
           <div className="p-5 rounded-3xl bg-white border border-slate-200 shadow-xs">
-            <h3 className="text-sm font-black text-slate-900 mb-3">Tỷ Trọng Nguồn Thu &amp; Quỹ</h3>
+            <h3 className="text-sm font-black text-slate-900 mb-3">Tỷ Trọng Quỹ Tổng &amp; Quỹ Ban</h3>
             <div className="h-60 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <RechartsPieChart>
@@ -667,8 +677,7 @@ export function FinanceReport() {
                     data={[
                       { name: "Quỹ Tổng", value: Math.max(0, currentMasterBalance) },
                       { name: "7 Quỹ Ban", value: Math.max(0, totalAllocatedToDepts) },
-                      { name: "Thu Sự Kiện", value: Math.max(0, totalEventIn) },
-                      { name: "Tài Trợ", value: Math.max(0, totalSponsorIn) },
+                      { name: "Thu Vé Sự Kiện", value: Math.max(0, totalEventIn) },
                     ].filter((x) => x.value > 0)}
                     dataKey="value"
                     nameKey="name"
@@ -677,7 +686,7 @@ export function FinanceReport() {
                     outerRadius={72}
                     label={false}
                   >
-                    {["#003B95", "#F59E0B", "#10B981", "#EF4444"].map((c, idx) => (
+                    {["#003B95", "#F59E0B", "#10B981"].map((c, idx) => (
                       <Cell key={idx} fill={c} />
                     ))}
                   </Pie>
@@ -689,70 +698,29 @@ export function FinanceReport() {
           </div>
         </div>
 
-        {/* ── 3. PHÂN HỆ LUỒNG THU VÀO (INFLOWS BREAKDOWN - CÓ NÚT XEM CHI TIẾT) ── */}
+        {/* ── 3. PHÂN HỆ LUỒNG THU VÀO THỰC TẾ (KHÔNG DỮ LIỆU ẢO) ── */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-base font-black text-slate-900 tracking-tight">
-                Luồng Dòng Tiền Thu Vào Quỹ Tổng
+                Luồng Dòng Tiền Thực Tế (Vé Sự Kiện &amp; Nộp Quỹ Tổng)
               </h2>
               <p className="text-xs text-slate-500">
-                Phân bổ nguồn thu minh bạch từ học viên, sự kiện và nhà tài trợ. Bấm &quot;Xem chi tiết&quot; để tra cứu từng người đóng.
+                Tiền vé sự kiện vào Quỹ Ban Sự Kiện &amp; Hậu Cần trước, Trưởng ban lập lệnh chuyển về Quỹ Tổng. Quỹ Tài Trợ quản lý tại luồng riêng.
               </p>
             </div>
             <span className="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-full">
-              Tổng thu: <b>{totalInflows.toLocaleString("vi-VN")} đ</b>
+              Tổng thu sự kiện: <b>{totalEventIn.toLocaleString("vi-VN")} đ</b>
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* NGUỒN 1: THU PHÍ THAM GIA CLB / LỚP HỌC */}
-            <div className="p-5 rounded-3xl bg-white border border-slate-200 shadow-xs hover:shadow-md transition flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-                    Phí Tham Gia CLB
-                  </span>
-                  <span className="text-[11px] font-bold text-slate-500">{tuitionPayers.length} Học viên</span>
-                </div>
-                <h3 className="text-sm font-bold text-slate-900 leading-snug">
-                  Phí Tham Gia Lớp &amp; CLB CEO HN10
-                </h3>
-                <p className="text-[11px] text-slate-500 mt-1">
-                  1tr ưu đãi 1 tháng tuyển sinh · 2tr chuẩn
-                </p>
-                <div className="mt-3">
-                  <span className="text-xl font-black text-slate-900 font-mono">
-                    {totalTuitionIn.toLocaleString("vi-VN")} đ
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-4 pt-3 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setActiveInflowModal({
-                      title: "Chi Tiết Thu Phí Tham Gia CLB & Lớp CEO HN10",
-                      description: "Danh sách các doanh nhân, học viên đã hoàn tất chuyển phí tham gia CLB vào Quỹ Tổng.",
-                      totalAmount: totalTuitionIn,
-                      items: tuitionPayers,
-                    })
-                  }
-                  className="w-full py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-800 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1"
-                >
-                  <Eye className="w-3.5 h-3.5 text-blue-600" />
-                  <span>Xem Chi Tiết Danh Sách</span>
-                </button>
-              </div>
-            </div>
-
-            {/* NGUỒN 2: THU VÉ SỰ KIỆN */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* NGUỒN 1: THU VÉ SỰ KIỆN VÀO QUỸ BAN SỰ KIỆN */}
             <div className="p-5 rounded-3xl bg-white border border-slate-200 shadow-xs hover:shadow-md transition flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
-                    Vé Sự Kiện
+                    Vé Sự Kiện → Quỹ Ban Sự Kiện
                   </span>
                   <span className="text-[11px] font-bold text-slate-500">{eventPayers.length} Đại biểu</span>
                 </div>
@@ -760,7 +728,7 @@ export function FinanceReport() {
                   Thu Vé &amp; Phí Tham Dự Sự Kiện
                 </h3>
                 <p className="text-[11px] text-slate-500 mt-1">
-                  Dạ tiệc Gala tất niên, Khai giảng &amp; B2B
+                  Cộng vào Quỹ Ban Sự Kiện &amp; Hậu Cần khi SePay xác nhận
                 </p>
                 <div className="mt-3">
                   <span className="text-xl font-black text-slate-900 font-mono">
@@ -775,7 +743,7 @@ export function FinanceReport() {
                   onClick={() =>
                     setActiveInflowModal({
                       title: "Chi Tiết Thu Vé & Phí Tham Gia Sự Kiện",
-                      description: "Danh sách học viên và khách mời đã đăng ký thanh toán vé tham gia các sự kiện của CLB.",
+                      description: "Danh sách học viên và khách mời đã thanh toán vé sự kiện (vào Quỹ Ban Sự Kiện & Hậu Cần).",
                       totalAmount: totalEventIn,
                       items: eventPayers,
                     })
@@ -788,85 +756,31 @@ export function FinanceReport() {
               </div>
             </div>
 
-            {/* NGUỒN 3: THU TÀI TRỢ */}
-            <div className="p-5 rounded-3xl bg-white border border-slate-200 shadow-xs hover:shadow-md transition flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
-                    Quỹ Tài Trợ
-                  </span>
-                  <span className="text-[11px] font-bold text-slate-500">{sponsorPayers.length} Đơn vị</span>
-                </div>
-                <h3 className="text-sm font-bold text-slate-900 leading-snug">
-                  Tài Trợ Từ Các Nhà Tài Trợ
-                </h3>
-                <p className="text-[11px] text-slate-500 mt-1">
-                  Đồng hành Kim Cương, Vàng &amp; Bạc
-                </p>
-                <div className="mt-3">
-                  <span className="text-xl font-black text-slate-900 font-mono">
-                    {totalSponsorIn.toLocaleString("vi-VN")} đ
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-4 pt-3 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setActiveInflowModal({
-                      title: "Chi Tiết Quỹ Tài Trợ Từ Các Doanh Nghiệp Đồng Hành",
-                      description: "Danh sách các nhà tài trợ đã giải ngân tài trợ vào Quỹ Tổng CLB Doanh Nhân CEO HN10.",
-                      totalAmount: totalSponsorIn,
-                      items: sponsorPayers,
-                    })
-                  }
-                  className="w-full py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-800 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1"
-                >
-                  <Eye className="w-3.5 h-3.5 text-amber-700" />
-                  <span>Xem Chi Tiết Danh Sách</span>
-                </button>
-              </div>
-            </div>
-
-            {/* NGUỒN 4: THU KHÁC / ĐÓNG GÓP */}
+            {/* NGUỒN 2: TIỀN NỘP TỪ CÁC QUỸ BAN LÊN QUỸ TỔNG */}
             <div className="p-5 rounded-3xl bg-white border border-slate-200 shadow-xs hover:shadow-md transition flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
-                    Thu Khác
+                    Quỹ Ban → Quỹ Tổng
                   </span>
-                  <span className="text-[11px] font-bold text-slate-500">Lãi tiền gửi</span>
+                  <span className="text-[11px] font-bold text-slate-500">
+                    {(transfersQuery.data || []).filter((o: any) => o.direction === "dept_to_master" && o.status === "accepted").length} Lệnh
+                  </span>
                 </div>
                 <h3 className="text-sm font-bold text-slate-900 leading-snug">
-                  Đóng Góp Xây Dựng &amp; Lãi Ngân Hàng
+                  Tiền Các Ban Chuyển Nộp Về Quỹ Tổng
                 </h3>
                 <p className="text-[11px] text-slate-500 mt-1">
-                  Lãi tiền gửi Techcombank &amp; Đóng góp
+                  Tự động ghi nhận khi Trưởng ban làm lệnh chuyển lên Quỹ Tổng và được tiếp nhận
                 </p>
                 <div className="mt-3">
-                  <span className="text-xl font-black text-slate-900 font-mono">
-                    {totalOtherIn.toLocaleString("vi-VN")} đ
+                  <span className="text-xl font-black text-emerald-700 font-mono">
+                    {(transfersQuery.data || [])
+                      .filter((o: any) => o.direction === "dept_to_master" && o.status === "accepted")
+                      .reduce((s: number, o: any) => s + Number(o.amount || 0), 0)
+                      .toLocaleString("vi-VN")} đ
                   </span>
                 </div>
-              </div>
-
-              <div className="mt-4 pt-3 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setActiveInflowModal({
-                      title: "Chi Tiết Các Khoản Thu Khác (Real-time)",
-                      description: "Các khoản thu khác được ghi nhận trực tiếp từ hệ thống hoặc SePay.",
-                      totalAmount: totalOtherIn,
-                      items: otherInflows,
-                    })
-                  }
-                  className="w-full py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-800 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1"
-                >
-                  <Eye className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Xem Chi Tiết Danh Sách</span>
-                </button>
               </div>
             </div>
           </div>
@@ -1652,6 +1566,47 @@ export function FinanceReport() {
                     }}
                   />
                 </label>
+              </div>
+
+              {/* Biểu đồ biến động Dòng Tiền Vào / Ra riêng của Quỹ Ban */}
+              <div className="p-3.5 rounded-2xl bg-white border border-slate-200">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-black text-slate-800">Biểu Đồ Biến Động Dòng Tiền (Vào / Ra) — {activeDeptFund.name}</span>
+                  <span className="text-[11px] text-slate-500">
+                    Tổng vào: <b className="text-emerald-600">+{Number(activeDeptFund.total_inflow || activeDeptFund.totalInflow || 0).toLocaleString("vi-VN")} đ</b> · Tổng ra: <b className="text-rose-600">-{Number(activeDeptFund.total_outflow || activeDeptFund.totalOutflow || 0).toLocaleString("vi-VN")} đ</b>
+                  </span>
+                </div>
+                <div className="h-44 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={(() => {
+                        const rows = deptRowsQuery.data?.rows || [];
+                        if (rows.length === 0) {
+                          return [{
+                            date: new Date().toISOString().slice(0, 10),
+                            inflow: Number(activeDeptFund.total_inflow || activeDeptFund.totalInflow || 0),
+                            outflow: Number(activeDeptFund.total_outflow || activeDeptFund.totalOutflow || 0),
+                          }];
+                        }
+                        const byDate: Record<string, { date: string; inflow: number; outflow: number }> = {};
+                        for (const r of rows) {
+                          const d = String(r.transaction_date || "").slice(0, 10) || "Khác";
+                          if (!byDate[d]) byDate[d] = { date: d, inflow: 0, outflow: 0 };
+                          byDate[d].inflow += Number(r.income_amount || 0);
+                          byDate[d].outflow += Number(r.expense_amount || 0);
+                        }
+                        return Object.values(byDate).sort((a, b) => a.date.localeCompare(b.date));
+                      })()}
+                    >
+                      <XAxis dataKey="date" tick={{ fontSize: 10 }} />
+                      <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => (v >= 1000000 ? `${Math.round(v / 1000000)}tr` : `${Math.round(v / 1000)}k`)} />
+                      <RechartsTooltip formatter={(v: any) => `${Number(v || 0).toLocaleString("vi-VN")} đ`} />
+                      <Legend wrapperStyle={{ fontSize: "11px" }} />
+                      <Bar dataKey="inflow" name="Tiền Vào" fill="#10B981" radius={[6, 6, 0, 0]} />
+                      <Bar dataKey="outflow" name="Tiền Ra" fill="#EF4444" radius={[6, 6, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
 
               {/* Bảng dòng tiền Quỹ Ban với Cột Động + Xóa cứng hàng loạt */}

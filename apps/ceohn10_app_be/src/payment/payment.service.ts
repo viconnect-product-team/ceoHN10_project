@@ -558,19 +558,16 @@ export class PaymentService {
         }
       }
 
-      // Cập nhật số dư Quỹ Ban Sự kiện & Hậu cần khi thanh toán phí vé sự kiện qua SePay
-      let eventFundId: string | undefined = targetFundId || undefined;
-      if (!eventFundId) {
-        const eventFund = await this.prisma.financial_funds.findFirst({
-          where: {
-            OR: [
-              { code: 'FUND_BAN_SU_KIEN_HAU_CAN' },
-              { name: { contains: 'Sự kiện', mode: 'insensitive' } },
-            ],
-          },
-        }).catch(() => null);
-        eventFundId = eventFund?.id || undefined;
-      }
+      // Cập nhật số dư vào Quỹ Ban Sự Kiện & Hậu Cần TRƯỚC (chỉ chuyển về Quỹ Tổng khi Trưởng ban lập lệnh chuyển tiền)
+      const eventFund = await this.prisma.financial_funds.findFirst({
+        where: {
+          OR: [
+            { code: 'FUND_BAN_SU_KIEN_HAU_CAN' },
+            { name: { contains: 'Sự kiện', mode: 'insensitive' } },
+          ],
+        },
+      }).catch(() => null);
+      const eventFundId: string | undefined = eventFund?.id || undefined;
       if (eventFundId) {
         await this.prisma.$executeRawUnsafe(`
           UPDATE public.financial_funds SET current_balance = current_balance + $1, updated_at = NOW()
@@ -595,9 +592,10 @@ export class PaymentService {
         transferAmount,
         regRows[0]?.member_name || 'Khách tham dự',
         JSON.stringify({
-          department: 'Ban Sự Kiện',
+          fundId: eventFundId || undefined,
+          department: eventFund?.name || 'Quỹ Ban Sự Kiện & Hậu Cần',
           sourceFund: 'SePay VietQR',
-          targetFund: 'Quỹ Ban Sự Kiện',
+          targetFund: eventFund?.name || 'Quỹ Ban Sự Kiện & Hậu Cần',
           type: 'IN',
           flowDirection: 'in',
           regId,

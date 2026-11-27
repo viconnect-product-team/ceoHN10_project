@@ -728,7 +728,13 @@ export class FinancialReportService implements OnModuleInit {
     }
 
     const amount = Number(order.amount || 0);
-    const txDate = order.transfer_date ? String(order.transfer_date).slice(0, 10) : new Date().toISOString().slice(0, 10);
+    const txDate = order.transfer_date
+      ? order.transfer_date instanceof Date
+        ? order.transfer_date.toISOString().slice(0, 10)
+        : /^\d{4}-\d{2}-\d{2}/.test(String(order.transfer_date))
+          ? String(order.transfer_date).slice(0, 10)
+          : new Date().toISOString().slice(0, 10)
+      : new Date().toISOString().slice(0, 10);
 
     await this.prisma.$transaction(async (tx) => {
       if (order.source_fund_id) {
