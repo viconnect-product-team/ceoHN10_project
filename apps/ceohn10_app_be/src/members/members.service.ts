@@ -2157,21 +2157,26 @@ export class MembersService implements OnModuleInit {
       const memberEmailLower = String(email || current.email || '').trim().toLowerCase();
       const oldCodeUpper = oldCode.toUpperCase();
       if (oldCodeUpper) {
-        await this.prisma.$executeRaw`
-          UPDATE public.event_registrations
-          SET member_code = ${code}
-          WHERE UPPER(TRIM(COALESCE(member_code, ''))) = ${oldCodeUpper}
-        `.catch((err) => {
+        await this.prisma.$executeRawUnsafe(
+          `UPDATE public.event_registrations
+           SET member_code = $1
+           WHERE UPPER(TRIM(COALESCE(member_code, ''))) = $2`,
+          code,
+          oldCodeUpper,
+        ).catch((err) => {
           console.error('Cascade update member_code by oldCode error:', err?.message);
         });
       }
       if (memberEmailLower) {
-        await this.prisma.$executeRaw`
-          UPDATE public.event_registrations
-          SET member_code = ${code}
-          WHERE LOWER(TRIM(COALESCE(email, ''))) = ${memberEmailLower}
-            AND (member_code IS NULL OR TRIM(member_code) = '' OR UPPER(TRIM(member_code)) = ${oldCodeUpper})
-        `.catch((err) => {
+        await this.prisma.$executeRawUnsafe(
+          `UPDATE public.event_registrations
+           SET member_code = $1
+           WHERE LOWER(TRIM(COALESCE(email, ''))) = $2
+             AND (member_code IS NULL OR TRIM(member_code) = '' OR UPPER(TRIM(member_code)) = $3)`,
+          code,
+          memberEmailLower,
+          oldCodeUpper,
+        ).catch((err) => {
           console.error('Cascade update member_code by email error:', err?.message);
         });
       }

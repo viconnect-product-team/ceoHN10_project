@@ -10,6 +10,8 @@ import {
 } from '@nestjs/common';
 import { FinancialInitService } from './financial-init.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
 
 @Controller('finance-init')
 export class FinancialInitController {
@@ -19,6 +21,8 @@ export class FinancialInitController {
    * Danh sách Quỹ
    */
   @Get('funds')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'platform_admin', 'superadmin', 'president', 'vice_president', 'accountant', 'secretary', 'lop_truong', 'lop_pho', 'truong_ban_chuyen_trach', 'quan_tri')
   getFunds() {
     return this.finService.getFunds();
   }
@@ -27,6 +31,8 @@ export class FinancialInitController {
    * Sổ chi tiết dòng tiền minh bạch (người chuyển phí sự kiện, thu/chi nhập tay, SePay)
    */
   @Get('detailed-ledger')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'platform_admin', 'superadmin', 'president', 'vice_president', 'accountant', 'secretary', 'lop_truong', 'lop_pho', 'truong_ban_chuyen_trach', 'quan_tri')
   getDetailedLedger() {
     return this.finService.getDetailedLedger();
   }
@@ -35,7 +41,8 @@ export class FinancialInitController {
    * Nhập tay khoản Thu / Chi trực tiếp vào Quỹ (tự động biến động số dư Quỹ & tùy chọn chuyển về Quỹ Tổng)
    */
   @Post('manual-cashflow')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'platform_admin', 'superadmin', 'president', 'vice_president', 'accountant', 'secretary', 'lop_truong', 'lop_pho', 'truong_ban_chuyen_trach', 'quan_tri')
   createManualCashflow(
     @Req() req: any,
     @Body()
