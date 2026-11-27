@@ -605,6 +605,10 @@ function DepartmentsPage() {
       {/* ── MODAL 1: XEM CHI TIẾT BAN CHUYÊN MÔN & DANH SÁCH THÀNH VIÊN ── */}
       {isViewOpen && selectedDept && (() => {
         const viewMembers = deptMembersMap[selectedDept.id] || [];
+        const assignedLeaders = viewMembers.filter((m: any) => {
+          const r = String(m.executiveRole || m.executive_role || m.role || "").toLowerCase();
+          return r.includes("truong_ban") || r.includes("trưởng ban");
+        });
         return (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
             <div className="w-full max-w-2xl rounded-2xl border border-border bg-card p-6 shadow-xl space-y-4 max-h-[90vh] flex flex-col">
@@ -649,6 +653,34 @@ function DepartmentsPage() {
                 <div className="p-3.5 rounded-xl bg-muted/40 border border-border/60">
                   <span className="font-semibold text-muted-foreground block mb-1">Quy chế & Nhiệm vụ cốt lõi:</span>
                   <p className="text-foreground leading-relaxed text-xs">{selectedDept.description || "Chưa có quy chế cụ thể."}</p>
+                </div>
+
+                {/* Trưởng Ban Được Phân Quyền */}
+                <div className="p-3.5 rounded-xl bg-blue-50/70 border border-blue-200/80">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-bold text-[#003B95] text-xs uppercase tracking-wide">
+                      Trưởng Ban Được Phân Quyền ({assignedLeaders.length})
+                    </span>
+                  </div>
+                  {assignedLeaders.length === 0 ? (
+                    <p className="text-slate-500 text-xs">
+                      Chưa có tài khoản nào được gán quyền Trưởng Ban cho ban này (Phụ trách mặc định: <strong>{selectedDept.headTitle || selectedDept.leaderName || "Chưa gán"}</strong>).
+                    </p>
+                  ) : (
+                    <div className="space-y-1.5">
+                      {assignedLeaders.map((ld: any, idx: number) => (
+                        <div key={ld.id || idx} className="flex items-center justify-between bg-white px-3 py-2 rounded-lg border border-blue-100">
+                          <div>
+                            <div className="font-bold text-slate-900 text-xs">{ld.name || ld.fullName}</div>
+                            <div className="text-[11px] text-slate-500">{ld.email || "—"} {ld.phone ? `· ${ld.phone}` : ""}</div>
+                          </div>
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#003B95] text-white">
+                            Trưởng Ban
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Members list section */}

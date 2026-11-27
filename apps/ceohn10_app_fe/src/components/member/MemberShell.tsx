@@ -11,11 +11,10 @@ import { fetchNestApi } from "@/lib/api-client";
 import authBg from "@/assets/connect-auth-bg.jpg";
 
 const CHARCOAL = "#0F172A";
-const emblem83 = "/ceohn10-emblem-8.png";
+const emblem83 = "/hn10-logo-2.png";
 
 import { PullToRefresh } from "@/components/member/PullToRefresh";
 import { IncomingConnectionModal } from "@/components/member/IncomingConnectionModal";
-import { WelcomeMemberModal } from "@/components/member/WelcomeMemberModal";
 import { sendExternalNotification, registerNativePushUser, getNotificationPermission } from "@/lib/notification-permissions";
 import { useAuth } from "@/context/AuthContext";
 import { AssociationMemberQrModal } from "@/components/member/AssociationMemberQrModal";
@@ -392,7 +391,6 @@ export function MemberScreen({ children }: { children: ReactNode }) {
           onSnooze={snoozeNotice}
         />
         <IncomingConnectionModal />
-        <WelcomeMemberModal />
         <FirstDayAiWelcomeModal onOpenTour={() => setShowAiTour(true)} />
         <ViOneAiTutorGuide
           isOpen={showAiTour}

@@ -555,6 +555,8 @@ export class PaymentService {
               content: `Kính gửi Anh/Chị ${reg.member_name || 'Đại biểu'},\nBan Tổ Chức CLB Doanh Nhân CEO HN10 đã nhận được thanh toán thành công phí vé tham dự sự kiện "${reg.event_name || 'Sự kiện'}".\n- Mã vé: ${reg.id}\n- Số may mắn Lucky Draw: #${reg.lucky_number || '0000'}\n- Số tiền: ${Number(transferAmount).toLocaleString('vi-VN')} đ\nVé điện tử và mã QR check-in đã được gửi tới email của Anh/Chị. Trân trọng!`,
             }).catch(() => {});
           }
+
+          await this.dispatchEventPaymentNotification(reg, Number(reg.payment_amount || transferAmount));
         }
       }
 
@@ -956,5 +958,72 @@ export class PaymentService {
         'x-sepay-simulation': 'true',
       },
     } as any);
+  }
+
+  /**
+   * Gửi thông báo vào hệ thống (App Học viên + CRM) khi thanh toán vé sự kiện thành công
+   */
+  private async dispatchEventPaymentNotification(reg: any, amount: number) {
+    try {
+      const eventTitle = reg.event_name || reg.event_title || 'Sự kiện CLB CEO HN10';
+      const memberName = reg.member_name || 'Quý Hội viên / Đại biểu';
+      const formattedAmt = Number(amount || 0).toLocaleString('vi-VN');
+      const title = 'Thanh toán vé sự kiện thành công';
+      const body = `${memberName} đã thanh toán thành công ${formattedAmt} đ cho vé sự kiện "${eventTitle}" (Mã vé: ${reg.id}).`;
+
+      // 1. Thông báo tới CRM Notification Center
+      await this.prisma.$executeRawUnsafe(
+        `INSERT INTO public.notifications (id, type, title, message, target_role, read, app_scope, target_app, created_at)
+         VALUES (gen_random_uuid(), 'payment_success', $1, $2, 'all', false, 'crm_platform', 'crm_platform', NOW())`,
+        `[SePay] ${title}`,
+        body,
+      ).catch(() => {});
+
+      // 2. Tìm user_id người thanh toán để gửi vào App (member_notifications + business_notifications)
+      let targetUserId: string | null = null;
+      if (reg.email && String(reg.email).includes('@')) {
+        const uRows = await this.prisma.$queryRawUnsafe<any[]>(
+          `SELECT id FROM public.vione_users WHERE LOWER(email) = LOWER($1) LIMIT 1`,
+          String(reg.email).trim(),
+        ).catch(() => []);
+        targetUserId = uRows[0]?.id || null;
+      }
+      if (!targetUserId && reg.member_code) {
+        const mRows = await this.prisma.$queryRawUnsafe<any[]>(
+          `SELECT user_id FROM public.members WHERE code = $1 AND user_id IS NOT NULL LIMIT 1`,
+          String(reg.member_code).trim(),
+        ).catch(() => []);
+        targetUserId = mRows[0]?.user_id || null;
+      }
+
+      if (targetUserId) {
+        await this.prisma.$executeRawUnsafe(
+          `INSERT INTO public.member_notifications (id, recipient_id, title, body, read, dismissed, ref_type, ref_id, created_at)
+           VALUES (gen_random_uuid(), $1, $2, $3, false, false, 'event_payment', $4, NOW())`,
+          targetUserId,
+          title,
+          body,
+          reg.id,
+        ).catch(() => {});
+
+        await this.prisma.$executeRawUnsafe(
+          `INSERT INTO public.business_notifications (
+             id, recipient_user_id, source_domain, source_record_id, event_kind, notification_kind,
+             title_key, body_key, safe_display_data, priority, status, dedupe_key, app_scope, target_app, created_at, updated_at
+           ) VALUES (
+             gen_random_uuid(), $1::uuid, 'payment', $2, 'event_payment', 'payment_success',
+             $3, $4, $5::jsonb, 'high', 'delivered', $6, 'all', 'all', NOW(), NOW()
+           )`,
+          targetUserId,
+          reg.id,
+          title,
+          body,
+          JSON.stringify({ title, body, eventTitle, amount, regId: reg.id }),
+          `evt-pay-${reg.id}-${Date.now()}`,
+        ).catch(() => {});
+      }
+    } catch (e: any) {
+      this.logger.warn(`dispatchEventPaymentNotification warning: ${e?.message}`);
+    }
   }
 }

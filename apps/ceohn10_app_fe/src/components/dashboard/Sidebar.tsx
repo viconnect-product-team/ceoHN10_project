@@ -131,7 +131,6 @@ const crmNotifications: Item[] = [
 const crmSystemDocs: Item[] = [
   { key: "nav.documents" as TKey, icon: FolderOpen, to: "/documents", label: "Tài liệu & Biểu mẫu" },
   { key: "nav.templates" as TKey, icon: LayoutTemplate, to: "/templates", label: "Quản lý mẫu trang" },
-  { key: "nav.settings" as TKey, icon: Settings, to: "/settings", label: "Cài đặt hệ thống" },
 ];
 
 const COLLAPSE_KEY = "vba.sidebar.collapsed";

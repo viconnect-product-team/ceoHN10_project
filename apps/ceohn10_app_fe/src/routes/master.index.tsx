@@ -1919,22 +1919,6 @@ function MasterAdminPortal() {
 
               <button
                 type="button"
-                onClick={() => setSettingsSubTab("platforms")}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
-                  settingsSubTab === "platforms"
-                    ? "bg-white text-[#002B70] shadow-sm border border-slate-200"
-                    : "text-slate-600 hover:text-slate-900"
-                }`}
-              >
-                <Layers className="w-4 h-4 text-emerald-600" />
-                <span>Cài Đặt Từng Hệ Thống Con</span>
-                <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-emerald-100 text-emerald-700 font-extrabold">
-                  CRM &amp; App
-                </span>
-              </button>
-
-              <button
-                type="button"
                 onClick={() => setSettingsSubTab("matrix")}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
                   settingsSubTab === "matrix"

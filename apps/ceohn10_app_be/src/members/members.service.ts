@@ -1844,36 +1844,59 @@ export class MembersService implements OnModuleInit {
                 updated_at: new Date(),
               },
             })
-            .catch(() => null);
+            .catch((err: any) => {
+              this.logger.warn(`vione_users.create warning: ${err?.message}`);
+            });
 
           await this.prisma.$executeRaw`
             INSERT INTO public.user_roles (user_id, role)
             VALUES (${assignedUserId}::uuid, 'member'::public.app_role)
             ON CONFLICT DO NOTHING
           `.catch(() => null);
-
+        } else {
           await this.prisma.$executeRaw`
-            INSERT INTO public.user_profiles (
-              user_id, display_name, company_name, onboarding_status, must_change_password, account_status, created_at, updated_at
-            ) VALUES (
-              ${assignedUserId}::uuid,
-              ${data.name},
-              ${data.contact || 'CLB Doanh Nhân CEO HN10'},
-              'new',
-              true,
-              'active',
-              NOW(),
-              NOW()
-            )
-            ON CONFLICT (user_id) DO NOTHING
-          `.catch(() => null);
-
-          await this.prisma.$executeRaw`
-            INSERT INTO auth.users (id, email, role)
-            VALUES (${assignedUserId}::uuid, ${cleanEmail}, 'authenticated')
-            ON CONFLICT (id) DO NOTHING
+            UPDATE public.vione_users
+            SET password = ${hashedPassword},
+                email = ${cleanEmail},
+                username = ${cleanEmail},
+                email_verified = true,
+                updated_at = NOW()
+            WHERE id = ${assignedUserId}::uuid
           `.catch(() => null);
         }
+
+        // Đồng bộ ceohn10_users (nếu có) để không bị lệch mật khẩu khi đăng nhập
+        await this.prisma.$executeRawUnsafe(
+          `UPDATE public.ceohn10_users SET password = $1, email = $2, username = $2, updated_at = NOW() WHERE LOWER(email) = $2 OR LOWER(username) = $2`,
+          hashedPassword,
+          cleanEmail,
+        ).catch(() => {});
+
+        await this.prisma.$executeRaw`
+          INSERT INTO public.user_profiles (
+            user_id, display_name, company_name, onboarding_status, must_change_password, account_status, created_at, updated_at
+          ) VALUES (
+            ${assignedUserId}::uuid,
+            ${data.name},
+            ${data.contact || 'CLB Doanh Nhân CEO HN10'},
+            'new',
+            true,
+            'active',
+            NOW(),
+            NOW()
+          )
+          ON CONFLICT (user_id) DO UPDATE SET
+            onboarding_status = 'new',
+            must_change_password = true,
+            account_status = 'active',
+            updated_at = NOW()
+        `.catch(() => null);
+
+        await this.prisma.$executeRaw`
+          INSERT INTO auth.users (id, email, role)
+          VALUES (${assignedUserId}::uuid, ${cleanEmail}, 'authenticated')
+          ON CONFLICT (id) DO NOTHING
+        `.catch(() => null);
 
         if (assignedUserId) {
           const appOnlySettings = JSON.stringify({

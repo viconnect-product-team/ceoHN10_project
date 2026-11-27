@@ -58,6 +58,8 @@ export function WelcomeMemberModal({ forceOpen = false, onClose }: WelcomeMember
     onClose?.();
   };
 
+  // Đã gỡ bỏ hoàn toàn popup chào mừng doanh nhân theo yêu cầu
+  if (!forceOpen) return null;
   if (!open) return null;
 
   const isDark = theme === "dark";

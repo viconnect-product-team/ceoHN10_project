@@ -5200,6 +5200,13 @@ export class EventsService extends BaseService implements OnModuleInit {
       reg.association_id && String(reg.association_id).match(/^[0-9a-f-]{36}$/i) ? reg.association_id : null,
     ).catch(() => {});
 
+    await this.dispatchTicketLifecycleNotification(
+      reg,
+      'event_checkin',
+      'Check-in sự kiện thành công',
+      `${reg.name || reg.member_name || 'Đại biểu'} đã check-in thành công sự kiện "${reg.event_name || reg.event_title || 'CEO HN10'}" lúc ${now.toLocaleString('vi-VN')}.`,
+    );
+
     const isWalkIn = reg.is_walkin === true || reg.registration_origin === 'walkin_at_door';
     const attendeeType = isWalkIn ? 'WALK_IN_NEW' : 'PRE_REGISTERED';
     const attendeeTypeLabel = isWalkIn ? 'Khách mới đăng ký tại sự kiện' : 'Đại biểu đã đăng ký từ trước';
@@ -5364,6 +5371,13 @@ export class EventsService extends BaseService implements OnModuleInit {
         this.logger.warn(`Lỗi gửi email cảm ơn check-out cho ${reg.email}: ${err?.message}`);
       });
     }
+
+    await this.dispatchTicketLifecycleNotification(
+      reg,
+      'event_checkout',
+      'Check-out sự kiện thành công',
+      `${reg.member_name || 'Đại biểu'} đã check-out thành công khỏi sự kiện "${reg.event_name || reg.event_title || 'CEO HN10'}" lúc ${now.toLocaleString('vi-VN')}. Cảm ơn Quý Anh/Chị đã tham dự!`,
+    );
 
     return {
       ok: true,
@@ -7445,6 +7459,13 @@ export class EventsService extends BaseService implements OnModuleInit {
         .catch(() => {});
     }
 
+    await this.dispatchTicketLifecycleNotification(
+      { id: regId, email, member_code: memberCode, member_name: fullName, event_name: eventTitle },
+      'event_registered',
+      'Đăng ký sự kiện thành công',
+      `${fullName} đã đăng ký thành công sự kiện "${eventTitle}" (Mã vé: ${regId}${totalFee > 0 ? ` — Phí: ${Number(totalFee).toLocaleString('vi-VN')} đ` : ' — Miễn phí'}).`,
+    );
+
     return {
       ok: true,
       regId,
@@ -7459,5 +7480,72 @@ export class EventsService extends BaseService implements OnModuleInit {
       transferContent,
       bankInfo,
     };
+  }
+
+  /**
+   * Gửi thông báo vào hệ thống (App Học viên + CRM) cho Đăng ký, Check-in, Check-out sự kiện
+   */
+  private async dispatchTicketLifecycleNotification(
+    reg: { id: string; email?: string | null; member_code?: string | null; member_name?: string | null; event_name?: string | null; event_title?: string | null },
+    eventKind: 'event_registered' | 'event_checkin' | 'event_checkout',
+    title: string,
+    body: string,
+  ) {
+    try {
+      await this.prisma.$executeRawUnsafe(
+        `INSERT INTO public.notifications (id, type, title, message, target_role, read, app_scope, target_app, created_at)
+         VALUES (gen_random_uuid(), $1, $2, $3, 'all', false, 'crm_platform', 'crm_platform', NOW())`,
+        eventKind,
+        title,
+        body,
+      ).catch(() => {});
+
+      let targetUserId: string | null = null;
+      if (reg.email && String(reg.email).includes('@')) {
+        const uRows = await this.prisma.$queryRawUnsafe<any[]>(
+          `SELECT id FROM public.vione_users WHERE LOWER(email) = LOWER($1) LIMIT 1`,
+          String(reg.email).trim(),
+        ).catch(() => []);
+        targetUserId = uRows[0]?.id || null;
+      }
+      if (!targetUserId && reg.member_code) {
+        const mRows = await this.prisma.$queryRawUnsafe<any[]>(
+          `SELECT user_id FROM public.members WHERE code = $1 AND user_id IS NOT NULL LIMIT 1`,
+          String(reg.member_code).trim(),
+        ).catch(() => []);
+        targetUserId = mRows[0]?.user_id || null;
+      }
+
+      if (targetUserId) {
+        await this.prisma.$executeRawUnsafe(
+          `INSERT INTO public.member_notifications (id, recipient_id, title, body, read, dismissed, ref_type, ref_id, created_at)
+           VALUES (gen_random_uuid(), $1, $2, $3, false, false, $4, $5, NOW())`,
+          targetUserId,
+          title,
+          body,
+          eventKind,
+          reg.id,
+        ).catch(() => {});
+
+        await this.prisma.$executeRawUnsafe(
+          `INSERT INTO public.business_notifications (
+             id, recipient_user_id, source_domain, source_record_id, event_kind, notification_kind,
+             title_key, body_key, safe_display_data, priority, status, dedupe_key, app_scope, target_app, created_at, updated_at
+           ) VALUES (
+             gen_random_uuid(), $1::uuid, 'event', $2, $3, $3,
+             $4, $5, $6::jsonb, 'high', 'delivered', $7, 'all', 'all', NOW(), NOW()
+           )`,
+          targetUserId,
+          reg.id,
+          eventKind,
+          title,
+          body,
+          JSON.stringify({ title, body, regId: reg.id, eventTitle: reg.event_name || reg.event_title }),
+          `${eventKind}-${reg.id}-${Date.now()}`,
+        ).catch(() => {});
+      }
+    } catch (e: any) {
+      this.logger.warn(`dispatchTicketLifecycleNotification warning: ${e?.message}`);
+    }
   }
 }
