@@ -212,12 +212,12 @@ function ForgotPasswordPage() {
         {status !== "success" && (
           <div className="mt-6 space-y-3">
             <input
-              type="email"
+              type="text"
               value={email}
               disabled={status === "loading"}
               onChange={(e) => setEmail(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && submit()}
-              placeholder={t("forgot.email.placeholder")}
+              placeholder="Nhập Email hoặc Mã học viên (VD: HN10-0001)..."
               className={inputCls}
               style={inputStyle}
             />

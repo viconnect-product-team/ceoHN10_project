@@ -222,10 +222,16 @@ function PublicEventCheckinGatePage() {
         const list = Array.isArray(res) ? res : res?.items || [];
         if (list.length > 0) {
           setEventsList(list);
-          const first = list[0];
-          setSelectedEventId(first.id);
-          setSelectedEventName(first.name || first.title || "Sự kiện CLB CEO HN10");
-          const fee = Number(first.fee || first.ticket_price || first.ticketPrice || 0);
+          const urlEventId =
+            typeof window !== "undefined"
+              ? new URLSearchParams(window.location.search).get("eventId")
+              : null;
+          const matched =
+            (urlEventId && list.find((e: any) => e.id === urlEventId || e.slug === urlEventId)) ||
+            list[0];
+          setSelectedEventId(matched.id);
+          setSelectedEventName(matched.name || matched.title || "Sự kiện CLB CEO HN10");
+          const fee = Number(matched.fee || matched.ticket_price || matched.ticketPrice || 0);
           setSelectedEventFee(fee);
           setSelectedEventIsFree(fee === 0);
         }

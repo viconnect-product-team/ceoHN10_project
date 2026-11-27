@@ -11,6 +11,7 @@ import {
   Loader2,
   QrCode,
   RefreshCw,
+  Clock,
 } from "lucide-react";
 import { toast } from "sonner";
 import { fetchNestApi, resolveMediaUrl } from "@/lib/api-client";
@@ -76,15 +77,22 @@ function PublicInvitationPage() {
       })
       .then((res) => {
         setData(res);
+        const isVipFromUrl =
+          typeof window !== "undefined" &&
+          new URLSearchParams(window.location.search).get("vip") === "1";
         if (res?.guest) {
-          setTicketTier(res.guest.guestType === "other_participant" ? "other_participant" : "invited_guest");
+          setTicketTier(
+            res.guest.guestType === "other_participant" && !isVipFromUrl
+              ? "other_participant"
+              : "invited_guest",
+          );
           setCustomFullName(res.guest.fullName || "");
           setCustomTitle(res.guest.title || "");
           setCustomCompany(res.guest.company || "");
           setContactEmail(res.guest.email || "");
           setContactPhone(res.guest.phone || "");
         } else {
-          setTicketTier("other_participant");
+          setTicketTier(isVipFromUrl ? "invited_guest" : "other_participant");
           if (initialSlug) {
             setCustomFullName(formatSlugFallback(initialSlug));
           }
@@ -163,8 +171,13 @@ function PublicInvitationPage() {
   }, [event]);
 
   const timelineItems = useMemo(() => {
-    return parts.flatMap((p) => (Array.isArray(p.items) ? p.items : [])).slice(0, 3);
-  }, [parts]);
+    const items = parts.flatMap((p) =>
+      Array.isArray(p.items) && p.items.length > 0
+        ? p.items
+        : [{ time: p.time || event?.time || "", title: p.name }],
+    );
+    return items;
+  }, [parts, event?.time]);
 
   // Build RSVP Options from event.parts
   const rsvpOptions = useMemo(() => {
@@ -179,12 +192,19 @@ function PublicInvitationPage() {
 
     parts.forEach((p, idx) => {
       const subTimes = Array.isArray(p.items) ? p.items.map((it: any) => `${it.time} ${it.title}`).join(" · ") : "";
-      const feeNum = ticketTier === "invited_guest" ? Number(p.guestFee ?? 0) : Number(p.fee || 0);
+      const rawPartFee = Number(p.fee ?? (parts.length === 1 ? event?.ticketPrice : 0) ?? 0);
+      const feeNum = ticketTier === "invited_guest" ? 0 : rawPartFee;
       opts.push({
         key: `part_${p.id || idx}`,
         mode: "single_part",
         label: `Chỉ tham dự ${p.name}`,
-        desc: `${subTimes ? subTimes + " · " : ""}${feeNum > 0 ? feeNum.toLocaleString("vi-VN") + " đ/người" : "Miễn phí"}`,
+        desc: `${subTimes ? subTimes + " · " : ""}${
+          ticketTier === "invited_guest"
+            ? "Miễn phí (Khách mời / Diễn giả)"
+            : feeNum > 0
+              ? `${feeNum.toLocaleString("vi-VN")} đ/người (Có phí)`
+              : "Miễn phí (0đ)"
+        }`,
         partNames: [p.name],
         unitFee: feeNum,
       });
@@ -192,14 +212,20 @@ function PublicInvitationPage() {
 
     if (parts.length > 1) {
       const totalUnit = parts.reduce(
-        (s, p) => s + (ticketTier === "invited_guest" ? Number(p.guestFee ?? 0) : Number(p.fee || 0)),
+        (s, p) => s + (ticketTier === "invited_guest" ? 0 : Number(p.fee || 0)),
         0,
       );
       opts.push({
         key: "full_all",
         mode: "full",
         label: `Tham dự toàn bộ (${parts.map((p) => p.name).join(" và ")})`,
-        desc: `Bao gồm tất cả ${parts.length} phần · ${totalUnit > 0 ? totalUnit.toLocaleString("vi-VN") + " đ/người" : "Miễn phí"}`,
+        desc: `Bao gồm tất cả ${parts.length} phần · ${
+          ticketTier === "invited_guest"
+            ? "Miễn phí (Khách mời / Diễn giả)"
+            : totalUnit > 0
+              ? `${totalUnit.toLocaleString("vi-VN")} đ/người (Có phí)`
+              : "Miễn phí (0đ)"
+        }`,
         partNames: parts.map((p) => p.name),
         unitFee: totalUnit,
       });
@@ -308,9 +334,11 @@ function PublicInvitationPage() {
       ? rawCustomFont
       : "'Be Vietnam Pro', 'Inter', 'Segoe UI', Roboto, sans-serif";
   const displayProgramItems =
-    Array.isArray(invCfg.invProgramItems) && invCfg.invProgramItems.length > 0
-      ? invCfg.invProgramItems
-      : timelineItems;
+    timelineItems.length > 0
+      ? timelineItems
+      : Array.isArray(invCfg.invProgramItems) && invCfg.invProgramItems.length > 0
+        ? invCfg.invProgramItems
+        : [];
 
   const dateObj = event.date ? new Date(event.date) : new Date();
   const dayNames = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
@@ -319,6 +347,13 @@ function PublicInvitationPage() {
     ? `${String(dateObj.getDate()).padStart(2, "0")}.${String(dateObj.getMonth() + 1).padStart(2, "0")}`
     : "05.12";
   const yearStr = !isNaN(dateObj.getTime()) ? String(dateObj.getFullYear()) : "2026";
+  const eventTimeStr =
+    event.time ||
+    (event.startTime && event.endTime ? `${event.startTime} - ${event.endTime}` : event.startTime || "");
+  const eventVenueStr = event.venueName || invCfg.invVenueName || "Hội trường CLB";
+  const eventLocationStr = event.location || invCfg.invLocation || "Hà Nội";
+  const eventTitleStr = event.name || invCfg.invEventTitle || "Sự kiện CLB CEO HN10";
+  const eventDescriptionStr = (event.description || "").trim();
   const heroBg = customBgImg
     ? resolveMediaUrl(customBgImg) || customBgImg
     : event.image && !String(event.image).includes("unsplash")
@@ -349,12 +384,12 @@ function PublicInvitationPage() {
       </div>
 
       {/* Main Responsive Layout */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 py-8 md:py-10 grid grid-cols-1 md:grid-cols-12 items-center gap-6">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-3.5 sm:px-6 py-5 sm:py-8 md:py-10 grid grid-cols-1 md:grid-cols-12 items-center gap-4 md:gap-6">
         {/* Left Column (Desktop Motto over city skyline) */}
-        <div className="md:col-span-5 flex flex-col justify-between md:min-h-[580px] pt-2 pb-16 md:pb-0">
+        <div className="md:col-span-5 flex flex-col justify-between md:min-h-[580px] pt-1 pb-2 md:pb-0">
           <div>
-            <div className="w-16 h-0.5 bg-gradient-to-r from-slate-200 to-transparent mb-3" />
-            <p className="font-sans italic text-2xl md:text-4xl leading-snug text-slate-100 drop-shadow">
+            <div className="w-12 sm:w-16 h-0.5 bg-gradient-to-r from-slate-200 to-transparent mb-2.5 sm:mb-3" />
+            <p className="font-sans italic text-lg sm:text-2xl md:text-4xl leading-snug text-slate-100 drop-shadow">
               {invCfg.invMotto || (
                 <>
                   Hội Tụ Doanh Trí,
@@ -367,113 +402,138 @@ function PublicInvitationPage() {
         </div>
 
         {/* Right Column (Invitation Content) */}
-        <div className="md:col-span-7 flex flex-col items-center text-center space-y-4">
-          <div className="font-sans italic text-4xl md:text-5xl text-slate-100 tracking-wide">
+        <div className="md:col-span-7 flex flex-col items-center text-center space-y-3.5 sm:space-y-4 min-w-0 w-full">
+          <div className="font-sans italic text-3xl sm:text-4xl md:text-5xl text-slate-100 tracking-wide">
             {invCfg.invHeading || "Thư mời"}
           </div>
 
-          <div className="flex items-center gap-3">
-            <span className="w-20 md:w-28 h-px bg-gradient-to-r from-transparent to-slate-300/80" />
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <span className="w-14 sm:w-20 md:w-28 h-px bg-gradient-to-r from-transparent to-slate-300/80" />
             <span className="w-2 h-2 rotate-45 bg-white shadow" />
-            <span className="w-20 md:w-28 h-px bg-gradient-to-l from-transparent to-slate-300/80" />
+            <span className="w-14 sm:w-20 md:w-28 h-px bg-gradient-to-l from-transparent to-slate-300/80" />
           </div>
 
-          <div className="space-y-1">
-            <div className="text-[11px] md:text-xs uppercase tracking-[0.35em] text-slate-300 font-semibold">
+          <div className="space-y-1 max-w-full px-1">
+            <div className="text-[10.5px] sm:text-xs uppercase tracking-[0.25em] sm:tracking-[0.35em] text-slate-300 font-semibold">
               {invCfg.invSubtitle || "TRÂN TRỌNG KÍNH MỜI"}
             </div>
-            <h1 className="font-sans text-3xl md:text-5xl font-bold text-white tracking-wide drop-shadow">
+            <h1 className="font-sans text-2xl sm:text-3xl md:text-5xl font-bold text-white tracking-wide drop-shadow break-words">
               {displayGuestName}
             </h1>
             {displayGuestOrg && (
-              <p className="text-xs md:text-base text-slate-200 font-normal">
+              <p className="text-xs sm:text-sm md:text-base text-slate-200 font-normal break-words">
                 {displayGuestOrg}
               </p>
             )}
           </div>
 
-          <div className="space-y-2 pt-2">
-            <div className="text-[11px] uppercase tracking-[0.3em] text-slate-300 font-semibold">
+          <div className="space-y-2 pt-1 sm:pt-2 max-w-full px-1">
+            <div className="text-[10.5px] sm:text-[11px] uppercase tracking-[0.25em] sm:tracking-[0.3em] text-slate-300 font-semibold">
               {invCfg.invAttendLabel || "TỚI DỰ"}
             </div>
-            <h2 className="font-sans text-3xl md:text-5xl font-bold uppercase tracking-wider text-white">
-              {invCfg.invEventTitle || event.name}
+            <h2 className="font-sans text-xl sm:text-3xl md:text-5xl font-bold uppercase tracking-wide md:tracking-wider text-white leading-tight break-words">
+              {eventTitleStr}
             </h2>
-            <div className="inline-block bg-white text-slate-900 font-extrabold text-xs md:text-sm tracking-[0.16em] uppercase px-8 py-2 rounded-full shadow-xl">
-              {invCfg.invOrgName || "CLB DOANH NHÂN CEO HN10"}
+            <div className="inline-block bg-white text-slate-900 font-extrabold text-[11px] sm:text-xs md:text-sm tracking-[0.12em] sm:tracking-[0.16em] uppercase px-5 sm:px-8 py-1.5 sm:py-2 rounded-full shadow-xl max-w-full">
+              {invCfg.invOrgName || event.associationName || "CLB DOANH NHÂN CEO HN10"}
             </div>
           </div>
 
           {/* Glassmorphism Info Panel */}
-          <div className="w-full max-w-2xl rounded-2xl border border-white/25 bg-slate-900/75 backdrop-blur-md p-4 md:p-5 shadow-2xl space-y-4 mt-2">
+          <div className="w-full max-w-2xl rounded-2xl border border-white/25 bg-slate-900/75 backdrop-blur-md p-4 sm:p-5 shadow-2xl space-y-4 mt-1 sm:mt-2 text-left sm:text-center">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center border-b border-white/15 pb-4">
-              <div className="flex items-center justify-center gap-3 sm:border-r sm:border-white/15 sm:pr-4">
-                <div className="text-[10px] uppercase tracking-wider text-slate-300 text-right leading-tight">
-                  {dayOfWeek}
-                  <br />
-                  NGÀY
+              <div className="flex flex-col items-center justify-center gap-1.5 sm:border-r sm:border-white/15 sm:pr-4">
+                <div className="flex items-center justify-center gap-3">
+                  <div className="text-[10px] uppercase tracking-wider text-slate-300 text-right leading-tight">
+                    {dayOfWeek}
+                    <br />
+                    NGÀY
+                  </div>
+                  <div className="font-sans text-3xl md:text-4xl font-bold text-white">
+                    {dayMonth}
+                  </div>
+                  <div className="text-[10px] uppercase tracking-wider text-slate-300 text-left leading-tight">
+                    NĂM
+                    <br />
+                    <b className="text-white text-xs">{yearStr}</b>
+                  </div>
                 </div>
-                <div className="font-sans text-3xl md:text-4xl font-bold text-white">
-                  {invCfg.invDateText ? invCfg.invDateText.split(".").slice(0, 2).join(".") : dayMonth}
-                </div>
-                <div className="text-[10px] uppercase tracking-wider text-slate-300 text-left leading-tight">
-                  NĂM
-                  <br />
-                  <b className="text-white text-xs">
-                    {invCfg.invDateText && invCfg.invDateText.split(".")[2] ? invCfg.invDateText.split(".")[2] : yearStr}
-                  </b>
-                </div>
+                {eventTimeStr && (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white/10 text-[11px] font-semibold text-amber-200">
+                    <Clock className="h-3 w-3" />
+                    <span>{eventTimeStr}</span>
+                  </div>
+                )}
               </div>
 
-              <div className="flex items-center justify-center gap-3">
+              <div className="flex items-center justify-center gap-3 min-w-0">
                 <div className="text-[10px] uppercase tracking-wider text-slate-300 text-right leading-tight shrink-0">
                   ĐỊA ĐIỂM
                   <br />
                   HỘI TRƯỜNG
                 </div>
-                <div className="text-left">
-                  <div className="font-sans italic text-xl md:text-2xl text-white leading-tight">
-                    {invCfg.invVenueName || event.venueName || "Hội trường CLB"}
+                <div className="text-left min-w-0">
+                  <div className="font-sans italic text-lg sm:text-xl md:text-2xl text-white leading-tight break-words">
+                    {eventVenueStr}
                   </div>
-                  <div className="text-[11px] text-slate-300">{invCfg.invLocation || event.location || "Hà Nội"}</div>
+                  <div className="text-[11px] text-slate-300 break-words">{eventLocationStr}</div>
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <span className="h-px flex-1 bg-white/20" />
-              <span className="text-[11px] uppercase tracking-[0.25em] text-slate-300 font-semibold">
-                CHƯƠNG TRÌNH
-              </span>
-              <span className="h-px flex-1 bg-white/20" />
-            </div>
+            {eventDescriptionStr && (
+              <p className="text-xs text-slate-200/95 leading-relaxed text-center border-b border-white/10 pb-3 break-words">
+                {eventDescriptionStr}
+              </p>
+            )}
 
-            <div className="grid grid-cols-3 gap-2 relative pt-1">
-              {displayProgramItems.map((it: any, idx: number) => (
-                <div key={idx} className="flex flex-col items-center text-center space-y-1.5">
-                  <span className="font-sans text-sm md:text-lg font-semibold text-white">{it.time}</span>
-                  <span className="w-2.5 h-2.5 rotate-45 bg-white shadow ring-4 ring-slate-800" />
-                  <span className="text-[11px] md:text-xs text-slate-300 leading-snug">{it.title}</span>
+            {displayProgramItems.length > 0 && (
+              <>
+                <div className="flex items-center gap-3">
+                  <span className="h-px flex-1 bg-white/20" />
+                  <span className="text-[11px] uppercase tracking-[0.25em] text-slate-300 font-semibold">
+                    CHƯƠNG TRÌNH
+                  </span>
+                  <span className="h-px flex-1 bg-white/20" />
                 </div>
-              ))}
-            </div>
 
-            <div className="pt-2.5 border-t border-white/15 flex items-center justify-center gap-2 text-xs text-slate-200">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-2.5 relative pt-1">
+                  {displayProgramItems.map((it: any, idx: number) => (
+                    <div
+                      key={idx}
+                      className="flex sm:flex-col items-center sm:text-center gap-2.5 sm:gap-1.5 p-2 sm:p-0 rounded-xl bg-white/5 sm:bg-transparent"
+                    >
+                      <span className="w-2.5 h-2.5 rotate-45 bg-white shadow ring-4 ring-slate-800 shrink-0 sm:order-2" />
+                      <div className="flex flex-col sm:contents min-w-0">
+                        <span className="font-sans text-xs sm:text-sm md:text-base font-semibold text-white sm:order-1">
+                          {it.time || eventTimeStr || "Theo lịch"}
+                        </span>
+                        <span className="text-[11px] md:text-xs text-slate-300 leading-snug break-words sm:order-3">
+                          {it.title}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
+            <div className="pt-2.5 border-t border-white/15 flex items-center justify-center gap-2 text-xs text-slate-200 text-center">
               <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
               <span>Quý Doanh nhân vui lòng xác nhận tham dự để Ban Tổ Chức đón tiếp chu đáo.</span>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-center gap-3 pt-2">
+          <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 pt-1 sm:pt-2">
             <a
               href={mapsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-11 h-11 rounded-full border border-white/30 bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition"
+              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-white/30 bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition shrink-0"
               title="Chỉ đường Google Maps"
             >
-              <MapPin className="h-5 w-5" />
+              <MapPin className="h-4 w-4 sm:h-5 sm:w-5" />
             </a>
 
             <button
@@ -483,9 +543,9 @@ function PublicInvitationPage() {
                 setIsPaidConfirmed(false);
                 setRsvpOpen(true);
               }}
-              className="px-7 py-3 rounded-full bg-gradient-to-b from-white via-slate-100 to-slate-300 text-slate-950 font-extrabold text-sm md:text-base shadow-[0_0_28px_rgba(255,255,255,0.35)] hover:brightness-105 active:scale-95 transition flex items-center gap-2 cursor-pointer"
+              className="px-5 sm:px-7 py-2.5 sm:py-3 rounded-full bg-gradient-to-b from-white via-slate-100 to-slate-300 text-slate-950 font-extrabold text-xs sm:text-sm md:text-base shadow-[0_0_28px_rgba(255,255,255,0.35)] hover:brightness-105 active:scale-95 transition flex items-center gap-2 cursor-pointer whitespace-nowrap"
             >
-              <Check className="h-5 w-5" />
+              <Check className="h-4 w-4 sm:h-5 sm:w-5" />
               <span>{rsvpResult ? "Đã gửi phản hồi ✓" : "Xác nhận tham dự"}</span>
             </button>
 
@@ -493,10 +553,10 @@ function PublicInvitationPage() {
               href={mapsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-11 h-11 rounded-full border border-white/30 bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition"
+              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-white/30 bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition shrink-0"
               title="Lưu lịch"
             >
-              <Calendar className="h-5 w-5" />
+              <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
             </a>
           </div>
 
@@ -520,7 +580,7 @@ function PublicInvitationPage() {
       {/* RSVP MODAL (Không cần đăng nhập) */}
       {rsvpOpen && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-xs p-0 sm:p-4">
-          <div className="relative w-full max-w-lg max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-slate-900 border border-white/15 p-6 text-white shadow-2xl space-y-4">
+          <div className="relative w-full max-w-lg max-h-[90dvh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-slate-900 border border-white/15 p-4 sm:p-6 pb-8 text-white shadow-2xl space-y-4">
             <button
               type="button"
               onClick={() => setRsvpOpen(false)}
@@ -756,13 +816,42 @@ function PublicInvitationPage() {
                       </div>
                     )}
 
-                    {/* Tổng phí thanh toán */}
+                    {/* Tổng phí thanh toán & Nổi luôn QR thanh toán nếu phần chọn có phí */}
                     <div className="flex items-center justify-between p-3.5 rounded-2xl bg-white/10 border border-white/15">
                       <span className="text-xs font-semibold text-slate-200">Tổng phí tham dự:</span>
                       <span className="font-mono text-lg font-black text-emerald-300">
-                        {totalFee > 0 ? `${totalFee.toLocaleString("vi-VN")} VNĐ` : "Miễn phí (0đ)"}
+                        {ticketTier === "invited_guest"
+                          ? "Miễn phí (Khách mời / Diễn giả)"
+                          : totalFee > 0
+                            ? `${totalFee.toLocaleString("vi-VN")} VNĐ`
+                            : "Miễn phí (0đ)"}
                       </span>
                     </div>
+
+                    {ticketTier !== "invited_guest" && totalFee > 0 && data?.sepayConfig?.accountNumber && (
+                      <div className="rounded-2xl border border-amber-400/40 bg-amber-500/10 p-4 text-center space-y-2.5">
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-[11px] font-bold">
+                          <CreditCard className="h-3.5 w-3.5" />
+                          <span>Mã QR Thanh Toán Phí Phần Đã Chọn ({totalFee.toLocaleString("vi-VN")} đ)</span>
+                        </div>
+                        <div className="p-2.5 bg-white rounded-xl inline-block shadow-md">
+                          <img
+                            src={`https://img.vietqr.io/image/${encodeURIComponent(data.sepayConfig.bankName || "MB")}-${encodeURIComponent(data.sepayConfig.accountNumber)}-compact2.png?amount=${totalFee}&addInfo=${encodeURIComponent(`${data.sepayConfig.prefixEvent || "EV"}_RSVP`)}&accountName=${encodeURIComponent(data.sepayConfig.accountHolder || "")}`}
+                            alt="VietQR Thanh Toán"
+                            className="w-44 h-44 object-contain"
+                          />
+                        </div>
+                        <div className="text-[11px] text-slate-200 space-y-0.5">
+                          <div>
+                            <b>{data.sepayConfig.bankName}</b> · STK: <b className="font-mono text-amber-300">{data.sepayConfig.accountNumber}</b>
+                          </div>
+                          <div>Chủ TK: <b>{data.sepayConfig.accountHolder}</b></div>
+                          <p className="text-[10.5px] text-amber-200/90 pt-1">
+                            Bấm nút <b>Gửi xác nhận &amp; Tạo mã QR thanh toán</b> bên dưới để hệ thống cấp Mã vé định danh &amp; tự động đối soát khi chuyển khoản.
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
 

@@ -45,6 +45,7 @@ export function Ceo1983MemberRegistrationForm({
   const [email, setEmail] = useState(initialEmail || "");
   const [position, setPosition] = useState("Tổng Giám Đốc / CEO");
   const [customPosition, setCustomPosition] = useState("");
+  const [boardWish, setBoardWish] = useState("Ban Đối ngoại & Giao thương");
   const [birthDate, setBirthDate] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [industry, setIndustry] = useState("ind.trade");
@@ -142,6 +143,7 @@ export function Ceo1983MemberRegistrationForm({
           phone: phone.trim(),
           email: email.trim().toLowerCase(),
           position: finalPosition,
+          boardWish: boardWish.trim(),
           birthYear: birthDate,
           companyName: companyName.trim(),
           taxCode: taxCode.trim(),
@@ -513,6 +515,27 @@ export function Ceo1983MemberRegistrationForm({
                       className="mt-2 w-full px-4 py-2.5 rounded-xl border border-blue-300 focus:outline-none focus:ring-2 focus:ring-[#003B95] focus:border-transparent text-sm bg-white"
                     />
                   )}
+                </div>
+
+                {/* Mong muốn gia nhập Ban */}
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                    Mong muốn gia nhập Ban <span className="text-rose-500">*</span>
+                  </label>
+                  <select
+                    required
+                    value={boardWish}
+                    onChange={(e) => setBoardWish(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#003B95] focus:border-transparent text-sm bg-slate-50/50"
+                  >
+                    <option value="Ban Đối ngoại & Giao thương">Ban Đối ngoại & Giao thương</option>
+                    <option value="Ban Công nghệ">Ban Công nghệ</option>
+                    <option value="Ban Truyền thông">Ban Truyền thông</option>
+                    <option value="Ban Tài chính">Ban Tài chính</option>
+                    <option value="Ban Sự kiện & Hậu cần">Ban Sự kiện & Hậu cần</option>
+                    <option value="Ban Gắn kết & Đời sống">Ban Gắn kết & Đời sống</option>
+                    <option value="Ban Thiện nguyện">Ban Thiện nguyện</option>
+                  </select>
                 </div>
 
                 {/* Ngày tháng năm sinh - Sửa label và điền ngày tháng năm sinh */}

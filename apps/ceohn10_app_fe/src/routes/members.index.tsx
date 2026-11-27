@@ -28,6 +28,9 @@ import {
   ShieldCheck,
   Mail,
   UploadCloud,
+  Copy,
+  Link2,
+  ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/dashboard/AppShell";
@@ -48,6 +51,7 @@ import { validateMemberForm } from "@/lib/validation";
 import { exportToExcel, formatDisplayDate } from "@/lib/excel-export";
 import { useUrlState } from "@/hooks/use-url-state";
 import { resolveMediaUrl } from "@/lib/api-client";
+import { getPublicAppOrigin } from "@/lib/qr";
 import { Pagination, SortHeader } from "@/components/dashboard/DataTablePagination";
 import { useTableControls } from "@/hooks/use-table-controls";
 import { TruncatedText } from "@/components/dashboard/TruncatedText";
@@ -1132,6 +1136,25 @@ function MembersPage() {
             </button>
             <button
               type="button"
+              onClick={() => {
+                const registerUrl = `${getPublicAppOrigin()}/association/register`;
+                if (navigator?.clipboard?.writeText) {
+                  navigator.clipboard.writeText(registerUrl).then(
+                    () => toast.success(`Đã sao chép link Form đăng ký: ${registerUrl}`),
+                    () => setShowInviteModal(true)
+                  );
+                } else {
+                  setShowInviteModal(true);
+                }
+              }}
+              className="inline-flex items-center gap-2 rounded-xl border border-blue-300 bg-blue-50 px-3.5 py-2 text-sm font-semibold text-blue-800 shadow-xs hover:bg-blue-100 cursor-pointer transition-colors"
+              title="Sao chép hoặc xem đường dẫn Form đăng ký học viên công khai"
+            >
+              <Link2 className="h-4 w-4" />
+              <span>Link Form Đăng Ký</span>
+            </button>
+            <button
+              type="button"
               onClick={() => setShowInviteModal(true)}
               className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-700 to-indigo-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:from-blue-800 hover:to-indigo-800 cursor-pointer transition-colors"
               title="Gửi link form đăng ký thông tin vào email cho học viên mới"
@@ -1846,6 +1869,45 @@ function MembersPage() {
             </div>
 
             <form onSubmit={handleSendInvite} className="space-y-4 pt-4">
+              {/* Link Form Đăng Ký Công Khai (Copy nhanh / Mở trực tiếp) */}
+              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                    <Link2 className="h-3.5 w-3.5 text-blue-600" />
+                    Link Form Đăng Ký Thông Tin
+                  </span>
+                  <a
+                    href="/association/register"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:underline"
+                  >
+                    <span>Mở form</span>
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={`${getPublicAppOrigin()}/association/register`}
+                    className="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-mono text-slate-700 dark:text-slate-200 select-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const url = `${getPublicAppOrigin()}/association/register`;
+                      navigator.clipboard.writeText(url);
+                      toast.success("Đã sao chép link Form đăng ký!");
+                    }}
+                    className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer shrink-0"
+                  >
+                    <Copy className="h-3.5 w-3.5" />
+                    <span>Sao chép</span>
+                  </button>
+                </div>
+              </div>
+
               <div>
                 <label className="block text-xs font-bold text-foreground mb-1">
                   Email học viên / ứng viên <span className="text-rose-500">*</span>

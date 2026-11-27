@@ -18,10 +18,12 @@ import {
   Trash2,
   Save,
   Pencil,
+  Award,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { fetchNestApi, uploadFileToNest, resolveMediaUrl } from "@/lib/api-client";
+import { getPublicAppOrigin } from "@/lib/qr";
 import type { EventItem } from "@/lib/events.functions";
 
 interface InvitationGuest {
@@ -178,8 +180,8 @@ export function EventInvitationBuilderModal({
     phone: "",
   };
 
-  const buildGuestUrl = (slug: string) => {
-    const origin = typeof window !== "undefined" ? window.location.origin : "https://ceohn10.viconnect.vn";
+  const buildGuestUrl = (slug: string, guestType?: "invited_guest" | "other_participant") => {
+    const origin = getPublicAppOrigin();
     const qs = new URLSearchParams({
       bg: cityBgUrl,
       bgColor: bgThemeColor,
@@ -187,6 +189,9 @@ export function EventInvitationBuilderModal({
       accentColor,
       font: fontPreset,
     });
+    if (guestType === "invited_guest") {
+      qs.set("vip", "1");
+    }
     return `${origin}/invitation/${event.id}?${qs.toString()}#${slug}`;
   };
 
@@ -369,7 +374,10 @@ export function EventInvitationBuilderModal({
     }
   };
 
-  const sendEmailsToGuests = async (targetGuests: InvitationGuest[]) => {
+  const sendEmailsToGuests = async (
+    targetGuests: InvitationGuest[],
+    forceGuestType?: "invited_guest" | "other_participant",
+  ) => {
     const validTargets = targetGuests.filter(
       (g) => (g.email && g.email.trim().includes("@")) || (g.phone && g.phone.trim().length >= 8),
     );
@@ -379,6 +387,22 @@ export function EventInvitationBuilderModal({
     }
     setSendingEmails(true);
     try {
+      const preparedTargets = validTargets.map((g) => ({
+        ...g,
+        guestType: forceGuestType || (g.guestType === "other_participant" ? "other_participant" : "invited_guest"),
+      }));
+
+      if (forceGuestType) {
+        const targetSlugSet = new Set(preparedTargets.map((g) => g.slug));
+        setGuests((prev) =>
+          prev.map((item) => (targetSlugSet.has(item.slug) ? { ...item, guestType: forceGuestType } : item)),
+        );
+        await fetchNestApi(`/events/${event.id}/invitation-guests`, {
+          method: "POST",
+          body: JSON.stringify({ guests: preparedTargets }),
+        }).catch(() => {});
+      }
+
       const res = await fetchNestApi<{
         ok: boolean;
         sentCount: number;
@@ -387,29 +411,31 @@ export function EventInvitationBuilderModal({
       }>(`/events/${event.id}/send-invitations`, {
         method: "POST",
         body: JSON.stringify({
-          guests: validTargets.map((g) => ({
+          guests: preparedTargets.map((g) => ({
             slug: g.slug,
             fullName: g.fullName,
             title: g.title,
             company: g.company,
             email: g.email,
             phone: g.phone,
-            link: buildGuestUrl(g.slug),
+            guestType: g.guestType,
+            link: buildGuestUrl(g.slug, g.guestType),
           })),
           template: {
             bgThemeColor,
             textColor,
             accentColor,
             fontPreset,
-            baseUrl: typeof window !== "undefined" ? window.location.origin : "https://ceohn10.viconnect.vn",
+            baseUrl: getPublicAppOrigin(),
           },
         }),
       });
 
       const sentCount = Number(res?.sentCount || 0);
       const failedCount = Number(res?.failedCount || 0);
+      const modeLabel = forceGuestType === "invited_guest" ? " (Khách mời / Diễn giả - Miễn phí)" : "";
       if (sentCount > 0 && failedCount === 0) {
-        toast.success(`Đã gửi link thư mời cá nhân hóa tới ${sentCount} khách (Email / Zalo OA)!`);
+        toast.success(`Đã gửi link thư mời${modeLabel} tới ${sentCount} khách (Email / Zalo OA)!`);
       } else if (sentCount > 0 && failedCount > 0) {
         const firstReason = res?.failed?.[0]?.reason || "Lỗi SMTP";
         toast.warning(`Đã gửi ${sentCount} khách, thất bại ${failedCount} khách (${firstReason}).`);
@@ -424,13 +450,13 @@ export function EventInvitationBuilderModal({
     }
   };
 
-  const handleSendSelectedEmails = async () => {
+  const handleSendSelectedEmails = async (forceGuestType?: "invited_guest" | "other_participant") => {
     const chosen = guests.filter((g) => selectedGuestSlugs.has(g.slug));
     if (chosen.length === 0) {
       toast.error("Vui lòng chọn ít nhất 1 khách mời để gửi thư mời.");
       return;
     }
-    await sendEmailsToGuests(chosen);
+    await sendEmailsToGuests(chosen, forceGuestType);
   };
 
   const allSelected = guests.length > 0 && guests.every((g) => selectedGuestSlugs.has(g.slug));
@@ -560,22 +586,33 @@ export function EventInvitationBuilderModal({
                 <span>({selectedGuestSlugs.size}/{guests.length})</span>
               </div>
               {guests.length > 0 && (
-                <div className="flex items-center gap-1.5">
+                <div className="flex flex-wrap items-center gap-1.5">
                   <button
                     type="button"
-                    onClick={handleSendSelectedEmails}
+                    onClick={() => handleSendSelectedEmails("invited_guest")}
+                    disabled={sendingEmails || selectedGuestSlugs.size === 0}
+                    className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white px-2.5 py-1.5 text-[11px] font-bold cursor-pointer"
+                    title="Đánh dấu là Khách mời / Diễn giả (Miễn phí 100% phí tham dự) và gửi thư mời"
+                  >
+                    {sendingEmails ? <Loader2 className="h-3 w-3 animate-spin" /> : <Award className="h-3 w-3" />}
+                    <span>Gửi Khách Mời / Diễn Giả (0đ) ({selectedGuestSlugs.size})</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSendSelectedEmails("other_participant")}
                     disabled={sendingEmails || selectedGuestSlugs.size === 0}
                     className="inline-flex items-center gap-1 rounded-lg bg-[#003B95] hover:bg-[#002B70] disabled:opacity-50 text-white px-2.5 py-1.5 text-[11px] font-bold cursor-pointer"
+                    title="Gửi thư mời bình thường (hiện đủ các phần & mã QR thanh toán nếu phần chọn có phí)"
                   >
                     {sendingEmails ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3" />}
-                    <span>Gửi tới mail đã chọn ({selectedGuestSlugs.size})</span>
+                    <span>Gửi Bình Thường ({selectedGuestSlugs.size})</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => sendEmailsToGuests(guests)}
                     disabled={sendingEmails}
                     className="inline-flex items-center gap-1 rounded-lg border border-border bg-white hover:bg-slate-50 text-slate-700 px-2 py-1.5 text-[11px] font-bold cursor-pointer disabled:opacity-50"
-                    title="Gửi link thư mời tới tất cả khách mời"
+                    title="Gửi link thư mời tới tất cả khách mời theo phân loại hiện tại"
                   >
                     <Mail className="h-3 w-3" />
                     <span>Gửi tất cả</span>

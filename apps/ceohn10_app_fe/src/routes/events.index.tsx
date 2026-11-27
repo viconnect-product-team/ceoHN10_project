@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { getPublicAppOrigin } from "@/lib/qr";
 import {
   CalendarDays,
   Download,
@@ -653,7 +654,7 @@ function EventsPage() {
         (e as any).coverUrl ||
         (e as any).bannerUrl ||
         "/app-icon.png";
-      const regUrl = `https://ceohn10.viconnect.vn/guest-event-register/${e.id}`;
+      const regUrl = `${getPublicAppOrigin()}/guest-event-register/${e.id}`;
       const checkinQr = regUrl; // Mã QR chứa trực tiếp đường link đăng ký
 
       await fetchNestApi("/feed", {

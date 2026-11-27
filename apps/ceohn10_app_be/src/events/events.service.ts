@@ -7330,8 +7330,9 @@ export class EventsService extends BaseService implements OnModuleInit {
     }
 
     // Trường hợp tham dự 1 phần hoặc toàn bộ (UC-INV-04, UC-INV-05)
-    // Phân loại vé lấy từ CSDL (do Trưởng ban Truyền thông / Trưởng ban Sự kiện & Hậu cần chỉ định), không cho khách tự chọn
-    let ticketTier: 'invited_guest' | 'other_participant' = 'other_participant';
+    // Phân loại vé lấy từ CSDL (hoặc nút Khách mời / Diễn giả miễn phí)
+    let ticketTier: 'invited_guest' | 'other_participant' =
+      body.ticketTier === 'invited_guest' ? 'invited_guest' : 'other_participant';
     if (body.guestSlug && String(body.guestSlug).trim()) {
       const gRows = await this.prisma.$queryRaw<any[]>`
         SELECT guest_type FROM public.event_invitation_guests
@@ -7342,14 +7343,33 @@ export class EventsService extends BaseService implements OnModuleInit {
         ticketTier = gRows[0].guest_type === 'other_participant' ? 'other_participant' : 'invited_guest';
       }
     }
-    const tierBadge = ticketTier === 'invited_guest' ? 'Vé Khách mời' : 'Vé Khách tham dự';
+
+    // Khách mời / Diễn giả (invited_guest) luôn được miễn phí 100% dù sự kiện có phí
+    let effectiveTotalFee = 0;
+    if (ticketTier === 'other_participant') {
+      const evParts = parseJsonArraySafe(ev.parts);
+      if (evParts.length > 0 && selectedPartNames.length > 0) {
+        const unitSum = evParts.reduce((sum: number, p: any) => {
+          if (selectedPartNames.includes(String(p?.name || ''))) {
+            return sum + Math.max(0, Number(p?.fee || 0));
+          }
+          return sum;
+        }, 0);
+        effectiveTotalFee = unitSum > 0 ? unitSum * attendeeCount : totalFee;
+      } else {
+        const fallbackUnit = Math.max(0, Number(ev.ticket_price || 0));
+        effectiveTotalFee = totalFee > 0 ? totalFee : fallbackUnit * attendeeCount;
+      }
+    }
+
+    const tierBadge = ticketTier === 'invited_guest' ? 'Vé Khách mời / Diễn giả (0đ)' : 'Vé Khách tham dự';
     const partsLabel =
       attendMode === 'full'
         ? `${tierBadge} · Tham dự toàn bộ (${selectedPartNames.join(' + ') || 'Lễ + Tiệc'})`
         : `${tierBadge} · Chỉ dự: ${selectedPartNames.join(', ') || '1 phần'}`;
 
-    const paymentStatus = totalFee > 0 ? 'pending' : 'free';
-    const regStatus = totalFee > 0 ? 'pending' : 'confirmed';
+    const paymentStatus = effectiveTotalFee > 0 ? 'pending' : 'free';
+    const regStatus = effectiveTotalFee > 0 ? 'pending' : 'confirmed';
     const dynamicPayload = {
       title,
       company,
@@ -7366,7 +7386,7 @@ export class EventsService extends BaseService implements OnModuleInit {
         status, payment_status, payment_amount, attended_parts, dynamic_data, note, created_at, updated_at
       ) VALUES (
         ${regId}, ${eventId}, ${memberCode}, ${ev.association_id}::uuid, ${fullName}, ${company}, ${email}, ${phone},
-        ${partsLabel}, ${attendeeCount}, ${regStatus}, ${paymentStatus}, ${totalFee},
+        ${partsLabel}, ${attendeeCount}, ${regStatus}, ${paymentStatus}, ${effectiveTotalFee},
         ${JSON.stringify(selectedPartNames)}::jsonb,
         ${JSON.stringify(dynamicPayload)}::jsonb,
         ${partsLabel}, now(), now()
@@ -7386,7 +7406,7 @@ export class EventsService extends BaseService implements OnModuleInit {
     let vietQrUrl = '';
     let transferContent = '';
     let bankInfo: any = null;
-    if (totalFee > 0) {
+    if (effectiveTotalFee > 0) {
       const pubInfo = await this.getPublicInvitation(eventId);
       const cfg = pubInfo.sepayConfig;
       if (cfg.accountNumber) {
@@ -7396,10 +7416,10 @@ export class EventsService extends BaseService implements OnModuleInit {
               bankName: cfg.bankName,
               accountNumber: cfg.accountNumber,
               accountHolder: cfg.accountHolder,
-              amount: totalFee,
+              amount: effectiveTotalFee,
               memo: transferContent,
             })
-          : `https://img.vietqr.io/image/${encodeURIComponent(cfg.bankName || 'MB')}-${encodeURIComponent(cfg.accountNumber)}-compact2.png?amount=${totalFee}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(cfg.accountHolder)}`;
+          : `https://img.vietqr.io/image/${encodeURIComponent(cfg.bankName || 'MB')}-${encodeURIComponent(cfg.accountNumber)}-compact2.png?amount=${effectiveTotalFee}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(cfg.accountHolder)}`;
       }
       bankInfo = cfg;
     }
@@ -7414,7 +7434,7 @@ export class EventsService extends BaseService implements OnModuleInit {
       const receiptHtml = `
         <div style="font-family:'Be Vietnam Pro','Segoe UI',Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;background:#ffffff;color:#0f172a;border:1px solid #e2e8f0;border-radius:12px;">
           <p style="font-size:12px;font-weight:700;color:#003B95;text-transform:uppercase;margin:0 0 6px 0;">CLB DOANH NHÂN CEO HN10 — XÁC NHẬN VÉ SỰ KIỆN</p>
-          <h2 style="margin:0 0 12px 0;font-size:20px;color:#0f172a;">${totalFee > 0 ? 'Thông Tin Đăng Ký & Thanh Toán Vé' : 'Vé Điện Tử Tham Dự Sự Kiện'}</h2>
+          <h2 style="margin:0 0 12px 0;font-size:20px;color:#0f172a;">${effectiveTotalFee > 0 ? 'Thông Tin Đăng Ký & Thanh Toán Vé' : 'Vé Điện Tử Tham Dự Sự Kiện'}</h2>
           <div style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:10px;padding:14px 16px;font-size:13px;line-height:1.7;">
             <div><strong>Khách tham dự:</strong> ${fullName} (${attendeeCount} người)</div>
             <div><strong>Sự kiện:</strong> ${eventTitle}</div>
@@ -7423,17 +7443,17 @@ export class EventsService extends BaseService implements OnModuleInit {
             <div><strong>Mã vé của Quý khách:</strong> <span style="font-family:monospace;font-size:15px;font-weight:800;color:#003B95;">${regId}</span></div>
             ${formattedDate ? `<div><strong>Thời gian:</strong> ${formattedDate}</div>` : ''}
             ${evLocation ? `<div><strong>Địa điểm:</strong> ${evLocation}</div>` : ''}
-            <div><strong>Tổng phí:</strong> <strong style="color:${totalFee > 0 ? '#d97706' : '#059669'};">${totalFee > 0 ? `${totalFee.toLocaleString('vi-VN')} VNĐ` : 'Miễn phí (0đ)'}</strong></div>
+            <div><strong>Tổng phí:</strong> <strong style="color:${effectiveTotalFee > 0 ? '#d97706' : '#059669'};">${effectiveTotalFee > 0 ? `${effectiveTotalFee.toLocaleString('vi-VN')} VNĐ` : 'Miễn phí (0đ)'}</strong></div>
           </div>
           ${
-            totalFee > 0 && vietQrUrl
+            effectiveTotalFee > 0 && vietQrUrl
               ? `<div style="margin-top:18px;text-align:center;padding:16px;border:1px dashed #f59e0b;border-radius:10px;background:#fffbeb;">
                   <div style="font-size:13px;font-weight:700;color:#b45309;margin-bottom:8px;">QUÉT MÃ VIETQR ĐỂ THANH TOÁN PHÍ SỰ KIỆN</div>
                   <img src="${vietQrUrl}" alt="VietQR Thanh Toán" style="width:220px;height:220px;object-fit:contain;border-radius:8px;background:#fff;padding:6px;" />
                   <div style="margin-top:8px;font-size:12px;color:#334155;">
                     <div><strong>Ngân hàng:</strong> ${bankInfo?.bankName || ''} — <strong>STK:</strong> ${bankInfo?.accountNumber || ''}</div>
                     <div><strong>Chủ TK:</strong> ${bankInfo?.accountHolder || ''}</div>
-                    <div><strong>Số tiền:</strong> ${totalFee.toLocaleString('vi-VN')} VNĐ</div>
+                    <div><strong>Số tiền:</strong> ${effectiveTotalFee.toLocaleString('vi-VN')} VNĐ</div>
                     <div><strong>Nội dung CK:</strong> <code style="font-weight:700;">${transferContent}</code></div>
                   </div>
                 </div>`
@@ -7450,7 +7470,7 @@ export class EventsService extends BaseService implements OnModuleInit {
         .sendDirectEmail({
           to: email,
           subject:
-            totalFee > 0
+            effectiveTotalFee > 0
               ? `[VÉ & QR THANH TOÁN] ${eventTitle} — Mã vé ${regId}`
               : `[VÉ SỰ KIỆN] ${eventTitle} — Mã vé ${regId}`,
           html: receiptHtml,
@@ -7463,7 +7483,7 @@ export class EventsService extends BaseService implements OnModuleInit {
       { id: regId, email, member_code: memberCode, member_name: fullName, event_name: eventTitle },
       'event_registered',
       'Đăng ký sự kiện thành công',
-      `${fullName} đã đăng ký thành công sự kiện "${eventTitle}" (Mã vé: ${regId}${totalFee > 0 ? ` — Phí: ${Number(totalFee).toLocaleString('vi-VN')} đ` : ' — Miễn phí'}).`,
+      `${fullName} đã đăng ký thành công sự kiện "${eventTitle}" (Mã vé: ${regId}${effectiveTotalFee > 0 ? ` — Phí: ${Number(effectiveTotalFee).toLocaleString('vi-VN')} đ` : ' — Miễn phí'}).`,
     );
 
     return {
@@ -7474,7 +7494,7 @@ export class EventsService extends BaseService implements OnModuleInit {
       attendMode,
       partsLabel,
       attendeeCount,
-      totalFee,
+      totalFee: effectiveTotalFee,
       paymentStatus,
       vietQrUrl,
       transferContent,

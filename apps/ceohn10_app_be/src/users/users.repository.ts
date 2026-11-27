@@ -97,8 +97,7 @@ export class UsersRepository {
     const memberCodeRows: any[] = (await this.prisma
       .$queryRawUnsafe<any[]>(
         `SELECT user_id, email FROM public.members 
-         WHERE (LOWER(TRIM(COALESCE(code, ''))) = LOWER(TRIM($1)) 
-            OR LOWER(TRIM(COALESCE(member_code, ''))) = LOWER(TRIM($1)))
+         WHERE LOWER(TRIM(COALESCE(code, ''))) = LOWER(TRIM($1))
          LIMIT 1`,
         input,
       )

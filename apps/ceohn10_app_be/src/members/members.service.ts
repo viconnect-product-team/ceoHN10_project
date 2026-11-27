@@ -4244,7 +4244,7 @@ Trân trọng cảm ơn Anh/Chị!`;
           ${taxCode || null},
           ${aboutMeta},
           'member',
-          'Học viên ceohn10',
+          ${boardWish && boardWish.trim() ? boardWish.trim() : 'Học viên ceohn10'},
           ${staffSize || null},
           ${parsedEmployees},
           ${companyName},
@@ -4284,7 +4284,7 @@ Trân trọng cảm ơn Anh/Chị!`;
             ${taxCode || null},
             ${aboutMeta},
             'member',
-            'Học viên ceohn10',
+            ${boardWish && boardWish.trim() ? boardWish.trim() : 'Học viên ceohn10'},
             ${staffSize || null},
             ${parsedEmployees},
             ${companyName},
@@ -5087,12 +5087,40 @@ Trân trọng cảm ơn Anh/Chị!`;
               address, fee_paid, fee_year, joined_at, created_at, updated_at,
               association_id, executive_role, department, code
             ) VALUES (
-              ${newId}, ${name}, ${name}, ${company || null}, ${email || null}, ${phone || null}, 'individual', 'Chính thức', ${industry}, 'active',
+              ${newId}, ${name}, ${name}, ${company || null}, ${email || null}, ${phone || null}, 'individual', 'Chính thức', ${industry}, 'pending',
               ${address || null}, true, 2026, NOW()::date::text, NOW(), NOW(),
               ${defaultAssocId}::uuid, ${title}, ${department}, ${code}
             )
           `;
           created++;
+
+          // Gửi email mời tham gia lớp học CEOHN10 kèm link Form đăng ký thông tin
+          if (email && email.includes('@') && this.mailService) {
+            const appBaseUrl = (
+              process.env.MEMBER_APP_URL ||
+              process.env.APP_URL ||
+              'https://ceohn10.viconnect.vn'
+            ).replace(/\/$/, '');
+            const regUrl = `${appBaseUrl}/association/register?email=${encodeURIComponent(email)}`;
+            void this.mailService.sendDirectEmail({
+              to: email,
+              subject: '[CLB CEO HN10] Thư Mời Tham Gia Lớp Học CEOHN10 & Hoàn Tất Đăng Ký',
+              html: `
+                <div style="font-family: 'Be Vietnam Pro', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 14px; background: #ffffff;">
+                  <div style="background: #003B95; color: #ffffff; padding: 18px 22px; border-radius: 10px; margin-bottom: 18px;">
+                    <div style="font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #93c5fd;">CLB DOANH NHÂN CEO HN10</div>
+                    <h2 style="margin: 4px 0 0; font-size: 19px; color: #ffffff;">Thư Mời Tham Gia Lớp Học CEOHN10</h2>
+                  </div>
+                  <p style="font-size: 14px; color: #1e293b;">Kính chào Quý Doanh nhân <strong>${name}</strong>,</p>
+                  <p style="font-size: 14px; color: #334155; line-height: 1.6;">Trân trọng kính mời Quý Anh/Chị tham gia cộng đồng lớp học <strong>CEO HN10</strong>. Vui lòng bấm vào nút bên dưới để điền đầy đủ thông tin đăng ký (Họ tên, SĐT, Email, Công ty, Chức danh, Mong muốn gia nhập Ban):</p>
+                  <div style="margin: 22px 0; text-align: center;">
+                    <a href="${regUrl}" style="display: inline-block; background: #003B95; color: #ffffff; text-decoration: none; font-weight: 700; padding: 12px 24px; border-radius: 8px; font-size: 14px;">Điền Form Đăng Ký Gia Nhập CEOHN10</a>
+                  </div>
+                  <p style="font-size: 12.5px; color: #64748b;">Sau khi gửi thông tin, Admin Platform hoặc Lớp trưởng sẽ phê duyệt và gửi tài khoản cùng Mã số học viên qua Email cho Quý Anh/Chị.</p>
+                </div>
+              `,
+            }).catch(() => {});
+          }
         }
       } catch (err) {
         this.logger.error(`Error importing member ${name}:`, err);
@@ -5152,7 +5180,7 @@ Trân trọng cảm ơn Anh/Chị!`;
     }
 
     const appUrl = process.env.APP_URL || process.env.FRONTEND_URL || 'http://localhost:5173';
-    const registerUrl = `${appUrl}/register?email=${encodeURIComponent(cleanEmail)}&ref=invite_${encodeURIComponent(adminUserId)}`;
+    const registerUrl = `${appUrl}/association/register?email=${encodeURIComponent(cleanEmail)}&ref=invite_${encodeURIComponent(adminUserId)}`;
 
     const subject = `[CLB CEO HN10 - HanoiBA] Thư Mời Đăng Ký Gia Nhập CEOHN10 Doanh Nhân`;
     const recipientName = data.name?.trim() || 'Quý Doanh Nhân';

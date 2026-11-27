@@ -212,7 +212,7 @@ export function AssociationAppSignIn({
         >
           <div className="space-y-1">
             <label htmlFor="assoc-auth-id" className="block text-[12px] font-semibold text-slate-700 uppercase tracking-wide">
-              {lang === "en" ? "Email or Phone Number" : "Email hoặc Số điện thoại"}
+              {lang === "en" ? "Email or Member Code" : "Email hoặc Mã học viên"}
             </label>
             <div className="relative">
               <User
@@ -225,7 +225,7 @@ export function AssociationAppSignIn({
                 autoComplete="username"
                 value={identifier}
                 onChange={(e) => onIdentifierChange(e.target.value)}
-                placeholder={lang === "en" ? "Enter email or phone number..." : "Nhập email hoặc số điện thoại..."}
+                placeholder={lang === "en" ? "Enter email or member code (e.g. HN10-0001)..." : "Nhập email hoặc mã học viên (VD: HN10-0001)..."}
                 className={fieldClass}
                 required
               />

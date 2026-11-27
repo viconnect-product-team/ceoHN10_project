@@ -1,5 +1,6 @@
 import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
 import { useState, useEffect, useMemo } from "react";
+import { getPublicAppOrigin } from "@/lib/qr";
 import {
   Copy,
   Check,
@@ -225,11 +226,7 @@ function CheckinQrSetupPage() {
     }
   };
 
-  const isLocalHost =
-    typeof window !== "undefined" &&
-    (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
-
-  const publicAppOrigin = isLocalHost ? window.location.origin : "https://ceohn10.viconnect.vn";
+  const publicAppOrigin = getPublicAppOrigin();
 
   // URL 2 Mã QR tối đa theo yêu cầu
   const registerUrl = activeEvent ? `${publicAppOrigin}/guest-event-register/${activeEvent.id}` : "";

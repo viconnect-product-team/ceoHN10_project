@@ -649,47 +649,109 @@ Kính chúc Doanh nghiệp của Anh/Chị luôn phát triển thịnh vượng,
 
   async forgotPassword(email: string) {
     if (!email || !email.trim()) {
-      throw new BadRequestException('Vui lòng nhập email hoặc tài khoản đăng nhập');
+      throw new BadRequestException('Vui lòng nhập email hoặc mã học viên đăng nhập');
     }
-    const cleanEmail = email.trim().toLowerCase();
+    const cleanInput = email.trim().toLowerCase();
     const user =
-      (await this.usersService.findByEmail(cleanEmail).catch(() => null)) ||
-      (await this.usersService.findByUsername(cleanEmail).catch(() => null));
+      (await this.usersService.findByEmail(cleanInput).catch(() => null)) ||
+      (await this.usersService.findByUsername(cleanInput).catch(() => null));
 
-    if (user) {
-      const targetEmail = (user.email || cleanEmail).toLowerCase().trim();
-      const memberName = user.name || user.username || targetEmail;
+    if (!user) {
+      throw new BadRequestException('Không tìm thấy tài khoản hoặc mã học viên tương ứng trên hệ thống.');
+    }
 
-      // Bắn thông báo về CRM (public.notifications) để Ban Quản Trị bấm vào xử lý và đặt mật khẩu mới
-      if (this.prisma) {
-        const actionUrl = `/account-settings?tab=users&action=reset_password&userId=${user.id}&email=${encodeURIComponent(targetEmail)}`;
-        await this.prisma.$executeRaw`
-          INSERT INTO public.notifications (
-            id, title, message, body, type, category, priority, app_scope, target_app, target_url, created_at, updated_at
-          ) VALUES (
-            gen_random_uuid(),
-            ${'Yêu cầu cấp lại mật khẩu: ' + memberName},
-            ${'Học viên ' + memberName + ' (' + targetEmail + ') đã gửi yêu cầu cấp lại mật khẩu. Vui lòng bấm vào thông báo này để thiết lập mật khẩu mới.'},
-            ${'Học viên ' + memberName + ' (' + targetEmail + ') đã gửi yêu cầu cấp lại mật khẩu. Vui lòng bấm vào thông báo này để thiết lập mật khẩu mới.'},
-            'forgot_password',
-            'security',
-            'high',
-            'crm',
-            'crm',
-            ${actionUrl},
-            NOW(),
-            NOW()
-          )
-        `.catch((e) => {
-          console.warn('[forgotPassword] Error inserting notification to CRM:', e?.message);
+    const targetEmail = (user.email || cleanInput).toLowerCase().trim();
+    const memberName = user.name || user.username || targetEmail;
+    const newPasswordRaw = `CEOHN10@${Math.floor(1000 + Math.random() * 9000)}`;
+    const hashedPassword = await bcrypt.hash(newPasswordRaw, 10);
+
+    if (this.prisma) {
+      await this.prisma.$executeRaw`
+        UPDATE public.vione_users
+        SET password = ${hashedPassword}, updated_at = NOW()
+        WHERE id = ${user.id}::uuid
+      `.catch(() => {});
+
+      await this.prisma.$executeRawUnsafe(
+        `UPDATE public.ceohn10_users SET password = $1, updated_at = NOW() WHERE id = $2::uuid OR LOWER(email) = $3`,
+        hashedPassword,
+        user.id,
+        targetEmail,
+      ).catch(() => {});
+
+      await this.prisma.$executeRaw`
+        UPDATE public.user_profiles
+        SET must_change_password = true, updated_at = NOW()
+        WHERE user_id = ${user.id}::uuid
+      `.catch(() => {});
+
+      const memberRows = await this.prisma.$queryRaw<any[]>`
+        SELECT code FROM public.members
+        WHERE user_id = ${user.id}::uuid OR LOWER(email) = ${targetEmail}
+        LIMIT 1
+      `.catch(() => []);
+      const memberCode = memberRows[0]?.code || '';
+
+      const appBaseUrl = (
+        process.env.MEMBER_APP_URL ||
+        process.env.APP_URL ||
+        'https://ceohn10.viconnect.vn'
+      ).replace(/\/$/, '');
+      const loginUrl = `${appBaseUrl}/association/login`;
+
+      if (targetEmail.includes('@') && this.mailService) {
+        await this.mailService.sendDirectEmail({
+          to: targetEmail,
+          subject: '[CLB CEO HN10] Cấp Lại Mật Khẩu Đăng Nhập Mới',
+          html: `
+            <div style="font-family: 'Be Vietnam Pro', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 14px; background: #ffffff;">
+              <div style="background: #003B95; color: #ffffff; padding: 18px 22px; border-radius: 10px; margin-bottom: 18px;">
+                <div style="font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #93c5fd;">CLB DOANH NHÂN CEO HN10</div>
+                <h2 style="margin: 4px 0 0; font-size: 19px; color: #ffffff;">Cấp Lại Mật Khẩu Mới</h2>
+              </div>
+              <p style="font-size: 14px; color: #1e293b;">Kính chào Quý Doanh nhân <strong>${memberName}</strong>,</p>
+              <p style="font-size: 14px; color: #334155; line-height: 1.6;">Hệ thống vừa tiếp nhận yêu cầu Quên mật khẩu và đã tự động cấp lại mật khẩu mới cho tài khoản của Quý Anh/Chị:</p>
+              <div style="background: #f8fafc; border-left: 4px solid #003B95; padding: 14px 16px; border-radius: 0 8px 8px 0; margin: 16px 0; font-size: 13.5px; line-height: 1.8;">
+                <div><strong>Email đăng nhập:</strong> ${targetEmail}</div>
+                ${memberCode ? `<div><strong>Mã học viên (có thể dùng đăng nhập):</strong> <span style="font-family: monospace; font-weight: 700; color: #003B95;">${memberCode}</span></div>` : ''}
+                <div><strong>Mật khẩu mới:</strong> <span style="font-family: monospace; font-size: 15px; font-weight: 800; color: #003B95; background: #eff6ff; padding: 2px 8px; border-radius: 4px;">${newPasswordRaw}</span></div>
+              </div>
+              <p style="font-size: 13px; color: #64748b;">Vui lòng đăng nhập bằng mật khẩu mới ở trên và đổi lại mật khẩu riêng để đảm bảo an toàn tài khoản.</p>
+              <div style="margin: 20px 0; text-align: center;">
+                <a href="${loginUrl}" style="display: inline-block; background: #003B95; color: #ffffff; text-decoration: none; font-weight: 700; padding: 12px 24px; border-radius: 8px; font-size: 14px;">Đăng Nhập App CEO HN10</a>
+              </div>
+            </div>
+          `,
+        }).catch((err) => {
+          console.warn('[forgotPassword] Error sending reset password email:', err?.message);
         });
       }
+
+      const actionUrl = `/members`;
+      await this.prisma.$executeRaw`
+        INSERT INTO public.notifications (
+          id, title, message, body, type, category, priority, app_scope, target_app, target_url, created_at, updated_at
+        ) VALUES (
+          gen_random_uuid(),
+          ${'Đã cấp lại mật khẩu: ' + memberName},
+          ${'Hệ thống đã tự động cấp lại mật khẩu mới và gửi về Email ' + targetEmail + ' theo yêu cầu Quên mật khẩu.'},
+          ${'Hệ thống đã tự động cấp lại mật khẩu mới và gửi về Email ' + targetEmail + ' theo yêu cầu Quên mật khẩu.'},
+          'forgot_password',
+          'security',
+          'medium',
+          'crm',
+          'crm',
+          ${actionUrl},
+          NOW(),
+          NOW()
+        )
+      `.catch(() => {});
     }
 
     return {
       ok: true,
       success: true,
-      message: 'Yêu cầu cấp lại mật khẩu đã được gửi đến Ban Quản Trị CRM. Quản trị viên sẽ thiết lập mật khẩu mới và tự động gửi thông báo về Email cùng Zalo OA của Quý Học viên.',
+      message: `Mật khẩu mới đã được tự động cấp lại và gửi về Email ${targetEmail}. Quý Học viên vui lòng kiểm tra hộp thư để đăng nhập!`,
     };
   }
 

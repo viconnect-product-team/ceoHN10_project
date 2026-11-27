@@ -529,8 +529,16 @@ async function handleResponse(response: Response, endpoint = "") {
 
       const isPublicRoute =
         pathname.startsWith("/guest-event-register") ||
+        pathname.startsWith("/event-checkin") ||
+        pathname.startsWith("/association/register") ||
+        pathname === "/register" ||
+        pathname.startsWith("/register") ||
         pathname.startsWith("/invitation") ||
-        pathname.startsWith("/events/") && pathname.endsWith("/register") ||
+        pathname.startsWith("/public-voting") ||
+        pathname.startsWith("/guest-voting") ||
+        pathname.startsWith("/guest-event-feedback") ||
+        pathname.startsWith("/card/") ||
+        (pathname.startsWith("/events/") && pathname.endsWith("/register")) ||
         pathname.startsWith("/guest-attendance") ||
         pathname.startsWith("/guest-invite") ||
         pathname.startsWith("/p/") ||

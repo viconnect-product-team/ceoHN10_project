@@ -7,12 +7,33 @@ export function getQrUrl(data: string, size = 300): string {
   return `/api/events/qr?data=${encodeURIComponent(data)}&size=${size}`;
 }
 
+export function getPublicAppOrigin(): string {
+  const envUrl = (import.meta as any).env?.VITE_PUBLIC_APP_URL;
+  if (typeof window !== "undefined") {
+    const { protocol, hostname, port, origin } = window.location;
+    if (port === "5032") {
+      return `${protocol}//${hostname}:5030`;
+    }
+    if (hostname.startsWith("crm.")) {
+      return `${protocol}//${hostname.slice(4)}`;
+    }
+    if (hostname === "localhost" || hostname === "127.0.0.1" || port === "5030") {
+      return origin;
+    }
+    if (envUrl && typeof envUrl === "string" && envUrl.trim()) {
+      return envUrl.trim().replace(/\/+$/, "");
+    }
+    return origin;
+  }
+  if (envUrl && typeof envUrl === "string" && envUrl.trim()) {
+    return envUrl.trim().replace(/\/+$/, "");
+  }
+  return "https://ceohn10.viconnect.vn";
+}
+
 export function getAbsoluteQrUrl(data: string, size = 300): string {
   const rel = getQrUrl(data, size);
   if (!rel) return "";
-  if (typeof window !== "undefined" && window.location?.origin) {
-    return `${window.location.origin}${rel}`;
-  }
-  return `https://ceohn10.viconnect.vn${rel}`;
+  return `${getPublicAppOrigin()}${rel}`;
 }
 
