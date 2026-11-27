@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { EventWizard } from "@/components/dashboard/EventWizard";
 import {
   ArrowLeft,
   CalendarDays,
@@ -757,20 +758,14 @@ function EventDetailPage() {
       )}
       {canManage && <div className="h-20 md:hidden" />}
 
-      <CrudModal
+      <EventWizard
         open={editOpen}
-        title={t("common.editTitle")}
-        fields={fields}
-        initial={({
-          ...event,
-          sponsors: event.sponsors || [],
-          qrStaff: (event as any).qrStaff || (event as any).qrScanners || [],
-        }) as unknown as CrudValues}
-        submitting={submitting}
-        submitLabel={t("common.save")}
-        cancelLabel={t("common.cancel")}
-        onSubmit={onSubmit}
+        editingEvent={event}
         onClose={() => setEditOpen(false)}
+        onCreated={async () => {
+          setEditOpen(false);
+          await router.invalidate();
+        }}
       />
 
       {/* Event Cancel Confirmation Modal */}

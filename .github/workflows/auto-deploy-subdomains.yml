@@ -211,6 +211,14 @@ jobs:
             docker rm -f ceohn10-crm-frontend-prod ceohn10-crm-backend-prod 2>/dev/null || true
             docker compose -f docker-compose.yml up -d --force-recreate
 
+            echo ">>> [4b/5] Cập nhật Cụm Test (https://14.225.217.232:5030 & :5032)..."
+            if [ -f /root/ceohn10-test/docker-compose.yml ]; then
+              cp -a /root/deploy-cache/deploy/test/. /root/ceohn10-test/
+              cd /root/ceohn10-test
+              sed -i 's/\r$//' docker-compose.yml nginx.test.conf .env.test.app .env.test.crm 2>/dev/null || true
+              docker compose -f docker-compose.yml up -d --force-recreate
+            fi
+
             echo ">>> [5/5] Bỏ qua cấu hình Nginx SSL (server dev đã có sẵn Nginx SSL; chỉ chạy khi chọn target=ssl)."
             if [ "${{ github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'ssl' }}" = "true" ]; then
               mkdir -p /root/ssl-proxy

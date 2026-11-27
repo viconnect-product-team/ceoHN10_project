@@ -1254,6 +1254,52 @@ export class EventsService extends BaseService implements OnModuleInit {
       data.category !== undefined
         ? String(data.category).trim()
         : (current.category ?? 'su_kien_clb');
+    const timeStr =
+      (data as any).time !== undefined
+        ? String((data as any).time || '').trim()
+        : startTime || endTime
+          ? `${startTime || '08:30'} - ${endTime || '11:30'}`
+          : (current.time ?? '');
+    const customFieldsJson = JSON.stringify(
+      Array.isArray((data as any).customFields)
+        ? (data as any).customFields
+        : Array.isArray((data as any).dynamicFields)
+          ? (data as any).dynamicFields
+          : parseJsonArraySafe(current.custom_fields),
+    );
+    const isPaid =
+      (data as any).isPaid !== undefined
+        ? Boolean((data as any).isPaid)
+        : Boolean(current.is_paid || safeTicketPrice > 0);
+    const isFixed =
+      (data as any).isFixed !== undefined
+        ? Boolean((data as any).isFixed)
+        : Boolean(current.is_fixed);
+    const recurrenceRule =
+      (data as any).recurrenceRule !== undefined
+        ? String((data as any).recurrenceRule || '')
+        : (current.recurrence_rule ?? '');
+
+    // Đảm bảo các cột mở rộng tồn tại trên DB trước khi UPDATE để không bao giờ bị rơi về fallback thiếu cột
+    await this.prisma.$executeRawUnsafe(`
+      ALTER TABLE public.events
+        ADD COLUMN IF NOT EXISTS tagline text,
+        ADD COLUMN IF NOT EXISTS venue_name text,
+        ADD COLUMN IF NOT EXISTS parts jsonb,
+        ADD COLUMN IF NOT EXISTS start_time text,
+        ADD COLUMN IF NOT EXISTS end_time text,
+        ADD COLUMN IF NOT EXISTS time text,
+        ADD COLUMN IF NOT EXISTS is_paid boolean DEFAULT false,
+        ADD COLUMN IF NOT EXISTS is_fixed boolean DEFAULT false,
+        ADD COLUMN IF NOT EXISTS recurrence_rule text,
+        ADD COLUMN IF NOT EXISTS custom_fields jsonb,
+        ADD COLUMN IF NOT EXISTS photo_gallery_url text,
+        ADD COLUMN IF NOT EXISTS banner text,
+        ADD COLUMN IF NOT EXISTS qr_scanners jsonb,
+        ADD COLUMN IF NOT EXISTS sponsors jsonb,
+        ADD COLUMN IF NOT EXISTS agenda jsonb,
+        ADD COLUMN IF NOT EXISTS checkin_qr text
+    `).catch(() => {});
 
     try {
       await this.prisma.$executeRaw`
@@ -1263,9 +1309,14 @@ export class EventsService extends BaseService implements OnModuleInit {
           department = ${department},
           category = ${category},
           date = ${safeDate}::date,
+          time = ${timeStr},
           location = ${location},
           venue_name = ${venueName},
           parts = ${partsJson}::jsonb,
+          custom_fields = ${customFieldsJson}::jsonb,
+          is_paid = ${isPaid},
+          is_fixed = ${isFixed},
+          recurrence_rule = ${recurrenceRule},
           capacity = ${safeCapacity},
           type = ${type},
           status = ${status},

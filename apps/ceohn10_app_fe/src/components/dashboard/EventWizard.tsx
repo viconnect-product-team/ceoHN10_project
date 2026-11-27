@@ -107,16 +107,24 @@ export function EventWizard({
   onClose,
   onCreated,
   initialType,
+  editingEvent,
 }: {
   open: boolean;
   onClose: () => void;
   onCreated: (event: EventItem) => void;
   initialType?: EventType;
+  editingEvent?: EventItem | null;
 }) {
-  // Chỉ render khi người dùng bấm "Tạo sự kiện" (open=true). Mỗi lần mở là 1 phiên mới (state reset).
+  // Chỉ render khi người dùng bấm "Tạo sự kiện" hoặc "Chỉnh sửa" (open=true). Mỗi lần mở là 1 phiên mới.
   if (!open || typeof document === "undefined") return null;
   return createPortal(
-    <EventWizardDialog onClose={onClose} onCreated={onCreated} initialType={initialType} />,
+    <EventWizardDialog
+      key={editingEvent?.id || "create"}
+      onClose={onClose}
+      onCreated={onCreated}
+      initialType={initialType}
+      editingEvent={editingEvent}
+    />,
     document.body,
   );
 }
@@ -125,10 +133,12 @@ function EventWizardDialog({
   onClose,
   onCreated,
   initialType,
+  editingEvent,
 }: {
   onClose: () => void;
   onCreated: (event: EventItem) => void;
   initialType?: EventType;
+  editingEvent?: EventItem | null;
 }) {
   const t = useT();
 
@@ -143,30 +153,69 @@ function EventWizardDialog({
   const defaultTpl = EVENT_TYPE_TEMPLATES[(initialType as EventTypeKey) || "khai_giang"] || EVENT_TYPE_TEMPLATES.khai_giang;
 
   const defaultParts = createDefaultCeoHn10Parts();
-  const initialPartsCap = defaultParts.reduce((s, p) => s + (Number(p.capacity) || 0), 0);
+  const editAny = editingEvent as any;
+  const editParts: EventPartConfig[] =
+    Array.isArray(editAny?.parts) && editAny.parts.length > 0
+      ? editAny.parts
+      : defaultParts;
+  const parsedTimeParts = String(editAny?.time || "").split("-").map((s: string) => s.trim());
+  const initialDateStr = editingEvent?.date
+    ? String(editingEvent.date).slice(0, 10)
+    : "";
+  const initialPartsCap = editParts.reduce((s, p) => s + (Number(p.capacity) || 0), 0);
   const [step, setStep] = useState<0 | 1 | 2 | 3>(0);
   const [createdEvent, setCreatedEvent] = useState<EventItem | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [info, setInfo] = useState<Info>({
-    name: initialType === "charity" ? defaultTpl.name : "",
-    tagline: defaultTpl.tagline,
-    date: "",
-    startTime: "08:30",
-    endTime: "11:30",
-    location: initialType === "charity" ? defaultTpl.defaultLocation : "",
-    capacity: initialType === "charity" ? defaultTpl.defaultCapacity : String(initialPartsCap),
-    type: initialType || "khai_giang",
-    status: "upcoming",
-    imageUrl: defaultTpl.bgImage,
-    description: initialType === "charity" ? defaultTpl.description : "",
-    qrStaff: [],
-    sponsors: [],
-    isFixed: false,
-    recurrenceRule: "Hàng tháng",
-    isPaid: false,
-    venueName: "",
-    parts: defaultParts,
-    customFields: [],
+  const [info, setInfo] = useState<Info>(() => {
+    if (editingEvent) {
+      return {
+        name: editingEvent.name || "",
+        tagline: editAny?.tagline || defaultTpl.tagline,
+        date: initialDateStr,
+        startTime: editAny?.startTime || parsedTimeParts[0] || "08:30",
+        endTime: editAny?.endTime || parsedTimeParts[1] || "11:30",
+        location: editingEvent.location || "",
+        capacity: String(editingEvent.capacity ?? initialPartsCap),
+        type: (editingEvent.type as EventType) || "khai_giang",
+        status: (editingEvent.status as EventStatus) || "upcoming",
+        imageUrl: editAny?.image || editAny?.imageUrl || editAny?.banner || defaultTpl.bgImage,
+        photoGalleryUrl: editAny?.photoGalleryUrl || "",
+        description: editAny?.description || "",
+        qrStaff: editAny?.qrStaff || editAny?.qrScanners || [],
+        sponsors: editingEvent.sponsors || [],
+        isFixed: Boolean(editAny?.isFixed),
+        recurrenceRule: editAny?.recurrenceRule || "Hàng tháng",
+        isPaid: Boolean(editAny?.isPaid || Number(editingEvent.ticketPrice || editAny?.fee || 0) > 0 || editParts.some((p) => p.isPaid || Number(p.fee || 0) > 0)),
+        venueName: editAny?.venueName || "",
+        parts: editParts,
+        customFields: Array.isArray(editAny?.customFields)
+          ? editAny.customFields
+          : Array.isArray(editAny?.dynamicFields)
+            ? editAny.dynamicFields
+            : [],
+      };
+    }
+    return {
+      name: initialType === "charity" ? defaultTpl.name : "",
+      tagline: defaultTpl.tagline,
+      date: "",
+      startTime: "08:30",
+      endTime: "11:30",
+      location: initialType === "charity" ? defaultTpl.defaultLocation : "",
+      capacity: initialType === "charity" ? defaultTpl.defaultCapacity : String(initialPartsCap),
+      type: initialType || "khai_giang",
+      status: "upcoming",
+      imageUrl: defaultTpl.bgImage,
+      description: initialType === "charity" ? defaultTpl.description : "",
+      qrStaff: [],
+      sponsors: [],
+      isFixed: false,
+      recurrenceRule: "Hàng tháng",
+      isPaid: false,
+      venueName: "",
+      parts: defaultParts,
+      customFields: [],
+    };
   });
   const [tickets, setTickets] = useState<TicketDraft[]>([]);
   const [qrFields, setQrFields] = useState<QrField[]>(["registration_code"]);
@@ -386,51 +435,69 @@ function EventWizardDialog({
           guestFee: gFee,
         };
       });
-      const computedTicketPrice = info.isPaid && tickets.length > 0
-        ? Math.max(0, ...tickets.map((tk) => parseVndNumber(tk.price)))
-        : 0;
+      const computedTicketPrice =
+        info.isPaid && tickets.length > 0
+          ? Math.max(0, ...tickets.map((tk) => parseVndNumber(tk.price)))
+          : info.isPaid
+            ? Math.max(0, ...syncedParts.map((p) => Number(p.fee || 0)))
+            : 0;
+
+      const payloadBody = {
+        name: info.name.trim(),
+        tagline: (info.tagline || "").trim(),
+        date: info.date,
+        startTime: (info.startTime || "08:30").trim(),
+        endTime: (info.endTime || "11:30").trim(),
+        time: `${(info.startTime || "08:30").trim()} - ${(info.endTime || "11:30").trim()}`,
+        location: info.location.trim(),
+        venueName: (info.venueName || "").trim(),
+        parts: syncedParts,
+        customFields: Array.isArray(info.customFields) ? info.customFields : [],
+        dynamicFields: Array.isArray(info.customFields) ? info.customFields : [],
+        address: info.location.trim(),
+        capacity: (Number(info.capacity) || 0) + (approvedReserveExtra > 0 ? approvedReserveExtra : 0),
+        reserveCapacity: approvedReserveExtra,
+        allowWalkinCheckin: approvedReserveExtra > 0,
+        type: info.type,
+        status: info.status,
+        imageUrl: info.imageUrl,
+        image: info.imageUrl,
+        banner: info.imageUrl,
+        photoGalleryUrl: info.photoGalleryUrl || "",
+        isFixed: !!info.isFixed,
+        recurrenceRule: info.recurrenceRule || "",
+        isPaid: !!info.isPaid,
+        ticketPrice: computedTicketPrice,
+        fee: computedTicketPrice,
+        description: info.description || "",
+        qrStaff: info.qrStaff,
+        qrScanners: info.qrStaff,
+        sponsors: info.sponsors,
+        qrFields,
+        tickets: tickets.map((tk) => ({
+          name: tk.name.trim(),
+          price: info.isPaid ? parseVndNumber(tk.price) : 0,
+          quantity: parseInt(String(tk.quantity).replace(/\D/g, ""), 10) || 0,
+          description: tk.description.trim(),
+        })),
+      };
+
+      if (editingEvent?.id) {
+        const res = await fetchNestApi<{ event: EventItem }>(`/events/${editingEvent.id}`, {
+          method: "PUT",
+          body: JSON.stringify(payloadBody),
+        });
+        const updatedEv = res?.event || (res as unknown as EventItem) || editingEvent;
+        onCreated(updatedEv);
+        toast.success("Đã lưu cập nhật sự kiện thành công!");
+        reset();
+        onClose();
+        return;
+      }
 
       const res = await fetchNestApi<{ event: EventItem }>("/events", {
         method: "POST",
-        body: JSON.stringify({
-          name: info.name.trim(),
-          tagline: (info.tagline || "").trim(),
-          date: info.date,
-          startTime: (info.startTime || "08:30").trim(),
-          endTime: (info.endTime || "11:30").trim(),
-          time: `${(info.startTime || "08:30").trim()} - ${(info.endTime || "11:30").trim()}`,
-          location: info.location.trim(),
-          venueName: (info.venueName || "").trim(),
-          parts: syncedParts,
-          customFields: Array.isArray(info.customFields) ? info.customFields : [],
-          dynamicFields: Array.isArray(info.customFields) ? info.customFields : [],
-          address: info.location.trim(),
-          capacity: (Number(info.capacity) || 0) + (approvedReserveExtra > 0 ? approvedReserveExtra : 0),
-          reserveCapacity: approvedReserveExtra,
-          allowWalkinCheckin: approvedReserveExtra > 0,
-          type: info.type,
-          status: info.status,
-          imageUrl: info.imageUrl,
-          image: info.imageUrl,
-          banner: info.imageUrl,
-          photoGalleryUrl: info.photoGalleryUrl || "",
-          isFixed: !!info.isFixed,
-          recurrenceRule: info.recurrenceRule || "",
-          isPaid: !!info.isPaid,
-          ticketPrice: computedTicketPrice,
-          fee: computedTicketPrice,
-          description: info.description || "",
-          qrStaff: info.qrStaff,
-          qrScanners: info.qrStaff,
-          sponsors: info.sponsors,
-          qrFields,
-          tickets: tickets.map((tk) => ({
-            name: tk.name.trim(),
-            price: info.isPaid ? parseVndNumber(tk.price) : 0,
-            quantity: parseInt(String(tk.quantity).replace(/\D/g, ""), 10) || 0,
-            description: tk.description.trim(),
-          })),
-        }),
+        body: JSON.stringify(payloadBody),
       });
       const createdEv = res?.event || (res as unknown as EventItem);
       if (createdEv?.id && tickets.length > 0) {
@@ -499,7 +566,13 @@ function EventWizardDialog({
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-base font-extrabold text-foreground flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-[#003B95] dark:text-blue-400" />
-              <span>{step === 3 ? "Đăng Ký Thành Viên Tham Dự Sự Kiện" : t("ewz.title")}</span>
+              <span>
+                {step === 3
+                  ? "Đăng Ký Thành Viên Tham Dự Sự Kiện"
+                  : editingEvent
+                    ? `Chỉnh Sửa Sự Kiện — ${editingEvent.name}`
+                    : t("ewz.title")}
+              </span>
             </h2>
             <button
               type="button"
@@ -614,25 +687,38 @@ function EventWizardDialog({
                   </>
                 )}
               </button>
-              {step < 2 ? (
-                <button
-                  type="button"
-                  onClick={next}
-                  className="inline-flex items-center gap-1.5 rounded-xl px-5 py-2 text-sm font-bold bg-[#003B95] hover:bg-[#002d73] text-white shadow-md shadow-[#003B95]/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer transition active:scale-95"
-                >
-                  {t("ewz.next")} <ChevronRight className="h-4 w-4" aria-hidden="true" />
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={submit}
-                  disabled={submitting}
-                  className="inline-flex items-center gap-1.5 rounded-xl px-5 py-2 text-sm font-bold bg-[#003B95] hover:bg-[#002d73] text-white shadow-md shadow-[#003B95]/20 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer transition active:scale-95"
-                >
-                  <Check className="h-4 w-4 text-white" aria-hidden="true" />
-                  {submitting ? "Đang xử lý..." : t("ewz.create")}
-                </button>
-              )}
+              <div className="flex items-center gap-2">
+                {editingEvent && (
+                  <button
+                    type="button"
+                    onClick={submit}
+                    disabled={submitting}
+                    className="inline-flex items-center gap-1.5 rounded-xl px-5 py-2 text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md disabled:opacity-60 cursor-pointer transition active:scale-95"
+                  >
+                    <Check className="h-4 w-4 text-white" aria-hidden="true" />
+                    {submitting ? "Đang lưu..." : "Lưu Thay Đổi"}
+                  </button>
+                )}
+                {step < 2 ? (
+                  <button
+                    type="button"
+                    onClick={next}
+                    className="inline-flex items-center gap-1.5 rounded-xl px-5 py-2 text-sm font-bold bg-[#003B95] hover:bg-[#002d73] text-white shadow-md shadow-[#003B95]/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer transition active:scale-95"
+                  >
+                    {t("ewz.next")} <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={submit}
+                    disabled={submitting}
+                    className="inline-flex items-center gap-1.5 rounded-xl px-5 py-2 text-sm font-bold bg-[#003B95] hover:bg-[#002d73] text-white shadow-md shadow-[#003B95]/20 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer transition active:scale-95"
+                  >
+                    <Check className="h-4 w-4 text-white" aria-hidden="true" />
+                    {submitting ? "Đang xử lý..." : editingEvent ? "Lưu Thay Đổi" : t("ewz.create")}
+                  </button>
+                )}
+              </div>
             </>
           )}
         </div>

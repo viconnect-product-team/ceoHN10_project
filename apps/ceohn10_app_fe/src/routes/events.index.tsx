@@ -1330,41 +1330,25 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
           <CalendarView events={filtered} />
         )}
 
-        <CrudModal
-          open={open}
-          title={editing ? t("common.editTitle") : t("events.create")}
-          fields={fields}
-          initial={
-            editing
-              ? ({
-                ...editing,
-                sponsors: editing.sponsors || [],
-                qrStaff: (editing as any).qrStaff || (editing as any).qrScanners || [],
-              } as unknown as CrudValues)
-              : { sponsors: [], qrStaff: [] }
-          }
-          submitting={submitting}
-          submitLabel={editing ? t("common.save") : t("common.create")}
-          cancelLabel={t("common.cancel")}
-          onSubmit={onSubmit}
-          onClose={() => {
-            setOpen(false);
-            setEditing(null);
-          }}
-        />
-
         <EventWizard
-          open={wizardOpen}
+          open={wizardOpen || Boolean(editing)}
+          editingEvent={editing}
           initialType={wizardInitialType}
           onClose={() => {
             setWizardOpen(false);
+            setEditing(null);
             setWizardInitialType(undefined);
           }}
-          onCreated={(ev) => {
+          onCreated={async (ev) => {
+            const wasEditing = Boolean(editing);
             setWizardOpen(false);
+            setEditing(null);
             setWizardInitialType(undefined);
-            router.invalidate();
-            router.navigate({ to: "/events/$eventId", params: { eventId: ev.id } });
+            await reloadEvents();
+            await router.invalidate();
+            if (!wasEditing && ev?.id) {
+              router.navigate({ to: "/events/$eventId", params: { eventId: ev.id } });
+            }
           }}
         />
 
