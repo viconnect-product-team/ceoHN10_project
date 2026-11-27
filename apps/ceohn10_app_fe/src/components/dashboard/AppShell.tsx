@@ -5,11 +5,22 @@ import { BottomNav } from "./BottomNav";
 import { MobileMenuDrawer } from "./MobileMenuDrawer";
 import { CommandPaletteProvider } from "./CommandPalette";
 import { ViOneAiTutorGuide } from "@/components/common/ViOneAiTutorGuide";
+import { FirstLoginChangePasswordModal } from "@/components/member/FirstLoginChangePasswordModal";
+import { useAuth } from "@/context/AuthContext";
 import { Bot, Sparkles } from "lucide-react";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showAiTour, setShowAiTour] = useState(false);
+  const { user, logout } = useAuth();
+  const [mustChangePwd, setMustChangePwd] = useState(false);
+
+  useEffect(() => {
+    const flag =
+      Boolean((user as any)?.mustChangePassword || (user as any)?.must_change_password) ||
+      (typeof window !== "undefined" && localStorage.getItem("vba_must_change_password") === "true");
+    setMustChangePwd(flag);
+  }, [user]);
 
   useEffect(() => {
     const handleOpenTour = () => setShowAiTour(true);
@@ -38,6 +49,21 @@ export function AppShell({ children }: { children: ReactNode }) {
           onClose={() => setShowAiTour(false)}
           systemType="crm"
         />
+
+        {mustChangePwd && (
+          <FirstLoginChangePasswordModal
+            onSuccess={() => {
+              setMustChangePwd(false);
+              try {
+                localStorage.removeItem("vba_must_change_password");
+              } catch {}
+            }}
+            onLogout={() => {
+              logout?.();
+              window.location.replace("/auth");
+            }}
+          />
+        )}
       </div>
     </CommandPaletteProvider>
   );

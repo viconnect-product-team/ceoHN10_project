@@ -1537,8 +1537,7 @@ export class EventsService extends BaseService implements OnModuleInit {
         SELECT e.*, a.name as association_name, a.logo_url as association_logo
         FROM public.events e
         LEFT JOIN public.associations a ON e.association_id = a.id
-        WHERE e.association_id = '00000000-0000-4000-8000-000000000001'::uuid
-          AND e.name IS NOT NULL
+        WHERE e.name IS NOT NULL
           AND TRIM(e.name) != ''
         ORDER BY (e.date >= CURRENT_DATE) DESC, e.date ASC
       `.catch(() => []);
@@ -1546,9 +1545,12 @@ export class EventsService extends BaseService implements OnModuleInit {
 
     const memberRow = me && me.length > 0 ? me[0] : null;
     const userRow = !isGuest
-      ? await this.prisma.vione_users
+      ? (await this.prisma.vione_users
           .findUnique({ where: { id: userId } })
-          .catch(() => null)
+          .catch(() => null)) ||
+        (await (this.prisma as any).ceohn10_users
+          ?.findUnique({ where: { id: userId } })
+          .catch(() => null))
       : null;
     const myCode = memberRow?.code;
     const myEmail = memberRow?.email || userRow?.email;

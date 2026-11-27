@@ -37,7 +37,7 @@ export function createDefaultCeoHn10Parts(): EventPartConfig[] {
       id: "part_2",
       name: "Dự Tiệc Chúc Mừng",
       capacity: 100,
-      fee: 1000,
+      fee: 2000,
       guestFee: 0,
       isPaid: true,
       isParty: true,
@@ -226,7 +226,12 @@ export function EventPartsEditor({
                     </button>
                     <button
                       type="button"
-                      onClick={() => updatePart(pIdx, { isPaid: true })}
+                      onClick={() =>
+                        updatePart(pIdx, {
+                          isPaid: true,
+                          fee: Number(part.fee || 0) >= 2000 ? Number(part.fee) : 2000,
+                        })
+                      }
                       className={`flex-1 h-9 rounded-xl border text-xs font-bold transition cursor-pointer ${
                         part.isPaid ?? Number(part.fee || 0) > 0
                           ? "border-amber-500 bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"

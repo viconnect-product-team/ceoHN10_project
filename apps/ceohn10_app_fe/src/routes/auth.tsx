@@ -145,6 +145,22 @@ function CrmAdminAuthPage() {
       }
       setAuthData(res);
       applyRememberPreference(remember, email.trim());
+      const isMustChange = Boolean(
+        res.mustChangePassword ||
+        res.must_change_password ||
+        res.user?.mustChangePassword ||
+        res.user?.must_change_password
+      );
+      if (isMustChange) {
+        try {
+          localStorage.setItem("vba_must_change_password", "true");
+        } catch {}
+        toast.warning("Tài khoản mới cấp bắt buộc đổi mật khẩu lần đầu trước khi sử dụng.");
+      } else {
+        try {
+          localStorage.removeItem("vba_must_change_password");
+        } catch {}
+      }
       await goPostLogin();
     } catch (e: any) {
       const rawMsg = String(e?.message || "");

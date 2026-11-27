@@ -3679,6 +3679,11 @@ Trân trọng cảm ơn Anh/Chị!`;
     ) {
       sanitizedDept = 'Ban tài chính';
     } else if (
+      rawDeptLower.includes('sự kiện') ||
+      rawDeptLower.includes('bsk')
+    ) {
+      sanitizedDept = 'Ban Sự Kiện';
+    } else if (
       rawDept &&
       !rawDeptLower.includes('Học viên') &&
       !rawDeptLower.includes('ceohn10')
@@ -3752,6 +3757,23 @@ Trân trọng cảm ơn Anh/Chị!`;
         (rawRole.includes('trưởng') || rawRole.includes('truong')))
     ) {
       sanitizedRole = 'truong_ban_thien_nguyen';
+    } else if (
+      rawRole === 'truong_ban_su_kien' ||
+      ((rawRole.includes('trưởng') || rawRole.includes('truong')) &&
+        (rawRole.includes('sự kiện') || rawDeptLower.includes('sự kiện') || rawDeptLower.includes('bsk')))
+    ) {
+      sanitizedRole = 'truong_ban_su_kien';
+    } else if (
+      (rawRole.includes('trưởng ban') || rawRole.includes('truong ban')) &&
+      sanitizedDept !== 'Học viên ceohn10'
+    ) {
+      if (sanitizedDept.toLowerCase().includes('truyền thông')) sanitizedRole = 'truong_ban_truyen_thong';
+      else if (sanitizedDept.toLowerCase().includes('thành viên')) sanitizedRole = 'truong_ban_thanh_vien';
+      else if (sanitizedDept.toLowerCase().includes('xúc tiến')) sanitizedRole = 'truong_ban_xuc_tien';
+      else if (sanitizedDept.toLowerCase().includes('tài chính')) sanitizedRole = 'truong_ban_tai_chinh';
+      else if (sanitizedDept.toLowerCase().includes('thiện nguyện')) sanitizedRole = 'truong_ban_thien_nguyen';
+      else if (sanitizedDept.toLowerCase().includes('sự kiện')) sanitizedRole = 'truong_ban_su_kien';
+      else sanitizedRole = 'truong_ban_su_kien';
     } else if (
       rawRole.startsWith('thanh_vien_ban_') ||
       rawRole.startsWith('truong_ban_')
