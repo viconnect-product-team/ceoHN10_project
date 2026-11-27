@@ -1,0 +1,94 @@
+name: ceohn10-test
+services:
+  ceohn10-test-frontend:
+    image: ceohn10-frontend:latest
+    container_name: ceohn10-test-frontend
+    restart: always
+    env_file:
+      - .env.test.app
+    environment:
+      - PORT=8080
+      - HOST=0.0.0.0
+      - NITRO_HOST=0.0.0.0
+      - NEST_API_URL=http://ceohn10-test-backend:4003
+      - VITE_APP_SCOPE=association_app
+    depends_on:
+      - ceohn10-test-backend
+    networks:
+      - ceohn10-test-network
+
+  ceohn10-test-backend:
+    image: ceohn10-backend:latest
+    container_name: ceohn10-test-backend
+    restart: always
+    env_file:
+      - .env.test.app
+    environment:
+      - NODE_ENV=production
+      - PORT=4003
+      - APP_SCOPE=association_app
+      - DOCKER_CONTAINER=true
+    user: "0:0"
+    volumes:
+      - ceohn10-test-uploads:/app/uploads
+    networks:
+      - ceohn10-test-network
+
+  ceohn10-crm-test-frontend:
+    image: ceohn10-crm-frontend:latest
+    container_name: ceohn10-crm-test-frontend
+    restart: always
+    env_file:
+      - .env.test.crm
+    environment:
+      - PORT=8080
+      - HOST=0.0.0.0
+      - NITRO_HOST=0.0.0.0
+      - NEST_API_URL=http://ceohn10-crm-test-backend:4003
+      - VITE_APP_SCOPE=crm_platform
+    depends_on:
+      - ceohn10-crm-test-backend
+    networks:
+      - ceohn10-test-network
+
+  ceohn10-crm-test-backend:
+    image: ceohn10-crm-backend:latest
+    container_name: ceohn10-crm-test-backend
+    restart: always
+    env_file:
+      - .env.test.crm
+    environment:
+      - NODE_ENV=production
+      - PORT=4003
+      - APP_SCOPE=crm_platform
+      - DOCKER_CONTAINER=true
+    user: "0:0"
+    volumes:
+      - ceohn10-test-uploads:/app/uploads
+    networks:
+      - ceohn10-test-network
+
+  ceohn10-test-ssl-proxy:
+    image: nginx:1.27-alpine
+    container_name: ceohn10-test-ssl-proxy
+    restart: always
+    ports:
+      - "5030:5030"
+      - "5032:5032"
+    volumes:
+      - ./nginx.test.conf:/etc/nginx/nginx.conf:ro
+      - ./certs:/etc/nginx/certs:ro
+    depends_on:
+      - ceohn10-test-frontend
+      - ceohn10-crm-test-frontend
+    networks:
+      - ceohn10-test-network
+
+volumes:
+  ceohn10-test-uploads:
+    name: ceohn10-test-uploads
+
+networks:
+  ceohn10-test-network:
+    name: ceohn10-test-network
+    driver: bridge

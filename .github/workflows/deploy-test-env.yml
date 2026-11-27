@@ -1,0 +1,77 @@
+name: Deploy Test Environment (HTTPS 5030 / 5032 - DB ceohn10_test)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - test
+
+jobs:
+  deploy-test:
+    name: Kích Hoạt Môi Trường Test (5030 App & 5032 CRM HTTPS)
+    runs-on: ubuntu-latest
+    env:
+      SERVER_IP: ${{ secrets.REMOTE_HOST || '14.225.217.232' }}
+      SERVER_USER: ${{ secrets.REMOTE_USER || 'root' }}
+    steps:
+      - name: Checkout mã nguồn
+        uses: actions/checkout@v4
+
+      - name: Khởi tạo Node.js 22 & PostgreSQL client
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Đồng bộ Schema sang DB Test (ceohn10_test)
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+          TABLE_CNT=$(psql "postgresql://app1:5^S0CEpvYwC1(#YN1UoJ@113.20.107.184:6432/ceohn10_test" -tAc "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='public';")
+          if [ "$TABLE_CNT" = "0" ]; then
+            echo ">>> Cloning schema & base seed from ceohn10_project to ceohn10_test..."
+            pg_dump "postgresql://app1:5^S0CEpvYwC1(#YN1UoJ@113.20.107.184:6432/ceohn10_project" --no-owner --no-privileges | psql "postgresql://app1:5^S0CEpvYwC1(#YN1UoJ@113.20.107.184:6432/ceohn10_test"
+          else
+            echo ">>> ceohn10_test already has $TABLE_CNT tables, skipping clone."
+          fi
+
+      - name: Copy cấu hình deploy/test sang VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ env.SERVER_IP }}
+          username: ${{ env.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE || '' }}
+          password: ${{ secrets.SSH_PASSWORD || '' }}
+          source: "deploy/test/**,deploy/test/.env.test.app,deploy/test/.env.test.crm"
+          target: "/root/deploy-cache/"
+          strip_components: 0
+
+      - name: Mở cổng 5030/5032, tạo SSL SAN & khởi động cụm Test
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ env.SERVER_IP }}
+          username: ${{ env.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE || '' }}
+          password: ${{ secrets.SSH_PASSWORD || '' }}
+          script: |
+            set -e
+            mkdir -p /root/ceohn10-test/certs
+            cp -a /root/deploy-cache/deploy/test/. /root/ceohn10-test/
+            cd /root/ceohn10-test
+            sed -i 's/\r$//' docker-compose.yml nginx.test.conf .env.test.app .env.test.crm 2>/dev/null || true
+
+            if [ ! -f certs/test.crt ] || [ ! -f certs/test.key ]; then
+              openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
+                -keyout certs/test.key -out certs/test.crt \
+                -subj "/CN=14.225.217.232" \
+                -addext "subjectAltName=IP:14.225.217.232,DNS:localhost"
+            fi
+
+            # Validate nginx.test.conf truoc khi khoi dong (Strict Nginx Validation Gate)
+            docker run --rm -v /root/ceohn10-test/nginx.test.conf:/etc/nginx/nginx.conf:ro -v /root/ceohn10-test/certs:/etc/nginx/certs:ro nginx:1.27-alpine nginx -t
+
+            ufw allow 5030/tcp >/dev/null 2>&1 || true
+            ufw allow 5032/tcp >/dev/null 2>&1 || true
+
+            docker compose -f docker-compose.yml up -d --force-recreate
+            echo "TEST_ENV_READY: https://14.225.217.232:5030 (App) | https://14.225.217.232:5032 (CRM)"
