@@ -159,7 +159,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD || '' }}
           timeout: 1200s
           command_timeout: 1200s
-          source: "dist-images/*.tar.gz,deploy/**"
+          source: "dist-images/*.tar.gz,deploy/**,deploy/ceohn10/.env.association,deploy/ceohn10/.env.production,deploy/crm/.env.crm,deploy/crm/.env.production"
           target: "/root/deploy-cache/"
           strip_components: 0
 
@@ -194,6 +194,7 @@ jobs:
             echo ">>> [3/5] Đồng bộ và khởi động Mobile CEO HN10 (https://ceohn10.viconnect.vn)..."
             mkdir -p /root/ceohn10-app
             cp -a /root/deploy-cache/deploy/ceohn10/. /root/ceohn10-app/
+            [ -f /root/association/.env.association ] && cp -n /root/association/.env.* /root/ceohn10-app/ 2>/dev/null || true
             cd /root/ceohn10-app
             sed -i 's/\r$//' docker-compose.yml .env.association .env.production 2>/dev/null || true
             docker compose -f docker-compose.yml stop 2>/dev/null || true
@@ -203,6 +204,7 @@ jobs:
             echo ">>> [4/5] Đồng bộ và khởi động CRM CEO HN10 (https://crm.ceohn10.viconnect.vn)..."
             mkdir -p /root/ceohn10-crm
             cp -a /root/deploy-cache/deploy/crm/. /root/ceohn10-crm/
+            [ -f /root/crm/.env.crm ] && cp -n /root/crm/.env.crm /root/ceohn10-crm/ 2>/dev/null || true
             cd /root/ceohn10-crm
             sed -i 's/\r$//' docker-compose.yml .env.crm .env.production 2>/dev/null || true
             docker compose -f docker-compose.yml stop 2>/dev/null || true
