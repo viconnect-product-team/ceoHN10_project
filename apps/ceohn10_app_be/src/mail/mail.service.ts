@@ -6,13 +6,16 @@ import * as QRCode from 'qrcode';
 import { PrismaService } from '../prisma/prisma.service';
 import { ZaloService } from '../zalo/zalo.service';
 
-const DEFAULT_APP_URL = process.env.APP_URL
-  ? process.env.APP_URL.replace(/\/$/, '')
-  : 'https://ceohn10.viconnect.vn';
+const DEFAULT_APP_URL = (
+  process.env.MEMBER_APP_URL ||
+  process.env.APP_URL ||
+  'https://ceohn10.viconnect.vn'
+).replace(/\/$/, '');
 
-const DEFAULT_CRM_URL = process.env.CRM_URL
-  ? process.env.CRM_URL.replace(/\/$/, '')
-  : 'https://crm.ceohn10.viconnect.vn';
+const DEFAULT_CRM_URL = (
+  process.env.CRM_URL ||
+  'https://crm.ceohn10.viconnect.vn'
+).replace(/\/$/, '');
 
 export interface SendAccountEmailOptions {
   to: string;

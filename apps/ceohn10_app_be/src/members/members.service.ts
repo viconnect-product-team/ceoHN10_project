@@ -1890,9 +1890,12 @@ export class MembersService implements OnModuleInit {
           `.catch(() => null);
 
           const createdMem = await this.getMemberById(userId, id).catch(() => null);
-          const portalUrl = process.env.APP_URL
-            ? `${process.env.APP_URL.replace(/\/$/, '')}/association/login`
-            : 'https://ceohn10.viconnect.vn/association/login';
+          const appBaseUrl = (
+            process.env.MEMBER_APP_URL ||
+            process.env.APP_URL ||
+            'https://ceohn10.viconnect.vn'
+          ).replace(/\/$/, '');
+          const portalUrl = `${appBaseUrl}/association/login`;
 
           void this.mailService
             .sendRegistrationAccountEmail({
@@ -2295,9 +2298,11 @@ export class MembersService implements OnModuleInit {
                 memberCode: current.code || id,
                 associationName: 'CLB Doanh Nhân CEO HN10',
                 companyName: current.company || current.organization || name,
-                portalUrl: process.env.APP_URL
-                  ? `${process.env.APP_URL.replace(/\/$/, '')}/association/login`
-                  : 'https://ceohn10.viconnect.vn/association/login',
+                portalUrl: `${(
+                  process.env.MEMBER_APP_URL ||
+                  process.env.APP_URL ||
+                  'https://ceohn10.viconnect.vn'
+                ).replace(/\/$/, '')}/association/login`,
                 username: memberEmail,
                 passwordRaw: rawPass,
               })
@@ -4631,9 +4636,11 @@ Trân trọng cảm ơn Anh/Chị!`;
     // 6. Gửi email tài khoản đăng nhập chính thức
     let emailSent = false;
     let emailMessage = '';
-    const portalUrl = process.env.APP_URL
-      ? `${process.env.APP_URL.replace(/\/$/, '')}/association/login`
-      : 'https://ceohn10.viconnect.vn/association/login';
+    const portalUrl = `${(
+      process.env.MEMBER_APP_URL ||
+      process.env.APP_URL ||
+      'https://ceohn10.viconnect.vn'
+    ).replace(/\/$/, '')}/association/login`;
     const compName =
       member.company_name ||
       member.company ||
