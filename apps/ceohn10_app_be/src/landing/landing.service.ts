@@ -843,6 +843,10 @@ export class LandingService implements OnModuleInit {
   constructor(private readonly prisma: PrismaService) { }
 
   async onModuleInit() {
+    await this.ensureVotesTable();
+  }
+
+  private async ensureVotesTable() {
     await this.prisma.$executeRawUnsafe(`
       CREATE TABLE IF NOT EXISTS public.landing_video_votes (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -853,9 +857,13 @@ export class LandingService implements OnModuleInit {
         voter_name TEXT NOT NULL,
         voter_email TEXT NOT NULL,
         created_at TIMESTAMPTZ DEFAULT NOW()
-      );
-      CREATE INDEX IF NOT EXISTS idx_landing_video_votes_landing ON public.landing_video_votes(landing_id);
-      CREATE INDEX IF NOT EXISTS idx_landing_video_votes_email ON public.landing_video_votes(landing_id, LOWER(voter_email));
+      )
+    `).catch(() => {});
+    await this.prisma.$executeRawUnsafe(`
+      CREATE INDEX IF NOT EXISTS idx_landing_video_votes_landing ON public.landing_video_votes(landing_id)
+    `).catch(() => {});
+    await this.prisma.$executeRawUnsafe(`
+      CREATE INDEX IF NOT EXISTS idx_landing_video_votes_email ON public.landing_video_votes(landing_id, LOWER(voter_email))
     `).catch(() => {});
   }
 

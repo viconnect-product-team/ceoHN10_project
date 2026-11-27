@@ -2155,20 +2155,25 @@ export class MembersService implements OnModuleInit {
     // Đồng bộ mã học viên mới sang các bảng liên kết (Check-in / Vé sự kiện / Hồ sơ)
     if (code && code.toUpperCase() !== oldCode.toUpperCase()) {
       const memberEmailLower = String(email || current.email || '').trim().toLowerCase();
-      if (oldCode) {
+      const oldCodeUpper = oldCode.toUpperCase();
+      if (oldCodeUpper) {
         await this.prisma.$executeRaw`
           UPDATE public.event_registrations
           SET member_code = ${code}
-          WHERE UPPER(TRIM(COALESCE(member_code, ''))) = UPPER(${oldCode})
-        `.catch(() => {});
+          WHERE UPPER(TRIM(COALESCE(member_code, ''))) = ${oldCodeUpper}
+        `.catch((err) => {
+          console.error('Cascade update member_code by oldCode error:', err?.message);
+        });
       }
       if (memberEmailLower) {
         await this.prisma.$executeRaw`
           UPDATE public.event_registrations
           SET member_code = ${code}
           WHERE LOWER(TRIM(COALESCE(email, ''))) = ${memberEmailLower}
-            AND (member_code IS NULL OR TRIM(member_code) = '' OR UPPER(TRIM(member_code)) = UPPER(${oldCode}))
-        `.catch(() => {});
+            AND (member_code IS NULL OR TRIM(member_code) = '' OR UPPER(TRIM(member_code)) = ${oldCodeUpper})
+        `.catch((err) => {
+          console.error('Cascade update member_code by email error:', err?.message);
+        });
       }
     }
 
