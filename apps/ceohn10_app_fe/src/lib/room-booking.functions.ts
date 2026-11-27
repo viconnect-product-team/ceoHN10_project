@@ -122,7 +122,7 @@ export const INITIAL_ROOM_BOOKINGS: RoomBookingRequest[] = [
     onlinePasscode: "198302",
     createdAt: "2026-09-10T08:00:00Z",
     reviewedAt: "2026-09-10T10:30:00Z",
-    reviewedBy: "Chủ tịch Hiệp hội",
+    reviewedBy: "Chủ tịch CEOHN10",
   },
   {
     id: "BK-1983-02",
@@ -304,7 +304,7 @@ export const RoomBookingService = {
     const b = bookings[idx];
     b.status = "approved";
     b.reviewedAt = new Date().toISOString();
-    b.reviewedBy = "Ban Quản Trị Hiệp Hội";
+    b.reviewedBy = "Ban Quản Trị CEOHN10";
     if (options?.adminNotes) b.adminNotes = options.adminNotes;
     if (options?.zoomUrl) b.onlineMeetingUrl = options.zoomUrl;
     if (options?.passcode) b.onlinePasscode = options.passcode;
@@ -345,7 +345,7 @@ export const RoomBookingService = {
     b.status = "rejected";
     b.rejectionReason = reason;
     b.reviewedAt = new Date().toISOString();
-    b.reviewedBy = "Ban Quản Trị Hiệp Hội";
+    b.reviewedBy = "Ban Quản Trị CEOHN10";
 
     saveBookings(bookings);
 

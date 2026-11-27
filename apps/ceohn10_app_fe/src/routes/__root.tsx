@@ -186,11 +186,11 @@ export const Route = createRootRoute({
         content:
           "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover",
       },
-      { title: "CEO HN10 — Nền tảng Quản trị Hiệp hội & App Học viên" },
+      { title: "CEO HN10 — Nền tảng Quản trị CEOHN10 & App Học viên" },
       {
         name: "description",
         content:
-          "Quản lý Học viên, tổ chức sự kiện, kết nối doanh nghiệp và số hoá vận hành hiệp hội.",
+          "Quản lý Học viên, tổ chức sự kiện, kết nối doanh nghiệp và số hoá vận hành CEOHN10.",
       },
       { name: "author", content: "CLB Doanh Nhân CEO HN10" },
       { name: "theme-color", content: "#001D4A" },
@@ -199,20 +199,20 @@ export const Route = createRootRoute({
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       { name: "apple-mobile-web-app-title", content: "CEO HN10" },
       { name: "application-name", content: "CEO HN10" },
-      { property: "og:title", content: "CEO HN10 — Nền tảng Quản trị Hiệp hội & App Học viên" },
+      { property: "og:title", content: "CEO HN10 — Nền tảng Quản trị CEOHN10 & App Học viên" },
       {
         property: "og:description",
         content:
-          "Quản lý Học viên, tổ chức sự kiện, kết nối doanh nghiệp và số hoá vận hành hiệp hội.",
+          "Quản lý Học viên, tổ chức sự kiện, kết nối doanh nghiệp và số hoá vận hành CEOHN10.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@ceohn10" },
-      { name: "twitter:title", content: "CEO HN10 — Nền tảng Quản trị Hiệp hội & App Học viên" },
+      { name: "twitter:title", content: "CEO HN10 — Nền tảng Quản trị CEOHN10 & App Học viên" },
       {
         name: "twitter:description",
         content:
-          "Quản lý Học viên, tổ chức sự kiện, tăng doanh thu tài trợ và số hoá vận hành hiệp hội.",
+          "Quản lý Học viên, tổ chức sự kiện, tăng doanh thu tài trợ và số hoá vận hành CEOHN10.",
       },
       {
         property: "og:image",
@@ -354,7 +354,7 @@ function GlobalVoiceNavAssistant() {
   if (!isMounted || status !== "in" || !user) return null;
   if (!aiEnabled) return null;
 
-  // Robot chỉ xuất hiện trong mỗi app hiệp hội (/association/* hoặc /m/*), không xuất hiện ở CRM hệ thống hay app ViOne
+  // Robot chỉ xuất hiện trong mỗi app CEOHN10 (/association/* hoặc /m/*), không xuất hiện ở CRM hệ thống hay app ViOne
   const isAssociationApp = pathname.startsWith("/association") || pathname.startsWith("/m");
   if (!isAssociationApp) return null;
 

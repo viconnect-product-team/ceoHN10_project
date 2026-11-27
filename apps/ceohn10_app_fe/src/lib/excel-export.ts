@@ -174,7 +174,7 @@ function buildVoucherSheet(opts: VoucherTemplateOptions, now: Date): XLSX.WorkSh
   const dateStr = sample.date || `${now.getDate()} tháng ${now.getMonth() + 1} năm ${now.getFullYear()}`;
   const personName = sample.personName || "Họ và tên người giao dịch";
   const address = sample.address || "Hà Nội";
-  const reason = sample.reason || (isThu ? "Thu nộp hội phí / đóng góp quỹ hoạt động" : "Chi công tác / hoạt động sự kiện hiệp hội");
+  const reason = sample.reason || (isThu ? "Thu nộp phí tham gia CLB / đóng góp quỹ hoạt động" : "Chi công tác / hoạt động sự kiện CEOHN10");
   const amount = Number(sample.amount || 0);
   const words = numberToVietnameseWords(amount);
 

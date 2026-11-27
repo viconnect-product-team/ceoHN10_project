@@ -104,7 +104,7 @@ export function CreateOpportunityModal({
             Đăng Cơ Hội Kinh Doanh
           </h2>
           <p className="text-xs text-slate-300 mt-0.5">
-            Kết nối trực tiếp nhu cầu cung - cầu với 200+ lãnh đạo và doanh nghiệp trong hiệp hội.
+            Kết nối trực tiếp nhu cầu cung - cầu với 200+ lãnh đạo và doanh nghiệp trong CEOHN10.
           </p>
         </div>
 

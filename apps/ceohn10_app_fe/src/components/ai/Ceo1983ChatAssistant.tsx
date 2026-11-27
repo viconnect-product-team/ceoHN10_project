@@ -94,7 +94,7 @@ const QUICK_PROMPTS: QuickPrompt[] = [
   },
   {
     label: "Phân tích dòng tiền & chia sẻ cơ hội",
-    query: "Phân tích dòng tiền tôi đã chi vào hội phí và dòng tiền ở chia sẻ cơ hội B2B của tôi?",
+    query: "Phân tích dòng tiền tôi đã chi vào phí tham gia CLB và dòng tiền ở chia sẻ cơ hội B2B của tôi?",
     icon: TrendingUp,
     route: "/association/opportunities",
   },
@@ -123,14 +123,14 @@ const QUICK_PROMPTS: QuickPrompt[] = [
     route: "/association/business-cards",
   },
   {
-    label: "Hóa đơn / Hội phí cần đóng",
-    query: "Tôi có hóa đơn hay khoản hội phí nào phải thanh toán không?",
+    label: "Hóa đơn / Phí tham gia CLB cần đóng",
+    query: "Tôi có hóa đơn hay khoản phí tham gia CLB nào phải thanh toán không?",
     icon: CreditCard,
     route: "/association/renew/pay",
   },
   {
     label: "Cơ cấu các Ban chuyên môn",
-    query: "Hiệp hội CEO HN10 gồm những Ban chuyên môn nào và chức năng của từng ban?",
+    query: "CEOHN10 CEO HN10 gồm những Ban chuyên môn nào và chức năng của từng ban?",
     icon: Building2,
   },
 ];
@@ -372,7 +372,7 @@ export function Ceo1983ChatAssistant() {
         const invoices = Array.isArray(ctx?.dues?.unpaidInvoices)
           ? ctx.dues.unpaidInvoices.map((i: any) => ({
             id: i.invoiceNo,
-            title: `Hội phí${i.year ? ` năm ${i.year}` : ""}${i.invoiceNo ? ` (${i.invoiceNo})` : ""}`,
+            title: `Phí tham gia CLB${i.year ? ` năm ${i.year}` : ""}${i.invoiceNo ? ` (${i.invoiceNo})` : ""}`,
             amount: fmtVnd(i.amount),
             dueDate: i.dueDate || "",
             status: i.status,
@@ -438,7 +438,7 @@ export function Ceo1983ChatAssistant() {
         {
           id: "welcome-1",
           role: "assistant",
-          content: `Xin chào **${memberName}**! 👋\n\nEm là **Trợ lý AI Doanh Nhân CEO HN10**. Em có thể giải đáp chi tiết theo đúng tài khoản của Anh/Chị:\n\n- 🎟️ **Sự kiện đã đăng ký & vé tham dự**\n- 💼 **Cơ hội kinh doanh B2B đang quan tâm**\n- 👥 **Số lượng bạn bè & kết nối trong danh bạ**\n- 🤝 **Lịch hẹn gặp kết nối Cafe B2B sắp tới**\n- 💳 **Hóa đơn & hội phí niên liễm cần thanh toán**\n- 🏛️ **Cơ cấu tổ chức & nhiệm vụ các Ban chuyên môn**\n\nAnh/Chị cần em tra cứu nội dung gì ạ?`,
+          content: `Xin chào **${memberName}**! 👋\n\nEm là **Trợ lý AI Doanh Nhân CEO HN10**. Em có thể giải đáp chi tiết theo đúng tài khoản của Anh/Chị:\n\n- 🎟️ **Sự kiện đã đăng ký & vé tham dự**\n- 💼 **Cơ hội kinh doanh B2B đang quan tâm**\n- 👥 **Số lượng bạn bè & kết nối trong danh bạ**\n- 🤝 **Lịch hẹn gặp kết nối Cafe B2B sắp tới**\n- 💳 **Hóa đơn & phí tham gia CLB niên liễm cần thanh toán**\n- 🏛️ **Cơ cấu tổ chức & nhiệm vụ các Ban chuyên môn**\n\nAnh/Chị cần em tra cứu nội dung gì ạ?`,
           timestamp: Date.now(),
           suggestions: [
             "Tôi đăng ký sự kiện nào không?",
@@ -477,7 +477,7 @@ export function Ceo1983ChatAssistant() {
       return {
         text:
           `Dạ em là **Trợ lý AI CLB Doanh Nhân CEO HN10**, nắm dữ liệu tài khoản của Anh/Chị **${name}**. Em có thể:\n\n` +
-          `1. 📊 Tra cứu tài khoản: sự kiện đã đăng ký, hội phí/hóa đơn, bạn bè kết nối, lịch hẹn B2B, cơ hội quan tâm, sản phẩm.\n` +
+          `1. 📊 Tra cứu tài khoản: sự kiện đã đăng ký, phí tham gia CLB/hóa đơn, bạn bè kết nối, lịch hẹn B2B, cơ hội quan tâm, sản phẩm.\n` +
           `2. 🔎 Tìm Học viên, sản phẩm, cơ hội, sự kiện, văn bản, thông tin các Ban.\n` +
           `3. 🧭 Hướng dẫn & mở nhanh mọi tính năng trong app.\n\n` +
           `**Tình hình hiện tại:** ${liveContext.registeredEvents.length} sự kiện đã đăng ký • ${liveContext.connectedCount} bạn bè • ${liveContext.b2bMeetings.filter((m: any) => m.upcoming).length} lịch hẹn sắp tới • ${unpaid} hóa đơn chưa thanh toán.\n\nAnh/Chị cần em hỗ trợ gì ạ?`,
@@ -611,7 +611,7 @@ export function Ceo1983ChatAssistant() {
     if (
       q.includes("hóa đơn") ||
       q.includes("thanh toán") ||
-      q.includes("hội phí") ||
+      q.includes("phí tham gia CLB") ||
       q.includes("niên liễm") ||
       q.includes("công nợ") ||
       q.includes("tiền") ||
@@ -621,8 +621,8 @@ export function Ceo1983ChatAssistant() {
       const invs = liveContext.invoices;
       if (invs.length === 0) {
         return {
-          text: `Dạ thưa Anh/Chị **${name}**, tài khoản hiện **không có hóa đơn / hội phí nào chưa thanh toán** ✅.`,
-          actionLink: { label: "Xem Hội Phí", route: "/association/profile" },
+          text: `Dạ thưa Anh/Chị **${name}**, tài khoản hiện **không có hóa đơn / phí tham gia CLB nào chưa thanh toán** ✅.`,
+          actionLink: { label: "Xem Phí Tham Gia CLB", route: "/association/profile" },
           suggestions: ["Sự kiện tôi đã đăng ký", "Tôi có bao nhiêu bạn bè?"],
         };
       }
@@ -631,7 +631,7 @@ export function Ceo1983ChatAssistant() {
         .join("\n");
       return {
         text: `Dạ thưa Anh/Chị **${name}**, tài khoản có **${invs.length} hóa đơn chưa thanh toán**:\n\n${listStr}\n\nAnh/Chị bấm nút bên dưới để thanh toán qua VietQR ạ!`,
-        actionLink: { label: "Xem & Thanh Toán Hội Phí", route: "/association/renew/pay" },
+        actionLink: { label: "Xem & Thanh Toán Phí Tham Gia CLB", route: "/association/renew/pay" },
         suggestions: ["Sự kiện tôi đã đăng ký", "Tôi có bao nhiêu bạn bè?", "Cơ hội tôi quan tâm"],
       };
     }
@@ -639,9 +639,9 @@ export function Ceo1983ChatAssistant() {
     // 6. Committee structure & Roles
     if (/(^|\s)ban(\s|$)/.test(norm.replace(/ban be/g, "")) && /(co cau|chuyen mon|to chuc|cac ban|ban nao)/.test(norm)) {
       return {
-        text: `Dạ cơ cấu tổ chức CLB Doanh Nhân CEO HN10 trực thuộc HanoiBA gồm **6 Ban chuyên môn cốt lõi**:\n\n1. 🏛️ **Ban Điều Hành**: Lãnh đạo chung, định hướng chiến lược và đại diện CLB.\n2. 👥 **Ban Thành Viên**: Phát triển mạng lưới, thẩm định hồ sơ kết nạp và chăm sóc Học viên.\n3. 💼 **Ban Xúc Tiến Thương Mại**: Điều phối giao thương B2B, tổ chức phiên kết nối cung cầu.\n4. 📢 **Ban Truyền Thông**: Quảng bá hình ảnh, phụ trách Caravan, Gala và bản tin số.\n5. 💰 **Ban Tài Chính**: Quản trị ngân sách, quỹ CLB và thu hội phí niên liễm.\n6. ❤️ **Ban Thiện Nguyện**: Tổ chức các chương trình an sinh xã hội, vì cộng đồng vùng cao.\n\nMọi hoạt động và phê duyệt đều được phân quyền chặt chẽ trên hệ thống số hóa của CLB ạ!`,
+        text: `Dạ cơ cấu tổ chức CLB Doanh Nhân CEO HN10 trực thuộc HanoiBA gồm **6 Ban chuyên môn cốt lõi**:\n\n1. 🏛️ **Ban Điều Hành**: Lãnh đạo chung, định hướng chiến lược và đại diện CLB.\n2. 👥 **Ban Thành Viên**: Phát triển mạng lưới, thẩm định hồ sơ kết nạp và chăm sóc Học viên.\n3. 💼 **Ban Xúc Tiến Thương Mại**: Điều phối giao thương B2B, tổ chức phiên kết nối cung cầu.\n4. 📢 **Ban Truyền Thông**: Quảng bá hình ảnh, phụ trách Caravan, Gala và bản tin số.\n5. 💰 **Ban Tài Chính**: Quản trị ngân sách, quỹ CLB và thu phí tham gia CLB niên liễm.\n6. ❤️ **Ban Thiện Nguyện**: Tổ chức các chương trình an sinh xã hội, vì cộng đồng vùng cao.\n\nMọi hoạt động và phê duyệt đều được phân quyền chặt chẽ trên hệ thống số hóa của CLB ạ!`,
         actionLink: { label: "Xem Danh Bạ & Ban Chuyên Môn", route: "/association/members" },
-        suggestions: ["Ban chấp hành gồm ai?", "Ban truyền thông làm gì?", "Hội phí bao nhiêu?"],
+        suggestions: ["Ban chấp hành gồm ai?", "Ban truyền thông làm gì?", "Phí tham gia CLB bao nhiêu?"],
       };
     }
 
@@ -674,7 +674,7 @@ export function Ceo1983ChatAssistant() {
           `📜 **Tổng thư ký**: **Anh Nguyễn Đình Toản** (Trưởng ban Thư ký)\n\n` +
           `Ban Chấp Hành luôn sát cánh cùng hơn 200 doanh nhân tuổi CEO HN10 phát triển bền vững và gắn kết!`,
         actionLink: { label: "Xem Danh Bạ & Ban Chuyên Môn", route: "/association/members" },
-        suggestions: ["Ban truyền thông làm gì?", "Hội phí bao nhiêu?", "Lịch sự kiện sắp tới"],
+        suggestions: ["Ban truyền thông làm gì?", "Phí tham gia CLB bao nhiêu?", "Lịch sự kiện sắp tới"],
       };
     }
 
@@ -716,8 +716,8 @@ export function Ceo1983ChatAssistant() {
         return {
           text: `🏛️ **Ban Thư Ký & Ban Điều Hành CLB CEO HN10**:\n\n` +
             `- Lên lịch và tổ chức các cuộc họp Ban Chấp Hành (cả hình thức Offline tại trụ sở và Online).\n` +
-            `- Soạn thảo, ban hành và lưu trữ các văn bản, nghị quyết, điều lệ Hiệp hội.\n` +
-            `- Quản trị phân quyền tài liệu Hiệp Hội và bảo mật thông tin nội bộ.`,
+            `- Soạn thảo, ban hành và lưu trữ các văn bản, nghị quyết, điều lệ CEOHN10.\n` +
+            `- Quản trị phân quyền tài liệu CEOHN10 và bảo mật thông tin nội bộ.`,
           actionLink: { label: "Xem Lịch Họp & Văn Bản", route: "/association/library" },
         };
       }
@@ -733,10 +733,10 @@ export function Ceo1983ChatAssistant() {
       norm.includes("quy dinh hoi phi")
     ) {
       return {
-        text: `💳 **Quy Chế Hội Phí Thường Niên CLB Doanh Nhân CEO HN10**:\n\n` +
-          `- **Mức hội phí**: **10.000.000 VNĐ / năm**.\n` +
+        text: `💳 **Quy Chế Phí Tham Gia CLB Thường Niên CLB Doanh Nhân CEO HN10**:\n\n` +
+          `- **Mức phí tham gia CLB**: **10.000.000 VNĐ / năm**.\n` +
           `- **Ngân hàng thụ hưởng**: **Ngân hàng Quân Đội (MB Bank)**.\n` +
-          `- **Chủ tài khoản**: **Hiệp Hội Doanh Nhân CEO HN10 (HanoiBA)**.\n` +
+          `- **Chủ tài khoản**: **CEOHN10 Doanh Nhân CEO HN10 (HanoiBA)**.\n` +
           `- **Cú pháp chuyển khoản**: \`${p?.code || "MÃ_HỘI_VIÊN"} ${name} HP2026\`\n\n` +
           `💡 Anh/Chị có thể quét mã VietQR tự động điền sẵn số tiền và nội dung bằng cách nhấn nút bên dưới ạ!`,
         actionLink: { label: "Thanh Toán VietQR Tự Động", route: "/association/renew/pay" },
@@ -748,7 +748,7 @@ export function Ceo1983ChatAssistant() {
     if (norm.includes("tai lieu") || norm.includes("van ban") || norm.includes("nghi quyet") || norm.includes("dieu le")) {
       return {
         text: `📚 **Phân Hệ Quản Lý Tài Liệu CLB CEO HN10**:\n\n` +
-          `1. 🏛️ **Tài liệu Hiệp Hội**: Gồm điều lệ, quy chế hoạt động, nghị quyết BCH, báo cáo tài chính. Phân quyền bảo mật cao: Chỉ Quản trị viên, Chủ tịch và Trưởng các ban mới có quyền thêm/sửa/xóa; Học viên thường có quyền xem và tải về.\n` +
+          `1. 🏛️ **Tài liệu CEOHN10**: Gồm điều lệ, quy chế hoạt động, nghị quyết BCH, báo cáo tài chính. Phân quyền bảo mật cao: Chỉ Quản trị viên, Chủ tịch và Trưởng các ban mới có quyền thêm/sửa/xóa; Học viên thường có quyền xem và tải về.\n` +
           `2. 🏢 **Tài liệu Doanh Nghiệp**: Doanh nghiệp Học viên tự do đăng tải hồ sơ năng lực, brochure, catalogue sản phẩm để giới thiệu tới các thành viên khác.`,
         actionLink: { label: "Mở Thư Viện Tài Liệu", route: "/association/library" },
       };
@@ -767,7 +767,7 @@ export function Ceo1983ChatAssistant() {
 
     // Default polite response
     return {
-      text: `Dạ em đã ghi nhận câu hỏi của Anh/Chị **${name}**! CLB Doanh Nhân CEO HN10 luôn đồng hành hỗ trợ Anh/Chị kết nối kinh doanh, mở rộng đối tác và tham gia các hoạt động cộng đồng ý nghĩa.\n\nAnh/Chị có thể hỏi em thêm về: Sự kiện đăng ký, cơ hội B2B quan tâm, số lượng bạn bè, lịch hẹn Cafe, hóa đơn hội phí hoặc cơ cấu các Ban chuyên môn nhé ạ!`,
+      text: `Dạ em đã ghi nhận câu hỏi của Anh/Chị **${name}**! CLB Doanh Nhân CEO HN10 luôn đồng hành hỗ trợ Anh/Chị kết nối kinh doanh, mở rộng đối tác và tham gia các hoạt động cộng đồng ý nghĩa.\n\nAnh/Chị có thể hỏi em thêm về: Sự kiện đăng ký, cơ hội B2B quan tâm, số lượng bạn bè, lịch hẹn Cafe, hóa đơn phí tham gia CLB hoặc cơ cấu các Ban chuyên môn nhé ạ!`,
       suggestions: [
         "Sự kiện tôi đã đăng ký?",
         "Tôi có quan tâm cơ hội nào không?",
@@ -831,7 +831,7 @@ export function Ceo1983ChatAssistant() {
           .join("\n")
         : "Không có hóa đơn nợ.";
 
-    return `Bạn là Trợ lý AI Thông minh chính thức của CLB Doanh Nhân CEO HN10 (Hiệp Hội Doanh Nghiệp Trẻ Hà Nội - HanoiBA).
+    return `Bạn là Trợ lý AI Thông minh chính thức của CLB Doanh Nhân CEO HN10 (CEOHN10 Doanh Nghiệp Trẻ Hà Nội - HanoiBA).
 Bạn giao tiếp bằng tiếng Việt lịch thiệp, thông minh, chuẩn mực doanh nhân cao cấp, xưng "em" và gọi người dùng là "Anh/Chị" hoặc "Anh/Chị ${name}".
 
 THÔNG TIN TÀI KHOẢN NGƯỜI DÙNG HIỆN TẠI (DỮ LIỆU ĐỘNG THẬT):
@@ -857,7 +857,7 @@ ${oppsText}
 LỊCH HẸN GẶP KẾT NỐI B2B CỦA ANH/CHỊ:
 ${meetingsText}
 
-HÓA ĐƠN & HỘI PHÍ NIÊN LIỄM CỦA ANH/CHỊ:
+HÓA ĐƠN & PHÍ THAM GIA CLB NIÊN LIỄM CỦA ANH/CHỊ:
 ${invoicesText}
 
 HƯỚNG DẪN TRẢ LỜI:

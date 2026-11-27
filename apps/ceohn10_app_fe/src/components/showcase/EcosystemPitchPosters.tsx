@@ -259,11 +259,11 @@ export function EcosystemPitchPosters() {
                   HỆ SINH THÁI DOANH NHÂN CEO HN10 (HANOIBA)
                 </span>
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                <span className="text-[11px] text-slate-300 font-semibold">Chuyển Đổi Số Hiệp Hội</span>
+                <span className="text-[11px] text-slate-300 font-semibold">Chuyển Đổi Số CEOHN10</span>
               </div>
 
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight leading-[1.1] text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-amber-200 drop-shadow-[0_4px_24px_rgba(0,0,0,0.8)]">
-                BIẾN MẠNG LƯỚI HIỆP HỘI THÀNH NỀN TẢNG SỐ HÓA THÔNG MINH
+                BIẾN MẠNG LƯỚI CEOHN10 THÀNH NỀN TẢNG SỐ HÓA THÔNG MINH
               </h1>
 
               <p className="text-sm sm:text-base lg:text-lg text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed drop-shadow-sm">
@@ -377,7 +377,7 @@ export function EcosystemPitchPosters() {
                 <Wallet className="size-6 text-sky-400 mb-2" />
                 <h3 className="text-sm font-bold text-white">Tài Chính Minh Bạch</h3>
                 <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                  Sổ quỹ thu chi, quản lý hội phí tự động gạch nợ với mã QR Napas247 chính xác từng giao dịch.
+                  Sổ quỹ thu chi, quản lý phí tham gia CLB tự động gạch nợ với mã QR Napas247 chính xác từng giao dịch.
                 </p>
               </div>
 
@@ -502,7 +502,7 @@ export function EcosystemPitchPosters() {
                       <span className="text-[9px] font-bold text-amber-400">Đã đăng ký</span>
                     </div>
                     <div className="p-2 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
-                      <span className="text-[10px] text-slate-300">Hội phí thường niên</span>
+                      <span className="text-[10px] text-slate-300">Phí tham gia CLB thường niên</span>
                       <span className="text-[9px] font-bold text-emerald-400">Đã hoàn thành</span>
                     </div>
                   </div>
@@ -556,7 +556,7 @@ export function EcosystemPitchPosters() {
               </h1>
 
               <p className="text-sm sm:text-base lg:text-lg text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed">
-                Tự động đề xuất kết nối kinh doanh, nhắc lịch họp Ban, cảnh báo gia hạn hội phí và phát hành vé mời điện tử chuẩn mực.
+                Tự động đề xuất kết nối kinh doanh, nhắc lịch họp Ban, cảnh báo gia hạn phí tham gia CLB và phát hành vé mời điện tử chuẩn mực.
               </p>
             </div>
 
@@ -689,7 +689,7 @@ export function EcosystemPitchPosters() {
                   </div>
                   <div className="grid grid-cols-2 gap-1 text-[8px] font-bold">
                     <div className="p-1.5 bg-slate-800 rounded-lg text-center">Giao Thương B2B</div>
-                    <div className="p-1.5 bg-slate-800 rounded-lg text-center">Hội Phí Đã Đóng</div>
+                    <div className="p-1.5 bg-slate-800 rounded-lg text-center">Phí Tham Gia CLB Đã Đóng</div>
                   </div>
                 </div>
                 <div>

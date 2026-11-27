@@ -40,7 +40,7 @@ const KEYWORDS: Array<{ capability: AiCapability; terms: string[] }> = [
   {
     capability: "fee_analysis",
     terms: [
-      "hội phí",
+      "phí tham gia CLB",
       "công nợ",
       "quá hạn",
       "đã thu",
@@ -189,7 +189,7 @@ const LABELS: Record<AiCapability, string> = {
   document_qa: "Hỏi đáp tài liệu",
   member_search: "Tìm kiếm Học viên",
   networking: "Kết nối",
-  fee_analysis: "Phân tích hội phí",
+  fee_analysis: "Phân tích phí tham gia CLB",
   event_summary: "Tổng hợp sự kiện",
   marketplace: "Marketplace",
   announcement_draft: "Soạn thông báo",

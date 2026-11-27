@@ -106,7 +106,7 @@ describe.skipIf(!canRun)("company history + networking queries (live DB)", () =>
     await admin.from("activity_log").insert({
       code: `AL-${rid()}`,
       user: "Admin",
-      action: "Thanh toán hội phí",
+      action: "Thanh toán phí tham gia CLB",
       target: memberCode, // matched by company code
       category: "fee",
       at: "2024-06-01",
@@ -170,7 +170,7 @@ describe.skipIf(!canRun)("company history + networking queries (live DB)", () =>
       .limit(50);
     expect(error).toBeNull();
     expect((data ?? []).length).toBeGreaterThan(0);
-    expect(data![0].action).toBe("Thanh toán hội phí");
+    expect(data![0].action).toBe("Thanh toán phí tham gia CLB");
   });
 
   it("event_registrations + events join returns enriched event history", async () => {

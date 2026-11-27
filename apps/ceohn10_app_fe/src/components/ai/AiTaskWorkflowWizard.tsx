@@ -69,10 +69,10 @@ export function AiTaskWorkflowWizard() {
   // ── BƯỚC 2: SOẠN THẢO THÔNG BÁO / BÁO CÁO ──
   const [noticeCategory, setNoticeCategory] = useState<string>("fees");
   const [noticeTitle, setNoticeTitle] = useState<string>(
-    "Thông báo đóng niên liễm & hội phí thường niên năm 2026 — CLB Doanh Nhân CEO HN10"
+    "Thông báo đóng niên liễm & phí tham gia CLB thường niên năm 2026 — CLB Doanh Nhân CEO HN10"
   );
   const [noticeContent, setNoticeContent] = useState<string>(
-    `Kính gửi Quý Doanh nhân {name} - {company},\n\nBan Chấp hành và Ban Tài chính CLB Doanh Nhân CEO HN10 (HanoiBA) xin gửi lời chào trân trọng và lời chúc sức khỏe, thành công đến Quý Hội viên.\n\nNhằm duy trì và phát triển các hoạt động kết nối giao thương B2B, đào tạo nâng tầm lãnh đạo và các chương trình thiện nguyện vì cộng đồng trong năm 2026, Ban Điều Hành trân trọng kính báo Quý Hội viên hoàn thành nghĩa vụ đóng niên liễm thường niên 2026.\n\n• Số tiền hội phí: {amount} VNĐ\n• Hạn nộp: Trước ngày {deadline}\n• Nội dung chuyển khoản: {transfer_note}\n\nSự đồng hành trách nhiệm của Quý Hội viên là nền tảng vững chắc xây dựng tập thể CEO HN10 đoàn kết và thịnh vượng.\n\nTrân trọng cảm ơn,\nBAN ĐIỀU HÀNH CLB DOANH NHÂN CEO HN10`
+    `Kính gửi Quý Doanh nhân {name} - {company},\n\nBan Chấp hành và Ban Tài chính CLB Doanh Nhân CEO HN10 (HanoiBA) xin gửi lời chào trân trọng và lời chúc sức khỏe, thành công đến Quý Hội viên.\n\nNhằm duy trì và phát triển các hoạt động kết nối giao thương B2B, đào tạo nâng tầm lãnh đạo và các chương trình thiện nguyện vì cộng đồng trong năm 2026, Ban Điều Hành trân trọng kính báo Quý Hội viên hoàn thành nghĩa vụ đóng niên liễm thường niên 2026.\n\n• Số tiền phí tham gia CLB: {amount} VNĐ\n• Hạn nộp: Trước ngày {deadline}\n• Nội dung chuyển khoản: {transfer_note}\n\nSự đồng hành trách nhiệm của Quý Hội viên là nền tảng vững chắc xây dựng tập thể CEO HN10 đoàn kết và thịnh vượng.\n\nTrân trọng cảm ơn,\nBAN ĐIỀU HÀNH CLB DOANH NHÂN CEO HN10`
   );
   const [deadline, setDeadline] = useState<string>("31/03/2026");
   const [exportFormats, setExportFormats] = useState<{
@@ -147,9 +147,9 @@ export function AiTaskWorkflowWizard() {
     setActionType(type);
     if (type === "fee_notice") {
       setNoticeCategory("fees");
-      setNoticeTitle("Thông báo đóng niên liễm & hội phí thường niên năm 2026 — CLB Doanh Nhân CEO HN10");
+      setNoticeTitle("Thông báo đóng niên liễm & phí tham gia CLB thường niên năm 2026 — CLB Doanh Nhân CEO HN10");
       setNoticeContent(
-        `Kính gửi Quý Doanh nhân {name} - {company},\n\nBan Chấp hành và Ban Tài chính CLB Doanh Nhân CEO HN10 (HanoiBA) xin gửi lời chào trân trọng và lời chúc sức khỏe, thành công đến Quý Hội viên.\n\nNhằm duy trì và phát triển các hoạt động kết nối giao thương B2B, đào tạo nâng tầm lãnh đạo và các chương trình thiện nguyện vì cộng đồng trong năm 2026, Ban Điều Hành trân trọng kính báo Quý Hội viên hoàn thành nghĩa vụ đóng niên liễm thường niên 2026.\n\n• Số tiền hội phí: {amount} VNĐ\n• Hạn nộp: Trước ngày {deadline}\n• Nội dung chuyển khoản: {transfer_note}\n\nSự đồng hành trách nhiệm của Quý Hội viên là nền tảng vững chắc xây dựng tập thể CEO HN10 đoàn kết và thịnh vượng.\n\nTrân trọng cảm ơn,\nBAN ĐIỀU HÀNH CLB DOANH NHÂN CEO HN10`
+        `Kính gửi Quý Doanh nhân {name} - {company},\n\nBan Chấp hành và Ban Tài chính CLB Doanh Nhân CEO HN10 (HanoiBA) xin gửi lời chào trân trọng và lời chúc sức khỏe, thành công đến Quý Hội viên.\n\nNhằm duy trì và phát triển các hoạt động kết nối giao thương B2B, đào tạo nâng tầm lãnh đạo và các chương trình thiện nguyện vì cộng đồng trong năm 2026, Ban Điều Hành trân trọng kính báo Quý Hội viên hoàn thành nghĩa vụ đóng niên liễm thường niên 2026.\n\n• Số tiền phí tham gia CLB: {amount} VNĐ\n• Hạn nộp: Trước ngày {deadline}\n• Nội dung chuyển khoản: {transfer_note}\n\nSự đồng hành trách nhiệm của Quý Hội viên là nền tảng vững chắc xây dựng tập thể CEO HN10 đoàn kết và thịnh vượng.\n\nTrân trọng cảm ơn,\nBAN ĐIỀU HÀNH CLB DOANH NHÂN CEO HN10`
       );
     } else if (type === "reminder_notice") {
       setNoticeCategory("events");
@@ -161,7 +161,7 @@ export function AiTaskWorkflowWizard() {
       setNoticeCategory("all");
       setNoticeTitle("Báo Cáo Tổng Hợp Tài Chính, Sự Kiện & Hoạt Động Thiện Nguyện — CEO HN10");
       setNoticeContent(
-        `Báo cáo quyết toán toàn diện kỳ hạch toán năm 2026 của Hiệp Hội Doanh Nhân CEO HN10. Hồ sơ bao gồm đầy đủ dữ liệu thu chi, bảng phân bổ nguồn quỹ sự kiện, học phần đào tạo và quỹ thiện nguyện an sinh xã hội.`
+        `Báo cáo quyết toán toàn diện kỳ hạch toán năm 2026 của CEOHN10 Doanh Nhân CEO HN10. Hồ sơ bao gồm đầy đủ dữ liệu thu chi, bảng phân bổ nguồn quỹ sự kiện, học phần đào tạo và quỹ thiện nguyện an sinh xã hội.`
       );
     }
   };
@@ -312,8 +312,8 @@ export function AiTaskWorkflowWizard() {
       id: `BC-${2026}-${String(idx + 1).padStart(3, "0")}`,
       date: new Date().toISOString().slice(0, 10),
       type: "income",
-      category: noticeCategory === "fees" ? "Hội phí" : "Sự kiện",
-      description: `Thu ${noticeCategory === "fees" ? "hội phí niên liễm 2026" : "kinh phí tham gia"} - ${m.name}`,
+      category: noticeCategory === "fees" ? "Phí tham gia CLB" : "Sự kiện",
+      description: `Thu ${noticeCategory === "fees" ? "phí tham gia CLB niên liễm 2026" : "kinh phí tham gia"} - ${m.name}`,
       amount: m.amount || 5000000,
       recipient: m.companyName || m.name,
       method: "bank",
@@ -437,7 +437,7 @@ export function AiTaskWorkflowWizard() {
                   .replace(/\{transfer_note\}/g, `${m.name} - CEOHN10`)
                   .replace(/\n/g, "<br/>")}
               </div>
-              <p style="font-size: 12px; color: #64748b;">Hệ thống phát thông báo tự động từ Cổng Quản trị CRM Hiệp Hội Doanh Nhân CEO HN10.</p>
+              <p style="font-size: 12px; color: #64748b;">Hệ thống phát thông báo tự động từ Cổng Quản trị CRM CEOHN10 Doanh Nhân CEO HN10.</p>
             </div>`,
           }),
         }).catch(() => null);
@@ -552,7 +552,7 @@ export function AiTaskWorkflowWizard() {
                 {
                   id: "fee_notice",
                   title: "Thông Báo Nộp Phí",
-                  desc: "Gửi email & thông báo thu niên liễm, hội phí thường niên",
+                  desc: "Gửi email & thông báo thu niên liễm, phí tham gia CLB thường niên",
                   icon: Wallet,
                 },
                 {

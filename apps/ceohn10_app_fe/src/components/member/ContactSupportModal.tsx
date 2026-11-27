@@ -87,7 +87,7 @@ const COMMITTEES: CommitteeItem[] = [
     icon: ShieldCheck,
     color: "#0F766E",
     bgLight: "bg-teal-50 dark:bg-teal-950/30 border-teal-200 dark:border-teal-800/40",
-    description: "Quản trị ngân sách, thu chi hội phí minh bạch, tài chính dự án và quỹ tương trợ.",
+    description: "Quản trị ngân sách, thu chi phí tham gia CLB minh bạch, tài chính dự án và quỹ tương trợ.",
   },
   {
     id: "truyen-thong",
@@ -135,7 +135,7 @@ const COMMITTEES: CommitteeItem[] = [
     icon: Laptop,
     color: "#4338CA",
     bgLight: "bg-indigo-50 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-800/40",
-    description: "Ứng dụng công nghệ AI/CRM, tối ưu hóa nền tảng số hiệp hội và đào tạo quản trị.",
+    description: "Ứng dụng công nghệ AI/CRM, tối ưu hóa nền tảng số CEOHN10 và đào tạo quản trị.",
   },
 ];
 

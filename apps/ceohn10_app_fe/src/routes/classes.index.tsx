@@ -316,7 +316,7 @@ const DEFAULT_LEDGER: ClassLedgerEntry[] = [
     id: "tx-init",
     code: "GD-FUND-INIT",
     date: "10/03/2026",
-    description: "Khởi tạo quỹ lớp CEO HN10 rót từ Quỹ Tổng Hiệp Hội HN10 (Đúng mức quy chuẩn 20tr)",
+    description: "Khởi tạo quỹ lớp CEO HN10 rót từ Quỹ Tổng CEOHN10 HN10 (Đúng mức quy chuẩn 20tr)",
     sourceType: "general_fund_init",
     sourceTypeName: "Khởi tạo từ Quỹ Tổng HN10",
     direction: "IN",
@@ -2493,7 +2493,7 @@ function ClassesManagementPage() {
                   {new Intl.NumberFormat("vi-VN").format(financeStats.initFund)} VNĐ
                 </div>
                 <p className="text-[11px] text-muted-foreground leading-snug">
-                  Đúng mức chuẩn 20.000.000đ được phê duyệt và rót từ Quỹ Tổng Hiệp Hội HN10.
+                  Đúng mức chuẩn 20.000.000đ được phê duyệt và rót từ Quỹ Tổng CEOHN10 HN10.
                 </p>
               </div>
 

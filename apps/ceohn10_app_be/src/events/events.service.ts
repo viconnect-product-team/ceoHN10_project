@@ -1453,7 +1453,7 @@ export class EventsService extends BaseService implements OnModuleInit {
 
                   <div style="border-top: 1px solid #e2e8f0; padding-top: 20px; margin-top: 24px; font-size: 12px; color: #64748b; line-height: 1.6;">
                     <strong>BAN TỔ CHỨC & THƯ KÝ CLB DOANH NHÂN CEO HN10</strong><br />
-                    Hiệp Hội Doanh Nghiệp Trẻ Hà Nội (HanoiBA)<br />
+                    CEOHN10 Doanh Nghiệp Trẻ Hà Nội (HanoiBA)<br />
                     Hotline hỗ trợ: Ban Thư ký & Ban Sự kiện CLB CEO HN10<br />
                     Email: btc@ceohn10.vn · Website: <a href="https://ceohn10.viconnect.vn" style="color: #1e3a8a; text-decoration: none;">ceohn10.viconnect.vn</a>
                   </div>
@@ -1741,7 +1741,7 @@ export class EventsService extends BaseService implements OnModuleInit {
               minute: '2-digit',
             })
             : '09:30'),
-        place: m.location || 'Văn phòng Hiệp hội CEO HN10',
+        place: m.location || 'Văn phòng CEOHN10 CEO HN10',
         image: mImg,
         banner: mImg,
         ticketPrice: 0,
@@ -2668,7 +2668,7 @@ export class EventsService extends BaseService implements OnModuleInit {
 
               <div style="border-top: 1px solid #e2e8f0; padding-top: 20px; margin-top: 24px; font-size: 12px; color: #64748b; line-height: 1.6;">
                 <strong>BAN TỔ CHỨC & THƯ KÝ CLB DOANH NHÂN CEO HN10</strong><br />
-                Hiệp Hội Doanh Nghiệp Trẻ Hà Nội (HanoiBA)<br />
+                CEOHN10 Doanh Nghiệp Trẻ Hà Nội (HanoiBA)<br />
                 Hotline hỗ trợ: Ban Thư ký & Ban Sự kiện CLB CEO HN10<br />
                 Email: btc@ceohn10.vn · Website: <a href="https://ceohn10.viconnect.vn" style="color: #8B0000; text-decoration: none;">ceohn10.viconnect.vn</a>
               </div>

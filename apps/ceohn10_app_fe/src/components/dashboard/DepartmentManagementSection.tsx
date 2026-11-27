@@ -233,7 +233,7 @@ export function DepartmentManagementSection() {
   };
 
   const handleResetDefaults = () => {
-    if (window.confirm("Bạn có chắc chắn muốn khôi phục về danh sách 7 Ban chuẩn của Hiệp hội CEO HN10?")) {
+    if (window.confirm("Bạn có chắc chắn muốn khôi phục về danh sách 7 Ban chuẩn của CEOHN10 CEO HN10?")) {
       setDepartments(INITIAL_DEPARTMENTS);
       saveCustomDepartments(INITIAL_DEPARTMENTS);
       dispatchPermissionSyncEvent();
@@ -258,7 +258,7 @@ export function DepartmentManagementSection() {
                 </span>
               </h2>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Cấu hình cơ cấu tổ chức Hiệp hội CEO HN10 (Ban Điều Hành &amp; các Ban chuyên môn, không có Ban Quản trị)
+                Cấu hình cơ cấu tổ chức CEOHN10 CEO HN10 (Ban Điều Hành &amp; các Ban chuyên môn, không có Ban Quản trị)
               </p>
             </div>
           </div>
@@ -461,7 +461,7 @@ export function DepartmentManagementSection() {
                   rows={3}
                   value={formDesc}
                   onChange={(e) => setFormDesc(e.target.value)}
-                  placeholder="Mô tả chức năng, nhiệm vụ trọng tâm của ban trong hiệp hội..."
+                  placeholder="Mô tả chức năng, nhiệm vụ trọng tâm của ban trong CEOHN10..."
                   className="w-full rounded-xl border border-input bg-background px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#003B95]"
                 />
               </div>
@@ -469,7 +469,7 @@ export function DepartmentManagementSection() {
               <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 flex items-start gap-2.5">
                 <Info className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                 <p className="text-[11px] text-amber-800 dark:text-amber-300 leading-relaxed">
-                  Hiệp hội chuẩn hóa theo cơ cấu Ban Điều Hành và các Ban chuyên môn. Không sử dụng tên gọi "Ban Quản trị" hay "Trưởng ban quản trị".
+                  CEOHN10 chuẩn hóa theo cơ cấu Ban Điều Hành và các Ban chuyên môn. Không sử dụng tên gọi "Ban Quản trị" hay "Trưởng ban quản trị".
                 </p>
               </div>
 

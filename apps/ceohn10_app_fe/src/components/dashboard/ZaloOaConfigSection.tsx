@@ -385,7 +385,7 @@ ${qrImageUrl}
     } else if (testType === "meeting") {
       messageBody = `[CLB CEO HN10] Kính gửi Học viên ${testRecipientName}, Ban Điều Hành thông báo triệu tập Cuộc họp Ban Thường Trực định kỳ lúc 09:00 tại Văn phòng HanoiBA & trực tuyến qua Jitsi Meet.\n\n💻 Tham gia: https://meet.jit.si/CEOHN10_MEET_BAN_DIEU_HANH_14`;
     } else if (testType === "fee") {
-      messageBody = `[CLB CEO HN10] Kính gửi Học viên ${testRecipientName}, Ban Tài chính trân trọng thông báo kỳ thu hội phí thường niên năm 2026. Số tiền: 10.000.000 đ. Kính chúc Quý Doanh nghiệp ngày càng phát triển thịnh vượng!\n\n💳 Xem mã VietQR: https://ceohn10.viconnect.vn/association/profile`;
+      messageBody = `[CLB CEO HN10] Kính gửi Học viên ${testRecipientName}, Ban Tài chính trân trọng thông báo kỳ thu phí tham gia CLB thường niên năm 2026. Số tiền: 10.000.000 đ. Kính chúc Quý Doanh nghiệp ngày càng phát triển thịnh vượng!\n\n💳 Xem mã VietQR: https://ceohn10.viconnect.vn/association/profile`;
     } else {
       messageBody = customMessage.trim() || `[CLB CEO HN10] Tin nhắn kiểm thử kết nối thành công từ Cổng Quản trị CRM CEO HN10 đến số ${testPhone}.`;
     }
@@ -445,7 +445,7 @@ ${qrImageUrl}
               <span>Zalo Official Account: {oaName}</span>
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Kết nối trực tiếp OA ID <code className="font-mono text-slate-700 dark:text-slate-300 font-semibold">{oaId}</code> phục vụ gửi thư mời sự kiện, diễn đàn, cuộc họp và thông báo hội phí.
+              Kết nối trực tiếp OA ID <code className="font-mono text-slate-700 dark:text-slate-300 font-semibold">{oaId}</code> phục vụ gửi thư mời sự kiện, diễn đàn, cuộc họp và thông báo phí tham gia CLB.
             </p>
           </div>
 
@@ -707,14 +707,14 @@ ${qrImageUrl}
                 Cổng Thanh Toán Tự Động SePay Dynamic
               </span>
               <span className="text-xs text-slate-400 font-medium hidden sm:inline">
-                (Tích hợp VietQR nạp tiền &amp; hội phí)
+                (Tích hợp VietQR nạp tiền &amp; phí tham gia CLB)
               </span>
             </div>
             <h4 className="text-sm font-bold text-slate-900 dark:text-white pt-1">
               Cấu Hình Ngân Hàng Nhận Tiền &amp; Đối Soát SePay
             </h4>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Mọi thông số nạp hội phí, mua vé sự kiện qua SePay được lưu trực tiếp vào CSDL máy chủ, không hardcode.
+              Mọi thông số nạp phí tham gia CLB, mua vé sự kiện qua SePay được lưu trực tiếp vào CSDL máy chủ, không hardcode.
             </p>
           </div>
 
@@ -821,7 +821,7 @@ ${qrImageUrl}
               className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs font-semibold text-slate-800 dark:bg-slate-950 dark:border-slate-700 dark:text-slate-200"
             >
               <option value="all">Toàn Nền Tảng (Tất cả Cổng Web CRM &amp; App Mobile)</option>
-              <option value="ceohn10_mobile">CEO HN10 Mobile App (Thanh toán Hội phí &amp; Vé)</option>
+              <option value="ceohn10_mobile">CEO HN10 Mobile App (Thanh toán Phí tham gia CLB &amp; Vé)</option>
               <option value="crm_admin">Cổng Quản Trị Web CRM (Kế toán &amp; Thu chi)</option>
               <option value="events_checkin">Hệ Thống Sự Kiện &amp; Điểm Danh QR</option>
             </select>
@@ -885,7 +885,7 @@ ${qrImageUrl}
               <option value="event">🎪 Thư mời Sự kiện &amp; Gala</option>
               <option value="forum">🏛️ Thư mời Diễn đàn Doanh nhân</option>
               <option value="meeting">💼 Thông báo Họp Ban Điều Hành</option>
-              <option value="fee">💳 Nhắc nộp hội phí niên liễm</option>
+              <option value="fee">💳 Nhắc nộp phí tham gia CLB niên liễm</option>
               <option value="custom">✍️ Tự soạn nội dung riêng</option>
             </select>
           </div>

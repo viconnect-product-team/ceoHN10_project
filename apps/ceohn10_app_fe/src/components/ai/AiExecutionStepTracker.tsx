@@ -193,7 +193,7 @@ export function AiExecutionStepTracker({
     taskType === "event_email"
       ? `[CEO HN10] Thư Mời Tham Dự Sự Kiện & Hội Nghị Doanh Nhân CEO HN10`
       : taskType === "fee_reminder"
-      ? `[CEO HN10] Thông Báo Đóng Hội Phí Thường Niên 2026 - CLB Doanh Nhân CEO HN10`
+      ? `[CEO HN10] Thông Báo Đóng Phí Tham Gia CLB Thường Niên 2026 - CLB Doanh Nhân CEO HN10`
       : taskType === "training_notice"
       ? `[CEO HN10] Thông Báo Lịch Học Chuyên Đề Quản Trị Chiến Lược Doanh Nghiệp`
       : `[CEO HN10] Thông Báo Điều Hành & Báo Cáo Hoạt Động`;

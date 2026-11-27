@@ -43,7 +43,7 @@ interface FinanceChartsSectionProps {
 // Bảng màu chuẩn CEO HN10 (Deep Cobalt Navy, Warm Amber Gold, Emerald, Rose, Sky)
 const INCOME_COLORS: Record<string, string> = {
   "Tài trợ sự kiện & Doanh nghiệp": "#F59E0B", // Warm Amber Gold
-  "Hội phí Học viên": "#003B95", // Deep Cobalt Navy
+  "Phí tham gia CLB Học viên": "#003B95", // Deep Cobalt Navy
   "Vé sự kiện & Triển lãm": "#10B981", // Emerald
   "Nguồn thu khác & Đột xuất": "#0284C7", // Sky Blue
 };
@@ -146,7 +146,7 @@ export function FinanceChartsSection({
 
       if (cat.includes("tài trợ") || cat.includes("sponsor") || desc.includes("tài trợ")) {
         sponsorAmt += amt;
-      } else if (cat.includes("hội phí") || cat.includes("membership") || desc.includes("hội phí")) {
+      } else if (cat.includes("phí tham gia CLB") || cat.includes("membership") || desc.includes("phí tham gia CLB")) {
         feeAmt += amt;
       } else if (cat.includes("vé") || cat.includes("ticket") || cat.includes("walkin") || desc.includes("vé")) {
         ticketAmt += amt;
@@ -165,7 +165,7 @@ export function FinanceChartsSection({
 
     const items = [
       { name: "Tài trợ sự kiện & Doanh nghiệp", value: sponsorAmt, color: INCOME_COLORS["Tài trợ sự kiện & Doanh nghiệp"] },
-      { name: "Hội phí Học viên", value: feeAmt, color: INCOME_COLORS["Hội phí Học viên"] },
+      { name: "Phí tham gia CLB Học viên", value: feeAmt, color: INCOME_COLORS["Phí tham gia CLB Học viên"] },
       { name: "Vé sự kiện & Triển lãm", value: ticketAmt, color: INCOME_COLORS["Vé sự kiện & Triển lãm"] },
       { name: "Nguồn thu khác & Đột xuất", value: otherAmt, color: INCOME_COLORS["Nguồn thu khác & Đột xuất"] },
     ].filter((it) => it.value > 0);
@@ -380,7 +380,7 @@ export function FinanceChartsSection({
       {/* ── 2. LƯỚI BIỂU ĐỒ TRÒN / DONUT CƠ CẤU THU & CHI ── */}
       {(activeTab === "all" || activeTab === "income_sponsor" || activeTab === "expense") && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          {/* A. Cơ Cấu Nguồn Thu (Làm Nổi Bật TÀI TRỢ & HỘI PHÍ) */}
+          {/* A. Cơ Cấu Nguồn Thu (Làm Nổi Bật TÀI TRỢ & PHÍ THAM GIA CLB) */}
           {(activeTab === "all" || activeTab === "income_sponsor") && (
             <div className="p-5 sm:p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#0F172A] shadow-sm space-y-4">
               <div className="flex items-center justify-between">
@@ -392,7 +392,7 @@ export function FinanceChartsSection({
                     </h4>
                   </div>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Tỷ trọng đóng góp từ Nhà tài trợ, Hội phí và Vé sự kiện
+                    Tỷ trọng đóng góp từ Nhà tài trợ, Phí tham gia CLB và Vé sự kiện
                   </p>
                 </div>
                 <span className="font-mono text-xs font-black px-2.5 py-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">

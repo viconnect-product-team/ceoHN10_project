@@ -283,7 +283,7 @@ async function parseExcelFile(file: File, isCsv = false): Promise<ParsedFileResu
           val.includes("giá vé") ||
           val.includes("vé") ||
           val.includes("amount") ||
-          val.includes("hội phí")
+          val.includes("phí tham gia CLB")
         ) {
           amountColIdx = c;
         }

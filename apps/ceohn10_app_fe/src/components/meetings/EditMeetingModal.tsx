@@ -365,7 +365,7 @@ export function EditMeetingModal({
                   required
                   value={venue}
                   onChange={(addr) => setVenue(addr)}
-                  placeholder="VD: Văn phòng Hiệp hội CEO HN10, Tòa V-Tower, 649 Kim Mã, Hà Nội"
+                  placeholder="VD: Văn phòng CEOHN10 CEO HN10, Tòa V-Tower, 649 Kim Mã, Hà Nội"
                   showQuickLocations={true}
                 />
               </div>

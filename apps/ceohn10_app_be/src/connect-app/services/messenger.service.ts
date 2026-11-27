@@ -380,7 +380,7 @@ export class ConnectMessengerService {
           'Văn bản chỉ đạo & kế hoạch hoạt động quý 1/2026 đã được Ban Thư Ký cập nhật. Kính mời Quý Học viên theo dõi và đồng hành.',
         ],
         channel_media: [
-          'Chào mừng Quý Học viên đến với Kênh Ban Truyền Thông Hiệp Hội CEO HN10.',
+          'Chào mừng Quý Học viên đến với Kênh Ban Truyền Thông CEOHN10 CEO HN10.',
           'Bản tin hoạt động CLB: Đẩy mạnh các chiến dịch truyền thông nhận diện thương hiệu cho các doanh nghiệp Học viên trên đa nền tảng.',
           'Thông cáo báo chí: Chuỗi sự kiện Gala Doanh Nhân & Lễ tôn vinh Doanh nghiệp tiêu biểu 2026 chuẩn bị khởi động.',
         ],
@@ -433,7 +433,7 @@ export class ConnectMessengerService {
 
     const channelNames: Record<string, string> = {
       channel_secretariat: '🏛️ Kênh Ban Thư Ký & Ban Điều Hành',
-      channel_media: '📢 Kênh Ban Truyền Thông Hiệp Hội',
+      channel_media: '📢 Kênh Ban Truyền Thông CEOHN10',
       channel_promotion: '🤝 Kênh Ban Xúc Tiến Giao Thương',
       channel_deals: '🎯 Kênh Cơ Hội & Deal B2B',
       channel_events: '🌟 Kênh Ban Sự Kiện & Hội Nghị',

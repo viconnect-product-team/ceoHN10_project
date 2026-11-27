@@ -666,7 +666,7 @@ export function CeoHn10StudentAppScreen() {
               CLB DOANH NHÂN CEO HN10
             </h1>
             <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
-              Hiệp Hội HanoiBA · {profile?.name || "Học Viên"}
+              CEOHN10 HanoiBA · {profile?.name || "Học Viên"}
             </p>
           </div>
         </div>
@@ -1262,7 +1262,7 @@ export function CeoHn10StudentAppScreen() {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-bold text-slate-900">
-                  Sự Kiện Hiệp Hội CEO HN10
+                  Sự Kiện CEOHN10 CEO HN10
                 </h3>
                 <p className="text-[11px] text-slate-500">Xem chi tiết, đăng ký vé tham dự và nhận mã QR</p>
               </div>
@@ -1361,7 +1361,7 @@ export function CeoHn10StudentAppScreen() {
                 <h3 className="text-sm font-bold text-slate-900">
                   Mạng Lưới Bạn Học CEO HN10
                 </h3>
-                <p className="text-[11px] text-slate-500">Các lãnh đạo doanh nghiệp cùng khóa học và Hiệp hội</p>
+                <p className="text-[11px] text-slate-500">Các lãnh đạo doanh nghiệp cùng khóa học và CEOHN10</p>
               </div>
               <span className="text-xs font-bold text-slate-600 bg-slate-200/60 px-2.5 py-0.5 rounded-full">
                 {peers.length} Doanh nhân

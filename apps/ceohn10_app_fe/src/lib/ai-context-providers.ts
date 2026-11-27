@@ -225,7 +225,7 @@ export function feeProvider(
   const res = empty();
   if (isAdminLike(permission)) {
     if (!data) {
-      res.limitations.push("Chưa có dữ liệu hội phí tổng hợp.");
+      res.limitations.push("Chưa có dữ liệu phí tham gia CLB tổng hợp.");
       return res;
     }
     res.metrics = {
@@ -238,7 +238,7 @@ export function feeProvider(
       ...(data.collectionRate != null ? { collectionRate: `${data.collectionRate}%` } : {}),
     };
     res.suggestedActions = [
-      { label: "Mở Trung tâm hội phí", route: "/fees" },
+      { label: "Mở Trung tâm phí tham gia CLB", route: "/fees" },
       { label: "Xem gia hạn", route: "/renewal" },
     ];
     res.limitations.push(
@@ -253,11 +253,11 @@ export function feeProvider(
       ...(myFee.amountDue != null ? { amountDue: myFee.amountDue } : {}),
       ...(myFee.dueDate ? { dueDate: myFee.dueDate } : {}),
     };
-    res.suggestedActions = [{ label: "Xem hội phí của tôi", route: "/renewal" }];
+    res.suggestedActions = [{ label: "Xem phí tham gia CLB của tôi", route: "/renewal" }];
     return res;
   }
   res.limitations.push(
-    "Bạn chưa có quyền xem số liệu hội phí tổng hợp; chỉ có thể xem hội phí của chính mình.",
+    "Bạn chưa có quyền xem số liệu phí tham gia CLB tổng hợp; chỉ có thể xem phí tham gia CLB của chính mình.",
   );
   return res;
 }
@@ -397,7 +397,7 @@ export function runProvider(
     default: {
       const res = empty();
       res.limitations.push(
-        "Chưa xác định rõ năng lực phù hợp; vui lòng nêu cụ thể hơn (tài liệu, Học viên, hội phí, sự kiện…).",
+        "Chưa xác định rõ năng lực phù hợp; vui lòng nêu cụ thể hơn (tài liệu, Học viên, phí tham gia CLB, sự kiện…).",
       );
       return res;
     }

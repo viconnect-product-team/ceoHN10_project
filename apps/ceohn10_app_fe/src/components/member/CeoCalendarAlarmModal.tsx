@@ -91,7 +91,7 @@ export const CeoCalendarAlarmModal: React.FC<CeoCalendarAlarmModalProps> = ({
       list.push({
         id,
         type: "event",
-        title: ev.title || "Sự kiện Hiệp hội CEO HN10",
+        title: ev.title || "Sự kiện CEOHN10 CEO HN10",
         dateStr,
         timeStr,
         location: ev.location || ev.venue || "Keangnam Landmark 72, Hà Nội",

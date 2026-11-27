@@ -1112,7 +1112,7 @@ function StandaloneGuestEventRegistrationPage() {
                 <Award className="w-7 h-7 text-amber-600" />
               </div>
               <div className="text-[11px] font-black tracking-[0.22em] text-[#003B95] uppercase">
-                HANOIBA · HIỆP HỘI DOANH NGHIỆP TRẺ HÀ NỘI
+                HANOIBA · CEOHN10 DOANH NGHIỆP TRẺ HÀ NỘI
               </div>
               <div className="text-xs font-bold tracking-widest text-slate-600 uppercase">
                 CLB DOANH NHÂN CEO HN10

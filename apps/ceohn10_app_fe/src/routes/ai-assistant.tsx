@@ -46,7 +46,7 @@ export function AiAssistantPage() {
     taxCode: "0109988776",
     address: "Tòa tháp Keangnam Landmark 72, Nam Từ Liêm, Hà Nội",
     amount: 5000000,
-    reason: "Đóng hội phí thường niên năm 2026 - CLB Doanh Nhân CEO HN10",
+    reason: "Đóng phí tham gia CLB thường niên năm 2026 - CLB Doanh Nhân CEO HN10",
     paymentMethod: "Chuyển khoản QR Ngân Hàng",
   });
   const [invoicePreview, setInvoicePreview] = useState<any>(null);
@@ -318,7 +318,7 @@ export function AiAssistantPage() {
                   },
                   {
                     priority: "Trung bình",
-                    title: "Nhắc nhở đóng hội phí kỳ mới",
+                    title: "Nhắc nhở đóng phí tham gia CLB kỳ mới",
                     desc: "Tự động gửi thông báo qua Zalo OA và App CEO HN10 cho các Học viên sắp đến hạn.",
                   },
                   {

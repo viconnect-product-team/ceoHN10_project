@@ -168,7 +168,7 @@ export class AdminRepository {
       )
       .catch(() => {});
 
-    // Chuẩn hóa bảng invoices (Hóa đơn điện tử hội phí & sự kiện)
+    // Chuẩn hóa bảng invoices (Hóa đơn điện tử phí tham gia CLB & sự kiện)
     await this.prisma
       .$executeRawUnsafe(
         `
@@ -182,7 +182,7 @@ export class AdminRepository {
         paid_at date,
         status text DEFAULT 'pending',
         method text DEFAULT 'vnpay',
-        category text DEFAULT 'Hội phí',
+        category text DEFAULT 'Phí tham gia CLB',
         customer_name text,
         customer_email text,
         customer_phone text,
@@ -196,7 +196,7 @@ export class AdminRepository {
     await this.prisma
       .$executeRawUnsafe(
         `
-      ALTER TABLE public.invoices ADD COLUMN IF NOT EXISTS category text DEFAULT 'Hội phí';
+      ALTER TABLE public.invoices ADD COLUMN IF NOT EXISTS category text DEFAULT 'Phí tham gia CLB';
     `,
       )
       .catch(() => {});

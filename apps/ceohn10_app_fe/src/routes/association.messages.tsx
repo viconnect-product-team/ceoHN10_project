@@ -386,7 +386,7 @@ function MessagesScreen() {
                                   Tin tức
                                 </p>
                                 <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                                  Bản tin & thông cáo hiệp hội
+                                  Bản tin & thông cáo CEOHN10
                                 </p>
                               </div>
                             </div>

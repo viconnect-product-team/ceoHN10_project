@@ -118,11 +118,11 @@ export function useUnreadNotifications() {
           catCounts["/notifications?filter=new_members"] = (catCounts["/notifications?filter=new_members"] || 0) + 1;
         }
 
-        // 2. Hội phí & niên liễm
+        // 2. Phí tham gia CLB & niên liễm
         if (
           text.includes("gia hạn") ||
           text.includes("niên liễm") ||
-          text.includes("hội phí") ||
+          text.includes("phí tham gia CLB") ||
           text.includes("phí") ||
           text.includes("quá hạn")
         ) {

@@ -56,7 +56,7 @@ export const VNPayConfigSection: React.FC = () => {
   }, []);
 
   const [testAmount, setTestAmount] = useState(1000000);
-  const [testOrderInfo, setTestOrderInfo] = useState("CEO HN10 - Đóng hội phí thường niên");
+  const [testOrderInfo, setTestOrderInfo] = useState("CEO HN10 - Đóng phí tham gia CLB thường niên");
   const [testPaymentUrl, setTestPaymentUrl] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -115,7 +115,7 @@ export const VNPayConfigSection: React.FC = () => {
               </span>
             </div>
             <p className="text-xs text-blue-100 mt-0.5">
-              Hệ thống xử lý thanh toán hội phí, vé sự kiện & B2B thay thế hoàn toàn VietQR cũ
+              Hệ thống xử lý thanh toán phí tham gia CLB, vé sự kiện & B2B thay thế hoàn toàn VietQR cũ
             </p>
           </div>
         </div>
@@ -206,7 +206,7 @@ export const VNPayConfigSection: React.FC = () => {
 
           <div className="md:col-span-2">
             <label className="block text-xs font-bold text-foreground mb-1">
-              URL Webhook IPN (Tự Động Kích Hoạt Vé / Hội Phí Khi Nhận Tiền)
+              URL Webhook IPN (Tự Động Kích Hoạt Vé / Phí Tham Gia CLB Khi Nhận Tiền)
             </label>
             <div className="relative">
               <input

@@ -96,7 +96,7 @@ export function MiniKpiCard({
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
-   CHUẨN HÓA 4 Ô METRIC CARDS ĐỒNG BỘ TOÀN HỆ THỐNG HIỆP HỘI (ẢNH 2 FIGMA)
+   CHUẨN HÓA 4 Ô METRIC CARDS ĐỒNG BỘ TOÀN HỆ THỐNG CEOHN10 (ẢNH 2 FIGMA)
    Ô 1: Sky/Blue  |  Ô 2: Violet/Indigo  |  Ô 3: Orange/Amber  |  Ô 4: Green/Emerald
    Kích thước: h-32 p-4 rounded-[20px] outline-[0.5px] outline-slate-200
 ────────────────────────────────────────────────────────────────────────── */

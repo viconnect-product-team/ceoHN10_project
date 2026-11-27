@@ -365,7 +365,7 @@ export function Ceo1983FullLandingWeb() {
               },
               {
                 title: "Ban Quan Hệ Đối Ngoại",
-                desc: "Mở rộng liên kết với các hiệp hội doanh nghiệp trong và ngoài nước, đón tiếp các đoàn xúc tiến thương mại quốc tế.",
+                desc: "Mở rộng liên kết với các CEOHN10 doanh nghiệp trong và ngoài nước, đón tiếp các đoàn xúc tiến thương mại quốc tế.",
                 icon: Globe,
               },
             ].map((dept, idx) => (

@@ -569,7 +569,7 @@ export function EventCheckinGatekeeperModal({
                     Phân quyền người quét mã QR sự kiện (Ban Truyền Thông):
                   </div>
                   <div>
-                    Chọn các thành viên Ban Truyền Thông được quyền dùng App Hiệp hội để quét vé cho sự kiện này. Nếu một người được chọn ở nhiều sự kiện, App Hiệp hội sẽ cho phép chuyển đổi giữa các sự kiện đó.
+                    Chọn các thành viên Ban Truyền Thông được quyền dùng App CEOHN10 để quét vé cho sự kiện này. Nếu một người được chọn ở nhiều sự kiện, App CEOHN10 sẽ cho phép chuyển đổi giữa các sự kiện đó.
                   </div>
                 </div>
               </div>

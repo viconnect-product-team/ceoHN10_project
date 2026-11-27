@@ -151,7 +151,7 @@ export class ConnectIdentityService {
         .catch(() => null);
     } catch { }
 
-    // 3. members (App Hiệp hội CEO HN10)
+    // 3. members (App CEOHN10 CEO HN10)
     try {
       await this.prisma.$executeRaw`
         UPDATE public.members

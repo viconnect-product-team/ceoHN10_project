@@ -97,7 +97,7 @@ describe("member DTO whitelist", () => {
       row: DIRTY_MEMBER,
       card: PUBLIC_CARD,
       viewerUserId: VIEWER,
-      communityName: "Hiệp hội Test",
+      communityName: "CEOHN10 Test",
       viewerRole: "member",
       connectionState: "none",
       connectionId: null,

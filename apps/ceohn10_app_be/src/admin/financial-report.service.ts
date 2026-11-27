@@ -466,7 +466,7 @@ export class FinancialReportService implements OnModuleInit {
     fundAccountLink?: string;
     transactionDate?: string;
   }) {
-    const fromDept = data.fromDepartment || 'Quỹ Tổng Hiệp Hội';
+    const fromDept = data.fromDepartment || 'Quỹ Tổng CEOHN10';
     const toDept = data.toDepartment || 'Ban Công Nghệ';
     const amount = Math.max(0, Number(data.amount) || 0);
     const txDate = data.transactionDate || new Date().toISOString().split('T')[0];

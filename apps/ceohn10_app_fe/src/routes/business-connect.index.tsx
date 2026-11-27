@@ -6,7 +6,7 @@ export const Route = createFileRoute("/business-connect/")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Business Connect — Hệ Điều Hành Kết Nối Kinh Doanh & Hiệp Hội" },
+      { title: "Business Connect — Hệ Điều Hành Kết Nối Kinh Doanh & CEOHN10" },
       {
         name: "description",
         content:

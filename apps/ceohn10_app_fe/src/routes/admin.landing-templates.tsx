@@ -227,7 +227,7 @@ export const ALL_ACTION_ITEMS: { key: string; name: string; defaultIcon: string;
   { key: "voting", name: "Biểu quyết", defaultIcon: "🗳️", category: "Nghiệp vụ" },
   { key: "history", name: "Lịch sử", defaultIcon: "📜", category: "Nghiệp vụ" },
   { key: "library", name: "Kho tài liệu", defaultIcon: "📁", category: "Nghiệp vụ" },
-  { key: "fees", name: "Hội phí", defaultIcon: "💎", category: "Tài chính" },
+  { key: "fees", name: "Phí tham gia CLB", defaultIcon: "💎", category: "Tài chính" },
   { key: "connect", name: "Mạng lưới", defaultIcon: "🤝", category: "Kết nối" },
   { key: "events", name: "Sự kiện", defaultIcon: "📅", category: "Sự kiện" },
   { key: "opportunities", name: "Cơ hội B2B", defaultIcon: "💼", category: "Kinh doanh" },
@@ -391,7 +391,7 @@ export function AdminThemeManagementPage() {
       console.warn("Could not save active theme to backend:", e);
     }
 
-    toast.success(`Đã kích hoạt thành công chủ đề "${theme.name}" cho App Hiệp hội!`, {
+    toast.success(`Đã kích hoạt thành công chủ đề "${theme.name}" cho App CEOHN10!`, {
       description: "Toàn bộ App CEO HN10 & CRM đã đổi màu sắc, bố cục và icon tương ứng tức thì.",
     });
   };
@@ -465,7 +465,7 @@ export function AdminThemeManagementPage() {
     }
 
     toast.success(`Đã lưu và áp dụng chủ đề tùy chỉnh thành công!`, {
-      description: "App Hiệp hội CEO HN10 & CRM đã cập nhật bố cục, bộ icon và hiệu ứng mới tức thì.",
+      description: "App CEOHN10 CEO HN10 & CRM đã cập nhật bố cục, bộ icon và hiệu ứng mới tức thì.",
     });
   };
 
@@ -508,7 +508,7 @@ export function AdminThemeManagementPage() {
       console.warn("Could not save deactivate theme to backend:", e);
     }
 
-    toast.success("Đã tắt chủ đề, trở về giao diện gốc chuẩn của Hiệp hội!", {
+    toast.success("Đã tắt chủ đề, trở về giao diện gốc chuẩn của CEOHN10!", {
       description: "Toàn bộ App CEO HN10 sử dụng giao diện mặc định ban đầu (không áp dụng chủ đề).",
     });
   };
@@ -520,7 +520,7 @@ export function AdminThemeManagementPage() {
     <AppShell>
       <PageHeader
         title="Quản Lý Chủ Đề & Giao Diện App CEO HN10"
-        subtitle="Hệ thống tùy biến bố cục, màu sắc, icon động và không gian lễ hội chào mừng các sự kiện lớn cho App Hiệp hội"
+        subtitle="Hệ thống tùy biến bố cục, màu sắc, icon động và không gian lễ hội chào mừng các sự kiện lớn cho App CEOHN10"
         actions={
           <div className="flex items-center gap-2">
             <button
@@ -560,7 +560,7 @@ export function AdminThemeManagementPage() {
                 {isEnabled ? (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/25 border border-emerald-400/40 text-emerald-300 text-xs font-bold backdrop-blur-md">
                     <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                    ĐANG KÍCH HOẠT TRÊN APP HIỆP HỘI
+                    ĐANG KÍCH HOẠT TRÊN APP CEOHN10
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-200 text-xs font-bold backdrop-blur-md">
@@ -797,7 +797,7 @@ export function AdminThemeManagementPage() {
                           <span title="Check-in">{theme.actionIcons.checkin || "⚡"}</span>
                           <span title="Đặc quyền">{theme.actionIcons.perks || "👑"}</span>
                           <span title="Biểu quyết">{theme.actionIcons.voting || "🗳️"}</span>
-                          <span title="Hội phí">{theme.actionIcons.fees || "💎"}</span>
+                          <span title="Phí tham gia CLB">{theme.actionIcons.fees || "💎"}</span>
                         </div>
                       </div>
 

@@ -209,7 +209,7 @@ export function NotificationCenter() {
     if (
       titleLower.includes("phí") ||
       titleLower.includes("thanh toán") ||
-      bodyLower.includes("hội phí")
+      bodyLower.includes("phí tham gia CLB")
     ) {
       void navigate({ to: "/fees" });
       return;

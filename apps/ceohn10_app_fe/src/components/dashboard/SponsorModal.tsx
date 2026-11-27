@@ -288,7 +288,7 @@ export function SponsorModal({
                     ? "Ví dụ: Tài trợ kinh phí xây dựng điểm trường Bản Mù Mù Cang Chải / 500 suất quà tết cho hộ nghèo..."
                     : isCurrentInKind
                     ? "Ví dụ: Tài trợ 200 áo đồng phục Gala kết nối, 50 lẵng hoa tươi và quà tặng đại biểu..."
-                    : "Ví dụ: Tài trợ kinh phí tổ chức sự kiện Business Matching HN10 Quý 3 / Hỗ trợ công tác truyền thông hiệp hội..."
+                    : "Ví dụ: Tài trợ kinh phí tổ chức sự kiện Business Matching HN10 Quý 3 / Hỗ trợ công tác truyền thông CEOHN10..."
                 }
                 className="w-full rounded-xl border border-border bg-background p-3 text-xs text-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
               />

@@ -73,7 +73,7 @@ describe("permission checks", () => {
 
 describe("action planning", () => {
   it("puts export first only when the user asks to export", () => {
-    const withExport = planActions("fee", "Xuất báo cáo hội phí quý này", ADMIN);
+    const withExport = planActions("fee", "Xuất báo cáo phí tham gia CLB quý này", ADMIN);
     expect(withExport.steps.some((s) => /xuất/i.test(s.label))).toBe(true);
 
     const noExport = planActions("member", "Tìm Học viên ngành Logistics", MEMBER);

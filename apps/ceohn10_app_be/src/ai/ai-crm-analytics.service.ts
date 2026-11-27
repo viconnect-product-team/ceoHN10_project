@@ -357,14 +357,14 @@ export class AiCrmAnalyticsService {
       keyStrengths: [
         `Giao thương B2B thực tế: Ghi nhận ${totalOpps} cơ hội đang mở xúc tiến giữa các Học viên với tổng ngân sách ${oppValueBillions} Tỷ VNĐ.`,
         `Dòng tiền quỹ ngân sách: Tổng thu thực tế ${new Intl.NumberFormat('vi-VN').format(totalIncome)} đ, Tổng chi ${new Intl.NumberFormat('vi-VN').format(totalExpense)} đ, số dư quỹ an toàn ${surplusFormatted}.`,
-        `Điều phối sự kiện & kết nối: Đang triển khai ${totalEvents} sự kiện trọng điểm kết nối giao thương cấp hiệp hội.`,
+        `Điều phối sự kiện & kết nối: Đang triển khai ${totalEvents} sự kiện trọng điểm kết nối giao thương cấp CEOHN10.`,
       ],
       bottlenecks: [
         totalOpps < 10
           ? 'Số lượng cơ hội B2B mở mới cần được Ban Xúc Tiến Thương Mại kích cầu thêm trong các kỳ họp chi hội.'
           : 'Cần phân loại cơ hội B2B theo các ngành mũi nhọn (xây dựng, thương mại, CNTT) để matching nhanh hơn.',
         surplusFund <= 0
-          ? 'Cần đôn đốc kế hoạch thu hội phí thường niên để đảm bảo nguồn vốn chi cho hoạt động CLB.'
+          ? 'Cần đôn đốc kế hoạch thu phí tham gia CLB thường niên để đảm bảo nguồn vốn chi cho hoạt động CLB.'
           : 'Nên duy trì quỹ dự phòng sự kiện và xúc tiến thêm các gói tài trợ doanh nghiệp.',
       ],
       actionableRecommendations: [
@@ -480,7 +480,7 @@ export class AiCrmAnalyticsService {
         options?.companyName || 'Doanh nghiệp Học viên CLB CEO HN10';
       const reason =
         options?.reason ||
-        'Đóng hội phí thường niên năm 2026 - CLB Doanh Nhân CEO HN10 (HanoiBA)';
+        'Đóng phí tham gia CLB thường niên năm 2026 - CLB Doanh Nhân CEO HN10 (HanoiBA)';
 
       return {
         ok: true,
@@ -556,7 +556,7 @@ export class AiCrmAnalyticsService {
       },
       incomeBreakdown: [
         {
-          category: 'Hội phí niên liễm đã ghi nhận',
+          category: 'Phí tham gia CLB niên liễm đã ghi nhận',
           amount: totalIncome,
           percentage: 100,
         },
@@ -711,7 +711,7 @@ export class AiCrmAnalyticsService {
         source: 'CSDL public.transactions',
       },
       {
-        title: 'Tài liệu Hiệp hội',
+        title: 'Tài liệu CEOHN10',
         countOrVal: `${docsCount} văn bản`,
         source: 'CSDL public.documents',
       },
@@ -749,10 +749,10 @@ export class AiCrmAnalyticsService {
       personaName = 'Trợ Lý Lịch Họp & Kết Nối 1-on-1';
       proactiveAlert = `🤝 **LỊCH HẸN B2B:** Tôi đã rà soát lịch làm việc. Hiện có các cuộc gặp gỡ kết nối giao thương giữa các CEO đang được lên lịch. Anh/Chị có muốn tôi hỗ trợ đặt lịch hẹn mới không?`;
     } else if (persona === 'finance') {
-      personaName = 'Trợ Lý Tài Chính & Quỹ Hiệp Hội';
+      personaName = 'Trợ Lý Tài Chính & Quỹ CEOHN10';
       proactiveAlert = `💰 **ĐỐI SOÁT QUỸ THỰC TẾ:** Sổ quỹ kế toán ghi nhận số dư khả dụng thực tế hiện tại là **${balanceFormatted} VNĐ** (Tổng thu: ${new Intl.NumberFormat('vi-VN').format(totalIncome)} đ, Tổng chi: ${new Intl.NumberFormat('vi-VN').format(totalExpense)} đ).`;
     } else if (persona === 'documents') {
-      personaName = 'Trợ Lý Văn Bản & Tri Thức Hiệp Hội';
+      personaName = 'Trợ Lý Văn Bản & Tri Thức CEOHN10';
       proactiveAlert = `📚 **HỆ THỐNG VĂN BẢN:** CLB hiện có **${docsCount} tài liệu & quy chuẩn** đã ban hành. Tôi có thể tra cứu điều lệ hoặc soạn thảo văn bản mới cho Anh/Chị.`;
     }
 
@@ -857,7 +857,7 @@ Quy tắc trả lời:
       ) {
         generatedReply = `### 💼 Báo Cáo Phân Tích Cơ Hội Giao Thương B2B Thực Tế
 
-Kính thưa Anh/Chị, tôi xin phép cập nhật tình hình cơ hội kinh doanh thực tế được đối soát trực tiếp từ CSDL Hiệp hội:
+Kính thưa Anh/Chị, tôi xin phép cập nhật tình hình cơ hội kinh doanh thực tế được đối soát trực tiếp từ CSDL CEOHN10:
 
 - **Tổng số cơ hội đang hoạt động**: **${oppsList.length} cơ hội**.
 - **Tổng quy mô giá trị ngân sách**: **${oppBudgetFormatted} Tỷ VNĐ** (chính xác: ${totalOppBudget.toLocaleString('vi-VN')} đ).
@@ -944,9 +944,9 @@ ${eventsList
                 : tx.created_at
                   ? new Date(tx.created_at).toISOString().slice(0, 10)
                   : '',
-              category: tx.category || 'Hội phí niên liễm',
+              category: tx.category || 'Phí tham gia CLB niên liễm',
               description:
-                tx.description || 'Đóng hội phí thường niên CLB Doanh Nhân CEO HN10',
+                tx.description || 'Đóng phí tham gia CLB thường niên CLB Doanh Nhân CEO HN10',
               amount: Number(tx.amount || 0),
               method: tx.method || 'bank',
               status: tx.status || 'completed',
@@ -983,9 +983,9 @@ ${eventsList
                   : inv.due_date
                     ? String(inv.due_date).slice(0, 10)
                     : '',
-                category: 'Hội phí niên liễm',
+                category: 'Phí tham gia CLB niên liễm',
                 description:
-                  `Thu hội phí hội viên ${inv.member_name || ''} - ${inv.member_company || ''}`.trim(),
+                  `Thu phí tham gia CLB hội viên ${inv.member_name || ''} - ${inv.member_company || ''}`.trim(),
                 amount: Number(inv.amount || 0),
                 method: inv.method || 'bank',
                 status: inv.status || 'completed',
@@ -1078,10 +1078,10 @@ ${eventsList
             },
             {
               id: 'membership_fee',
-              title: 'Báo Cáo Thu Hội Phí Niên Liễm Học Viên',
-              desc: 'Khoản thu đóng hội phí thường niên 2026, đối soát mã học viên, doanh nghiệp thành viên',
+              title: 'Báo Cáo Thu Phí Tham Gia CLB Niên Liễm Học Viên',
+              desc: 'Khoản thu đóng phí tham gia CLB thường niên 2026, đối soát mã học viên, doanh nghiệp thành viên',
               icon: 'Users',
-              badge: 'Hội Phí 2026',
+              badge: 'Phí Tham Gia CLB 2026',
               count: finalFeeRecords.length,
               totalAmount: finalFeeRecords.reduce(
                 (acc, r) => acc + Number(r.amount || 0),
@@ -1147,7 +1147,7 @@ Dưới đây là **5 Danh Mục Báo Cáo Chuyên Đề**. Anh/Chị hãy bấm
         lower.includes('tài chính') ||
         lower.includes('quỹ') ||
         lower.includes('tiền') ||
-        lower.includes('hội phí')
+        lower.includes('phí tham gia CLB')
       ) {
         generatedReply = `### 💰 Báo Cáo Tài Chính & Quỹ Ngân Sách Thực Tế
 
@@ -1303,7 +1303,7 @@ Anh/Chị có thể chọn nhanh vai trò trợ lý chuyên biệt ở thanh cô
         persona === 'finance'
           ? 'Chi tiết các khoản thu chi'
           : 'Báo cáo quỹ ngân sách',
-        'Xuất file Excel hội phí niên liễm',
+        'Xuất file Excel phí tham gia CLB niên liễm',
         'Đề xuất chiến lược tuần này',
       ],
     };
@@ -1355,7 +1355,7 @@ Anh/Chị có thể chọn nhanh vai trò trợ lý chuyên biệt ở thanh cô
         title: 'Tự động soạn thảo thông điệp chuẩn doanh nhân',
         desc:
           detectedType === 'fee_reminder'
-            ? 'Đã soạn thông báo đóng hội phí thường niên 2026 trang trọng'
+            ? 'Đã soạn thông báo đóng phí tham gia CLB thường niên 2026 trang trọng'
             : detectedType === 'training_notice'
             ? 'Đã soạn thông báo lịch học chuyên đề quản trị lãnh đạo'
             : detectedType === 'report_export'

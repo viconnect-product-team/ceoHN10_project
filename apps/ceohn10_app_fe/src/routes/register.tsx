@@ -1,4 +1,4 @@
-// Cổng Tiếp Nhận Đơn Đăng Ký Gia Nhập Hiệp Hội CLB Doanh Nhân CEO HN10 (/register)
+// Cổng Tiếp Nhận Đơn Đăng Ký Gia Nhập CEOHN10 CLB Doanh Nhân CEO HN10 (/register)
 // Tách biệt hoàn toàn, độc lập 100% khỏi ViOne và các hệ thống bên ngoài.
 
 import { createFileRoute } from "@tanstack/react-router";
@@ -16,13 +16,13 @@ export const Route = createFileRoute("/register")({
       {
         name: "description",
         content:
-          "Cổng tiếp nhận hồ sơ gia nhập Hiệp Hội Doanh Nghiệp CLB Doanh Nhân CEO HN10. Kết nối đồng niên, gắn kết thương trường, mở rộng giao thương doanh nghiệp.",
+          "Cổng tiếp nhận hồ sơ gia nhập CEOHN10 Doanh Nghiệp CLB Doanh Nhân CEO HN10. Kết nối đồng niên, gắn kết thương trường, mở rộng giao thương doanh nghiệp.",
       },
       { property: "og:title", content: "Đăng Ký Gia Nhập — CLB Doanh Nhân CEO HN10" },
       {
         property: "og:description",
         content:
-          "Cổng tiếp nhận hồ sơ gia nhập Hiệp Hội Doanh Nghiệp CLB Doanh Nhân CEO HN10. Kết nối đồng niên, gắn kết thương trường.",
+          "Cổng tiếp nhận hồ sơ gia nhập CEOHN10 Doanh Nghiệp CLB Doanh Nhân CEO HN10. Kết nối đồng niên, gắn kết thương trường.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

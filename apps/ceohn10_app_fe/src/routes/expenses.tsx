@@ -548,7 +548,7 @@ function ExpensesPage() {
       secondarySheet: {
         sheetName: "Tong_Hop_Danh_Muc_Chi",
         title: "TỔNG HỢP CHI PHÍ THEO DANH MỤC PHÂN LOẠI",
-        subtitle: "Bảng phân tích cơ cấu các khoản chi Quỹ Hiệp Hội Doanh Nhân CEO HN10",
+        subtitle: "Bảng phân tích cơ cấu các khoản chi Quỹ CEOHN10 Doanh Nhân CEO HN10",
         columns: [
           { header: "Danh mục chi", key: "category", width: 30, value: (r) => r.category },
           { header: "Số lượng giao dịch", key: "count", width: 20, value: (r) => r.count },
@@ -1103,7 +1103,7 @@ function ExpensesPage() {
                     onChange={(e) => setFormFundType(e.target.value)}
                     className="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   >
-                    <option value="general">💼 Túi Quỹ Chung CLB (Từ Hội Phí)</option>
+                    <option value="general">💼 Túi Quỹ Chung CLB (Từ Phí Tham Gia CLB)</option>
                     <option value="sponsorship_cash">🎁 Túi Quỹ Tài Trợ (Từ Nhà Tài Trợ)</option>
                   </select>
                 </div>
@@ -1336,7 +1336,7 @@ function ExpensesPage() {
         open={invoiceExportOpen}
         onClose={() => setInvoiceExportOpen(false)}
         sourceType="finance"
-        title="BẢNG KÊ & CHỨNG TỪ KHOẢN CHI HIỆP HỘI"
+        title="BẢNG KÊ & CHỨNG TỪ KHOẢN CHI CEOHN10"
         items={invoiceItems}
       />
     </AppShell>

@@ -26,17 +26,17 @@ const TEMPLATES: { id: string; label: string; subject: string; body: (name: stri
   },
   {
     id: "event",
-    label: "Mời tham dự sự kiện hiệp hội",
+    label: "Mời tham dự sự kiện CEOHN10",
     subject: "Thư mời tham dự sự kiện giao thương & xúc tiến kinh doanh",
     body: (name) =>
-      `Kính gửi ${name},\n\nHiệp hội trân trọng kính mời đại diện Quý doanh nghiệp tham dự chương trình giao lưu, kết nối Học viên và xúc tiến thương mại sắp tới.\n\nThời gian & địa điểm chi tiết xin vui lòng xem tại cổng thông tin hoặc phản hồi email này để nhận vé mời chính thức.\n\nRất mong được đón tiếp Quý đơn vị!`,
+      `Kính gửi ${name},\n\nCEOHN10 trân trọng kính mời đại diện Quý doanh nghiệp tham dự chương trình giao lưu, kết nối Học viên và xúc tiến thương mại sắp tới.\n\nThời gian & địa điểm chi tiết xin vui lòng xem tại cổng thông tin hoặc phản hồi email này để nhận vé mời chính thức.\n\nRất mong được đón tiếp Quý đơn vị!`,
   },
   {
     id: "renewal",
-    label: "Thông báo hội phí & Gia hạn Học viên",
-    subject: "Thông báo về việc gia hạn quyền lợi Học viên hiệp hội",
+    label: "Thông báo phí tham gia CLB & Gia hạn Học viên",
+    subject: "Thông báo về việc gia hạn quyền lợi Học viên CEOHN10",
     body: (name) =>
-      `Kính gửi ${name},\n\nHiệp hội xin gửi lời cảm ơn chân thành đến Quý đơn vị đã đồng hành cùng cộng đồng doanh nghiệp trong suốt thời gian qua.\n\nKỳ hội phí tiếp theo đã đến hạn, kính mời Quý doanh nghiệp kiểm tra thông tin thanh toán và tiến hành gia hạn để tiếp tục nhận đầy đủ các quyền lợi đặc quyền của Học viên.\n\nTrân trọng,\nBan Tài chính CLB CEO HN10`,
+      `Kính gửi ${name},\n\nCEOHN10 xin gửi lời cảm ơn chân thành đến Quý đơn vị đã đồng hành cùng cộng đồng doanh nghiệp trong suốt thời gian qua.\n\nKỳ phí tham gia CLB tiếp theo đã đến hạn, kính mời Quý doanh nghiệp kiểm tra thông tin thanh toán và tiến hành gia hạn để tiếp tục nhận đầy đủ các quyền lợi đặc quyền của Học viên.\n\nTrân trọng,\nBan Tài chính CLB CEO HN10`,
   },
   {
     id: "partnership",

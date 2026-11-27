@@ -232,7 +232,7 @@ export function UserGuideModal({ open, onClose, defaultScreenId }: UserGuideModa
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-sm sm:text-base font-black tracking-tight text-white flex items-center gap-1.5">
-                  <span>HƯỚNG DẪN SỬ DỤNG APP HIỆP HỘI CEO HN10</span>
+                  <span>HƯỚNG DẪN SỬ DỤNG APP CEOHN10 CEO HN10</span>
                   <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 uppercase font-black">
                     Chỉ Dành Cho App
                   </span>
@@ -728,7 +728,7 @@ export function UserGuideModal({ open, onClose, defaultScreenId }: UserGuideModa
                       Ban Tài Chính & Ngân Quỹ
                     </span>
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 font-bold">
-                      Hội phí niên liễm
+                      Phí tham gia CLB niên liễm
                     </span>
                   </div>
                   <h4 className="text-xs font-black text-slate-900 dark:text-white">
@@ -822,7 +822,7 @@ export function UserGuideModal({ open, onClose, defaultScreenId }: UserGuideModa
               <div className="flex-1 rounded-3xl border border-slate-200 dark:border-white/10 overflow-hidden bg-slate-900 shadow-inner">
                 <iframe
                   src={`${pdfUrl}#toolbar=0&navpanes=0`}
-                  title="Tài liệu Hướng dẫn sử dụng App Hiệp Hội CEO HN10"
+                  title="Tài liệu Hướng dẫn sử dụng App CEOHN10 CEO HN10"
                   className="w-full h-full border-0"
                 />
               </div>

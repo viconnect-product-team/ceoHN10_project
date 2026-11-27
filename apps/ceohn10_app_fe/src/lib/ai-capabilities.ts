@@ -83,7 +83,7 @@ export const CAPABILITIES: Capability[] = [
     keywords: ["tài liệu", "văn bản", "biên bản", "quy chế", "quy định", "document", "tóm tắt"],
     suggestedPrompts: [
       "Tóm tắt các văn bản mới nhất trong tháng này",
-      "Tìm tài liệu liên quan đến hội phí",
+      "Tìm tài liệu liên quan đến phí tham gia CLB",
       "Liệt kê quy chế nội bộ hiện hành",
     ],
     actions: [{ label: "Mở Trung tâm tài liệu", to: "/documents" }],
@@ -146,13 +146,13 @@ export const CAPABILITIES: Capability[] = [
   },
   {
     id: "fee",
-    label: "Trợ lý Hội phí",
+    label: "Trợ lý Phí tham gia CLB",
     icon: Wallet,
-    description: "Phân tích tình trạng thu hội phí, công nợ và tỷ lệ thu.",
+    description: "Phân tích tình trạng thu phí tham gia CLB, công nợ và tỷ lệ thu.",
     minRole: "moderator",
     contextSources: ["fees"],
     keywords: [
-      "hội phí",
+      "phí tham gia CLB",
       "công nợ",
       "thu phí",
       "hóa đơn",
@@ -162,16 +162,16 @@ export const CAPABILITIES: Capability[] = [
       "chưa thu",
     ],
     suggestedPrompts: [
-      "Hội phí tháng này còn bao nhiêu chưa thu?",
-      "Nhóm Học viên nào cần nhắc đóng hội phí?",
-      "Tỷ lệ thu hội phí quý này là bao nhiêu?",
+      "Phí tham gia CLB tháng này còn bao nhiêu chưa thu?",
+      "Nhóm Học viên nào cần nhắc đóng phí tham gia CLB?",
+      "Tỷ lệ thu phí tham gia CLB quý này là bao nhiêu?",
     ],
     actions: [
-      { label: "Mở Trung tâm hội phí", to: "/fees" },
+      { label: "Mở Trung tâm phí tham gia CLB", to: "/fees" },
       { label: "Xem gia hạn", to: "/renewal" },
     ],
     relatedModules: [
-      { label: "Hội phí", to: "/fees" },
+      { label: "Phí tham gia CLB", to: "/fees" },
       { label: "Báo cáo tài chính", to: "/finance-report" },
     ],
     cardFields: [
@@ -227,7 +227,7 @@ export const CAPABILITIES: Capability[] = [
     id: "notification",
     label: "Trợ lý Thông báo",
     icon: Bell,
-    description: "Tổng hợp thông báo và tin tức của hiệp hội.",
+    description: "Tổng hợp thông báo và tin tức của CEOHN10.",
     minRole: "member",
     contextSources: ["notifications"],
     keywords: ["thông báo", "tin tức", "nhắc", "notification", "cập nhật"],
@@ -249,7 +249,7 @@ export const CAPABILITIES: Capability[] = [
     keywords: ["soạn", "viết", "thông báo mời", "email", "truyền thông", "draft", "nội dung"],
     suggestedPrompts: [
       "Viết thông báo mời Học viên tham dự sự kiện tuần sau",
-      "Soạn thông báo nhắc đóng hội phí với giọng trang trọng",
+      "Soạn thông báo nhắc đóng phí tham gia CLB với giọng trang trọng",
     ],
     actions: [{ label: "Mở Thông báo", to: "/notifications" }],
     relatedModules: [{ label: "Thông báo", to: "/notifications" }],
@@ -273,8 +273,8 @@ export const CAPABILITIES: Capability[] = [
       "executive",
     ],
     suggestedPrompts: [
-      "Tạo báo cáo ngắn cho Chủ tịch Hiệp hội trong tuần này",
-      "Tổng hợp tăng trưởng Học viên và thu hội phí tháng này",
+      "Tạo báo cáo ngắn cho Chủ tịch CEOHN10 trong tuần này",
+      "Tổng hợp tăng trưởng Học viên và thu phí tham gia CLB tháng này",
       "Những việc nào đang chờ phê duyệt?",
     ],
     actions: [

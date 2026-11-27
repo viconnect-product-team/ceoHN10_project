@@ -276,7 +276,7 @@ export function SupplyDeclarationModal({
       <body>
         <div class="header">
           <div>
-            <strong>HIỆP HỘI DOANH NGHIỆP TRẺ HÀ NỘI (HANOIBA)</strong><br/>
+            <strong>CEOHN10 DOANH NGHIỆP TRẺ HÀ NỘI (HANOIBA)</strong><br/>
             <strong>CLB DOANH NHÂN CEO HN10</strong><br/>
             <span>Ban Sự Kiện – Hậu Cần & Ban Tài Chính</span>
           </div>

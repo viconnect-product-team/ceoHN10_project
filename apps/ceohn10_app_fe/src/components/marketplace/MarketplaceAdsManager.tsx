@@ -83,7 +83,7 @@ const DEFAULT_AD_REQUESTS: AdRequestItem[] = [
     durationMonths: 3,
     budgetEst: "15.000.000 đ",
     productLink: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80",
-    notes: "Muốn đặt banner ở vị trí đầu sàn Marketplace App Hiệp hội.",
+    notes: "Muốn đặt banner ở vị trí đầu sàn Marketplace App CEOHN10.",
     status: "paid",
     paymentAmount: 15000000,
     paymentCode: "QC-CEO HN10-ABC",
@@ -319,7 +319,7 @@ export function MarketplaceAdsManager() {
     }
 
     window.dispatchEvent(new CustomEvent("ceohn10:ads-updated"));
-    toast.success("✓ Đã set up và đẩy quảng cáo trực tiếp xuống Marketplace App Hiệp hội!");
+    toast.success("✓ Đã set up và đẩy quảng cáo trực tiếp xuống Marketplace App CEOHN10!");
     setSetupModalOpen(false);
   };
 
@@ -375,7 +375,7 @@ export function MarketplaceAdsManager() {
             </div>
             <div>
               <h3 className="text-base font-bold text-foreground">
-                Quảng Cáo & Banner Đang Hoạt Động Trên App Hiệp Hội ({activeAds.length})
+                Quảng Cáo & Banner Đang Hoạt Động Trên App CEOHN10 ({activeAds.length})
               </h3>
               <p className="text-xs text-muted-foreground">
                 Tự động hiển thị nổi bật tại đầu sàn giao thương Marketplace trên ứng dụng di động
@@ -499,7 +499,7 @@ export function MarketplaceAdsManager() {
         )}
       </div>
 
-      {/* ── BẢNG YÊU CẦU ĐĂNG KÝ QUẢNG CÁO TỪ DOANH NGHIỆP APP HIỆP HỘI ── */}
+      {/* ── BẢNG YÊU CẦU ĐĂNG KÝ QUẢNG CÁO TỪ DOANH NGHIỆP APP CEOHN10 ── */}
       <div className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
@@ -647,7 +647,7 @@ export function MarketplaceAdsManager() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Chủ tài khoản:</span>
-                  <span className="font-bold">HIỆP HỘI DOANH NHÂN CEO HN10</span>
+                  <span className="font-bold">CEOHN10 DOANH NHÂN CEO HN10</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Số tiền:</span>
@@ -669,7 +669,7 @@ export function MarketplaceAdsManager() {
                 type="button"
                 onClick={() => {
                   navigator.clipboard.writeText(
-                    `Kính gửi ${selectedReq.companyName}, Ban Quản Trị Hiệp hội CEO HN10 xin gửi thông tin thanh toán dịch vụ chạy quảng cáo Marketplace:\nSTK: 0983001983 - MBBank\nChủ TK: HIEP HOI DOANH NHAN CEO HN10\nSố tiền: ${(
+                    `Kính gửi ${selectedReq.companyName}, Ban Quản Trị CEOHN10 CEO HN10 xin gửi thông tin thanh toán dịch vụ chạy quảng cáo Marketplace:\nSTK: 0983001983 - MBBank\nChủ TK: HIEP HOI DOANH NHAN CEO HN10\nSố tiền: ${(
                       selectedReq.paymentAmount || 15000000
                     ).toLocaleString()} VNĐ\nNội dung: ${selectedReq.paymentCode || `QC-CEO HN10-${selectedReq.id}`}`
                   );
@@ -701,7 +701,7 @@ export function MarketplaceAdsManager() {
               <div className="flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-blue-500" />
                 <h3 className="text-base font-bold text-foreground">
-                  Set Up & Kích Hoạt Quảng Cáo Trên App Hiệp Hội
+                  Set Up & Kích Hoạt Quảng Cáo Trên App CEOHN10
                 </h3>
               </div>
               <button
@@ -788,7 +788,7 @@ export function MarketplaceAdsManager() {
 
               <div>
                 <label className="font-bold text-foreground block mb-1">
-                  Hiệu ứng animation hiển thị trên App Hiệp hội
+                  Hiệu ứng animation hiển thị trên App CEOHN10
                 </label>
                 <div className="grid grid-cols-3 gap-2">
                   {[
@@ -915,7 +915,7 @@ export function MarketplaceAdsManager() {
                   type="submit"
                   className="rounded-xl px-5 py-2 text-xs font-bold shadow-md cursor-pointer transition hover:bg-blue-700 bg-blue-600 text-white"
                 >
-                  Kích Hoạt & Đẩy Lên App Hiệp Hội
+                  Kích Hoạt & Đẩy Lên App CEOHN10
                 </button>
               </div>
             </form>

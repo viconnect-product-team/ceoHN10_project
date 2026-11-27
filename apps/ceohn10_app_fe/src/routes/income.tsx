@@ -172,7 +172,7 @@ function IncomePage() {
       defaultCategory === "event_walkin"
         ? "Thu tiền mặt trực tiếp tại bàn đón tiếp sự kiện"
         : defaultCategory === "membership_fee"
-          ? "Thu hội phí thường niên"
+          ? "Thu phí tham gia CLB thường niên"
           : ""
     );
     setFormAmount(0);
@@ -480,7 +480,7 @@ function IncomePage() {
       secondarySheet: {
         sheetName: "Tong_Hop_Danh_Muc_Thu",
         title: "TỔNG HỢP NGUỒN THU THEO DANH MỤC PHÂN LOẠI",
-        subtitle: "Bảng phân tích cơ cấu nguồn thu Quỹ Hiệp Hội Doanh Nhân CEO HN10",
+        subtitle: "Bảng phân tích cơ cấu nguồn thu Quỹ CEOHN10 Doanh Nhân CEO HN10",
         columns: [
           { header: "Danh mục thu", key: "category", width: 30, value: (r) => r.category },
           { header: "Số lượng giao dịch", key: "count", width: 20, value: (r) => r.count },
@@ -500,7 +500,7 @@ function IncomePage() {
           date: formatDisplayDate(tc.sorted[0]?.date || new Date()),
           personName: tc.sorted[0]?.recipient || "Đại diện Học viên nộp quỹ",
           address: "Hà Nội",
-          reason: tc.sorted[0]?.description || "Thu nộp hội phí Học viên CLB Doanh Nhân CEO HN10",
+          reason: tc.sorted[0]?.description || "Thu nộp phí tham gia CLB Học viên CLB Doanh Nhân CEO HN10",
           amount: tc.sorted[0]?.amount || 50000000,
           attachedDocs: "01 Giấy báo có / Biên lai nộp tiền",
           debitAccount: tc.sorted[0]?.method === "cash" ? "111" : "112",
@@ -570,7 +570,7 @@ function IncomePage() {
             defaultTab="income_sponsor"
             hideTabs={false}
             title="Biểu Đồ Phân Tích Cơ Cấu Nguồn Thu & Tài Trợ"
-            subtitle="Trực quan hóa tỷ trọng Hội phí, Nhà tài trợ sự kiện, Vé tham gia và các nguồn thu khác"
+            subtitle="Trực quan hóa tỷ trọng Phí tham gia CLB, Nhà tài trợ sự kiện, Vé tham gia và các nguồn thu khác"
             className="mb-6"
           />
         </div>
@@ -1018,7 +1018,7 @@ function IncomePage() {
                     <option value="membership_fee">Phí Học viên thường niên</option>
                     <option value="event_ticket">Vé tham gia sự kiện</option>
                     <option value="event_walkin">Thu tiền mặt trực tiếp (Đột xuất tại sự kiện)</option>
-                    <option value="sponsor">Tài trợ sự kiện / hiệp hội</option>
+                    <option value="sponsor">Tài trợ sự kiện / CEOHN10</option>
                     <option value="other">Khoản thu khác</option>
                   </select>
                 </div>
@@ -1120,7 +1120,7 @@ function IncomePage() {
         open={invoiceExportOpen}
         onClose={() => setInvoiceExportOpen(false)}
         sourceType="finance"
-        title="BẢNG KÊ & HÓA ĐƠN NGUỒN THU HIỆP HỘI"
+        title="BẢNG KÊ & HÓA ĐƠN NGUỒN THU CEOHN10"
         items={invoiceItems}
       />
     </AppShell>

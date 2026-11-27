@@ -238,7 +238,7 @@ function LibraryScreen() {
     <div className="vba-animate pb-24">
       <MemberHeader title={isEn ? "Resource Library" : t("m.library.title")} back />
 
-      {/* Top Segmented Scope Tabs: Tài liệu Hiệp Hội vs Doanh Nghiệp */}
+      {/* Top Segmented Scope Tabs: Tài liệu CEOHN10 vs Doanh Nghiệp */}
       <div className="px-4 mt-2">
         <div className="grid grid-cols-2 p-1 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-inner">
           <button
@@ -250,7 +250,7 @@ function LibraryScreen() {
               }`}
           >
             <ShieldCheck className="h-4 w-4" />
-            <span>Tài liệu Hiệp Hội</span>
+            <span>Tài liệu CEOHN10</span>
           </button>
 
           <button

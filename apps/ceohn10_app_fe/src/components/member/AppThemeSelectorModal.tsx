@@ -37,7 +37,7 @@ export function AppThemeSelectorModal({ open, onClose }: AppThemeSelectorModalPr
     }
     toast.success(
       checked
-        ? "Đã bật hiệu ứng chủ đề lễ hội trên App Hiệp hội!"
+        ? "Đã bật hiệu ứng chủ đề lễ hội trên App CEOHN10!"
         : "Đã tắt hiệu ứng chủ đề (áp dụng giao diện gốc mặc định khi chưa add chủ đề)."
     );
   };
@@ -66,7 +66,7 @@ export function AppThemeSelectorModal({ open, onClose }: AppThemeSelectorModalPr
                 Chủ Đề & Không Gian Lễ Hội
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Tùy chỉnh giao diện App Hiệp hội theo dịp lễ
+                Tùy chỉnh giao diện App CEOHN10 theo dịp lễ
               </p>
             </div>
           </div>

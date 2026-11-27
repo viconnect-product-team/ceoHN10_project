@@ -161,7 +161,7 @@ function PublicSharePage() {
               type: "opportunity",
               title: found.title,
               subtitle: found.industry || "Cơ hội giao thương B2B",
-              content: found.description || found.desc || "Cơ hội kinh doanh và tìm kiếm đối tác cung ứng trong hiệp hội.",
+              content: found.description || found.desc || "Cơ hội kinh doanh và tìm kiếm đối tác cung ứng trong CEOHN10.",
               image: found.image || (Array.isArray(found.images) ? found.images[0] : undefined),
               authorName: found.contact_name || found.posterName || found.authorName,
               authorCompany: found.company,
@@ -240,7 +240,7 @@ function PublicSharePage() {
             title: fallbackTitle,
             subtitle: "Hệ Sinh Thái Doanh Nhân CEO HN10 - HanoiBA",
             content:
-              "Chào mừng Quý Anh/Chị đối tác và đại biểu doanh nhân. Đây là nội dung kết nối chính thức từ CLB Doanh Nhân CEO HN10 (Hiệp hội Doanh nghiệp Trẻ Hà Nội - HanoiBA).",
+              "Chào mừng Quý Anh/Chị đối tác và đại biểu doanh nhân. Đây là nội dung kết nối chính thức từ CLB Doanh Nhân CEO HN10 (CEOHN10 Doanh nghiệp Trẻ Hà Nội - HanoiBA).",
             image: "/skyline_perspective_dark.jpg",
             date: "2026-11-20",
             time: "08:30 - 17:00",
@@ -345,7 +345,7 @@ function PublicSharePage() {
               <div className="relative z-10 space-y-2">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-extrabold uppercase">
                   <Sparkles className="size-3.5" />
-                  {item.type === "event" ? "Sự kiện hiệp hội" : item.type === "opportunity" ? "Cơ hội B2B" : "Bài viết mạng lưới"}
+                  {item.type === "event" ? "Sự kiện CEOHN10" : item.type === "opportunity" ? "Cơ hội B2B" : "Bài viết mạng lưới"}
                 </span>
                 <h1 className="text-lg sm:text-xl font-black text-white leading-snug drop-shadow-md">
                   {item.title}
@@ -441,7 +441,7 @@ function PublicSharePage() {
                     <span>Khu Vực Dành Riêng Cho Học viên Doanh Nhân</span>
                   </div>
                   <p className="text-[12px] text-slate-300 leading-relaxed">
-                    Để xem toàn bộ tài liệu đính kèm, danh sách đại biểu tham gia hoặc liên hệ trực tiếp với tác giả, vui lòng bấm nút bên dưới để đăng nhập vào ứng dụng Hiệp hội.
+                    Để xem toàn bộ tài liệu đính kèm, danh sách đại biểu tham gia hoặc liên hệ trực tiếp với tác giả, vui lòng bấm nút bên dưới để đăng nhập vào ứng dụng CEOHN10.
                   </p>
                 </div>
               )}

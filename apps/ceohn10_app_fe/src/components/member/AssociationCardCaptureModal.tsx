@@ -239,7 +239,7 @@ export function AssociationCardCaptureModal({
         }
       }
 
-      // 2. Lấy danh sách Học viên chính thức của Hiệp hội CEO HN10 để đối soát
+      // 2. Lấy danh sách Học viên chính thức của CEOHN10 CEO HN10 để đối soát
       let directoryMembers: any[] = [];
       try {
         const fetched = await fetchNestApi<any[]>("/members/directory").catch(() => null);
@@ -333,7 +333,7 @@ export function AssociationCardCaptureModal({
 
       // NGUYÊN TẮC BẮT BUỘC:
       // Kiểm tra xem (Tên và Số điện thoại) HAY (Email và Số điện thoại) trên danh thiếp
-      // có trùng với Học viên chính thức của Hiệp hội hay không.
+      // có trùng với Học viên chính thức của CEOHN10 hay không.
       let matchedMember: any = null;
 
       if (rawPhone) {
@@ -346,7 +346,7 @@ export function AssociationCardCaptureModal({
         setContactEmail(matchedMember.email || rawEmail);
         setMemberCode(matchedMember.code || foundMemberCode || `HN10-${Date.now().toString().slice(-4)}`);
         setMemberStatus("member_found");
-        toast.success(`Xác thực thành công: Học viên ${matchedMember.name} (${matchedMember.phone}) thuộc Hiệp hội CEO HN10!`);
+        toast.success(`Xác thực thành công: Học viên ${matchedMember.name} (${matchedMember.phone}) thuộc CEOHN10 CEO HN10!`);
         return;
       }
 
@@ -414,10 +414,10 @@ export function AssociationCardCaptureModal({
         setContactEmail(matchedMember.email || contactEmail);
         setMemberCode(matchedMember.code || `HN10-${Date.now().toString().slice(-4)}`);
         setMemberStatus("member_found");
-        toast.success(`Xác thực thành công: Học viên ${matchedMember.name} (${matchedMember.phone}) thuộc Hiệp hội CEO HN10!`);
+        toast.success(`Xác thực thành công: Học viên ${matchedMember.name} (${matchedMember.phone}) thuộc CEOHN10 CEO HN10!`);
       } else {
         setMemberStatus("non_member");
-        toast.error("Không tìm thấy Học viên khớp (Họ tên + Số điện thoại) hoặc (Email + Số điện thoại) trong danh bạ Hiệp Hội!");
+        toast.error("Không tìm thấy Học viên khớp (Họ tên + Số điện thoại) hoặc (Email + Số điện thoại) trong danh bạ CEOHN10!");
       }
     } finally {
       setAnalyzing(false);
@@ -491,10 +491,10 @@ export function AssociationCardCaptureModal({
     reader.readAsDataURL(file);
   };
 
-  // Lưu danh bạ số: CHỈ LƯU Học viên THUỘC HIỆP HỘI
+  // Lưu danh bạ số: CHỈ LƯU Học viên THUỘC CEOHN10
   const handleSaveToDigitalContacts = async () => {
     if (memberStatus !== "member_found" || !memberCode || memberCode === "NON_MEMBER") {
-      toast.error("Tính năng không áp dụng cho người không thuộc app hiệp hội!");
+      toast.error("Tính năng không áp dụng cho người không thuộc app CEOHN10!");
       return;
     }
 
@@ -512,7 +512,7 @@ export function AssociationCardCaptureModal({
       const cleanName = contactName.trim();
       const cleanPhone = contactPhone.trim();
 
-      // 1. Lưu vào danh bạ số hiệp hội (localStorage)
+      // 1. Lưu vào danh bạ số CEOHN10 (localStorage)
       if (typeof window !== "undefined") {
         try {
           const existingContacts = JSON.parse(
@@ -683,7 +683,7 @@ export function AssociationCardCaptureModal({
                 )}
               </div>
 
-              {/* ── TRƯỜNG HỢP 1: LÀ Học viên HIỆP HỘI CEO HN10 ── */}
+              {/* ── TRƯỜNG HỢP 1: LÀ Học viên CEOHN10 CEO HN10 ── */}
               {/* HIỂN THỊ TÊN, SỐ ĐIỆN THOẠI VÀ EMAIL (NẾU CÓ) */}
               {memberStatus === "member_found" && (
                 <div className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-2xl p-4 border border-emerald-500/40 shadow-lg animate-scale-in text-slate-900 dark:text-white">
@@ -770,7 +770,7 @@ export function AssociationCardCaptureModal({
                 </div>
               )}
 
-              {/* ── TRƯỜNG HỢP 2: KHÔNG THUỘC HIỆP HỘI -> THÔNG BÁO ĐĂNG KÝ GIA NHẬP CLB CEO HN10 ── */}
+              {/* ── TRƯỜNG HỢP 2: KHÔNG THUỘC CEOHN10 -> THÔNG BÁO ĐĂNG KÝ GIA NHẬP CLB CEO HN10 ── */}
               {memberStatus === "non_member" && (
                 <div className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-2xl p-5 border-2 border-amber-500/60 shadow-xl shadow-amber-500/10 animate-scale-in text-slate-900 dark:text-white text-center">
                   <div className="mx-auto w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 grid place-items-center text-amber-500 mb-3">
@@ -781,18 +781,18 @@ export function AssociationCardCaptureModal({
                     Thông Báo Danh Thiếp CEO HN10
                   </h4>
 
-                  {/* Thông báo chuẩn nghiệp vụ Hiệp Hội Doanh Nhân CEO HN10 */}
+                  {/* Thông báo chuẩn nghiệp vụ CEOHN10 Doanh Nhân CEO HN10 */}
                   <p className="text-xs text-slate-700 dark:text-slate-200 mt-2 px-1 font-semibold leading-relaxed">
-                    Chức năng lưu danh thiếp tự động dành riêng cho Học viên CLB Doanh Nhân CEO HN10. Nếu bạn là doanh nhân mong muốn kết nối &amp; mở rộng giao thương, hãy đăng ký gia nhập Hiệp hội.
+                    Chức năng lưu danh thiếp tự động dành riêng cho Học viên CLB Doanh Nhân CEO HN10. Nếu bạn là doanh nhân mong muốn kết nối &amp; mở rộng giao thương, hãy đăng ký gia nhập CEOHN10.
                   </p>
 
-                  {/* Nút liên kết nội bộ đăng ký gia nhập Hiệp Hội CEO HN10 */}
+                  {/* Nút liên kết nội bộ đăng ký gia nhập CEOHN10 CEO HN10 */}
                   <div className="mt-4 flex flex-col gap-2.5">
                     <Link
                       to="/register"
                       className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#FFBE00] to-amber-500 hover:brightness-110 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 active:scale-98 transition-all cursor-pointer"
                     >
-                      <span>Đăng Ký Gia Nhập Hiệp Hội CEO HN10</span>
+                      <span>Đăng Ký Gia Nhập CEOHN10 CEO HN10</span>
                       <ExternalLink className="w-4 h-4" />
                     </Link>
 

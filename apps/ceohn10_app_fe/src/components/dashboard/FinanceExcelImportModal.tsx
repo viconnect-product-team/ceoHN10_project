@@ -93,7 +93,7 @@ function parseDate(val: any): string {
 
 function mapIncomeCategory(raw: string): { key: string; label: string } {
   const norm = (raw || "").toLowerCase().trim();
-  if (norm.includes("hội phí") || norm.includes("membership") || norm.includes("phí")) {
+  if (norm.includes("phí tham gia CLB") || norm.includes("membership") || norm.includes("phí")) {
     return { key: "membership_fee", label: "Phí Học viên" };
   }
   if (norm.includes("vé") || norm.includes("ticket")) {
@@ -181,11 +181,11 @@ export function FinanceExcelImportModal({
     if (isIncome) {
       fileName = "Bao_Cao_Mau_Thu_Quy_CEOHN10.xlsx";
       sampleData = [
-        ["HIỆP HỘI DOANH NHÂN CEO HN10 (HANOIBA)", "", "", "", "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM"],
-        ["BAN CHẤP HÀNH - VĂN PHÒNG HIỆP HỘI", "", "", "", "Độc lập - Tự do - Hạnh phúc"],
+        ["CEOHN10 DOANH NHÂN CEO HN10 (HANOIBA)", "", "", "", "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM"],
+        ["BAN CHẤP HÀNH - VĂN PHÒNG CEOHN10", "", "", "", "Độc lập - Tự do - Hạnh phúc"],
         [],
         ["", "", "BẢNG MẪU NHẬP DỮ LIỆU THU QUỸ Học viên & ĐỐI TÁC"],
-        ["(Mẫu chuẩn hóa hệ thống quản trị tài chính Hiệp Hội Doanh Nhân CEO HN10)"],
+        ["(Mẫu chuẩn hóa hệ thống quản trị tài chính CEOHN10 Doanh Nhân CEO HN10)"],
         [],
         [
           "STT",
@@ -203,7 +203,7 @@ export function FinanceExcelImportModal({
           "PT-2026-001",
           "10/03/2026",
           "Phí Học viên",
-          "Thu hội phí Học viên VIP thường niên 2026",
+          "Thu phí tham gia CLB Học viên VIP thường niên 2026",
           "Công ty CP Tập đoàn Hòa Bình",
           50000000,
           "Chuyển khoản",
@@ -246,11 +246,11 @@ export function FinanceExcelImportModal({
     } else {
       fileName = "Bao_Cao_Mau_Chi_Va_Tam_Ung_CEOHN10.xlsx";
       sampleData = [
-        ["HIỆP HỘI DOANH NHÂN CEO HN10 (HANOIBA)", "", "", "", "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM"],
-        ["BAN CHẤP HÀNH - VĂN PHÒNG HIỆP HỘI", "", "", "", "Độc lập - Tự do - Hạnh phúc"],
+        ["CEOHN10 DOANH NHÂN CEO HN10 (HANOIBA)", "", "", "", "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM"],
+        ["BAN CHẤP HÀNH - VĂN PHÒNG CEOHN10", "", "", "", "Độc lập - Tự do - Hạnh phúc"],
         [],
-        ["", "", "BẢNG MẪU NHẬP DỮ LIỆU CHI PHÍ & TẠM ỨNG HIỆP HỘI"],
-        ["(Mẫu chuẩn hóa hệ thống quản trị tài chính Hiệp Hội Doanh Nhân CEO HN10)"],
+        ["", "", "BẢNG MẪU NHẬP DỮ LIỆU CHI PHÍ & TẠM ỨNG CEOHN10"],
+        ["(Mẫu chuẩn hóa hệ thống quản trị tài chính CEOHN10 Doanh Nhân CEO HN10)"],
         [],
         [
           "STT",
@@ -356,7 +356,7 @@ export function FinanceExcelImportModal({
             date: new Date().toISOString().slice(0, 10),
             type: isIncome ? "income" : "expense",
             category: isIncome ? "fee" : "operations",
-            categoryLabel: isIncome ? "Hội phí / Niên liễm" : "Chi hoạt động lớp",
+            categoryLabel: isIncome ? "Phí tham gia CLB / Niên liễm" : "Chi hoạt động lớp",
             description: `Đối soát dữ liệu trích xuất từ file ${f.name}`,
             amount: 25000000,
             method: "bank",
@@ -624,7 +624,7 @@ export function FinanceExcelImportModal({
                 Import Báo Cáo {isIncome ? "Khoản Thu" : "Khoản Chi & Tạm Ứng"} từ Excel
               </h2>
               <p className="text-xs text-muted-foreground">
-                Nhập hàng loạt phiếu {isIncome ? "thu quỹ, hội phí, vé sự kiện" : "chi tiêu, thanh toán, tạm ứng"} nhanh chóng từ file Excel (.xlsx, .csv)
+                Nhập hàng loạt phiếu {isIncome ? "thu quỹ, phí tham gia CLB, vé sự kiện" : "chi tiêu, thanh toán, tạm ứng"} nhanh chóng từ file Excel (.xlsx, .csv)
               </p>
             </div>
           </div>
@@ -647,7 +647,7 @@ export function FinanceExcelImportModal({
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${isIncome ? "bg-emerald-600 text-white shadow-xs" : "text-muted-foreground hover:text-foreground"
                   }`}
               >
-                Thu Quỹ & Hội Phí
+                Thu Quỹ & Phí Tham Gia CLB
               </button>
               <button
                 type="button"

@@ -22,7 +22,7 @@ export type NewsItem = {
 export const DEFAULT_CEOHN10_NEWS: NewsItem[] = [
   {
     id: "ceohn10-news-01",
-    title: "Hiệp hội CEO HN10 phát động chương trình Xúc tiến Thương mại & Kết nối Giao thương Toàn diện 2026",
+    title: "CEOHN10 CEO HN10 phát động chương trình Xúc tiến Thương mại & Kết nối Giao thương Toàn diện 2026",
     category: "Giao thương B2B",
     author: "Ban Thư ký & Ban Truyền thông",
     excerpt: "Chương trình trọng điểm quy tụ hơn 200+ doanh nghiệp Học viên cùng các phiên kết nối 1-1, ký kết thỏa thuận hợp tác thương mại đa ngành và mở rộng chuỗi cung ứng nội khối.",
@@ -192,7 +192,7 @@ export const DEFAULT_CEOHN10_DOCS: LibraryDoc[] = [
     size: "950 KB",
     type: "XLSX",
     time: "10/09/2026",
-    description: "Báo cáo minh bạch thu chi hội phí niên liễm, các khoản tài trợ và phân bổ quỹ thiện nguyện xã hội của CLB.",
+    description: "Báo cáo minh bạch thu chi phí tham gia CLB niên liễm, các khoản tài trợ và phân bổ quỹ thiện nguyện xã hội của CLB.",
   },
   {
     id: "doc-5",

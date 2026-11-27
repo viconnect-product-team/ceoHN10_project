@@ -74,7 +74,7 @@ export const NOTIFICATION_TEMPLATES: NotificationTemplate[] = [
   </div>
   <div style="padding: 28px; background: #ffffff;">
     <p style="margin: 0 0 16px; font-size: 15px; color: #334155; line-height: 1.6;">
-      Kính gửi <strong>Ban Quản trị Hiệp hội</strong>,
+      Kính gửi <strong>Ban Quản trị CEOHN10</strong>,
     </p>
     <p style="margin: 0 0 20px; font-size: 14px; color: #475569; line-height: 1.6;">
       Hệ thống vừa tiếp nhận yêu cầu đăng ký mượn phòng họp từ thành viên. Thông tin chi tiết như sau:
@@ -134,7 +134,7 @@ export const NOTIFICATION_TEMPLATES: NotificationTemplate[] = [
       { key: "requesterName", label: "Tên người đặt", example: "Lê Hoàng Long" },
       { key: "meetingTitle", label: "Tiêu đề cuộc họp", example: "Họp Ban Xúc Tiến Thương Mại Quý 3" },
       { key: "roomName", label: "Tên phòng", example: "Phòng Họp VIP Sapphire (Tầng 5)" },
-      { key: "locationAddress", label: "Địa chỉ phòng offline", example: "Văn phòng Hiệp hội CEO HN10, Tầng 5 Tòa nhà V-Tower, Hà Nội" },
+      { key: "locationAddress", label: "Địa chỉ phòng offline", example: "Văn phòng CEOHN10 CEO HN10, Tầng 5 Tòa nhà V-Tower, Hà Nội" },
       { key: "onlineMeetingUrl", label: "Link họp Online (Zoom/Meet)", example: "https://zoom.us/j/88819839999?pwd=CEO" },
       { key: "passcode", label: "Mật khẩu phòng", example: "198388" },
       { key: "date", label: "Ngày họp", example: "15/10/2026" },
@@ -265,7 +265,7 @@ export const NOTIFICATION_TEMPLATES: NotificationTemplate[] = [
     inAppTitle: "Giấy mời họp trực tiếp: {{meetingTitle}}",
     inAppBody: "Kính mời quý đại biểu tham dự cuộc họp '{{meetingTitle}}' lúc {{startTime}} ngày {{date}} tại {{roomName}} ({{locationAddress}}). Nhấn xem định vị GPS dẫn đường.",
     variables: [
-      { key: "meetingTitle", label: "Tiêu đề cuộc họp", example: "Họp Ban Chấp Hành Hiệp Hội CEO HN10 Mở Rộng" },
+      { key: "meetingTitle", label: "Tiêu đề cuộc họp", example: "Họp Ban Chấp Hành CEOHN10 CEO HN10 Mở Rộng" },
       { key: "date", label: "Ngày họp", example: "18/10/2026" },
       { key: "startTime", label: "Giờ bắt đầu", example: "14:00" },
       { key: "endTime", label: "Giờ kết thúc", example: "17:00" },
@@ -285,7 +285,7 @@ export const NOTIFICATION_TEMPLATES: NotificationTemplate[] = [
       📍 Thư Mời Họp Trực Tiếp (Offline)
     </div>
     <h1 style="margin: 0; font-size: 22px; font-weight: 700; line-height: 1.3; color: #ffffff;">{{meetingTitle}}</h1>
-    <p style="margin: 8px 0 0; font-size: 14px; color: #cbd5e1;">Hiệp Hội Doanh Nhân CEO HN10 • Trân trọng kính mời Quý Đại biểu</p>
+    <p style="margin: 8px 0 0; font-size: 14px; color: #cbd5e1;">CEOHN10 Doanh Nhân CEO HN10 • Trân trọng kính mời Quý Đại biểu</p>
   </div>
   <div style="padding: 28px; background: #ffffff;">
     <p style="margin: 0 0 16px; font-size: 15px; color: #334155; line-height: 1.6;">
@@ -430,7 +430,7 @@ export const NOTIFICATION_TEMPLATES: NotificationTemplate[] = [
   <div style="padding: 28px;">
     <p style="margin: 0 0 16px; font-size: 14px; color: #334155;">Kính gửi <strong>{{payerName}}</strong>,</p>
     <p style="margin: 0 0 20px; font-size: 14px; color: #475569; line-height: 1.6;">
-      Ban Tài Chính Hiệp hội xin trân trọng xác nhận đã nhận đủ khoản thanh toán của Quý vị.
+      Ban Tài Chính CEOHN10 xin trân trọng xác nhận đã nhận đủ khoản thanh toán của Quý vị.
     </p>
     <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
       <table style="width: 100%; font-size: 14px;">
@@ -455,19 +455,19 @@ export const NOTIFICATION_TEMPLATES: NotificationTemplate[] = [
     id: "tmpl_event_announcement",
     code: "EVENT_ANNOUNCEMENT",
     category: "event",
-    name: "Thông Báo Khởi Động Sự Kiện Mới Trong Hiệp Hội",
+    name: "Thông Báo Khởi Động Sự Kiện Mới Trong CEOHN10",
     description: "Gửi thư mời và công bố sự kiện mới tới toàn thể Học viên và khách mời tiềm năng.",
     targetRole: "members",
     channels: ["email", "in_app", "push"],
     subject: "[THƯ MỜI SỰ KIỆN] {{eventName}} - {{eventDate}}",
     inAppTitle: "Sự kiện mới: {{eventName}}",
-    inAppBody: "Hiệp hội trân trọng kính mời Quý Doanh nhân tham dự '{{eventName}}' vào ngày {{eventDate}} tại {{eventLocation}}.",
+    inAppBody: "CEOHN10 trân trọng kính mời Quý Doanh nhân tham dự '{{eventName}}' vào ngày {{eventDate}} tại {{eventLocation}}.",
     variables: [
       { key: "memberName", label: "Tên Học viên", example: "Đỗ Thị Mai" },
       { key: "eventName", label: "Tên sự kiện", example: "Diễn Đàn Chuyển Đổi Số & Kết Nối Giao Thương 2026" },
       { key: "eventDate", label: "Ngày diễn ra", example: "20/11/2026" },
       { key: "eventLocation", label: "Địa điểm", example: "Trung tâm Hội nghị Quốc Gia, Hà Nội" },
-      { key: "keySpeakers", label: "Diễn giả tiêu biểu", example: "Chủ tịch Hiệp hội, TS. Kinh tế học Đỗ Văn Nam" },
+      { key: "keySpeakers", label: "Diễn giả tiêu biểu", example: "Chủ tịch CEOHN10, TS. Kinh tế học Đỗ Văn Nam" },
       { key: "registrationUrl", label: "Link đăng ký", example: "https://ceohn10.vn/events/evt-2026" },
     ],
     isLocked: true,
@@ -484,7 +484,7 @@ export const NOTIFICATION_TEMPLATES: NotificationTemplate[] = [
   <div style="padding: 28px;">
     <p style="margin: 0 0 16px; font-size: 15px; color: #334155;">Kính gửi Anh/Chị <strong>{{memberName}}</strong>,</p>
     <p style="margin: 0 0 20px; font-size: 14px; color: #475569; line-height: 1.6;">
-      Ban Chấp Hành Hiệp hội trân trọng kính mời Quý Anh/Chị tham dự chương trình đặc biệt quy tụ hơn 500 Chủ doanh nghiệp và Lãnh đạo cấp cao.
+      Ban Chấp Hành CEOHN10 trân trọng kính mời Quý Anh/Chị tham dự chương trình đặc biệt quy tụ hơn 500 Chủ doanh nghiệp và Lãnh đạo cấp cao.
     </p>
     <div style="background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
       <div style="margin-bottom: 10px;"><strong>Diễn giả:</strong> {{keySpeakers}}</div>
@@ -529,7 +529,7 @@ export const NOTIFICATION_TEMPLATES: NotificationTemplate[] = [
       Official E-Ticket & Pass
     </div>
     <h1 style="margin: 0; font-size: 22px; font-weight: 700; color: #ffffff;">{{eventName}}</h1>
-    <p style="margin: 8px 0 0; font-size: 13px; color: #9ca3af;">Vé mời tham dự chính thức - Hiệp hội Doanh nhân</p>
+    <p style="margin: 8px 0 0; font-size: 13px; color: #9ca3af;">Vé mời tham dự chính thức - CEOHN10 Doanh nhân</p>
   </div>
   <div style="padding: 28px;">
     <div style="background: #fafaf9; border: 2px dashed #d6d3d1; border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 24px;">
@@ -557,17 +557,17 @@ export const NOTIFICATION_TEMPLATES: NotificationTemplate[] = [
     id: "tmpl_cross_app_message",
     code: "CROSS_APP_COMMUNITY_MESSAGE",
     category: "cross_app",
-    name: "Thông Điệp Đồng Bộ 2 Chiều Giữa CRM và App Hiệp Hội CEO HN10",
-    description: "Đảm bảo luồng dữ liệu 2 chiều giữa Web CRM Quản trị và App Học viên của Hiệp hội CEO HN10.",
+    name: "Thông Điệp Đồng Bộ 2 Chiều Giữa CRM và App CEOHN10 CEO HN10",
+    description: "Đảm bảo luồng dữ liệu 2 chiều giữa Web CRM Quản trị và App Học viên của CEOHN10 CEO HN10.",
     targetRole: "members",
     channels: ["in_app", "push"],
     subject: "[CEO HN10] Tin nhắn mới từ {{senderName}} ({{associationName}})",
     inAppTitle: "Tin nhắn từ {{senderName}} - {{associationName}}",
     inAppBody: "{{messageSnippet}}",
     variables: [
-      { key: "senderName", label: "Người gửi", example: "Ban Thư Ký Hiệp Hội" },
+      { key: "senderName", label: "Người gửi", example: "Ban Thư Ký CEOHN10" },
       { key: "receiverName", label: "Người nhận", example: "Hoàng Minh Tuấn" },
-      { key: "associationName", label: "Tên Hiệp hội", example: "CLB Doanh Nhân CEO HN10" },
+      { key: "associationName", label: "Tên CEOHN10", example: "CLB Doanh Nhân CEO HN10" },
       { key: "messageSnippet", label: "Nội dung tóm tắt", example: "Kính gửi anh Tuấn, Ban Xúc Tiến Thương Mại đã xác nhận hồ sơ kết nối B2B với tập đoàn An Phát." },
       { key: "threadUrl", label: "Link mở hội thoại", example: "ceohn10://chat/thread/TH-1983-09" },
     ],

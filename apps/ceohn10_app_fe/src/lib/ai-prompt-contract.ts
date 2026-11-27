@@ -12,7 +12,7 @@ import type { PermissionLevel } from "@/lib/ai-context-providers";
  */
 
 /** Non-negotiable system rules the model must always follow. */
-export const SYSTEM_INSTRUCTION = `Bạn là Trợ lý AI cho nền tảng quản trị Hiệp hội (Association Hub).
+export const SYSTEM_INSTRUCTION = `Bạn là Trợ lý AI cho nền tảng quản trị CEOHN10 (Association Hub).
 Nguyên tắc bắt buộc:
 - CHỈ trả lời dựa trên phần "NGỮ CẢNH" được cung cấp. Không dùng kiến thức ngoài ngữ cảnh.
 - Nếu bằng chứng không đủ, hãy nói rõ và đặt confidence = "low" kèm clarificationQuestion.
@@ -57,7 +57,7 @@ export function buildUserContextMessage(input: PromptBuildInput): string {
   return [
     `Vai trò người dùng (quyền): ${input.permissionLevel}`,
     `Năng lực được định tuyến: ${input.capability}`,
-    bundle.associationId ? `Phạm vi hiệp hội: ${bundle.associationId}` : "",
+    bundle.associationId ? `Phạm vi CEOHN10: ${bundle.associationId}` : "",
     input.memorySummary ? `Tóm tắt ngữ cảnh phiên: ${input.memorySummary}` : "",
     "",
     "NGỮ CẢNH (chỉ dùng dữ liệu dưới đây):",

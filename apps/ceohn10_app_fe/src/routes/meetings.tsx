@@ -576,7 +576,7 @@ function MeetingsPage() {
   const handleSendOfflineInvite = async () => {
     if (!offlineInviteMeeting) return;
     try {
-      const address = offlineInviteMeeting.location || "Văn phòng Hiệp hội CEO HN10, Hà Nội";
+      const address = offlineInviteMeeting.location || "Văn phòng CEOHN10 CEO HN10, Hà Nội";
       const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
       
       await createNotif({
@@ -853,7 +853,7 @@ function MeetingsPage() {
                       <iframe
                         title={`Bản đồ ${m.title}`}
                         src={`https://maps.google.com/maps?q=${encodeURIComponent(
-                          m.location || "Văn phòng Hiệp hội CEO HN10, Hà Nội"
+                          m.location || "Văn phòng CEOHN10 CEO HN10, Hà Nội"
                         )}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
                         className="w-full h-28 border-0"
                         loading="lazy"
@@ -1380,7 +1380,7 @@ function MeetingsPage() {
                               setFormLocation("Phòng Họp Sapphire - Tầng 2 UniWork Hub, 649 Kim Mã, Hà Nội");
                               setFormGpsUrl("https://www.google.com/maps/search/?api=1&query=T%C3%B2a+nh%C3%A0+V-Tower+Kim+M%C3%A3+H%C3%A0+N%E1%BB%99i");
                             } else {
-                              setFormLocation("Văn phòng Hiệp hội CEO HN10, Hà Nội");
+                              setFormLocation("Văn phòng CEOHN10 CEO HN10, Hà Nội");
                               setFormGpsUrl("https://www.google.com/maps/search/?api=1&query=V%C4%83n+ph%C3%B2ng+Hi%E1%BB%87p+h%E1%BB%99i+CEO+1983");
                             }
                           }}
@@ -1547,7 +1547,7 @@ function MeetingsPage() {
                   </div>
                   <h4 className="text-lg font-bold leading-snug">{offlineInviteMeeting.title}</h4>
                   <p className="mt-1 text-xs text-slate-300">
-                    Hiệp Hội Doanh Nhân CEO HN10 • Trân trọng kính mời Quý Đại biểu
+                    CEOHN10 Doanh Nhân CEO HN10 • Trân trọng kính mời Quý Đại biểu
                   </p>
                 </div>
 
@@ -1568,7 +1568,7 @@ function MeetingsPage() {
                     <div className="sm:col-span-2">
                       <span className="font-semibold text-slate-500 block mb-0.5">📍 Địa chỉ họp trực tiếp:</span>
                       <span className="font-semibold text-slate-900 text-sm leading-relaxed block">
-                        {offlineInviteMeeting.location || "Văn phòng Hiệp hội CEO HN10, Tòa nhà V-Tower, 649 Kim Mã, Hà Nội"}
+                        {offlineInviteMeeting.location || "Văn phòng CEOHN10 CEO HN10, Tòa nhà V-Tower, 649 Kim Mã, Hà Nội"}
                       </span>
                     </div>
                   </div>
@@ -1578,7 +1578,7 @@ function MeetingsPage() {
                     <iframe
                       title="Bản đồ định vị họp offline"
                       src={`https://maps.google.com/maps?q=${encodeURIComponent(
-                        offlineInviteMeeting.location || "Văn phòng Hiệp hội CEO HN10, Tòa nhà V-Tower, 649 Kim Mã, Hà Nội"
+                        offlineInviteMeeting.location || "Văn phòng CEOHN10 CEO HN10, Tòa nhà V-Tower, 649 Kim Mã, Hà Nội"
                       )}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
                       className="w-full h-36 border-0"
                       loading="lazy"
@@ -1588,7 +1588,7 @@ function MeetingsPage() {
                   <div className="text-center pt-1">
                     <a
                       href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                        offlineInviteMeeting.location || "Văn phòng Hiệp hội CEO HN10, Hà Nội"
+                        offlineInviteMeeting.location || "Văn phòng CEOHN10 CEO HN10, Hà Nội"
                       )}`}
                       target="_blank"
                       rel="noreferrer"
@@ -1631,7 +1631,7 @@ function MeetingsPage() {
                 <button
                   type="button"
                   onClick={() => {
-                    const address = offlineInviteMeeting.location || "Văn phòng Hiệp hội CEO HN10, Hà Nội";
+                    const address = offlineInviteMeeting.location || "Văn phòng CEOHN10 CEO HN10, Hà Nội";
                     const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
                     const text = `[GIẤY MỜI HỌP OFFLINE]\nCuộc họp: ${offlineInviteMeeting.title}\nThời gian: ${offlineInviteMeeting.time} ngày ${offlineInviteMeeting.date}\nĐịa điểm: ${address}\nĐịnh vị Google Maps: ${mapsUrl}`;
                     navigator.clipboard.writeText(text);

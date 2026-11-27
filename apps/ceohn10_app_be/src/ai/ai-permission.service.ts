@@ -66,7 +66,7 @@ export const AI_CAPABILITIES_CATALOG: AiCapabilityDefinition[] = [
   {
     id: 'ai_cap_send_fee_reminders',
     code: 'AI_SEND_FEE_REMINDERS',
-    name: 'Tự động gửi email nhắc đóng hội phí',
+    name: 'Tự động gửi email nhắc đóng phí tham gia CLB',
     category: 'Tài chính & Thu phí',
     description: 'Cho phép AI quét danh sách hội viên chưa đóng phí, tạo kịch bản thông báo có mã QR thanh toán VietQR và gửi email sau khi được duyệt.',
     requiresReviewStep: true,

@@ -132,7 +132,7 @@ export const AI_PERSONAS = [
     color: "text-amber-500 bg-amber-500/10 border-amber-500/30",
     activeColor: "bg-amber-500 text-slate-950 font-bold",
     badge: "Bao quát toàn CLB",
-    greeting: "Kính chào Quý Lãnh đạo! Tôi là Trợ Lý Điều Hành Cấp Cao CEO HN10. Tôi sẵn sàng hỗ trợ phân tích và cố vấn hoạt động hiệp hội.",
+    greeting: "Kính chào Quý Lãnh đạo! Tôi là Trợ Lý Điều Hành Cấp Cao CEO HN10. Tôi sẵn sàng hỗ trợ phân tích và cố vấn hoạt động CEOHN10.",
   },
   {
     id: "opportunity" as AiPersonaType,
@@ -181,8 +181,8 @@ export const AI_PERSONAS = [
     icon: FileText,
     color: "text-blue-500 bg-blue-500/10 border-blue-500/30",
     activeColor: "bg-blue-500 text-white font-bold",
-    badge: "📚 Tra cứu văn bản hiệp hội",
-    greeting: "Chào Anh/Chị! Tôi là Trợ Lý Văn Bản & Tri Thức Hiệp Hội CEO HN10. Tôi quản lý hệ thống văn bản và tài liệu đã ban hành.",
+    badge: "📚 Tra cứu văn bản CEOHN10",
+    greeting: "Chào Anh/Chị! Tôi là Trợ Lý Văn Bản & Tri Thức CEOHN10 CEO HN10. Tôi quản lý hệ thống văn bản và tài liệu đã ban hành.",
   },
 ];
 
@@ -271,7 +271,7 @@ const QUICK_PROMPTS = [
     color: "from-emerald-500/10 to-teal-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/40",
     title: "Đối soát Quỹ Ngân Sách",
     desc: "Trích xuất số dư tài chính thực tế 100% từ sổ kế toán",
-    prompt: "Báo cáo chi tiết số dư quỹ hiệp hội và các giao dịch thực tế từ sổ kế toán, không lấy số liệu giả định.",
+    prompt: "Báo cáo chi tiết số dư quỹ CEOHN10 và các giao dịch thực tế từ sổ kế toán, không lấy số liệu giả định.",
     persona: "finance" as AiPersonaType,
   },
   {
@@ -781,7 +781,7 @@ export function CrmChatGPTView() {
             width: 28,
             value: (r: any) => r.recipient || "Học viên CLB CEO HN10",
           },
-          { header: "DANH MỤC THU", key: "category", width: 22, value: (r: any) => r.category || "Hội phí" },
+          { header: "DANH MỤC THU", key: "category", width: 22, value: (r: any) => r.category || "Phí tham gia CLB" },
           {
             header: "NỘI DUNG DIỄN GIẢI",
             key: "description",
@@ -1646,7 +1646,7 @@ export function CrmChatGPTView() {
                 {activePersonaObj.name}
               </h2>
               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-lg mx-auto leading-relaxed">
-                {activePersonaObj.roleDesc}. Phân tích và cố vấn số liệu thực tế của Hiệp hội Doanh nhân CEO HN10.
+                {activePersonaObj.roleDesc}. Phân tích và cố vấn số liệu thực tế của CEOHN10 Doanh nhân CEO HN10.
               </p>
 
               {/* 4 Thẻ gợi ý bắt đầu nhanh */}

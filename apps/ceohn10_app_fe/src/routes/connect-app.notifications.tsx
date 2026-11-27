@@ -556,7 +556,7 @@ function ConnectAppNotificationsPage() {
                           <div className="pt-2 border-t border-emerald-500/20 flex flex-wrap items-center gap-2 text-[10.5px] text-slate-600 dark:text-slate-300">
                             <span className="font-semibold">Nguồn tham gia:</span>
                             <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-medium">
-                              🏛️ App Hiệp hội: {n.safeDisplayData.sourceStats.associationApp || 0}
+                              🏛️ App CEOHN10: {n.safeDisplayData.sourceStats.associationApp || 0}
                             </span>
                             <span className="px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-700 dark:text-blue-300 font-medium">
                               💻 CRM: {n.safeDisplayData.sourceStats.crm || 0}

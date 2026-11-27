@@ -357,7 +357,7 @@ export const SECTIONS_CONFIG = [
     key: "gala" as const,
     title: "Đại Hội & Gala Toàn Thể",
     titleEn: "Grand Gala & Summits",
-    subtitle: "Chi tiết về đại hội cấp hiệp hội & vinh danh doanh nhân tiêu biểu, dạ tiệc tối nhà hàng sang trọng và các sự kiện tầm cỡ...",
+    subtitle: "Chi tiết về đại hội cấp CEOHN10 & vinh danh doanh nhân tiêu biểu, dạ tiệc tối nhà hàng sang trọng và các sự kiện tầm cỡ...",
     subtitleEn: "Official association summits, honorary entrepreneur galas, luxury evening banquets and premier celebrations...",
     icon: Trophy,
     variant: "hero" as const,

@@ -71,7 +71,7 @@ export const ProductAdRegistrationModal: React.FC<ProductAdRegistrationModalProp
                 Đăng Ký Quảng Cáo & Affiliate B2B
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Gửi yêu cầu tới Admin Quản trị hệ thống CRM Hiệp hội
+                Gửi yêu cầu tới Admin Quản trị hệ thống CRM CEOHN10
               </p>
             </div>
           </div>

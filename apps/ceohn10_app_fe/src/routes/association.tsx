@@ -22,7 +22,7 @@ export const Route = createFileRoute("/association")({
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       { name: "theme-color", content: "#001D4A" },
       { name: "apple-mobile-web-app-title", content: "CEO HN10" },
-      { title: "Hiệp hội Doanh nhân CEO HN10" },
+      { title: "CEOHN10 Doanh nhân CEO HN10" },
     ],
     links: [
       { rel: "manifest", href: MEMBER_MANIFEST_HREF },
@@ -50,7 +50,7 @@ export const Route = createFileRoute("/association")({
     ],
   }),
   beforeLoad: async ({ location }) => {
-    // Nếu đang ở màn hình đăng nhập hoặc đăng ký Hiệp hội, KHÔNG BAO GIỜ redirect vòng lặp
+    // Nếu đang ở màn hình đăng nhập hoặc đăng ký CEOHN10, KHÔNG BAO GIỜ redirect vòng lặp
     const path = location.pathname;
     if (
       path === "/association/login" ||
@@ -376,7 +376,7 @@ function MemberRoot() {
     }
   }, []);
 
-  // Trang đăng nhập hoặc tiếp nhận hồ sơ đăng ký Hiệp hội hiển thị độc lập, không hiển thị thanh Tab Bar hay layout Học viên đã đăng nhập
+  // Trang đăng nhập hoặc tiếp nhận hồ sơ đăng ký CEOHN10 hiển thị độc lập, không hiển thị thanh Tab Bar hay layout Học viên đã đăng nhập
   if (isLoginPage || isRegisterPage) {
     return <Outlet />;
   }

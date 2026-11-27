@@ -13,7 +13,7 @@ export interface CeoTableEllipsisProps {
 }
 
 /**
- * Hiển thị nội dung trong bảng CRM hiệp hội CEO HN10:
+ * Hiển thị nội dung trong bảng CRM CEOHN10 CEO HN10:
  * - Chỉ hiện tối đa 2 dòng (line-clamp-2), dữ liệu dài quá thì hiện ellipsis (...)
  * - Hover hiển thị Tooltip chuẩn phong cách Ant Design: nền đen sâu #1f1f1f, chữ trắng tinh tế, mũi tên định hướng
  */

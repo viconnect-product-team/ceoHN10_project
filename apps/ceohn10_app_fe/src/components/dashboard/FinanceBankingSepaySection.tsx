@@ -238,7 +238,7 @@ export function FinanceBankingSepaySection({ className = "" }: { className?: str
           <div className="p-3.5 rounded-xl bg-slate-800/60 border border-slate-700/60">
             <span className="text-[10px] font-bold text-slate-400 uppercase">Tiền Tố Đối Soát Tự Động</span>
             <div className="font-semibold text-sky-300 mt-1">Vé: {dynamicConfig.prefix_syntax?.event || "CEO1983_EVT"}</div>
-            <div className="text-[11px] text-slate-300">Hội phí: {dynamicConfig.prefix_syntax?.membership || "CEOHN10_HP"}</div>
+            <div className="text-[11px] text-slate-300">Phí tham gia CLB: {dynamicConfig.prefix_syntax?.membership || "CEOHN10_HP"}</div>
           </div>
           <div className="p-3.5 rounded-xl bg-slate-800/60 border border-slate-700/60">
             <span className="text-[10px] font-bold text-slate-400 uppercase">Xác Thực Chống Giả Mạo</span>
@@ -585,7 +585,7 @@ export function FinanceBankingSepaySection({ className = "" }: { className?: str
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold"
                 >
                   <option value="event_ticket">🎟️ Đại biểu thanh toán Vé Sự Kiện (Tự động đổi trạng thái vé PAID)</option>
-                  <option value="membership_fee">🏛️ Hội viên nộp Hội Phí Thường Niên 2026 (Quỹ Tổng)</option>
+                  <option value="membership_fee">🏛️ Hội viên nộp Phí Tham Gia CLB Thường Niên 2026 (Quỹ Tổng)</option>
                   <option value="transfer">🔄 Lệnh điều chuyển nội bộ (Quỹ Tổng sang Ban Công Nghệ 20M)</option>
                   <option value="general">💳 Giao dịch ngân hàng tự do (Chờ đối soát PENDING_RECONCILIATION)</option>
                 </select>

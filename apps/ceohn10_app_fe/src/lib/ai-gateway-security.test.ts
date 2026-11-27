@@ -114,7 +114,7 @@ describe("ai-output-guard", () => {
 
   it("context bundle for non-admin fee query exposes no sensitive fields", () => {
     const bundle = buildContextBundle({
-      message: "hội phí quá hạn",
+      message: "phí tham gia CLB quá hạn",
       capability: "fee_analysis",
       permissionLevel: "member",
     });

@@ -675,7 +675,7 @@ export class MailService {
       <div class="intro">
         Ban Thư Ký CLB Doanh Nhân CEO HN10 xin trân trọng thông báo hồ sơ đăng ký gia nhập của Anh/Chị ${companyName ? `(đại diện cho <strong>${companyName}</strong>)` : ''} đã được tiếp nhận thành công vào hệ thống.
         <br><br>
-        Dưới đây là thông tin tài khoản Học viên chính thức của Anh/Chị để đăng nhập vào <strong>App Hiệp Hội CEO HN10</strong>:
+        Dưới đây là thông tin tài khoản Học viên chính thức của Anh/Chị để đăng nhập vào <strong>App CEOHN10 CEO HN10</strong>:
       </div>
 
       <div class="card-box">
@@ -708,7 +708,7 @@ export class MailService {
           💬 QUAN TÂM (FOLLOW) ZALO OA CEO HN10
         </div>
         <div style="font-size: 12.5px; color: #334155; line-height: 1.5; margin-bottom: 12px;">
-          Bấm nút bên dưới để Quan tâm (Follow) Zalo OA chính thức của CLB. Anh/Chị sẽ nhận ngay thông báo lịch sự kiện, nhắc hạn hội phí và cơ hội B2B tự động về Zalo cá nhân:
+          Bấm nút bên dưới để Quan tâm (Follow) Zalo OA chính thức của CLB. Anh/Chị sẽ nhận ngay thông báo lịch sự kiện, nhắc hạn phí tham gia CLB và cơ hội B2B tự động về Zalo cá nhân:
         </div>
         <a href="${process.env.ZALO_OA_ID ? `https://zalo.me/${process.env.ZALO_OA_ID}` : 'https://oa.zalo.me'}" target="_blank" style="display: inline-block; background: #0068ff; color: #ffffff !important; font-weight: 800; font-size: 14px; text-decoration: none; padding: 12px 28px; border-radius: 9999px; box-shadow: 0 4px 14px rgba(0, 104, 255, 0.35);">
           👉 Bấm Vào Đây Để Quan Tâm (Follow) Zalo OA CEO HN10
@@ -1236,7 +1236,7 @@ export class MailService {
       </div>
 
       <p style="font-size: 13px; color: #64748b; line-height: 1.6; margin: 0;">
-        Nếu Quý Anh/Chị cần hỗ trợ thêm thông tin hoặc muốn tìm hiểu thủ tục gia nhập chính thức Hiệp hội CEO HN10, vui lòng liên hệ Ban Thư Ký CLB qua Hotline: <strong style="color: #0f172a;">0988 198 300</strong> hoặc Email: <strong style="color: #0f172a;">bientap@ceohn10.vn</strong>.
+        Nếu Quý Anh/Chị cần hỗ trợ thêm thông tin hoặc muốn tìm hiểu thủ tục gia nhập chính thức CEOHN10 CEO HN10, vui lòng liên hệ Ban Thư Ký CLB qua Hotline: <strong style="color: #0f172a;">0988 198 300</strong> hoặc Email: <strong style="color: #0f172a;">bientap@ceohn10.vn</strong>.
       </p>
     </div>
 
@@ -1483,7 +1483,7 @@ export class MailService {
     <div class="content">
       <div class="greeting">Kính gửi Anh/Chị <strong>${fullName}</strong>,</div>
       <div class="intro">
-        Ban Thư Ký CLB Doanh Nhân CEO HN10 xin chúc mừng Anh/Chị ${companyName ? `(Doanh nghiệp: <strong>${companyName}</strong>)` : ''} đã đăng ký tài khoản thành công trên nền tảng <strong>App Hiệp Hội CEO HN10</strong>.
+        Ban Thư Ký CLB Doanh Nhân CEO HN10 xin chúc mừng Anh/Chị ${companyName ? `(Doanh nghiệp: <strong>${companyName}</strong>)` : ''} đã đăng ký tài khoản thành công trên nền tảng <strong>App CEOHN10 CEO HN10</strong>.
         <br><br>
         Tài khoản của Anh/Chị đã được kích hoạt trên hệ thống với các thông tin như sau:
       </div>
@@ -1543,7 +1543,7 @@ export class MailService {
           💬 QUAN TÂM (FOLLOW) ZALO OA CEO HN10
         </div>
         <div style="font-size: 12.5px; color: #334155; line-height: 1.5; margin-bottom: 12px;">
-          Bấm nút bên dưới để Quan tâm (Follow) Zalo OA chính thức của CLB. Anh/Chị sẽ nhận ngay thông báo lịch sự kiện, nhắc hạn hội phí và cơ hội B2B tự động về Zalo cá nhân:
+          Bấm nút bên dưới để Quan tâm (Follow) Zalo OA chính thức của CLB. Anh/Chị sẽ nhận ngay thông báo lịch sự kiện, nhắc hạn phí tham gia CLB và cơ hội B2B tự động về Zalo cá nhân:
         </div>
         <a href="${process.env.ZALO_OA_ID ? `https://zalo.me/${process.env.ZALO_OA_ID}` : 'https://oa.zalo.me'}" target="_blank" style="display: inline-block; background: #0068ff; color: #ffffff !important; font-weight: 800; font-size: 14px; text-decoration: none; padding: 12px 28px; border-radius: 9999px; box-shadow: 0 4px 14px rgba(0, 104, 255, 0.35);">
           👉 Bấm Vào Đây Để Quan Tâm (Follow) Zalo OA CEO HN10
@@ -1665,7 +1665,7 @@ export class MailService {
     <div class="content">
       <div class="greeting">Kính gửi Anh/Chị <strong>${fullName}</strong>,</div>
       <div class="intro">
-        Ban Thư Ký CLB Doanh Nhân CEO HN10 xin thông báo: Quý Anh/Chị ${companyName ? `(Đại diện: <strong>${companyName}</strong>)` : ''} đã <strong>kích hoạt tài khoản và thiết lập mật khẩu cá nhân thành công</strong> trên ứng dụng Hiệp hội Doanh nhân CEO HN10.
+        Ban Thư Ký CLB Doanh Nhân CEO HN10 xin thông báo: Quý Anh/Chị ${companyName ? `(Đại diện: <strong>${companyName}</strong>)` : ''} đã <strong>kích hoạt tài khoản và thiết lập mật khẩu cá nhân thành công</strong> trên ứng dụng CEOHN10 Doanh nhân CEO HN10.
         <br><br>
         Tài khoản của Anh/Chị hiện đã ở trạng thái chính thức với đầy đủ các quyền lợi thành viên và thẻ doanh nhân số.
       </div>
@@ -1721,7 +1721,7 @@ export class MailService {
         </div>
         <div class="step-item">
           <span class="step-num">3</span>
-          <span>Trải nghiệm ngay Danh thiếp điện tử VIP và khám phá các cơ hội giao thương B2B trong Hiệp hội.</span>
+          <span>Trải nghiệm ngay Danh thiếp điện tử VIP và khám phá các cơ hội giao thương B2B trong CEOHN10.</span>
         </div>
       </div>
 
@@ -1888,7 +1888,7 @@ export class MailService {
           💬 QUAN TÂM (FOLLOW) ZALO OA CEO HN10
         </div>
         <div style="font-size: 12.5px; color: #334155; line-height: 1.5; margin-bottom: 12px;">
-          Bấm nút bên dưới để Quan tâm (Follow) Zalo OA chính thức của CLB. Anh/Chị sẽ nhận ngay thông báo lịch sự kiện, nhắc hạn hội phí và cơ hội B2B tự động về Zalo cá nhân:
+          Bấm nút bên dưới để Quan tâm (Follow) Zalo OA chính thức của CLB. Anh/Chị sẽ nhận ngay thông báo lịch sự kiện, nhắc hạn phí tham gia CLB và cơ hội B2B tự động về Zalo cá nhân:
         </div>
         <a href="${process.env.ZALO_OA_ID ? `https://zalo.me/${process.env.ZALO_OA_ID}` : 'https://oa.zalo.me'}" target="_blank" style="display: inline-block; background: #0068ff; color: #ffffff !important; font-weight: 800; font-size: 14px; text-decoration: none; padding: 12px 28px; border-radius: 9999px; box-shadow: 0 4px 14px rgba(0, 104, 255, 0.35);">
           👉 Bấm Vào Đây Để Quan Tâm (Follow) Zalo OA CEO HN10
@@ -2111,15 +2111,15 @@ export class MailService {
         id: 'tmpl-fee-notice',
         code: 'FEE_NOTICE_ANNUAL',
         category: 'fee',
-        name: 'Thông Báo Nộp Hội Phí Niên Liễm Định Kỳ',
+        name: 'Thông Báo Nộp Phí Tham Gia CLB Niên Liễm Định Kỳ',
         description:
           'Tự động gửi thông báo nộp phí Học viên định kỳ hàng năm kèm mã VietQR và hướng dẫn thanh toán.',
         channels: ['email', 'in_app', 'push'],
         subject:
-          '[CLB CEO HN10] Thông Báo Nộp Hội Phí Thường Niên Năm {{fee_year}} — Anh/Chị {{full_name}}',
-        inAppTitle: 'Thông báo nộp hội phí thường niên {{fee_year}}',
+          '[CLB CEO HN10] Thông Báo Nộp Phí Tham Gia CLB Thường Niên Năm {{fee_year}} — Anh/Chị {{full_name}}',
+        inAppTitle: 'Thông báo nộp phí tham gia CLB thường niên {{fee_year}}',
         inAppBody:
-          'Kính gửi Anh/Chị {{full_name}}, hệ thống gửi thông báo hội phí năm {{fee_year}} của đơn vị {{company_name}}.',
+          'Kính gửi Anh/Chị {{full_name}}, hệ thống gửi thông báo phí tham gia CLB năm {{fee_year}} của đơn vị {{company_name}}.',
         variables: [
           {
             key: 'full_name',
@@ -2132,10 +2132,10 @@ export class MailService {
             label: 'Tên doanh nghiệp',
             example: 'Tập Đoàn Công Nghệ ViConnect',
           },
-          { key: 'fee_year', label: 'Năm hội phí', example: '2026' },
+          { key: 'fee_year', label: 'Năm phí tham gia CLB', example: '2026' },
           {
             key: 'fee_amount',
-            label: 'Số tiền hội phí',
+            label: 'Số tiền phí tham gia CLB',
             example: '15,000,000',
           },
           {
@@ -2155,7 +2155,7 @@ export class MailService {
         htmlBody: `
 <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 620px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
   <div style="background: linear-gradient(135deg, #001A4D 0%, #003B95 100%); padding: 32px 24px; text-align: center; color: #ffffff;">
-    <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #ffffff;">THÔNG BÁO THU HỘI PHÍ NIÊN LIỄM {{fee_year}}</h1>
+    <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #ffffff;">THÔNG BÁO THU PHÍ THAM GIA CLB NIÊN LIỄM {{fee_year}}</h1>
     <p style="margin: 8px 0 0; font-size: 13px; color: #cbd5e1;">CLB Doanh Nhân CEO HN10 (HanoiBA)</p>
   </div>
   <div style="padding: 28px 24px; color: #1e293b;">
@@ -2164,12 +2164,12 @@ export class MailService {
       Đại diện Doanh nghiệp: <strong>{{company_name}}</strong> (Mã HV: {{member_code}}),
     </p>
     <p style="margin: 0 0 16px; font-size: 14px; line-height: 1.6; color: #334155;">
-      Ban Thư ký CLB Doanh Nhân CEO HN10 trân trọng thông báo đến Quý Anh/Chị kỳ nộp hội phí thường niên năm <strong>{{fee_year}}</strong> nhằm duy trì quyền lợi thành viên và tham gia các hoạt động kết nối xúc tiến thương mại.
+      Ban Thư ký CLB Doanh Nhân CEO HN10 trân trọng thông báo đến Quý Anh/Chị kỳ nộp phí tham gia CLB thường niên năm <strong>{{fee_year}}</strong> nhằm duy trì quyền lợi thành viên và tham gia các hoạt động kết nối xúc tiến thương mại.
     </p>
     <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 20px;">
       <table style="width: 100%; font-size: 13.5px; border-collapse: collapse;">
         <tr><td style="padding: 6px 0; color: #64748b; width: 140px;">Mã Học viên:</td><td style="padding: 6px 0; font-weight: 700; color: #003B95;">{{member_code}}</td></tr>
-        <tr><td style="padding: 6px 0; color: #64748b;">Mức hội phí:</td><td style="padding: 6px 0; font-weight: 800; color: #dc2626; font-size: 15px;">{{fee_amount}} VNĐ</td></tr>
+        <tr><td style="padding: 6px 0; color: #64748b;">Mức phí tham gia CLB:</td><td style="padding: 6px 0; font-weight: 800; color: #dc2626; font-size: 15px;">{{fee_amount}} VNĐ</td></tr>
         <tr><td style="padding: 6px 0; color: #64748b;">Hạn chót thanh toán:</td><td style="padding: 6px 0; font-weight: 700; color: #d97706;">{{due_date}}</td></tr>
       </table>
     </div>
@@ -2208,7 +2208,7 @@ export class MailService {
           { key: 'joined_date', label: 'Ngày gia nhập', example: '02/10/2026' },
           {
             key: 'executive_role',
-            label: 'Vai trò hiệp hội',
+            label: 'Vai trò CEOHN10',
             example: 'Học viên Chính Thức',
           },
           {
@@ -2364,7 +2364,7 @@ export class MailService {
     <div class="content">
       <div class="greeting">Kính gửi Anh/Chị <strong>${recipientName}</strong>,</div>
       <div class="intro">
-        Ban Tổ chức trân trọng kính mời Anh/Chị tham dự cuộc họp sau đây của Hiệp hội CEO HN10:
+        Ban Tổ chức trân trọng kính mời Anh/Chị tham dự cuộc họp sau đây của CEOHN10 CEO HN10:
       </div>
       <div class="card-box">
         <div class="card-title">📌 Thông Tin Chi Tiết Cuộc Họp</div>
@@ -2378,7 +2378,7 @@ export class MailService {
         ${notes ? `<div class="info-row"><span class="info-label">Ghi chú:</span><span class="info-value" style="font-weight: 500; font-style: italic;">${notes}</span></div>` : ''}
       </div>
       <div class="btn-wrap">
-        <a href="${appUrl}" class="btn-primary" target="_blank">${isOnline ? '💻 Vào Phòng Họp Trực Tuyến' : '📅 Xem Chi Tiết Trên App Hiệp Hội'}</a>
+        <a href="${appUrl}" class="btn-primary" target="_blank">${isOnline ? '💻 Vào Phòng Họp Trực Tuyến' : '📅 Xem Chi Tiết Trên App CEOHN10'}</a>
       </div>
     </div>
     <div class="footer">
@@ -2486,7 +2486,7 @@ export class MailService {
       <div class="greeting">Kính gửi Anh/Chị <strong>${recipientName}</strong>,</div>
       <div class="intro">
         ${isConfirmed
-        ? `Lịch hẹn kết nối giao thương 1-1 giữa Anh/Chị và <strong>${partnerName}</strong> đã được xác nhận thành công trên hệ thống Hiệp Hội CEO HN10.`
+        ? `Lịch hẹn kết nối giao thương 1-1 giữa Anh/Chị và <strong>${partnerName}</strong> đã được xác nhận thành công trên hệ thống CEOHN10 CEO HN10.`
         : `Doanh nhân <strong>${partnerName}</strong> ${partnerCompany ? `(đại diện <strong>${partnerCompany}</strong>)` : ''} vừa gửi lời mời hẹn gặp kết nối giao thương 1-1 tới Anh/Chị.`
       }
       </div>
@@ -2695,7 +2695,7 @@ export class MailService {
   }
 
   /**
-   * 4. Gửi email thông báo hội phí thường niên & nhắc phí kèm mã VNPAY-QR
+   * 4. Gửi email thông báo phí tham gia CLB thường niên & nhắc phí kèm mã VNPAY-QR
    */
   async sendMembershipFeeNotificationEmail(
     options: SendMembershipFeeNotificationEmailOptions,
@@ -2733,8 +2733,8 @@ export class MailService {
     const qrImg = vietQrAttachment ? 'cid:sepay_fee_qr' : vietQrUrlStr;
 
     const subject = isReminder
-      ? `[CLB CEO HN10] Nhắc Đóng Hội Phí Thường Niên Năm ${year} (Lần ${reminderCount}) — Học viên ${memberName}`
-      : `[CLB CEO HN10] Thông Báo Đóng Hội Phí Thường Niên Năm ${year} — Học viên ${memberName} (HĐ #${invoiceNo})`;
+      ? `[CLB CEO HN10] Nhắc Đóng Phí Tham Gia CLB Thường Niên Năm ${year} (Lần ${reminderCount}) — Học viên ${memberName}`
+      : `[CLB CEO HN10] Thông Báo Đóng Phí Tham Gia CLB Thường Niên Năm ${year} — Học viên ${memberName} (HĐ #${invoiceNo})`;
 
     const html = `
 <!DOCTYPE html>
@@ -2768,28 +2768,28 @@ export class MailService {
 <body>
   <div class="container">
     <div class="header">
-      <div class="gold-badge">✦ ${isReminder ? `Nhắc Đóng Phí Lần ${reminderCount}` : 'Thông Báo Hội Phí Thường Niên'} ✦</div>
-      <h1 class="title">HỘI PHÍ THƯỜNG NIÊN NĂM ${year}</h1>
+      <div class="gold-badge">✦ ${isReminder ? `Nhắc Đóng Phí Lần ${reminderCount}` : 'Thông Báo Phí Tham Gia CLB Thường Niên'} ✦</div>
+      <h1 class="title">PHÍ THAM GIA CLB THƯỜNG NIÊN NĂM ${year}</h1>
       <p class="subtitle">CLB Doanh Nhân CEO HN10 (HanoiBA)</p>
     </div>
     <div class="content">
       <div class="greeting">Kính gửi Anh/Chị <strong>${memberName}</strong>,</div>
       <div class="intro">
-        Ban Tài chính & Ban Thư Ký CLB Doanh Nhân CEO HN10 xin trân trọng thông báo tới Anh/Chị ${companyName ? `(đại diện <strong>${companyName}</strong>)` : ''} thông tin đóng hội phí thường niên năm <strong>${year}</strong> để tiếp tục duy trì tư cách Học viên chính thức và các quyền lợi giao thương.
+        Ban Tài chính & Ban Thư Ký CLB Doanh Nhân CEO HN10 xin trân trọng thông báo tới Anh/Chị ${companyName ? `(đại diện <strong>${companyName}</strong>)` : ''} thông tin đóng phí tham gia CLB thường niên năm <strong>${year}</strong> để tiếp tục duy trì tư cách Học viên chính thức và các quyền lợi giao thương.
       </div>
       <div class="card-box">
-        <div class="card-title">🧾 Chi Tiết Hóa Đơn Hội Phí</div>
+        <div class="card-title">🧾 Chi Tiết Hóa Đơn Phí Tham Gia CLB</div>
         <div class="info-row"><span class="info-label">Mã hóa đơn:</span><span class="info-value" style="color: #003B95;">#${invoiceNo}</span></div>
         <div class="info-row"><span class="info-label">Học viên:</span><span class="info-value">${memberName} ${memberCode ? `(${memberCode})` : ''}</span></div>
         <div class="info-row"><span class="info-label">Niên khóa:</span><span class="info-value">Năm ${year}</span></div>
-        <div class="info-row"><span class="info-label">Số tiền hội phí:</span><span class="info-value" style="color: #d97706; font-size: 16px;">${amount.toLocaleString('vi-VN')} VNĐ</span></div>
-        <div class="info-row"><span class="info-label">Hạn nộp hội phí:</span><span class="info-value" style="color: #dc2626;">${dueDate}</span></div>
+        <div class="info-row"><span class="info-label">Số tiền phí tham gia CLB:</span><span class="info-value" style="color: #d97706; font-size: 16px;">${amount.toLocaleString('vi-VN')} VNĐ</span></div>
+        <div class="info-row"><span class="info-label">Hạn nộp phí tham gia CLB:</span><span class="info-value" style="color: #dc2626;">${dueDate}</span></div>
       </div>
 
       <div class="vietqr-box">
         <div style="font-size: 13px; font-weight: 800; color: #1e3a8a; margin-bottom: 6px;">QUÉT MÃ VNPAY-QR ĐỂ THANH TOÁN TỰ ĐỘNG</div>
         <div style="font-size: 12px; color: #475569; margin-bottom: 12px;">Số tiền và cú pháp chuyển khoản đã được tích hợp sẵn chính xác 100%</div>
-        <img src="${qrImg}" alt="VNPAY-QR Hội Phí" class="qr-img" />
+        <img src="${qrImg}" alt="VNPAY-QR Phí Tham Gia CLB" class="qr-img" />
         <div style="margin-top: 12px; font-size: 12.5px; text-align: left; background: #ffffff; padding: 12px; border-radius: 8px;">
           <div><strong>Ngân hàng:</strong> ${bankName}</div>
           <div><strong>Số tài khoản:</strong> <span style="color:#003B95; font-weight:800; font-family:monospace; font-size:14px;">${bankAccount}</span></div>
@@ -2815,8 +2815,8 @@ export class MailService {
     this.dispatchZaloOaNotification({
       recipientEmail: cleanTo,
       recipientName: memberName,
-      title: `THÔNG BÁO HỘI PHÍ THƯỜNG NIÊN NĂM ${year}`,
-      content: `Kính gửi Anh/Chị ${memberName},\nBan Tài chính CLB Doanh Nhân CEO HN10 kính gửi thông báo hội phí:\n- Số tiền cần đóng: ${Number(amount || 0).toLocaleString('vi-VN')} VNĐ\n- Hạn thanh toán: ${dueDate}\n- Mã hóa đơn: #${invoiceNo}\n- Số tài khoản: 1983.888.888 tại Vietcombank (CLB Doanh Nhân CEO HN10)\n- Cú pháp CK: ${memberCode || memberName} dong hoi phi ${year}.\nAnh/Chị vui lòng hoàn tất hội phí để duy trì đầy đủ đặc quyền Học viên.`,
+      title: `THÔNG BÁO PHÍ THAM GIA CLB THƯỜNG NIÊN NĂM ${year}`,
+      content: `Kính gửi Anh/Chị ${memberName},\nBan Tài chính CLB Doanh Nhân CEO HN10 kính gửi thông báo phí tham gia CLB:\n- Số tiền cần đóng: ${Number(amount || 0).toLocaleString('vi-VN')} VNĐ\n- Hạn thanh toán: ${dueDate}\n- Mã hóa đơn: #${invoiceNo}\n- Số tài khoản: 1983.888.888 tại Vietcombank (CLB Doanh Nhân CEO HN10)\n- Cú pháp CK: ${memberCode || memberName} dong hoi phi ${year}.\nAnh/Chị vui lòng hoàn tất phí tham gia CLB để duy trì đầy đủ đặc quyền Học viên.`,
       ctaText: 'Đóng Phí Online / Xem Chi Tiết',
       ctaUrl: appUrl,
       trackingType: 'dues_notification',
@@ -2833,7 +2833,7 @@ export class MailService {
   }
 
   /**
-   * 5. Gửi email xác nhận thanh toán hội phí thành công & gia hạn Học viên
+   * 5. Gửi email xác nhận thanh toán phí tham gia CLB thành công & gia hạn Học viên
    */
   async sendMembershipFeeSuccessEmail(
     options: SendMembershipFeeSuccessEmailOptions,
@@ -2858,7 +2858,7 @@ export class MailService {
       'vupv090120@gmail.com'
     ).trim();
     const appUrl = portalUrl || `${DEFAULT_APP_URL}/association/profile`;
-    const subject = `[CLB CEO HN10] Xác Nhận Hoàn Thành Hội Phí Năm ${year} — Học viên ${memberName}`;
+    const subject = `[CLB CEO HN10] Xác Nhận Hoàn Thành Phí Tham Gia CLB Năm ${year} — Học viên ${memberName}`;
 
     const html = `
 <!DOCTYPE html>
@@ -2890,20 +2890,20 @@ export class MailService {
 <body>
   <div class="container">
     <div class="header">
-      <div class="gold-badge">✓ ĐÃ HOÀN TẤT HỘI PHÍ</div>
-      <h1 class="title">XÁC NHẬN THANH TOÁN HỘI PHÍ</h1>
+      <div class="gold-badge">✓ ĐÃ HOÀN TẤT PHÍ THAM GIA CLB</div>
+      <h1 class="title">XÁC NHẬN THANH TOÁN PHÍ THAM GIA CLB</h1>
       <p class="subtitle">CLB Doanh Nhân CEO HN10 (HanoiBA)</p>
     </div>
     <div class="content">
       <div class="greeting">Kính gửi Anh/Chị <strong>${memberName}</strong>,</div>
       <div class="intro">
-        Ban Tài chính & Ban Điều Hành CLB Doanh Nhân CEO HN10 xin trân trọng xác nhận: Khoản đóng hội phí thường niên năm <strong>${year}</strong> của Anh/Chị ${companyName ? `(đại diện <strong>${companyName}</strong>)` : ''} đã được hoàn tất thành công.
+        Ban Tài chính & Ban Điều Hành CLB Doanh Nhân CEO HN10 xin trân trọng xác nhận: Khoản đóng phí tham gia CLB thường niên năm <strong>${year}</strong> của Anh/Chị ${companyName ? `(đại diện <strong>${companyName}</strong>)` : ''} đã được hoàn tất thành công.
       </div>
       <div class="card-box">
         <div class="card-title">🧾 Thông Tin Xác Nhận Hoàn Tất</div>
         <div class="info-row"><span class="info-label">Học viên:</span><span class="info-value" style="color: #003B95;">${memberName} ${memberCode ? `(${memberCode})` : ''}</span></div>
         <div class="info-row"><span class="info-label">Mã hóa đơn / Biên lai:</span><span class="info-value">#${invoiceNo}</span></div>
-        <div class="info-row"><span class="info-label">Niên khóa hội phí:</span><span class="info-value">Năm ${year}</span></div>
+        <div class="info-row"><span class="info-label">Niên khóa phí tham gia CLB:</span><span class="info-value">Năm ${year}</span></div>
         <div class="info-row"><span class="info-label">Số tiền đã thanh toán:</span><span class="info-value" style="color: #16a34a; font-size: 16px;">${amount.toLocaleString('vi-VN')} VNĐ</span></div>
         <div class="info-row"><span class="info-label">Ngày thanh toán:</span><span class="info-value">${paidDate}</span></div>
         <div class="info-row"><span class="info-label">Phương thức:</span><span class="info-value">${paymentMethod}</span></div>
@@ -2931,8 +2931,8 @@ export class MailService {
     this.dispatchZaloOaNotification({
       recipientEmail: cleanTo,
       recipientName: memberName,
-      title: `XÁC NHẬN HOÀN THÀNH HỘI PHÍ NĂM ${year}`,
-      content: `Kính gửi Anh/Chị ${memberName},\nBan Tài chính CLB Doanh Nhân CEO HN10 xác nhận đã nhận đủ số tiền: ${Number(amount || 0).toLocaleString('vi-VN')} VNĐ cho kỳ hội phí năm ${year}.\n- Mã biên lai: #${invoiceNo}\n- Ngày thanh toán: ${paidDate}\n${newTermEnd ? `- Hạn Học viên mới: ${newTermEnd}\n` : ''}- Trạng thái: ✓ Đã gia hạn quyền lợi Học viên chính thức.\nTrân trọng cảm ơn sự đồng hành của Quý Doanh nhân!`,
+      title: `XÁC NHẬN HOÀN THÀNH PHÍ THAM GIA CLB NĂM ${year}`,
+      content: `Kính gửi Anh/Chị ${memberName},\nBan Tài chính CLB Doanh Nhân CEO HN10 xác nhận đã nhận đủ số tiền: ${Number(amount || 0).toLocaleString('vi-VN')} VNĐ cho kỳ phí tham gia CLB năm ${year}.\n- Mã biên lai: #${invoiceNo}\n- Ngày thanh toán: ${paidDate}\n${newTermEnd ? `- Hạn Học viên mới: ${newTermEnd}\n` : ''}- Trạng thái: ✓ Đã gia hạn quyền lợi Học viên chính thức.\nTrân trọng cảm ơn sự đồng hành của Quý Doanh nhân!`,
       ctaText: 'Xem Hồ Sơ & Quyền Lợi',
       ctaUrl: appUrl,
       trackingType: 'dues_success',
@@ -3014,7 +3014,7 @@ export class MailService {
     <div class="content">
       <div class="greeting">Kính gửi Anh/Chị <strong>${assigneeName}</strong>,</div>
       <div class="intro">
-        Anh/Chị vừa được <strong>${assignedBy}</strong> (${assignedByRole}) phân công phụ trách công việc mới trên hệ thống Hiệp Hội CEO HN10:
+        Anh/Chị vừa được <strong>${assignedBy}</strong> (${assignedByRole}) phân công phụ trách công việc mới trên hệ thống CEOHN10 CEO HN10:
       </div>
       <div class="card-box">
         <div class="card-title">📋 Thông Tin Công Việc</div>

@@ -43,7 +43,7 @@ export function ZaloTransactionCard({
   const accountNo = data.accountNo || "1010000000";
   const accountName = data.accountName || "CLB DOANH NHAN CEO HN10";
   const dueDate = data.dueDate || "31/03/2026";
-  const desc = data.desc || "Hội phí thường niên 2026 — CLB Doanh Nhân CEO HN10";
+  const desc = data.desc || "Phí tham gia CLB thường niên 2026 — CLB Doanh Nhân CEO HN10";
   const isPaid = data.status === "paid";
 
   const qrUrl =

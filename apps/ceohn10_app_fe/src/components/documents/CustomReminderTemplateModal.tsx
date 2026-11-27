@@ -58,7 +58,7 @@ const DEFAULT_REMINDER_FIELDS: DynamicReminderField[] = [
   {
     id: "f_fee",
     key: "activity_fee",
-    label: "Chi phí / Hội phí tham dự",
+    label: "Chi phí / Phí tham gia CLB tham dự",
     type: "price",
     value: "0",
     placeholder: "0 VNĐ (Miễn phí dành cho Học viên)",

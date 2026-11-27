@@ -198,7 +198,7 @@ export class PrismaService
           ('FUND_GENERAL', 'Quỹ Tổng CLB Doanh Nhân CEO HN10', 'GENERAL', 'Quỹ tài chính tổng hợp toàn CLB (2 tỷ 080 triệu)', 2080000000),
           ('FUND_BAN_CONG_NGHE', 'Quỹ Ban Công nghệ', 'COMMITTEE', 'Kinh phí khai giảng', 20000000),
           ('FUND_BAN_TRUYEN_THONG', 'Quỹ Ban Truyền thông', 'COMMITTEE', 'Quỹ chuyên trách truyền thông và thương hiệu', 0),
-          ('FUND_BAN_TAI_CHINH', 'Quỹ Ban Tài chính', 'COMMITTEE', 'Quỹ chuyên trách ngân sách, kiểm soát tài chính và hội phí', 0),
+          ('FUND_BAN_TAI_CHINH', 'Quỹ Ban Tài chính', 'COMMITTEE', 'Quỹ chuyên trách ngân sách, kiểm soát tài chính và phí tham gia CLB', 0),
           ('FUND_BAN_SU_KIEN_HAU_CAN', 'Quỹ Ban Sự kiện & Hậu cần', 'COMMITTEE', 'Quỹ chuyên trách tổ chức sự kiện và tiếp nhận phí vé SePay', 0),
           ('FUND_BAN_DOI_NGOAI', 'Quỹ Ban Đối ngoại & Giao thương', 'COMMITTEE', 'Quỹ chuyên trách đối ngoại và kết nối giao thương B2B', 0),
           ('FUND_BAN_GAN_KET', 'Quỹ Ban Gắn kết & Đời sống', 'COMMITTEE', 'Quỹ chăm lo đời sống và gắn kết thành viên', 0),

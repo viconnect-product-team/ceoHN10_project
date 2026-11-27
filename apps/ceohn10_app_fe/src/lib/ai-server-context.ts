@@ -125,7 +125,7 @@ const BASELINE_MARKETPLACE: SafeListing[] = [
 const BASELINE_NOTIFICATIONS: SafeNotification[] = [
   {
     id: "notif-01",
-    title: "Chào mừng Quý Học viên đến với nền tảng số Hiệp Hội Doanh Nhân CEO HN10!",
+    title: "Chào mừng Quý Học viên đến với nền tảng số CEOHN10 Doanh Nhân CEO HN10!",
     category: "Hệ thống",
     read: true,
     route: "/notifications",
@@ -141,8 +141,8 @@ const BASELINE_NOTIFICATIONS: SafeNotification[] = [
   },
   {
     id: "notif-03",
-    title: "Ban Tài Chính thông báo quyết toán hội phí niên liễm năm 2026",
-    category: "Hội phí",
+    title: "Ban Tài Chính thông báo quyết toán phí tham gia CLB niên liễm năm 2026",
+    category: "Phí tham gia CLB",
     read: false,
     route: "/fees",
     updatedAt: "2026-09-12",
@@ -160,7 +160,7 @@ export async function buildServerContext(input: ServerContextInput): Promise<Con
   const safeDocs: SafeDocument[] = DEFAULT_CEOHN10_DOCS.map((d) => ({
     id: d.id,
     title: d.name,
-    category: `${d.category}${d.enterpriseName ? ` (DN: ${d.enterpriseName})` : " (Hiệp hội)"}`,
+    category: `${d.category}${d.enterpriseName ? ` (DN: ${d.enterpriseName})` : " (CEOHN10)"}`,
     type: d.type,
     uploadedBy: d.committee || "Ban Điều Hành",
     updatedAt: d.time,
@@ -202,7 +202,7 @@ export async function buildServerContext(input: ServerContextInput): Promise<Con
     members: safeMembers,
     fees: isAdmin ? safeFees : undefined,
     myFee: {
-      status: "Đã hoàn thành hội phí 2026",
+      status: "Đã hoàn thành phí tham gia CLB 2026",
       amountDue: 0,
       dueDate: "2026-12-31",
     },

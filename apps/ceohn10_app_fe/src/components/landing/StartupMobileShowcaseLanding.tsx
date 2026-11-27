@@ -302,7 +302,7 @@ export function StartupMobileShowcaseLanding({
     },
     {
       question: "Điều kiện để gia nhập trở thành Học viên chính thức của CLB?",
-      answer: "Học viên là các Doanh nhân, Chủ tịch HĐQT, CEO, Tổng giám đốc hoặc Cấp quản lý doanh nghiệp CEO Hà Nội 10 (Quý Hợi). Hồ sơ gia nhập sẽ được Ban Thẩm định và Ban Điều hành phê duyệt theo đúng quy chế hiệp hội của HanoiBA.",
+      answer: "Học viên là các Doanh nhân, Chủ tịch HĐQT, CEO, Tổng giám đốc hoặc Cấp quản lý doanh nghiệp CEO Hà Nội 10 (Quý Hợi). Hồ sơ gia nhập sẽ được Ban Thẩm định và Ban Điều hành phê duyệt theo đúng quy chế CEOHN10 của HanoiBA.",
     },
     {
       question: "Ứng dụng di động CEO HN10 mang lại những lợi ích gì cho Học viên?",
@@ -1286,7 +1286,7 @@ export function StartupMobileShowcaseLanding({
 
             {/* Col 2: Hệ Thống Links */}
             <div className="space-y-2">
-              <h5 className="text-xs font-black text-white uppercase tracking-wider mb-3">Về Hiệp Hội</h5>
+              <h5 className="text-xs font-black text-white uppercase tracking-wider mb-3">Về CEOHN10</h5>
               <p>
                 <a href="#home" className="text-blue-100 hover:text-white transition">
                   Về Chúng Tôi

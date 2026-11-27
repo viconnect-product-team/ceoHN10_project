@@ -1561,7 +1561,7 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
       dto.messageTemplate ||
       `📢 [CLB DOANH NHÂN CEO HN10 - THÔNG BÁO TỰ ĐỘNG ĐỊNH KỲ]
 Kính gửi Học viên: {ho_ten} ({ma_hoi_vien}) - {ten_doanh_nghiep}
-Hệ thống tự động thông báo kỳ hoàn tất hội phí niên liễm thường niên.
+Hệ thống tự động thông báo kỳ hoàn tất phí tham gia CLB niên liễm thường niên.
 Trân trọng cảm ơn Anh/Chị!`;
 
     return this.sendBulkMessages({

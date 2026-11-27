@@ -413,7 +413,7 @@ function VotingPage() {
                       </span>
                     )}
                     <span className="rounded-full bg-blue-500/10 px-2.5 py-0.5 text-[10px] font-bold text-blue-700 dark:text-blue-400 border border-blue-500/20">
-                      🌐 Đẩy thông báo: App Hiệp hội & CRM
+                      🌐 Đẩy thông báo: App CEOHN10 & CRM
                     </span>
                   </div>
                   <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
@@ -643,7 +643,7 @@ function VotingPage() {
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="font-semibold text-foreground/80">Kênh bỏ phiếu:</span>
                   <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-700 dark:text-amber-400 font-medium border border-amber-500/20">
-                    🏛️ Hiệp hội App: <strong>{v.sourceStats?.associationApp ?? 0}</strong>
+                    🏛️ CEOHN10 App: <strong>{v.sourceStats?.associationApp ?? 0}</strong>
                   </span>
                   <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-500/10 text-slate-700 dark:text-slate-400 font-medium border border-slate-500/20">
                     💻 CRM: <strong>{v.sourceStats?.crm ?? 0}</strong>
@@ -1236,9 +1236,9 @@ function VoteModal({ vote, onClose }: { vote?: Vote; onClose: () => void }) {
               onChange={(e) => setTargetAudience(e.target.value)}
               className={inputCls}
             >
-              <option value="all">🌐 Toàn thể Học viên (App Hiệp hội & CRM)</option>
-              <option value="members">⭐ Chỉ Học viên chính thức hiệp hội</option>
-              <option value="non_members">🎯 Người ngoài hiệp hội (Khách mời sự kiện)</option>
+              <option value="all">🌐 Toàn thể Học viên (App CEOHN10 & CRM)</option>
+              <option value="members">⭐ Chỉ Học viên chính thức CEOHN10</option>
+              <option value="non_members">🎯 Người ngoài CEOHN10 (Khách mời sự kiện)</option>
             </select>
             <p className="mt-1 text-[11px] text-muted-foreground">
               * Hệ thống sẽ tự động phát thông báo thời gian thực tới App Học viên và CRM cho các đối tượng liên quan đã chọn.
@@ -1490,7 +1490,7 @@ function LuckyDrawModal({ onClose }: { onClose: () => void }) {
           eventName: selectedEventName,
         }),
       });
-      toast.success(`Đã phát thông báo trúng thưởng ${currentPrizeTitle} tới email và App Hiệp hội của ${winner.name}!`);
+      toast.success(`Đã phát thông báo trúng thưởng ${currentPrizeTitle} tới email và App CEOHN10 của ${winner.name}!`);
     } catch (err: any) {
       toast.error(err?.message || "Không thể gửi thông báo trúng thưởng");
     } finally {

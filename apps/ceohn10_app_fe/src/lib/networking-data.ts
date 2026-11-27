@@ -68,7 +68,7 @@ export function loadGroupChats(): GroupChat[] {
         memberIds: MEMBERS.slice(0, 8).map((m) => m.id),
         createdBy: CURRENT_USER_ID || "system",
         createdAt: new Date(Date.now() - 172800000).toISOString(),
-        description: "Điều phối và triển khai các chương trình trọng điểm của Hiệp hội CEO HN10",
+        description: "Điều phối và triển khai các chương trình trọng điểm của CEOHN10 CEO HN10",
       },
     ];
     try {
@@ -211,7 +211,7 @@ export function hydrateNetwork(
         id: "msg-welcome-1",
         fromId: peers[0].id,
         toId: CURRENT_USER_ID || "me",
-        text: `Chào anh/chị! Rất vui được kết nối cùng anh/chị trong Hiệp hội CEO HN10. Doanh nghiệp bên em rất mong muốn được tìm hiểu và hợp tác giao thương!`,
+        text: `Chào anh/chị! Rất vui được kết nối cùng anh/chị trong CEOHN10 CEO HN10. Doanh nghiệp bên em rất mong muốn được tìm hiểu và hợp tác giao thương!`,
         at: new Date(Date.now() - 1800000).toISOString(),
         readAt: null,
       });

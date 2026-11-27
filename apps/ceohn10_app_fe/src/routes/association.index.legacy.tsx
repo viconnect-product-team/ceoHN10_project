@@ -292,7 +292,7 @@ const quickActionDefs = [
     iconKey: "fees",
     icon: CreditCard,
     to: "/association/renew",
-    customLabel: "Hội phí",
+    customLabel: "Phí tham gia CLB",
     enLabel: "Membership Dues",
     badgeId: "fees",
     badgeText: "2026",
@@ -335,7 +335,7 @@ const CEOHN10_TOUR_STEPS: TourStep[] = [
   {
     targetId: "tour-member-card",
     title: "Thẻ Học viên & Số Điện Thoại",
-    description: "Thẻ nhận diện số chính thức của bạn trong Hiệp hội CEO HN10. Hiển thị ảnh đại diện, ảnh bìa sắc nét, mã Học viên HN10 và số điện thoại liên hệ trực tiếp.",
+    description: "Thẻ nhận diện số chính thức của bạn trong CEOHN10 CEO HN10. Hiển thị ảnh đại diện, ảnh bìa sắc nét, mã Học viên HN10 và số điện thoại liên hệ trực tiếp.",
     icon: "🎖️",
   },
   {

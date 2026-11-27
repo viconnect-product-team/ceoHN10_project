@@ -50,7 +50,7 @@ export function EventCheckinPanel({
     }
     exportToExcel<Registration>({
       title: `DANH SÁCH ĐẠI BIỂU ĐĂNG KÝ & ĐIỂM DANH SỰ KIỆN`,
-      subtitle: `${event.name} — Hiệp Hội Doanh Nhân CEO HN10 (HanoiBA)`,
+      subtitle: `${event.name} — CEOHN10 Doanh Nhân CEO HN10 (HanoiBA)`,
       filename: `danh-sach-dai-bieu-${event.id}`,
       sheetName: "Danh_Sach_Dai_Bieu",
       data: exportable,

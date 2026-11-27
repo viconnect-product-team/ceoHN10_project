@@ -250,7 +250,7 @@ export const HomeOpportunityRowWidget: React.FC<HomeOpportunityRowWidgetProps> =
                     {activeModal === "deal_value" && "Chi Tiết Giá Trị Đã Chốt Deal"}
                   </h3>
                   <p className="text-[11px] text-blue-200">
-                    Hệ thống khớp nối B2B Hiệp hội CEO HN10
+                    Hệ thống khớp nối B2B CEOHN10 CEO HN10
                   </p>
                 </div>
               </div>

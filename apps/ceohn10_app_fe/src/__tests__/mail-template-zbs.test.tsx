@@ -220,7 +220,7 @@ describe("CRM template ZBS dispatch", () => {
       ).value,
     ).toBe("welcome-template-id");
     fireEvent.click(
-      screen.getByText("Thông Báo Nộp Hội Phí Niên Liễm Định Kỳ"),
+      screen.getByText("Thông Báo Nộp Phí Tham Gia CLB Niên Liễm Định Kỳ"),
     );
     expect(
       (

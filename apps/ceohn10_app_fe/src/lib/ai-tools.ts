@@ -132,8 +132,8 @@ export const AI_TOOLS: AiTool[] = [
   },
   {
     id: "OpenFeeCenter",
-    name: "Mở Trung tâm hội phí",
-    description: "Xem tổng quan tình hình hội phí.",
+    name: "Mở Trung tâm phí tham gia CLB",
+    description: "Xem tổng quan tình hình phí tham gia CLB.",
     capability: "fee",
     kind: "navigate",
     requiredRole: "moderator",
@@ -145,7 +145,7 @@ export const AI_TOOLS: AiTool[] = [
   },
   {
     id: "ExportFeeReport",
-    name: "Xuất báo cáo hội phí",
+    name: "Xuất báo cáo phí tham gia CLB",
     description: "Mở báo cáo tài chính để xuất dữ liệu tổng hợp.",
     capability: "fee",
     kind: "export",
@@ -253,7 +253,7 @@ export function getToolsForCapability(capId: CapabilityId): AiTool[] {
  */
 export function canExecuteTool(tool: AiTool, ctx: AiToolContext): ToolAvailability {
   if (ctx.hasAssociation === false) {
-    return { allowed: false, reason: "Chưa chọn hiệp hội" };
+    return { allowed: false, reason: "Chưa chọn CEOHN10" };
   }
   if (ctx.rank < ROLE_RANK[tool.requiredRole]) {
     const roleLabel =

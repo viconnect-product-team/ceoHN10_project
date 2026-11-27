@@ -327,7 +327,7 @@ function DepartmentsPage() {
 
   const handleDeleteDept = (dept: DepartmentItem) => {
     if (dept.isCore) {
-      toast.error("Đây là ban nòng cốt của Hiệp hội, không thể xóa!");
+      toast.error("Đây là ban nòng cốt của CEOHN10, không thể xóa!");
       return;
     }
 
@@ -466,7 +466,7 @@ function DepartmentsPage() {
           <StandardMetricCard
             title="Ban Nòng Cốt"
             value={departments.filter((d) => d.isCore).length}
-            subtitle="Theo quy chế hiệp hội Hà Nội"
+            subtitle="Theo quy chế CEOHN10 Hà Nội"
             icon={Shield}
             index={1}
           />
@@ -822,7 +822,7 @@ function DepartmentsPage() {
                   rows={3}
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
-                  placeholder="Mô tả chức năng, nhiệm vụ cốt lõi của ban trong hiệp hội..."
+                  placeholder="Mô tả chức năng, nhiệm vụ cốt lõi của ban trong CEOHN10..."
                   className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs outline-none focus:border-[#003B95] focus:ring-1 focus:ring-[#003B95]"
                 />
               </div>

@@ -379,12 +379,12 @@ function CompanyDetailPage() {
       setCompanyState((prev) => ({ ...prev, feePaid: nextPaid }));
       toast.success(
         nextPaid
-          ? "✓ Đã xác nhận nộp hội phí thành công!"
+          ? "✓ Đã xác nhận nộp phí tham gia CLB thành công!"
           : "Đã chuyển trạng thái sang chưa đóng phí.",
       );
     } catch (err: any) {
       console.error("[Companies] Failed to update fee status:", err);
-      toast.error(err?.message || "Không thể cập nhật trạng thái hội phí");
+      toast.error(err?.message || "Không thể cập nhật trạng thái phí tham gia CLB");
     } finally {
       setSubmittingFee(false);
     }

@@ -171,7 +171,7 @@ function DocsPage() {
   const fmt = useFmt();
   const router = useRouter();
   const { isAdmin, isPlatformAdmin, isPresident, isChuTich, isTruongBan, isBanDieuHanh, can } = useRole();
-  // Quản trị, chủ tịch, admin, các trưởng ban có quyền xem, chỉnh sửa, upload, xóa tài liệu hiệp hội
+  // Quản trị, chủ tịch, admin, các trưởng ban có quyền xem, chỉnh sửa, upload, xóa tài liệu CEOHN10
   const isLeaderOrAdmin = Boolean(
     isAdmin || isPlatformAdmin || isPresident || isChuTich || isTruongBan || isBanDieuHanh
   );
@@ -276,7 +276,7 @@ function DocsPage() {
   const onSaveDoc = async (payload: any) => {
     const isAssocDoc = payload.docScope === "association" || !payload.docScope;
     if (isAssocDoc && !canWriteAssociation) {
-      toast.error("Tài liệu của Hiệp Hội chỉ có Quản trị, Chủ tịch và các Trưởng ban mới có quyền thêm/chỉnh sửa!");
+      toast.error("Tài liệu của CEOHN10 chỉ có Quản trị, Chủ tịch và các Trưởng ban mới có quyền thêm/chỉnh sửa!");
       return;
     }
     if (payload.category) {
@@ -368,7 +368,7 @@ function DocsPage() {
   const onDelete = async (d: Document) => {
     const isAssoc = d.docScope === "association" || !d.docScope;
     if (isAssoc && !canWriteAssociation) {
-      toast.error("Tài liệu Hiệp Hội chỉ có Quản trị, Chủ tịch và các Trưởng ban được xóa!");
+      toast.error("Tài liệu CEOHN10 chỉ có Quản trị, Chủ tịch và các Trưởng ban được xóa!");
       return;
     }
     if (!window.confirm(t("common.confirmDelete", { name: d.name }))) return;
@@ -767,7 +767,7 @@ function DocsPage() {
                   : "bg-blue-500/15 text-blue-700 dark:text-blue-400"
                   }`}
               >
-                {(d.docScope || "association") === "association" ? "🏛️ Hiệp hội" : "🏢 Doanh nghiệp"}
+                {(d.docScope || "association") === "association" ? "🏛️ CEOHN10" : "🏢 Doanh nghiệp"}
               </span>
               <span
                 className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-bold ${d.shareScope === "public"
@@ -950,7 +950,7 @@ function DocsPage() {
         className="relative min-h-[calc(100vh-120px)]"
       >
         <PageHeader
-          title={docTab === "mail_templates" ? "Mẫu Biểu Văn Bản & Công Văn Hiệp Hội" : t("doc.title")}
+          title={docTab === "mail_templates" ? "Mẫu Biểu Văn Bản & Công Văn CEOHN10" : t("doc.title")}
           subtitle={docTab === "mail_templates" ? "Kho biểu mẫu văn bản, hợp đồng mẫu chính thức và liên kết quản lý template thông báo CRM" : t("doc.subtitle")}
           actions={
             docTab === "docs" ? (
@@ -1037,7 +1037,7 @@ function DocsPage() {
           }
         />
 
-        {/* Phân Loại Danh Mục Tài Liệu: Hiệp Hội & Doanh Nghiệp */}
+        {/* Phân Loại Danh Mục Tài Liệu: CEOHN10 & Doanh Nghiệp */}
         {docTab === "docs" && (
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card/60 p-2.5 backdrop-blur-md">
             <div className="flex flex-wrap items-center gap-1.5">
@@ -1065,7 +1065,7 @@ function DocsPage() {
                   }`}
               >
                 <ShieldCheck className="h-3.5 w-3.5" />
-                <span>Tài liệu Hiệp Hội</span>
+                <span>Tài liệu CEOHN10</span>
                 <span className="ml-1 rounded-full bg-black/10 dark:bg-white/10 px-1.5 py-0.2 text-[10px]">
                   {DOCUMENTS.filter((d) => (d.docScope || "association") === "association").length}
                 </span>
@@ -1092,7 +1092,7 @@ function DocsPage() {
 
             <div className="text-xs text-muted-foreground flex items-center gap-1.5 pr-2">
               <Lock className="h-3.5 w-3.5 text-amber-500" />
-              <span>Tài liệu Hiệp Hội: Quản trị, Chủ tịch &amp; Trưởng ban toàn quyền; Thành viên chỉ xem.</span>
+              <span>Tài liệu CEOHN10: Quản trị, Chủ tịch &amp; Trưởng ban toàn quyền; Thành viên chỉ xem.</span>
             </div>
           </div>
         )}
@@ -1188,7 +1188,7 @@ function DocsPage() {
                     title: "Đơn Đề Nghị Gia Nhập CLB Doanh Nhân CEO HN10",
                     type: "Đơn / Phiếu Đăng Ký",
                     format: "DOCX",
-                    desc: "Mẫu đơn chính thức dành cho Doanh nhân CEO Hà Nội 10 đăng ký xét duyệt gia nhập Hiệp hội.",
+                    desc: "Mẫu đơn chính thức dành cho Doanh nhân CEO Hà Nội 10 đăng ký xét duyệt gia nhập CEOHN10.",
                     date: "01/11/2026",
                     fileUrl: "/docs/KICH_BAN_LOI_NOI_HOC_THUOC_THUYET_TRINH_CEOHN10.docx",
                   },
@@ -1230,7 +1230,7 @@ function DocsPage() {
                   },
                   {
                     code: "BM-06",
-                    title: "Quy Chế Quản Lý Thu - Chi & Quyết Toán Quỹ Hiệp Hội",
+                    title: "Quy Chế Quản Lý Thu - Chi & Quyết Toán Quỹ CEOHN10",
                     type: "Quy Chế Tài Chính",
                     format: "PDF",
                     desc: "Quy định tài chính minh bạch, hạn mức tạm ứng, chứng từ quyết toán và sao kê ngân hàng MB Bank.",
@@ -1901,7 +1901,7 @@ function DocsPage() {
                     onChange={(e) => setNewFolderScope(e.target.value as "association" | "enterprise")}
                     className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm focus:border-amber-500 focus:outline-none"
                   >
-                    <option value="association">🏛️ Thư mục Hiệp Hội (Chỉ Quản trị / Trưởng ban)</option>
+                    <option value="association">🏛️ Thư mục CEOHN10 (Chỉ Quản trị / Trưởng ban)</option>
                     <option value="enterprise">🏢 Thư mục Doanh Nghiệp (Dành cho thành viên)</option>
                   </select>
                 </div>

@@ -37,7 +37,7 @@ import authBg from "@/assets/connect-auth-bg.jpg";
 /** Multilingual dictionary for Association Landing showcase elements */
 const LAND_I18N = {
   vi: {
-    heroBadge: "NỀN TẢNG SỐ HÓA HIỆP HỘI DOANH NGHIỆP",
+    heroBadge: "NỀN TẢNG SỐ HÓA CEOHN10 DOANH NGHIỆP",
     heroTagline: "Gắn kết doanh nhân — Nâng tầm giá trị thương hiệu",
     heroDesc: "Cộng đồng kết nối giao thương, hợp tác đầu tư và chia sẻ tri thức quản trị bền vững. Trải nghiệm ứng dụng Học viên với đầy đủ thẻ số, danh bạ B2B và đặc quyền sự kiện.",
     ctaOpen: "Mở App Học viên",
@@ -726,7 +726,7 @@ export function AssociationLandingView({ a }: { a: PublicAssociation }) {
               )}
               <div>
                 <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--vba-text-muted)]">
-                  {lang === "vi" ? "HIỆP HỘI DOANH NGHIỆP" : lang === "en" ? "BUSINESS ASSOCIATION" : lang === "ja" ? "企業協会" : lang === "ko" ? "기업 협회" : "企业商会"}
+                  {lang === "vi" ? "CEOHN10 DOANH NGHIỆP" : lang === "en" ? "BUSINESS ASSOCIATION" : lang === "ja" ? "企業協会" : lang === "ko" ? "기업 협회" : "企业商会"}
                 </div>
                 <div className="max-w-[180px] truncate text-[15px] font-extrabold tracking-tight vba-gold-text sm:max-w-xs md:max-w-md">
                   {a.name}
@@ -863,7 +863,7 @@ export function AssociationLandingView({ a }: { a: PublicAssociation }) {
             </div>
           </section>
 
-          {/* Section 1: Ban Lãnh Đạo & Ban Chấp Hành Hiệp Hội */}
+          {/* Section 1: Ban Lãnh Đạo & Ban Chấp Hành CEOHN10 */}
           <section className="mt-20">
             <div className="mb-6 flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
               <div>
@@ -1136,11 +1136,11 @@ export function AssociationLandingView({ a }: { a: PublicAssociation }) {
               <div className="flex items-center gap-2">
                 <Crown className="h-4 w-4 text-[var(--vba-gold)]" />
                 <span className="font-bold text-[var(--vba-text)]">{a.name}</span>
-                <span className="text-[var(--vba-text-muted)]">· Hệ điều hành kết nối Hiệp Hội Doanh Nghiệp</span>
+                <span className="text-[var(--vba-text-muted)]">· Hệ điều hành kết nối CEOHN10 Doanh Nghiệp</span>
               </div>
               <div className="flex items-center gap-4 text-xs">
                 <Link to="/landing" className="text-[var(--vba-gold)] hover:underline">
-                  Giới thiệu Hiệp Hội
+                  Giới thiệu CEOHN10
                 </Link>
                 <Link to="/m" className="text-[var(--vba-gold)] hover:underline">
                   App Học viên

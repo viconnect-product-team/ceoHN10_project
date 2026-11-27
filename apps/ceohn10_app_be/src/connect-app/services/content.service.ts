@@ -40,7 +40,7 @@ const DEFAULT_OFFICIAL_NEWS = [
   {
     code: 'NEWS-001',
     title:
-      'Hiệp hội CEO HN10 phát động chương trình Xúc tiến Thương mại & Kết nối Giao thương Toàn diện 2026',
+      'CEOHN10 CEO HN10 phát động chương trình Xúc tiến Thương mại & Kết nối Giao thương Toàn diện 2026',
     category: 'Giao thương B2B',
     author: 'Ban Thư ký & Ban Truyền thông',
     published_at: '2026-09-20',

@@ -223,7 +223,7 @@ export function Ceo1983MemberRegistrationForm({
 
             <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-lg mx-auto mb-6">
               Kính gửi Anh/Chị <strong>{registeredData?.fullName}</strong> (Đại diện cho{" "}
-              <strong>{registeredData?.companyName}</strong>), đơn đăng ký gia nhập Hiệp hội CEO HN10 của Anh/Chị đã được tiếp nhận thành công vào hệ thống.
+              <strong>{registeredData?.companyName}</strong>), đơn đăng ký gia nhập CEOHN10 CEO HN10 của Anh/Chị đã được tiếp nhận thành công vào hệ thống.
             </p>
 
             {/* Email Dispatch Confirmation Highlight */}
@@ -272,12 +272,12 @@ export function Ceo1983MemberRegistrationForm({
             <div className="bg-blue-50 border-l-4 border-[#003B95] p-4 rounded-r-xl text-left text-xs sm:text-sm text-[#003B95] mb-8">
               <p className="font-bold mb-1">📌 Quy trình thẩm định & cấp tài khoản Học viên:</p>
               <ul className="list-disc list-inside space-y-1 text-slate-700">
-                <li>Ban Thành Viên Hiệp hội CEO HN10 sẽ thẩm định hồ sơ trong vòng 24 giờ.</li>
+                <li>Ban Thành Viên CEOHN10 CEO HN10 sẽ thẩm định hồ sơ trong vòng 24 giờ.</li>
                 <li>
                   Khi được phê duyệt, hệ thống sẽ <strong>tự động gửi email</strong> chứa tên đăng nhập
                   và mật khẩu kích hoạt tới hòm thư <strong>{registeredData?.email}</strong>.
                 </li>
-                <li>Anh/Chị có thể sử dụng thông tin đó để đăng nhập vào App Hiệp Hội.</li>
+                <li>Anh/Chị có thể sử dụng thông tin đó để đăng nhập vào App CEOHN10.</li>
               </ul>
             </div>
 
@@ -387,7 +387,7 @@ export function Ceo1983MemberRegistrationForm({
                 <span className="text-rose-500 font-semibold">* Mục bắt buộc</span>
                 <span className="text-slate-500 flex items-center gap-1 font-medium">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                  Bảo mật thông tin doanh nghiệp theo tiêu chuẩn Hiệp hội
+                  Bảo mật thông tin doanh nghiệp theo tiêu chuẩn CEOHN10
                 </span>
               </div>
 

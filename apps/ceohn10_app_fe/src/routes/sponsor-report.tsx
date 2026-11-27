@@ -69,7 +69,7 @@ function ReportPage() {
       address: "Tòa nhà HanoiBA, TP. Hà Nội",
       circularCode: "Mẫu số B04-BCTT",
       circularNote: "(Ban hành theo quy chế quản trị tài trợ & xúc tiến thương mại CLB CEO HN10)",
-      fundType: "Nguồn quỹ tài trợ & phát triển hiệp hội",
+      fundType: "Nguồn quỹ tài trợ & phát triển CEOHN10",
       currencyUnit: "VNĐ",
       data: SPONSORS,
       columns: [

@@ -27,7 +27,7 @@ export function generateInvoiceVoucherHtml(tx: Transaction): string {
   const fundLabel =
     tx.fundType === "sponsorship_cash" || tx.fundType === "sponsorship"
       ? "Túi Quỹ Tài Trợ CEO HN10 (Nguồn Đối Tác / NTT)"
-      : "Túi Quỹ Chung CLB (Nguồn Hội Phí Học viên)";
+      : "Túi Quỹ Chung CLB (Nguồn Phí Tham Gia CLB Học viên)";
 
   const deptLabel = tx.targetDepartment || tx.department || "Ban Điều Hành / Chung CLB";
   const eventLabel = tx.targetEventName || tx.eventName || (tx.targetEventId ? `Mã sự kiện: ${tx.targetEventId}` : "Hoạt động & Chi tiêu định kỳ");
@@ -74,7 +74,7 @@ export function generateInvoiceVoucherHtml(tx: Transaction): string {
     <div class="header">
       <div>
         <div class="brand">CLB DOANH NHÂN CEO HN10</div>
-        <div class="sub-brand">Hệ thống Quản trị Tài chính & 2 Túi Quỹ (Hội Phí & Tài Trợ)</div>
+        <div class="sub-brand">Hệ thống Quản trị Tài chính & 2 Túi Quỹ (Phí Tham Gia CLB & Tài Trợ)</div>
       </div>
       <div class="voucher-meta">
         <div class="voucher-no">Số: ${voucherCode}</div>

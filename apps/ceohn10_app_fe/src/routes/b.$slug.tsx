@@ -201,14 +201,14 @@ function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className="vba-app min-h-[100dvh] px-4 py-4 sm:py-6">
       <div className="mx-auto w-full max-w-md">
-        {/* Nút quay lại App Hiệp Hội chuẩn cho người dùng mobile & desktop */}
+        {/* Nút quay lại App CEOHN10 chuẩn cho người dùng mobile & desktop */}
         <div className="mb-3.5 flex items-center justify-between">
           <Link
             to="/association"
             className="inline-flex items-center gap-1.5 rounded-full border border-[var(--vba-border-soft)] bg-white/90 dark:bg-slate-900/90 px-3.5 py-1.5 text-[12px] font-bold text-[#003B95] dark:text-amber-300 shadow-xs backdrop-blur-md transition hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95 cursor-pointer"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span>Về App Hiệp Hội</span>
+            <span>Về App CEOHN10</span>
           </Link>
           <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
             CLB Doanh Nhân CEO HN10

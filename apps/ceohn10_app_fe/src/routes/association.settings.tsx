@@ -110,7 +110,7 @@ function AssociationSettingsScreen() {
     <div className="vba-animate pb-28 min-h-screen bg-slate-50 dark:bg-[#070D1A] text-slate-900 dark:text-white">
       <MemberHeader
         title={isEn ? "Settings" : "Cài đặt"}
-        subtitle="Hiệp hội Doanh nhân CEO HN10"
+        subtitle="CEOHN10 Doanh nhân CEO HN10"
         back={true}
         onBack={required === "true" ? handleBackToLogin : undefined}
       />
@@ -222,7 +222,7 @@ function AssociationSettingsScreen() {
               <div className="min-w-0 flex-1">
                 <span className="text-[10px] font-bold text-slate-400 block uppercase">Trụ sở CLB Doanh Nhân CEO HN10</span>
                 <span className="font-semibold text-slate-800 dark:text-white block text-[11px] leading-snug">
-                  Hiệp Hội Doanh Nghiệp Trẻ Hà Nội (HanoiBA) - TP. Hà Nội
+                  CEOHN10 Doanh Nghiệp Trẻ Hà Nội (HanoiBA) - TP. Hà Nội
                 </span>
               </div>
             </div>

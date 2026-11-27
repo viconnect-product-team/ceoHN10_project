@@ -233,8 +233,8 @@ export async function fetchFundSurplus(): Promise<MasterFundSurplus> {
     fundsBreakdown: [
       {
         id: "general_fund",
-        name: "Túi Quỹ Chung CLB (Hội phí)",
-        category: "Hội phí & Vận hành",
+        name: "Túi Quỹ Chung CLB (Phí tham gia CLB)",
+        category: "Phí tham gia CLB & Vận hành",
         balance: 820000000,
         income: 1408000000,
         expense: 588000000,
@@ -248,7 +248,7 @@ export async function fetchFundSurplus(): Promise<MasterFundSurplus> {
         balance: 444000000,
         income: 640000000,
         expense: 196000000,
-        description: "Nguồn tiền mặt nhận tài trợ từ các doanh nghiệp hội viên và nhà tài trợ vàng/kim cương",
+        description: "Nguồn tiền mặt nhận tài trợ từ các doanh ngCEOHN10 viên và nhà tài trợ vàng/kim cương",
         status: "normal",
       },
       {
@@ -461,7 +461,7 @@ export async function fetchIntegratedPlatforms(): Promise<IntegratedPlatformItem
       code: "APP_ERP_A",
       category: "erp",
       categoryLabel: "ERP Doanh Nghiệp",
-      description: "Tích hợp đồng bộ dữ liệu giao thương B2B, quản lý hàng hóa chuỗi cung ứng giữa các doanh nghiệp hội viên",
+      description: "Tích hợp đồng bộ dữ liệu giao thương B2B, quản lý hàng hóa chuỗi cung ứng giữa các doanh ngCEOHN10 viên",
       endpointUrl: "https://erp-a.viconnect.vn/api/v1",
       healthcheckUrl: "https://erp-a.viconnect.vn/api/v1/health",
       authType: "bearer_token",
@@ -497,7 +497,7 @@ export async function fetchIntegratedPlatforms(): Promise<IntegratedPlatformItem
       code: "APP_MISA_FINANCE_C",
       category: "finance",
       categoryLabel: "Kế Toán & Hóa Đơn",
-      description: "Đồng bộ tự động hóa đơn hội phí, chứng từ chi tiêu sự kiện và báo cáo tài chính sang MISA",
+      description: "Đồng bộ tự động hóa đơn phí tham gia CLB, chứng từ chi tiêu sự kiện và báo cáo tài chính sang MISA",
       endpointUrl: "https://misa-api.connect.vn/api/v2",
       healthcheckUrl: "https://misa-api.connect.vn/api/v2/ping",
       authType: "oauth2",

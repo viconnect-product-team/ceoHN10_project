@@ -83,7 +83,7 @@ export class ExecutiveMemberFeeStrategy implements IFeeCalculationStrategy {
       tierName: 'Học viên Ban Điều Hành',
       appliedBenefits: [
         'Quyền biểu quyết và hoạch định chiến lược CLB',
-        'Đại diện hiệp hội tham gia đối thoại chính sách',
+        'Đại diện CEOHN10 tham gia đối thoại chính sách',
         'Tham dự các hội nghị kín của Ban Lãnh đạo',
       ],
     };

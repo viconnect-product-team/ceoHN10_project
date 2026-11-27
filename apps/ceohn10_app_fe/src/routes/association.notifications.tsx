@@ -261,13 +261,13 @@ function getChannelOrPeerForNotif(n: any): string {
     return 'channel_promotion';
   }
 
-  // 4. Ban Thư Ký & Ban Điều Hành: Cuộc họp BCH, nghị quyết, văn bản, hội phí, điều lệ
+  // 4. Ban Thư Ký & Ban Điều Hành: Cuộc họp BCH, nghị quyết, văn bản, phí tham gia CLB, điều lệ
   if (
     kind.includes('meeting') ||
     kind.includes('fee') ||
     text.includes('cuộc họp') ||
     text.includes('họp bch') ||
-    text.includes('hội phí') ||
+    text.includes('phí tham gia CLB') ||
     text.includes('ban thư ký') ||
     text.includes('ban điều hành') ||
     text.includes('nghị quyết') ||
@@ -641,7 +641,7 @@ function NotificationsScreen() {
         method: "POST",
         body: JSON.stringify({ optionId, sourceApp: "association_app" }),
       });
-      toast.success("Đã ghi nhận biểu quyết của bạn qua Hiệp hội App!");
+      toast.success("Đã ghi nhận biểu quyết của bạn qua CEOHN10 App!");
       reload();
     } catch (e: any) {
       toast.error(e?.message || "Không thể gửi biểu quyết");
@@ -942,7 +942,7 @@ function NotificationsScreen() {
       return true;
     }
 
-    return /hội phí|phí thường niên|quản lý hội phí|hóa đơn Học viên|đóng phí/i.test(text);
+    return /phí tham gia CLB|phí thường niên|quản lý phí tham gia CLB|hóa đơn Học viên|đóng phí/i.test(text);
   };
 
   const handlePayNotification = (n: any) => {
@@ -1010,7 +1010,7 @@ function NotificationsScreen() {
     { key: "unread", label: "Chưa đọc" },
     { key: "opportunity", label: "Cơ hội B2B" },
     { key: "event", label: "Sự kiện" },
-    { key: "fee", label: "Hội phí" },
+    { key: "fee", label: "Phí tham gia CLB" },
     { key: "dismissed", label: "Đã ẩn" },
   ];
 
@@ -1388,7 +1388,7 @@ function NotificationsScreen() {
             fee: {
               iconBg: "bg-amber-600 text-white border-amber-700 shadow-xs",
               badge: "bg-amber-50 text-amber-900 dark:bg-amber-950/80 dark:text-amber-300 border-amber-300 dark:border-amber-700 font-bold",
-              label: "Hội phí",
+              label: "Phí tham gia CLB",
             },
             network: {
               iconBg: "bg-[#003B95] text-amber-300 border-amber-500/40 shadow-xs",
@@ -1824,7 +1824,7 @@ function NotificationsScreen() {
             <DialogHeader className="space-y-2">
               <div className="flex items-center justify-between gap-2">
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
-                  {selectedNotif.type === "fee" ? "Hội phí" : selectedNotif.type === "event" ? "Sự kiện" : selectedNotif.type === "opportunity" ? "Cơ hội B2B" : "Thông báo"}
+                  {selectedNotif.type === "fee" ? "Phí tham gia CLB" : selectedNotif.type === "event" ? "Sự kiện" : selectedNotif.type === "opportunity" ? "Cơ hội B2B" : "Thông báo"}
                 </span>
                 <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                   {fmt.rel(selectedNotif.time)}
@@ -1942,7 +1942,7 @@ function NotificationsScreen() {
                   </div>
                 )}
                 <div className="text-[11.5px] text-slate-600 dark:text-slate-400">
-                  Học viên có thể quét mã VNPAY-QR chuyển khoản tự động hoặc thanh toán trực tiếp qua cổng thanh toán của hiệp hội.
+                  Học viên có thể quét mã VNPAY-QR chuyển khoản tự động hoặc thanh toán trực tiếp qua cổng thanh toán của CEOHN10.
                 </div>
                 <button
                   type="button"

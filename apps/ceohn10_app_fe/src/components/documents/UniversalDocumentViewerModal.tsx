@@ -333,11 +333,11 @@ export function UniversalDocumentViewerModal({
                 </span>
               </h3>
               <p className="text-xs text-slate-500 truncate mt-0.5 flex items-center gap-2">
-                <span>{doc.category || "Tài liệu Hiệp hội"}</span>
+                <span>{doc.category || "Tài liệu CEOHN10"}</span>
                 <span>•</span>
                 <span>{doc.size || "—"}</span>
                 <span>•</span>
-                <span>Người tải: {doc.uploadedBy || "Hiệp hội CEO HN10"}</span>
+                <span>Người tải: {doc.uploadedBy || "CEOHN10 CEO HN10"}</span>
               </p>
             </div>
           </div>
@@ -643,7 +643,7 @@ export function UniversalDocumentViewerModal({
 
                 {/* Chân trang tài liệu */}
                 <div className="mt-16 pt-6 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center text-xs text-slate-400 font-sans">
-                  <span>Văn bản số hoá - Hệ thống quản trị Hiệp hội CEO HN10</span>
+                  <span>Văn bản số hoá - Hệ thống quản trị CEOHN10 CEO HN10</span>
                   <span>Trang 1 / 1</span>
                 </div>
               </div>
@@ -701,7 +701,7 @@ export function UniversalDocumentViewerModal({
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1">
               <Layers className="size-3.5 text-blue-500" />
-              <span>Phạm vi: {doc.docScope === "enterprise" ? "Doanh nghiệp" : "Hiệp hội"}</span>
+              <span>Phạm vi: {doc.docScope === "enterprise" ? "Doanh nghiệp" : "CEOHN10"}</span>
             </span>
             <span>•</span>
             <span>Quyền xem: {doc.shareScope === "public" ? "Công khai" : "Nội bộ"}</span>
@@ -748,5 +748,5 @@ function generateFallbackWorkbook(name: string): XLSX.WorkBook {
 }
 
 function generateFallbackDocxText(name: string): string {
-  return `CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM\nĐộc lập - Tự do - Hạnh phúc\n\nCLB DOANH NHÂN CEO HN10 (HANOIBA)\nSố: 1983/QĐ-BĐH-2026\n\nQUY CHẾ HOẠT ĐỘNG VÀ ĐIỀU LỆ GIAO THƯƠNG B2B\n\nĐiều 1: Mục đích và Tôn chỉ hoạt động\nCâu Lạc Bộ Doanh Nhân CEO HN10 trực thuộc Hội Doanh Nghiệp Trẻ Hà Nội (HanoiBA) là tổ chức liên kết các doanh nhân, chủ doanh nghiệp CEO Hà Nội 10 nhằm mục tiêu tăng cường hợp tác kinh doanh, chia sẻ cơ hội giao thương B2B, hỗ trợ đào tạo quản trị và xúc tiến thương mại đa phương diện.\n\nĐiều 2: Tiêu chuẩn và Quyền lợi của Học viên chính thức\n1. Học viên được cấp thẻ danh thiếp điện tử thông minh CEO HN10 tích hợp mã QR cá nhân hóa.\n2. Được ưu tiên tham gia các phiên kết nối giao thương 1-on-1 hàng tuần và diễn đàn CEO định kỳ.\n3. Được đăng tải tối đa 5 sản phẩm/dịch vụ tiêu biểu lên sàn thương mại nội bộ CLB.\n4. Được vinh danh và nhận các gói tài trợ truyền thông số từ Ban Điều Hành.\n\nĐiều 3: Nghĩa vụ tài chính và niên liễm\nMỗi Học viên có nghĩa vụ đóng hội phí niên liễm đầy đủ theo quy định của Ban Tài chính và tham gia tối thiểu 70% các kỳ sinh hoạt chính thức của Câu Lạc Bộ.\n\nTM. BAN ĐIỀU HÀNH CLB DOANH NHÂN CEO HN10\nCHỦ TỊCH HỘI ĐỒNG\n(Đã ký và đóng dấu điện tử)`;
+  return `CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM\nĐộc lập - Tự do - Hạnh phúc\n\nCLB DOANH NHÂN CEO HN10 (HANOIBA)\nSố: 1983/QĐ-BĐH-2026\n\nQUY CHẾ HOẠT ĐỘNG VÀ ĐIỀU LỆ GIAO THƯƠNG B2B\n\nĐiều 1: Mục đích và Tôn chỉ hoạt động\nCâu Lạc Bộ Doanh Nhân CEO HN10 trực thuộc Hội Doanh Nghiệp Trẻ Hà Nội (HanoiBA) là tổ chức liên kết các doanh nhân, chủ doanh nghiệp CEO Hà Nội 10 nhằm mục tiêu tăng cường hợp tác kinh doanh, chia sẻ cơ hội giao thương B2B, hỗ trợ đào tạo quản trị và xúc tiến thương mại đa phương diện.\n\nĐiều 2: Tiêu chuẩn và Quyền lợi của Học viên chính thức\n1. Học viên được cấp thẻ danh thiếp điện tử thông minh CEO HN10 tích hợp mã QR cá nhân hóa.\n2. Được ưu tiên tham gia các phiên kết nối giao thương 1-on-1 hàng tuần và diễn đàn CEO định kỳ.\n3. Được đăng tải tối đa 5 sản phẩm/dịch vụ tiêu biểu lên sàn thương mại nội bộ CLB.\n4. Được vinh danh và nhận các gói tài trợ truyền thông số từ Ban Điều Hành.\n\nĐiều 3: Nghĩa vụ tài chính và niên liễm\nMỗi Học viên có nghĩa vụ đóng phí tham gia CLB niên liễm đầy đủ theo quy định của Ban Tài chính và tham gia tối thiểu 70% các kỳ sinh hoạt chính thức của Câu Lạc Bộ.\n\nTM. BAN ĐIỀU HÀNH CLB DOANH NHÂN CEO HN10\nCHỦ TỊCH HỘI ĐỒNG\n(Đã ký và đóng dấu điện tử)`;
 }

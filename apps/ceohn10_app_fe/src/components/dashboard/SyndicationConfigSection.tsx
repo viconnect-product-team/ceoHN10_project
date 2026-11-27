@@ -565,7 +565,7 @@ export function SyndicationConfigSection() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h4 className="text-sm font-bold text-foreground">Cổng Thông Tin Hiệp Hội (ceohn10.com)</h4>
+                <h4 className="text-sm font-bold text-foreground">Cổng Thông Tin CEOHN10 (ceohn10.com)</h4>
                 {settings.webPortalUrl && (
                   <a
                     href={settings.webPortalUrl}

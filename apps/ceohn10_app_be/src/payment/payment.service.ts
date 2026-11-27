@@ -43,7 +43,7 @@ export class PaymentService {
 
   /**
    * Quy đổi tên ngân hàng sang mã chuẩn VietQR BIN (VPB, VCB, MB, TCB, ACB, BIDV, CTG...)
-   * Dùng chung cho toàn hệ thống (Vé sự kiện, Hội phí CLB, Phí gia nhập, Học phí...).
+   * Dùng chung cho toàn hệ thống (Vé sự kiện, Phí tham gia CLB CLB, Phí gia nhập, Học phí...).
    */
   resolveVietQrBankBin(bankName?: string): string {
     const raw = String(bankName || 'MB').trim().toUpperCase();
@@ -223,7 +223,7 @@ export class PaymentService {
   }
 
   /**
-   * Tạo phiên thanh toán SePay VietQR cho Hội phí
+   * Tạo phiên thanh toán SePay VietQR cho Phí tham gia CLB
    */
   async createFeeCheckout(data: {
     invoiceId: string;
@@ -250,7 +250,7 @@ export class PaymentService {
    * - Chống Replay Attack với X-SePay-Timestamp
    * - Đảm bảo Idempotency (chống trùng lặp theo gateway transaction id & số tài khoản)
    * - Phân luồng nhiều tài khoản ngân hàng về Quỹ tương ứng
-   * - Tự động đối soát vé sự kiện, hội phí hoặc điều chuyển nội bộ
+   * - Tự động đối soát vé sự kiện, phí tham gia CLB hoặc điều chuyển nội bộ
    * - Lưu trữ bền vững raw payload trước khi phản hồi thành công
    */
   async handleSepayWebhook(
@@ -614,7 +614,7 @@ export class PaymentService {
       return { success: true, status: 'POSTED', matched: 'event', regId };
     }
 
-    // B. Khớp hội phí thường niên: CEOHN10_HP_[INV_ID]
+    // B. Khớp phí tham gia CLB thường niên: CEOHN10_HP_[INV_ID]
     if (upperContent.includes(config.prefixFee)) {
       const match = upperContent.match(new RegExp(`${config.prefixFee}_([A-Z0-9]+)`, 'i'));
       if (match && match[1]) {

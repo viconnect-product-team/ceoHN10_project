@@ -351,7 +351,7 @@ export function EventRegistrationsExportModal({
         subtitle: `Sự kiện: ${eventTitle} | Địa điểm: ${eventLocation} | Ngày: ${eventDate}`,
         sheetName: "Danh Sách Đại Biểu",
         organization: "CLB DOANH NHÂN CEO HN10 (HANOIBA)",
-        address: "Hiệp Hội Doanh Nghiệp Trẻ Hà Nội",
+        address: "CEOHN10 Doanh Nghiệp Trẻ Hà Nội",
         columns: excelColumns,
         data: filteredData,
         summaryRows: [
@@ -566,7 +566,7 @@ export function EventRegistrationsExportModal({
         <table class="header-table">
           <tr>
             <td style="width: 45%; text-align: center;">
-              <strong>HIỆP HỘI DOANH NGHIỆP TRẺ HÀ NỘI</strong><br/>
+              <strong>CEOHN10 DOANH NGHIỆP TRẺ HÀ NỘI</strong><br/>
               <strong style="color: #002B70;">CLB DOANH NHÂN CEO HN10</strong><br/>
               <span style="font-size: 8.5pt;">Số: ...../BC-CEOHN10-EVT</span>
             </td>

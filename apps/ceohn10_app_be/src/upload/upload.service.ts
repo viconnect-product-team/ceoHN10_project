@@ -282,7 +282,7 @@ export class UploadService {
       }
     } catch (minioErr: any) {
       throw new InternalServerErrorException(
-        `Không thể lưu logo hiệp hội lên MinIO: ${minioErr?.message || 'MinIO unreachable'}`,
+        `Không thể lưu logo CEOHN10 lên MinIO: ${minioErr?.message || 'MinIO unreachable'}`,
       );
     }
 

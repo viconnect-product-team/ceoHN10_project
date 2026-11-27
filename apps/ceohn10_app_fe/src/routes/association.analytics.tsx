@@ -391,7 +391,7 @@ export function AssociationAnalyticsScreen() {
         rewardTitle: "Voucher Giảm 20% Dịch Vụ Golf & Khách Sạn 5 Sao",
         rewardVoucherCode: "TASK-MILESTONE-1",
         rewardDiscount: "Giảm 20%",
-        rewardDesc: "Mở khóa đặc quyền sau khi hoàn thành 3 nhiệm vụ giao thương và kết nối 1-on-1 trong hiệp hội.",
+        rewardDesc: "Mở khóa đặc quyền sau khi hoàn thành 3 nhiệm vụ giao thương và kết nối 1-on-1 trong CEOHN10.",
         perkData: {
           id: "milestone-reward-01",
           title: "Voucher Giảm 20% Dịch Vụ Golf & Khách Sạn 5 Sao",
@@ -414,7 +414,7 @@ export function AssociationAnalyticsScreen() {
         perkData: {
           id: "milestone-reward-02",
           title: "Hộp Quà Trà Cổ Thụ & Bộ Cốc Sứ Mạ Vàng CEO HN10",
-          partner: "Văn phòng Hiệp hội Doanh nhân CEO HN10",
+          partner: "Văn phòng CEOHN10 Doanh nhân CEO HN10",
           discount: "Tặng 100%",
           summary: "Thưởng hoàn thành Mốc 2 nhiệm vụ gắn kết nội khối CLB CEO HN10",
           category: "Thưởng nhiệm vụ",
@@ -1291,7 +1291,7 @@ export function AssociationAnalyticsScreen() {
   return (
     <div className="vba-animate pb-6 relative min-h-screen bg-white dark:bg-[#0B1120] text-slate-900 dark:text-white font-sans">
       <MemberHeader
-        title="Thống Kê Hiệp Hội"
+        title="Thống Kê CEOHN10"
         back
       />
 
@@ -2368,7 +2368,7 @@ export function AssociationAnalyticsScreen() {
                 <img src="/ceohn10-emblem-8.png" alt="CEO HN10" className="size-10 object-contain" />
                 <div>
                   <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                    HIỆP HỘI DOANH NHÂN CEO HN10 (HANOIBA)
+                    CEOHN10 DOANH NHÂN CEO HN10 (HANOIBA)
                   </h3>
                   <h2 className="text-sm font-black text-slate-900 dark:text-white">
                     BÁO CÁO THỐNG KÊ {activeCategory.toUpperCase()}
@@ -2507,7 +2507,7 @@ export function AssociationAnalyticsScreen() {
                 </div>
                 <div>
                   <p className="font-bold">TM. BAN ĐIỀU HÀNH CEO HN10</p>
-                  <p className="mt-6 font-black text-slate-800 dark:text-white">CHỦ TỊCH HIỆP HỘI</p>
+                  <p className="mt-6 font-black text-slate-800 dark:text-white">CHỦ TỊCH CEOHN10</p>
                 </div>
               </div>
             </div>

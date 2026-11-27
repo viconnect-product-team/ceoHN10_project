@@ -67,7 +67,7 @@ export function checkAiRateLimit(opts: {
     return {
       allowed: false,
       retryAfterSec: assocHit.retryAfterSec,
-      message: `Hệ thống đang xử lý nhiều yêu cầu AI của hiệp hội. Vui lòng thử lại sau ${assocHit.retryAfterSec}s.`,
+      message: `Hệ thống đang xử lý nhiều yêu cầu AI của CEOHN10. Vui lòng thử lại sau ${assocHit.retryAfterSec}s.`,
     };
   }
   return { allowed: true };

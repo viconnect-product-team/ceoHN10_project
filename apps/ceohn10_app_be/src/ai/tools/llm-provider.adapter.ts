@@ -298,7 +298,7 @@ export class LlmProviderAdapter {
         id: `call_${Date.now()}_prep_reconcile_email`,
         name: 'prepare_email_broadcast',
         arguments: {
-          subjectTemplate: `[CEO HN10] Thông Báo Đôn Đốc Hoàn Thành Hội Phí & Hoạt Động - Kính gửi {ho_ten}`,
+          subjectTemplate: `[CEO HN10] Thông Báo Đôn Đốc Hoàn Thành Phí Tham Gia CLB & Hoạt Động - Kính gửi {ho_ten}`,
           bodyTemplate: `Kính gửi Anh/Chị {ho_ten} ({cong_ty}),\n\nBan Thư Ký CLB Doanh Nhân CEO HN10 gửi thông báo đôn đốc hoàn thành nghĩa vụ hội viên theo danh sách đối soát.`,
           recipients: '[]',
         },
@@ -519,7 +519,7 @@ export class LlmProviderAdapter {
         name: 'prepare_email_broadcast',
         arguments: {
           subjectTemplate: lower.includes('phí')
-            ? '[CEO HN10] Thông Báo Đóng Hội Phí Thường Niên 2026 - Kính gửi {ho_ten}'
+            ? '[CEO HN10] Thông Báo Đóng Phí Tham Gia CLB Thường Niên 2026 - Kính gửi {ho_ten}'
             : lower.includes('học') || lower.includes('lớp')
             ? '[CEO HN10] Thông Báo Lịch Học Chuyên Đề Quản Trị Lãnh Đạo - Kính gửi {ho_ten}'
             : '[CEO HN10] Thư Mời Tham Dự Sự Kiện & Diễn Đàn Doanh Nhân - Kính gửi {ho_ten}',

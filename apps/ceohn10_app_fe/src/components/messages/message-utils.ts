@@ -333,7 +333,7 @@ export function formatMessagePreview(raw?: any): string {
       return text.includes("missed") ? "📞 Cuộc gọi thoại nhỡ" : "📞 Cuộc gọi thoại";
     }
     if (/\[action:payment/i.test(text)) {
-      return "💳 [Hóa đơn] Nhắc nhở thanh toán hội phí VietQR";
+      return "💳 [Hóa đơn] Nhắc nhở thanh toán phí tham gia CLB VietQR";
     }
     if (/\[action:meeting/i.test(text)) {
       return "📅 [Cuộc họp] Thư mời tham dự cuộc họp";

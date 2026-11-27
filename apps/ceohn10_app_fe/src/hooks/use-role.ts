@@ -142,7 +142,7 @@ export function useRole(): RoleState {
 
     const userEmail = String(userObj?.email || member?.email || user?.email || "").toLowerCase();
 
-    // 1. CHỦ TỊCH (Cấp cao nhất của Hiệp hội)
+    // 1. CHỦ TỊCH (Cấp cao nhất của CEOHN10)
     if (
       user?.isPresident ||
       primaryRole === "chu_tich" ||
@@ -156,7 +156,7 @@ export function useRole(): RoleState {
       return "chu_tich";
     }
 
-    // 2. BAN ĐIỀU HÀNH (Cấp điều hành hiệp hội)
+    // 2. BAN ĐIỀU HÀNH (Cấp điều hành CEOHN10)
     if (
       primaryRole === "ban_dieu_hanh" ||
       primaryRole === "truong_ban_dieu_hanh" ||

@@ -59,7 +59,7 @@ const DEFAULT_BENEFITS: MemberBenefit[] = [
   {
     titleVi: "Quảng bá thương hiệu",
     titleEn: "Brand promotion",
-    descVi: "trên kênh Hiệp hội",
+    descVi: "trên kênh CEOHN10",
     descEn: "on association channels",
   },
 ];

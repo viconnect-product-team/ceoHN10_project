@@ -380,7 +380,7 @@ function PerksAdminPage() {
             }`}
         >
           <Building2 className="size-4" />
-          <span>Ưu Đãi Đối Tác / Hiệp Hội ({perks.length})</span>
+          <span>Ưu Đãi Đối Tác / CEOHN10 ({perks.length})</span>
         </button>
         <button
           type="button"

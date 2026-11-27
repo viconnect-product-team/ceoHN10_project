@@ -183,8 +183,8 @@ export const createMeetingFn = createServerFn({ method: "POST" })
     const payload = {
       ...data,
       code,
-      location: data.location || (data.zoomUrl ? "Họp trực tuyến" : "Văn phòng Hiệp hội CEO HN10"),
-      venue: data.location || (data.zoomUrl ? "Họp trực tuyến" : "Văn phòng Hiệp hội CEO HN10"),
+      location: data.location || (data.zoomUrl ? "Họp trực tuyến" : "Văn phòng CEOHN10 CEO HN10"),
+      venue: data.location || (data.zoomUrl ? "Họp trực tuyến" : "Văn phòng CEOHN10 CEO HN10"),
       targetMembers: enrichedTargetMembers,
       zoomUrl: data.zoomUrl,
     };

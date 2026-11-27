@@ -826,7 +826,7 @@ export function ConversationList({
     try {
       let list = allConversations || [];
       if (activeTab === "channels") {
-        // Kênh Hiệp Hội chính thức (Req 7)
+        // Kênh CEOHN10 chính thức (Req 7)
         list = list.filter(isChannelConv);
       } else if (activeTab === "groups") {
         // Nhóm trò chuyện (Messenger Style)
@@ -860,7 +860,7 @@ export function ConversationList({
         // Chưa đọc
         list = list.filter((c) => (c?.unread || 0) > 0);
       } else {
-        // "all" (Tất cả): Có tất cả tin nhắn đã rep lại hoặc tin nhắn hệ thống hoặc nhóm hoặc người đã kết nối hoặc Kênh Hiệp Hội
+        // "all" (Tất cả): Có tất cả tin nhắn đã rep lại hoặc tin nhắn hệ thống hoặc nhóm hoặc người đã kết nối hoặc Kênh CEOHN10
         list = list.filter(
           (c) =>
             isGroupConv(c) ||
@@ -1196,7 +1196,7 @@ export function ConversationList({
                   <input
                     value={pickerQ}
                     onChange={(e) => setPickerQ(e.target.value)}
-                    placeholder="Tìm thành viên trong hiệp hội..."
+                    placeholder="Tìm thành viên trong CEOHN10..."
                     className="flex-1 bg-transparent text-[13px] border-none outline-none ring-0 focus:outline-none focus:ring-0 focus:border-none focus-visible:outline-none focus-visible:ring-0 text-slate-900 dark:text-white placeholder:text-slate-400 borderless-search-input"
                     style={{ outline: "none", border: "none", boxShadow: "none" }}
                     autoFocus

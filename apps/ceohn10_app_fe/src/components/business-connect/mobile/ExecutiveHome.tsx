@@ -242,7 +242,7 @@ export function ExecutiveHome() {
         date: mDate,
         time: m.time || "14:30",
         format: m.format || (m.location?.toLowerCase().includes("meet") ? "online" : "offline"),
-        location: m.location || (m.format === "online" ? "Google Meet Trực Tuyến" : "Văn phòng Hiệp hội"),
+        location: m.location || (m.format === "online" ? "Google Meet Trực Tuyến" : "Văn phòng CEOHN10"),
         status: m.status || "confirmed",
       });
     }

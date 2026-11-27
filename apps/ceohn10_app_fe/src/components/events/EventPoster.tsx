@@ -483,7 +483,7 @@ export const EventPoster: React.FC<EventPosterProps> = ({
                 </div>
               ) : (
                 <div className="p-3 rounded-xl bg-white/[0.04] border border-white/10 text-xs text-slate-300 leading-relaxed">
-                  Hiệp Hội Doanh Nhân CEO HN10 (HanoiBA) đồng hành cùng các Doanh nghiệp Học viên kiến tạo giá trị và kết nối giao thương vững bền.
+                  CEOHN10 Doanh Nhân CEO HN10 (HanoiBA) đồng hành cùng các Doanh nghiệp Học viên kiến tạo giá trị và kết nối giao thương vững bền.
                 </div>
               )}
 

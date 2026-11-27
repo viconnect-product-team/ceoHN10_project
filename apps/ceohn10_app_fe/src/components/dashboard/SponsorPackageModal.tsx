@@ -118,7 +118,7 @@ export function SponsorPackageModal({
                 {initial ? "Sửa Gói Tài Trợ" : "Tạo Gói Tài Trợ Mới"}
               </h2>
               <p className="text-xs text-muted-foreground">
-                {initial ? "Cập nhật định mức và quyền lợi đính kèm" : "Cấu hình gói tài trợ định danh cho sự kiện & hiệp hội"}
+                {initial ? "Cập nhật định mức và quyền lợi đính kèm" : "Cấu hình gói tài trợ định danh cho sự kiện & CEOHN10"}
               </p>
             </div>
           </div>

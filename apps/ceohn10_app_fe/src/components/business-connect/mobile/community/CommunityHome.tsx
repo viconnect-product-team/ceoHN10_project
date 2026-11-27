@@ -187,7 +187,7 @@ export function CommunityHome({ initialTab }: { initialTab?: CommunityTab } = {}
             <MobileSearchBar
               value={term}
               onChange={setTerm}
-              placeholder="Tìm hiệp hội, nhóm, sự kiện..."
+              placeholder="Tìm CEOHN10, nhóm, sự kiện..."
             />
             </form>
 
@@ -316,7 +316,7 @@ export function getCommunityVisuals(name: string, logoUrl?: string | null, banne
 
   let defaultBanner = "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=80";
   let defaultAvatar = logoUrl || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&auto=format&fit=crop&q=80";
-  let category = "Hiệp Hội Doanh Nghiệp B2B";
+  let category = "CEOHN10 Doanh Nghiệp B2B";
   let categoryColor = "border-[#D8B282]/50 bg-[#D8B282]/15 text-[#8C653B] dark:text-[#F6E1C3]";
   let attendees = [
     "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&auto=format&fit=crop&q=80",

@@ -57,7 +57,7 @@ describe("workflow registry", () => {
 
 describe("workflow planner", () => {
   it("selects the fee reminder workflow for an unpaid-fee request", () => {
-    const plan = planWorkflow("Hãy nhắc những Học viên chưa đóng hội phí", "fee");
+    const plan = planWorkflow("Hãy nhắc những Học viên chưa đóng phí tham gia CLB", "fee");
     expect(plan.workflow?.id).toBe("fee-reminder");
   });
 

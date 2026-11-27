@@ -425,7 +425,7 @@ function StreamlinedOpportunitiesSection({
 
                     {/* Organization / Poster */}
                     <div className="mt-1 text-[11.5px] text-[var(--bc-mobile-muted)] flex items-center gap-2">
-                      <span>{o.organizationLabel || "Học viên hiệp hội"}</span>
+                      <span>{o.organizationLabel || "Học viên CEOHN10"}</span>
                       {isClaimed ? (
                         <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-600 dark:text-[#D8B282]">
                           <CheckCircle2 className="w-3 h-3" />

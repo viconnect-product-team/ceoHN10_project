@@ -1165,7 +1165,7 @@ function MembersScreen() {
       });
     } catch { }
 
-    const messageText = `Xin chào, tôi là ${myMember?.name || "Học viên"} thuộc Hiệp hội Doanh nhân CEO HN10. Rất mong được kết nối cùng bạn!`;
+    const messageText = `Xin chào, tôi là ${myMember?.name || "Học viên"} thuộc CEOHN10 Doanh nhân CEO HN10. Rất mong được kết nối cùng bạn!`;
 
     try {
       await fetchNestApi<any>("/network/requests", {

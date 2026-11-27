@@ -50,7 +50,7 @@ export interface UserRoleAssignment {
 
 const SCOPE_CONFIG = {
   PLATFORM: { label: "Toàn Nền Tảng (Platform)", icon: Sparkles, color: "bg-purple-100 text-purple-800 border-purple-200" },
-  ORGANIZATION: { label: "Tổ Chức / Hiệp Hội", icon: Building2, color: "bg-blue-100 text-blue-800 border-blue-200" },
+  ORGANIZATION: { label: "Tổ Chức / CEOHN10", icon: Building2, color: "bg-blue-100 text-blue-800 border-blue-200" },
   CLASS: { label: "Lớp Học (Class)", icon: GraduationCap, color: "bg-emerald-100 text-emerald-800 border-emerald-200" },
   TEAM: { label: "Team / Nhóm", icon: Users2, color: "bg-amber-100 text-amber-800 border-amber-200" },
   COMMITTEE: { label: "Ban Chuyên Môn", icon: Layers, color: "bg-indigo-100 text-indigo-800 border-indigo-200" },
@@ -288,7 +288,7 @@ export function ScopeRoleAssignmentSection({ className = "" }: { className?: str
             >
               <option value="ALL">Tất cả Phạm vi (Scope)</option>
               <option value="PLATFORM">Toàn Nền Tảng</option>
-              <option value="ORGANIZATION">Tổ Chức / Hiệp Hội</option>
+              <option value="ORGANIZATION">Tổ Chức / CEOHN10</option>
               <option value="CLASS">Lớp Học</option>
               <option value="TEAM">Team / Nhóm</option>
               <option value="COMMITTEE">Ban Chuyên Môn</option>
@@ -467,7 +467,7 @@ export function ScopeRoleAssignmentSection({ className = "" }: { className?: str
                     className="w-full px-3 py-2 rounded-xl border border-input bg-background text-foreground font-semibold"
                   >
                     <option value="PLATFORM">Toàn Nền Tảng (Platform)</option>
-                    <option value="ORGANIZATION">Tổ Chức / Hiệp Hội (Organization)</option>
+                    <option value="ORGANIZATION">Tổ Chức / CEOHN10 (Organization)</option>
                     <option value="CLASS">Lớp Học (Class)</option>
                     <option value="TEAM">Team / Nhóm (Team)</option>
                     <option value="COMMITTEE">Ban Chuyên Môn (Committee)</option>

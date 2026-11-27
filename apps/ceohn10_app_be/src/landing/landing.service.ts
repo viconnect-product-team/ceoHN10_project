@@ -462,7 +462,7 @@ export const DEFAULT_STARTUP_MOBILE_CONFIG: StartupMobileTemplateConfig = {
     {
       question: 'Điều kiện để gia nhập trở thành Học viên chính thức của CLB?',
       answer:
-        'Học viên là các Doanh nhân, Chủ tịch HĐQT, CEO, Tổng giám đốc hoặc Cấp quản lý doanh nghiệp sinh năm 1983 (Quý Hợi). Hồ sơ gia nhập sẽ được Ban Thẩm định và Ban Điều hành phê duyệt theo đúng quy chế hiệp hội của HanoiBA.',
+        'Học viên là các Doanh nhân, Chủ tịch HĐQT, CEO, Tổng giám đốc hoặc Cấp quản lý doanh nghiệp sinh năm 1983 (Quý Hợi). Hồ sơ gia nhập sẽ được Ban Thẩm định và Ban Điều hành phê duyệt theo đúng quy chế CEOHN10 của HanoiBA.',
     },
     {
       question:
@@ -677,7 +677,7 @@ const DEFAULT_SUB_SCREENS: LandingSubScreen[] = [
     id: 'scr-offers',
     title: 'Gói Ưu Đãi Đặc Quyền Du Lịch & Trải Nghiệm',
     subtitle:
-      'Chương trình hợp tác độc quyền cùng Hiệp hội Doanh nhân CEO HN10',
+      'Chương trình hợp tác độc quyền cùng CEOHN10 Doanh nhân CEO HN10',
     layout: 'article',
     contentHtml: `<p>Nhận ngay ưu đãi 25% cho tất cả Học viên CEO HN10 khi đặt dịch vụ nghỉ dưỡng cao cấp và tour khám phá quốc tế.</p>`,
     ctaButton: { label: 'Nhận Mã Ưu Đãi', action: 'claim_offer' },

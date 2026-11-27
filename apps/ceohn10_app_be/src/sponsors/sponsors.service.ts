@@ -746,7 +746,7 @@ export class SponsorsService extends BaseService {
           Số tiền tài trợ đã đăng ký: <strong style="font-size: 15px; color: #166534;">${formattedAmount}</strong>.
         </p>
         <p style="font-size: 12.5px; color: #14532d; margin: 0; line-height: 1.6;">
-          Ban Tài chính CLB Doanh Nhân CEO HN10 sẽ liên hệ trực tiếp với Anh/Chị để tiếp nhận tại Văn phòng Hiệp hội hoặc tại Bàn Lễ tân sự kiện và phát hành Phiếu thu tài chính có đóng dấu xác nhận.
+          Ban Tài chính CLB Doanh Nhân CEO HN10 sẽ liên hệ trực tiếp với Anh/Chị để tiếp nhận tại Văn phòng CEOHN10 hoặc tại Bàn Lễ tân sự kiện và phát hành Phiếu thu tài chính có đóng dấu xác nhận.
         </p>
       </div>
       `;
@@ -863,7 +863,7 @@ export class SponsorsService extends BaseService {
       </p>
 
       <p class="paragraph">
-        Chúng tôi vô cùng vinh hạnh và trân quý khi nhận được sự đồng hành, tài trợ quý báu từ Quý Đơn vị trong các hoạt động, sự kiện và chương trình kết nối giao thương chiến lược của Hiệp hội. Sự chung tay, tin tưởng của Quý Nhà tài trợ chính là động lực to lớn tạo nên sự thành công rực rỡ và giá trị lan tỏa mạnh mẽ trong cộng đồng doanh nhân.
+        Chúng tôi vô cùng vinh hạnh và trân quý khi nhận được sự đồng hành, tài trợ quý báu từ Quý Đơn vị trong các hoạt động, sự kiện và chương trình kết nối giao thương chiến lược của CEOHN10. Sự chung tay, tin tưởng của Quý Nhà tài trợ chính là động lực to lớn tạo nên sự thành công rực rỡ và giá trị lan tỏa mạnh mẽ trong cộng đồng doanh nhân.
       </p>
 
       <div class="card-highlight">

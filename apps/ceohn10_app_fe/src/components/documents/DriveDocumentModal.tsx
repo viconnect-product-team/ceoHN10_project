@@ -137,7 +137,7 @@ export const DriveDocumentModal: React.FC<DriveDocumentModalProps> = ({
     }
 
     if (docScope === "association" && !isLeaderOrAdmin) {
-      toast.error("Tài liệu của Hiệp Hội chỉ có Quản trị, Chủ tịch và các Trưởng ban mới có quyền quản lý!");
+      toast.error("Tài liệu của CEOHN10 chỉ có Quản trị, Chủ tịch và các Trưởng ban mới có quyền quản lý!");
       return;
     }
 
@@ -310,7 +310,7 @@ export const DriveDocumentModal: React.FC<DriveDocumentModalProps> = ({
                 onChange={(e) => setDocScope(e.target.value as "association" | "enterprise")}
                 className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm focus:border-primary focus:outline-none"
               >
-                <option value="association">🏛️ Tài liệu Hiệp Hội (Ban Điều Hành)</option>
+                <option value="association">🏛️ Tài liệu CEOHN10 (Ban Điều Hành)</option>
                 <option value="enterprise">🏢 Tài liệu Doanh Nghiệp (Thành viên)</option>
               </select>
             </div>

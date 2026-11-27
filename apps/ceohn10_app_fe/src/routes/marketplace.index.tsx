@@ -1304,7 +1304,7 @@ function MarketplaceContent({ all, reload }: { all: Product[]; reload: () => voi
     <AppShell>
       <PageHeader
         title={t("mk.title")}
-        subtitle="Quản trị gian hàng giao thương, danh mục sản phẩm và chiến dịch quảng cáo affiliate của hiệp hội"
+        subtitle="Quản trị gian hàng giao thương, danh mục sản phẩm và chiến dịch quảng cáo affiliate của CEOHN10"
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <Link

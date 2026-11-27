@@ -106,7 +106,7 @@ const AUDIENCE_KEY: Record<Notification["audience"], TKey> = {
 
 const SCOPE_CONFIG: Record<string, { label: string; bg: string; text: string; border: string }> = {
   crm: { label: "CRM Quản trị", bg: "bg-blue-500/10", text: "text-blue-600 dark:text-blue-400", border: "border-blue-500/20" },
-  association_app: { label: "App Hiệp Hội CEO HN10", bg: "bg-emerald-500/10", text: "text-emerald-600 dark:text-emerald-400", border: "border-emerald-500/20" },
+  association_app: { label: "App CEOHN10 CEO HN10", bg: "bg-emerald-500/10", text: "text-emerald-600 dark:text-emerald-400", border: "border-emerald-500/20" },
   all: { label: "Toàn hệ thống", bg: "bg-blue-500/10", text: "text-[#003B95]", border: "border-blue-500/20" },
 };
 
@@ -170,21 +170,21 @@ function getNotificationCategory(n: Notification): {
     };
   }
 
-  // 2. Cảnh báo & Quá hạn hội phí
+  // 2. Cảnh báo & Quá hạn phí tham gia CLB
   if (
     code.includes("FEE") ||
-    title.includes("quá hạn hội phí") ||
-    title.includes("hết hạn hội phí") ||
-    title.includes("hội phí") ||
+    title.includes("quá hạn phí tham gia CLB") ||
+    title.includes("hết hạn phí tham gia CLB") ||
+    title.includes("phí tham gia CLB") ||
     title.includes("niên liễm") ||
-    body.includes("hội phí") ||
+    body.includes("phí tham gia CLB") ||
     body.includes("niên liễm") ||
     body.includes("đóng phí")
   ) {
     const isOverdue = code.includes("OVERDUE") || title.includes("quá hạn");
     return {
       id: "fee_alerts",
-      label: isOverdue ? "Quá hạn hội phí" : "Sắp đến hạn",
+      label: isOverdue ? "Quá hạn phí tham gia CLB" : "Sắp đến hạn",
       badgeBg: isOverdue ? "bg-rose-500/10" : "bg-amber-500/10",
       badgeText: isOverdue ? "text-rose-600 dark:text-rose-400" : "text-amber-600 dark:text-amber-400",
       badgeBorder: isOverdue ? "border-rose-500/25" : "border-amber-500/25",
@@ -626,7 +626,7 @@ function NotifyPage() {
       );
       window.dispatchEvent(new CustomEvent("vba:conversation_updated"));
 
-      toast.success("Đã đưa thông báo vào Kênh tin nhắn Hiệp hội thành công!");
+      toast.success("Đã đưa thông báo vào Kênh tin nhắn CEOHN10 thành công!");
       await router.invalidate();
     } catch (e: any) {
       toast.error(e?.message || "Không thể đưa thông báo vào tin nhắn");
@@ -727,7 +727,7 @@ function NotifyPage() {
     () => [
       { id: "all" as SubFilterType, label: "Tất cả thông báo", icon: Bell, count: items.length },
       { id: "new_members" as SubFilterType, label: "Học viên mới nộp hồ sơ", icon: UserCheck, count: newMembersCount },
-      { id: "fee_alerts" as SubFilterType, label: "Cảnh báo & Quá hạn hội phí", icon: AlertTriangle, count: feeAlertsCount },
+      { id: "fee_alerts" as SubFilterType, label: "Cảnh báo & Quá hạn phí tham gia CLB", icon: AlertTriangle, count: feeAlertsCount },
       { id: "admin_system" as SubFilterType, label: "BQT & Điều hành", icon: Building2, count: adminSystemCount },
       { id: "events_meetings" as SubFilterType, label: "Sự kiện & Cuộc họp", icon: Calendar, count: eventsMeetingsCount },
     ],
@@ -963,7 +963,7 @@ function NotifyPage() {
       type: "select",
       options: [
         { value: "crm", label: "Hệ thống Quản trị CRM" },
-        { value: "association_app", label: "Ứng dụng Hiệp Hội CEO HN10" },
+        { value: "association_app", label: "Ứng dụng CEOHN10 CEO HN10" },
         { value: "all", label: "Tất cả các nền tảng" },
       ],
     },
@@ -1011,7 +1011,7 @@ function NotifyPage() {
     },
     {
       name: "targetChatChannel",
-      label: "Đẩy thông báo vào Kênh tin nhắn Hiệp Hội",
+      label: "Đẩy thông báo vào Kênh tin nhắn CEOHN10",
       type: "select",
       options: [
         { value: "none", label: "Chỉ hiện chuông thông báo (Không đẩy vào tin nhắn)" },
@@ -1082,7 +1082,7 @@ function NotifyPage() {
         }
         window.dispatchEvent(new CustomEvent("vba:notification_pushed_to_messages"));
         window.dispatchEvent(new CustomEvent("vba:conversation_updated"));
-        toast.success("Đã đẩy thông báo tới các kênh tin nhắn Hiệp hội!");
+        toast.success("Đã đẩy thông báo tới các kênh tin nhắn CEOHN10!");
       }
 
       // Tự động bắn thông báo qua Zalo OA nếu quản trị viên chọn gửi Zalo OA
@@ -1249,7 +1249,7 @@ function NotifyPage() {
             <button
               onClick={() => handlePushToMessages(n)}
               disabled={pushingId === n.id}
-              title="Đưa thông báo này vào Kênh tin nhắn Hiệp Hội"
+              title="Đưa thông báo này vào Kênh tin nhắn CEOHN10"
               className="inline-flex items-center gap-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500 hover:text-white px-2.5 py-1 text-xs font-bold text-amber-700 dark:text-amber-400 transition-all cursor-pointer disabled:opacity-50"
             >
               <MessageSquare className="h-3.5 w-3.5" />
@@ -1307,7 +1307,7 @@ function NotifyPage() {
     <AppShell>
       <PageHeader
         title={t("notif.title")}
-        subtitle="Trung tâm điều hành và kiểm soát toàn bộ thông báo hệ thống, cảnh báo hội phí & hồ sơ Học viên mới"
+        subtitle="Trung tâm điều hành và kiểm soát toàn bộ thông báo hệ thống, cảnh báo phí tham gia CLB & hồ sơ Học viên mới"
         actions={
           <div className="flex items-center gap-2">
             {unreadCount > 0 && (
@@ -1435,7 +1435,7 @@ function NotifyPage() {
                 Quản Lý Mẫu Nhắc & Tự Động Hóa Thông Báo CEO HN10
               </h2>
               <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
-                Tự động hóa hoàn toàn quy trình gửi thông báo theo thời gian thực: Tự động nhắc nhở khi Học viên có công việc cần làm, tự động nhắc sự kiện đã đăng ký trước giờ khai mạc, và cung cấp trọn vẹn 4 mẫu nhắc nhở cốt lõi của Hiệp hội.
+                Tự động hóa hoàn toàn quy trình gửi thông báo theo thời gian thực: Tự động nhắc nhở khi Học viên có công việc cần làm, tự động nhắc sự kiện đã đăng ký trước giờ khai mạc, và cung cấp trọn vẹn 4 mẫu nhắc nhở cốt lõi của CEOHN10.
               </p>
             </div>
           </div>
@@ -1592,12 +1592,12 @@ function NotifyPage() {
                 Đầy Đủ 4 Mẫu Template Nhắc Nhở Tiêu Chuẩn (CEO HN10 Official Templates)
               </h3>
               <p className="text-xs text-muted-foreground">
-                Tích hợp sẵn đầy đủ mẫu cho Hội phí, Thông báo cuộc họp, Lịch sự kiện sắp diễn ra và Bản tin Hôm nay App có gì.
+                Tích hợp sẵn đầy đủ mẫu cho Phí tham gia CLB, Thông báo cuộc họp, Lịch sự kiện sắp diễn ra và Bản tin Hôm nay App có gì.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Mẫu 1: Hội phí */}
+              {/* Mẫu 1: Phí tham gia CLB */}
               <div className="p-5 rounded-2xl border border-border bg-card shadow-xs space-y-3 hover:shadow-md transition">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2.5">
@@ -1606,7 +1606,7 @@ function NotifyPage() {
                     </div>
                     <div>
                       <h4 className="font-bold text-sm text-foreground">
-                        1. Mẫu Nhắc Hội Phí Niên Liễm
+                        1. Mẫu Nhắc Phí Tham Gia CLB Niên Liễm
                       </h4>
                       <span className="font-mono text-[10px] text-muted-foreground font-bold">
                         MÃ: FEE_NOTICE_ANNUAL
@@ -1791,7 +1791,7 @@ function NotifyPage() {
                 tone="violet"
               />
               <CrmMetricCard
-                label="Cảnh báo hội phí"
+                label="Cảnh báo phí tham gia CLB"
                 value={feeAlertsCount}
                 sub="Quá hạn & sắp đến hạn niên liễm"
                 icon={AlertTriangle}
@@ -1871,7 +1871,7 @@ function NotifyPage() {
               >
                 <option value="all">🌐 Tất cả hệ thống</option>
                 <option value="crm">💻 CRM Quản trị</option>
-                <option value="association_app">📱 App Hiệp Hội CEO HN10</option>
+                <option value="association_app">📱 App CEOHN10 CEO HN10</option>
               </select>
 
               {/* Lọc đối tượng */}
@@ -1976,7 +1976,7 @@ function NotifyPage() {
                           type="button"
                           onClick={() => handlePushToMessages(n)}
                           disabled={pushingId === n.id}
-                          title="Đưa vào tin nhắn Hiệp hội"
+                          title="Đưa vào tin nhắn CEOHN10"
                           className="p-1.5 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 dark:border-amber-700 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 transition cursor-pointer disabled:opacity-50"
                         >
                           <MessageSquare className="h-3.5 w-3.5" />
@@ -2115,7 +2115,7 @@ function NotifyPage() {
                     disabled={loadingEntities}
                     className="w-full px-2.5 py-1.5 rounded-xl border border-blue-200 dark:border-blue-800 bg-white dark:bg-slate-900 text-xs font-semibold outline-none focus:ring-2 focus:ring-blue-500/30 cursor-pointer"
                   >
-                    <option value="">-- Chọn sự kiện của Hiệp hội --</option>
+                    <option value="">-- Chọn sự kiện của CEOHN10 --</option>
                     {systemEvents.map((ev) => (
                       <option key={ev.id} value={ev.id}>
                         📅 {ev.title || ev.name} ({ev.startDate || ev.date || "Sắp diễn ra"})
@@ -2192,7 +2192,7 @@ function NotifyPage() {
                     className="w-full px-3 py-2 rounded-xl border border-input bg-background text-xs outline-none focus:ring-2 focus:ring-blue-500/30"
                   >
                     <option value="all">Toàn bộ hệ thống (CRM & App)</option>
-                    <option value="association_app">Chỉ hiển thị trên App Hiệp Hội CEO HN10</option>
+                    <option value="association_app">Chỉ hiển thị trên App CEOHN10 CEO HN10</option>
                     <option value="crm">Chỉ hiển thị trên Cổng Quản Trị CRM</option>
                   </select>
                 </div>

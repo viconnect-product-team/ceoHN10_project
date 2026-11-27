@@ -611,7 +611,7 @@ function ProductsScreen() {
       "ceohn10",
       "hanoiba",
       "hanoi ba",
-      "hiệp hội",
+      "CEOHN10",
       "hội doanh nhân",
       "ban chấp hành",
       "vione",
@@ -620,7 +620,7 @@ function ProductsScreen() {
     const cleaned = normalizeCompanyName(name);
     if (!cleaned || cleaned.length < 3) return true;
     if (genericKeywords.some((kw) => lower === kw || lower.replace(/\s+/g, "") === kw.replace(/\s+/g, ""))) return true;
-    if (lower === "clb doanh nhân ceo 1983" || lower === "clb ceo 1983" || lower === "hiệp hội ceo 1983") return true;
+    if (lower === "clb doanh nhân ceo 1983" || lower === "clb ceo 1983" || lower === "CEOHN10 ceo 1983") return true;
     return false;
   };
 
@@ -1609,7 +1609,7 @@ function ProductsScreen() {
               to="/association/perks"
               onClick={(e) => e.stopPropagation()}
               className="absolute right-2.5 bottom-2.5 z-10 flex items-center gap-1 rounded-full bg-[#003B95] text-white px-2.5 py-0.5 text-[9.5px] font-bold shadow-xs transition-transform hover:scale-105 border border-white/20"
-              title="Ưu đãi độc quyền liên kết App Hiệp Hội"
+              title="Ưu đãi độc quyền liên kết App CEOHN10"
             >
               <span>ƯU ĐÃI VIP</span>
             </Link>

@@ -97,7 +97,7 @@ export default function NewsScreen() {
     return () => window.removeEventListener("ceohn10_news_read_updated", handleNewsRead);
   }, []);
 
-  // Strict RBAC (đồng bộ CRM Hiệp hội): CHỈ Quản trị / Admin / Chủ tịch được Đăng, Sửa, Xóa tin tức.
+  // Strict RBAC (đồng bộ CRM CEOHN10): CHỈ Quản trị / Admin / Chủ tịch được Đăng, Sửa, Xóa tin tức.
   // Không dựa vào chức danh công ty ("Chủ tịch HĐQT"), localStorage hay phòng ban.
   const { isSuperAdmin, loading: roleLoading } = useRole();
   const canManageNews = !roleLoading && isSuperAdmin;
@@ -1109,7 +1109,7 @@ export default function NewsScreen() {
                   {selectedNews.excerpt}
                 </p>
                 <p className="text-slate-600 dark:text-slate-300">
-                  Hiệp hội doanh nhân CEO HN10 không ngừng đẩy mạnh các hoạt động xúc tiến kết nối
+                  CEOHN10 doanh nhân CEO HN10 không ngừng đẩy mạnh các hoạt động xúc tiến kết nối
                   giao thương nội khối, xây dựng chuỗi cung ứng bền vững và lan tỏa giá trị kinh tế
                   thiết thực đến từng Học viên trong kỷ nguyên chuyển đổi số toàn diện.
                 </p>

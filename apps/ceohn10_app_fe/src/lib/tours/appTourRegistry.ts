@@ -62,7 +62,7 @@ export const APP_SCREEN_TOURS: ScreenGuideItem[] = [
         systemResponse: "Mở Modal Thẻ Thành Viên với mã QR động, tên công ty và số điện thoại liên hệ.",
         proTip: "Thẻ tích hợp mã định danh M1983 cá nhân hóa, đồng bộ thời gian thực với dữ liệu CRM CLB.",
         icon: "🎖️",
-        description: "Thẻ nhận diện số chính thức của Quý Học viên trong Hiệp hội CEO HN10. Hiển thị ảnh đại diện, ảnh bìa, mã Học viên và doanh nghiệp.",
+        description: "Thẻ nhận diện số chính thức của Quý Học viên trong CEOHN10 CEO HN10. Hiển thị ảnh đại diện, ảnh bìa, mã Học viên và doanh nghiệp.",
       },
       {
         targetId: "tour-quick-edit-btn",
@@ -127,7 +127,7 @@ export const APP_SCREEN_TOURS: ScreenGuideItem[] = [
         systemResponse: "Mở trang hồ sơ công khai của bạn trên trình duyệt đối tác mà họ không cần cài app.",
         proTip: "Bấm vào logo công ty ở góc trên bên phải thẻ để cập nhật logo thương hiệu mới của bạn.",
         icon: "📇",
-        description: "Danh thiếp số chuẩn mực thể hiện thương hiệu cá nhân và pháp nhân công ty với nhận diện Hiệp Hội CEO HN10.",
+        description: "Danh thiếp số chuẩn mực thể hiện thương hiệu cá nhân và pháp nhân công ty với nhận diện CEOHN10 CEO HN10.",
       },
       {
         targetId: "tour-card-qr-scan",
@@ -303,7 +303,7 @@ export const APP_SCREEN_TOURS: ScreenGuideItem[] = [
     iconName: "Calendar",
     category: "events",
     themeColor: "#0284C7",
-    screenSummary: "Quản trị lịch trình hoạt động hiệp hội. Đăng ký tham gia sự kiện, đặt lịch họp ban trực tuyến Zoom/Google Meet và đồng bộ vào lịch điện thoại Google/Apple Calendar.",
+    screenSummary: "Quản trị lịch trình hoạt động CEOHN10. Đăng ký tham gia sự kiện, đặt lịch họp ban trực tuyến Zoom/Google Meet và đồng bộ vào lịch điện thoại Google/Apple Calendar.",
     mockupMockTitle: "Sự Kiện & Lịch Hoạt Động",
     mockupElements: [
       { id: "tour-events-tabs", stepIndex: 1, label: "Tab Sự Kiện & Lịch Ban", x: 50, y: 16, badgePosition: "bottom" },
@@ -533,7 +533,7 @@ export const APP_SCREEN_TOURS: ScreenGuideItem[] = [
         touchPoint: "Các ô tích chọn ứng viên và nút xác nhận bỏ phiếu",
         instruction: "Tích chọn ứng viên bạn tín nhiệm, nhập nhận xét đóng góp (nếu có) và bấm 'Gửi phiếu bầu'.",
         systemResponse: "Hệ thống ghi nhận phiếu thành công và chuyển trạng thái của bạn sang 'Đã hoàn tất bỏ phiếu'.",
-        roleNote: "Chỉ các tài khoản Học viên chính thức (không bị nợ hội phí) mới được kích hoạt quyền bầu cử.",
+        roleNote: "Chỉ các tài khoản Học viên chính thức (không bị nợ phí tham gia CLB) mới được kích hoạt quyền bầu cử.",
         proTip: "Sau khi gửi phiếu, bạn có thể xem biểu đồ kết quả biểu quyết trực quan sau khi hết giờ bỏ phiếu.",
         icon: "✅",
         description: "Thao tác biểu quyết nhanh chóng, bảo mật tuyệt đối danh tính người bỏ phiếu theo đúng chuẩn mực.",
@@ -638,7 +638,7 @@ export const APP_SCREEN_TOURS: ScreenGuideItem[] = [
         title: "Hồ Sơ Doanh Nhân & Thông Tin Định Danh",
         actionGesture: "👆 Chạm vào vùng thông tin cá nhân",
         touchPoint: "Khối hồ sơ có avatar, họ tên, mã Học viên M1983 và email",
-        instruction: "Kiểm tra tình trạng kích hoạt tài khoản, niên liễm hội phí và chức danh trong câu lạc bộ.",
+        instruction: "Kiểm tra tình trạng kích hoạt tài khoản, niên liễm phí tham gia CLB và chức danh trong câu lạc bộ.",
         systemResponse: "Hiển thị chi tiết tình trạng hợp đồng Học viên và ngày gia hạn tiếp theo.",
         proTip: "Bấm 'Đổi mật khẩu' để tăng cường bảo mật cho tài khoản của bạn định kỳ 3 tháng một lần.",
         icon: "👤",
@@ -673,7 +673,7 @@ export const APP_SCREEN_TOURS: ScreenGuideItem[] = [
         touchPoint: "Mục hỗ trợ liên hệ Ban Truyền Thông, Ban Thư Ký, Ban Thành Viên...",
         instruction: "Bấm để mở danh bạ điện thoại và Zalo OA trực tiếp của các Trưởng ban phụ trách.",
         systemResponse: "Bật popup gọi điện hoặc mở chat Zalo trực tiếp tới nhân sự phụ trách ban tương ứng.",
-        roleNote: "Ban Truyền Thông hỗ trợ soát vé; Ban Thư Ký hỗ trợ thủ tục Học viên; Ban Tài Chính hỗ trợ hóa đơn hội phí.",
+        roleNote: "Ban Truyền Thông hỗ trợ soát vé; Ban Thư Ký hỗ trợ thủ tục Học viên; Ban Tài Chính hỗ trợ hóa đơn phí tham gia CLB.",
         proTip: "Tổng đài hỗ trợ 24/7 luôn sẵn sàng lắng nghe mọi ý kiến đóng góp xây dựng cộng đồng của bạn.",
         icon: "📞",
         description: "Cầu nối trực tiếp và thông suốt giữa các Học viên và Ban Chấp Hành điều hành câu lạc bộ.",
@@ -683,7 +683,7 @@ export const APP_SCREEN_TOURS: ScreenGuideItem[] = [
   {
     id: "association-library",
     title: "Màn hình Kho Văn Bản & Kỷ Yếu",
-    subtitle: "Điều lệ hiệp hội, Quy chế hoạt động & Tài liệu pháp lý",
+    subtitle: "Điều lệ CEOHN10, Quy chế hoạt động & Tài liệu pháp lý",
     route: "/association/library",
     badge: "Màn Thư Viện",
     iconName: "BookOpen",
@@ -706,7 +706,7 @@ export const APP_SCREEN_TOURS: ScreenGuideItem[] = [
         instruction: "Gõ 'Điều lệ', 'Quy chế', 'Kỷ yếu' hoặc tên văn bản cần tra cứu.",
         systemResponse: "Hệ thống lọc tức thì các tệp PDF và biểu mẫu liên quan.",
         icon: "🔍",
-        description: "Tra cứu nhanh các văn bản pháp quy điều hành hiệp hội.",
+        description: "Tra cứu nhanh các văn bản pháp quy điều hành CEOHN10.",
       },
       {
         targetId: "tour-lib-list",
@@ -749,7 +749,7 @@ export const APP_SCREEN_TOURS: ScreenGuideItem[] = [
     iconName: "Bell",
     category: "core",
     themeColor: "#E11D48",
-    screenSummary: "Hộp thư thông báo chính thức từ Ban Thư ký và Ban Điều hành. Nhắc việc, lịch họp ban, xác nhận vé sự kiện và tình trạng hội phí.",
+    screenSummary: "Hộp thư thông báo chính thức từ Ban Thư ký và Ban Điều hành. Nhắc việc, lịch họp ban, xác nhận vé sự kiện và tình trạng phí tham gia CLB.",
     mockupMockTitle: "Trung Tâm Thông Báo",
     mockupElements: [
       { id: "tour-notif-filter", stepIndex: 1, label: "Bộ Lọc Chưa Đọc / Đã Đọc", x: 50, y: 16, badgePosition: "bottom" },
@@ -870,7 +870,7 @@ export const APP_SCREEN_TOURS: ScreenGuideItem[] = [
     iconName: "Users",
     category: "network",
     themeColor: "#0F172A",
-    screenSummary: "Hệ thống CRM quản lý vòng đời Học viên của Hiệp hội CEO HN10. Tiếp nhận đơn đăng ký, thẩm định doanh nghiệp, phê duyệt kết nạp và cấp mã định danh.",
+    screenSummary: "Hệ thống CRM quản lý vòng đời Học viên của CEOHN10 CEO HN10. Tiếp nhận đơn đăng ký, thẩm định doanh nghiệp, phê duyệt kết nạp và cấp mã định danh.",
     mockupMockTitle: "Quản Lý Học viên CRM",
     mockupElements: [
       { id: "tour-admin-member-search", stepIndex: 1, label: "Tra Cứu Hồ Sơ CRM", x: 50, y: 15, badgePosition: "bottom" },
@@ -896,7 +896,7 @@ export const APP_SCREEN_TOURS: ScreenGuideItem[] = [
         touchPoint: "Cột hành động trên các hồ sơ đang ở trạng thái 'Chờ duyệt'",
         instruction: "Kiểm tra điều kiện năm sinh 1983 và giấy phép kinh doanh, sau đó bấm 'Phê duyệt'.",
         systemResponse: "Hệ thống tự sinh mã HN10-xxx và gửi email chào mừng chính thức.",
-        roleNote: "Thẩm quyền thuộc Ban Học viên và Chủ Tịch Hiệp Hội.",
+        roleNote: "Thẩm quyền thuộc Ban Học viên và Chủ Tịch CEOHN10.",
         icon: "🎖️",
         description: "Đảm bảo chất lượng và chuẩn mực cao nhất cho cộng đồng thành viên.",
       },
@@ -912,7 +912,7 @@ export const APP_SCREEN_TOURS: ScreenGuideItem[] = [
       },
       {
         targetId: "tour-admin-member-export",
-        title: "Xuất Danh Bạ Kỷ Yếu Toàn Hiệp Hội",
+        title: "Xuất Danh Bạ Kỷ Yếu Toàn CEOHN10",
         actionGesture: "👆 Chạm nút 'Xuất danh bạ'",
         touchPoint: "Nút xuất dữ liệu kỷ yếu doanh nghiệp",
         instruction: "Bấm để xuất danh bạ đầy đủ phục vụ in ấn ấn phẩm kỷ yếu doanh nhân thường niên.",
@@ -924,7 +924,7 @@ export const APP_SCREEN_TOURS: ScreenGuideItem[] = [
   },
   {
     id: "fees-admin",
-    title: "Màn hình Quản Trị Hội Phí & Thu Chi (Ban Tài Chính)",
+    title: "Màn hình Quản Trị Phí Tham Gia CLB & Thu Chi (Ban Tài Chính)",
     subtitle: "Lập đợt thu niên liễm, đối soát VietQR & báo cáo tài chính",
     route: "/fees",
     badge: "CRM Ngoài 3/6",
@@ -932,7 +932,7 @@ export const APP_SCREEN_TOURS: ScreenGuideItem[] = [
     category: "core",
     themeColor: "#059669",
     screenSummary: "Hệ thống quản lý tài chính minh bạch của CLB CEO HN10. Tạo kỳ thu niên liễm, đối soát tự động giao dịch MB Bank qua VietQR và lập báo cáo thu chi công khai.",
-    mockupMockTitle: "Quản Trị Hội Phí & Thu Chi",
+    mockupMockTitle: "Quản Trị Phí Tham Gia CLB & Thu Chi",
     mockupElements: [
       { id: "tour-admin-fees-campaign", stepIndex: 1, label: "Tạo Kỳ Thu Niên Liễm Mới", x: 85, y: 15, badgePosition: "left" },
       { id: "tour-admin-fees-status", stepIndex: 2, label: "Theo Dõi Tỷ Lệ Đã Đóng Phí", x: 50, y: 40, badgePosition: "bottom" },
@@ -942,7 +942,7 @@ export const APP_SCREEN_TOURS: ScreenGuideItem[] = [
     steps: [
       {
         targetId: "tour-admin-fees-campaign",
-        title: "Tạo Đợt Thu Hội Phí Thường Niên",
+        title: "Tạo Đợt Thu Phí Tham Gia CLB Thường Niên",
         actionGesture: "👆 Chạm nút 'Tạo đợt thu'",
         touchPoint: "Nút 'Tạo kỳ phí mới' ở góc phải màn hình",
         instruction: "Nhập Năm niên liễm (VD: 2026), Mức phí chuẩn (VD: 5.000.000 VNĐ), Hạn nộp và bấm 'Phát hành'.",
@@ -977,7 +977,7 @@ export const APP_SCREEN_TOURS: ScreenGuideItem[] = [
         actionGesture: "👆 Chạm nút 'Báo cáo thu chi'",
         touchPoint: "Nút xuất báo cáo tài chính định kỳ",
         instruction: "Bấm để xuất bảng cân đối thu chi gửi Ban Chấp Hành và báo cáo trước Đại hội toàn thể.",
-        systemResponse: "Tải xuống bảng báo cáo tài chính chuẩn kế toán hiệp hội.",
+        systemResponse: "Tải xuống bảng báo cáo tài chính chuẩn kế toán CEOHN10.",
         icon: "📑",
         description: "Đảm bảo tính trung thực và công khai tài chính của câu lạc bộ.",
       },
@@ -993,7 +993,7 @@ export const APP_SCREEN_TOURS: ScreenGuideItem[] = [
     category: "core",
     themeColor: "#4F46E5",
     screenSummary: "Hệ thống quản lý công việc và giao việc điều hành giữa các ban. Ban Chủ Nhiệm và Ban Thư Ký giao nhiệm vụ, phân bổ ngân sách và đôn đốc tiến độ công tác chuẩn bị sự kiện.",
-    mockupMockTitle: "Giao Việc Điều Hành Hiệp Hội",
+    mockupMockTitle: "Giao Việc Điều Hành CEOHN10",
     mockupElements: [
       { id: "tour-admin-task-create", stepIndex: 1, label: "Nút Giao Việc Mới", x: 85, y: 15, badgePosition: "left" },
       { id: "tour-admin-task-kanban", stepIndex: 2, label: "Bảng Kanban Tiến Độ Công Việc", x: 50, y: 45, badgePosition: "bottom" },
@@ -1019,7 +1019,7 @@ export const APP_SCREEN_TOURS: ScreenGuideItem[] = [
         instruction: "Kéo thả thẻ nhiệm vụ sang cột tiếp theo khi hoàn thành từng giai đoạn công việc.",
         systemResponse: "Cập nhật tiến độ dự án và thông báo cho Trưởng ban phụ trách.",
         icon: "📋",
-        description: "Phương pháp quản trị Agile hiện đại áp dụng cho công tác điều hành hiệp hội.",
+        description: "Phương pháp quản trị Agile hiện đại áp dụng cho công tác điều hành CEOHN10.",
       },
       {
         targetId: "tour-admin-task-assignee",
@@ -1052,7 +1052,7 @@ export const APP_SCREEN_TOURS: ScreenGuideItem[] = [
     iconName: "Shield",
     category: "core",
     themeColor: "#DC2626",
-    screenSummary: "Trung tâm quản trị bảo mật và phân quyền của Hiệp hội CEO HN10. Thiết lập ma trận quyền hạn cho Chủ Tịch, Ban Truyền Thông, Ban Tài Chính, Ban Thư Ký và Lễ Tân Soát Vé.",
+    screenSummary: "Trung tâm quản trị bảo mật và phân quyền của CEOHN10 CEO HN10. Thiết lập ma trận quyền hạn cho Chủ Tịch, Ban Truyền Thông, Ban Tài Chính, Ban Thư Ký và Lễ Tân Soát Vé.",
     mockupMockTitle: "Quản Trị Phân Quyền RBAC",
     mockupElements: [
       { id: "tour-admin-role-select", stepIndex: 1, label: "Chọn Vai Trò (Admin, Ban Bệ, Học viên)", x: 50, y: 18, badgePosition: "bottom" },
@@ -1063,7 +1063,7 @@ export const APP_SCREEN_TOURS: ScreenGuideItem[] = [
     steps: [
       {
         targetId: "tour-admin-role-select",
-        title: "Chọn Vai Trò Trong Bộ Máy Hiệp Hội",
+        title: "Chọn Vai Trò Trong Bộ Máy CEOHN10",
         actionGesture: "👆 Chạm chọn vai trò",
         touchPoint: "Thanh chọn vai trò: Ban Chấp Hành, Trưởng Ban Truyền Thông, Ban Thư Ký, Học viên...",
         instruction: "Chọn nhóm đối tượng bạn muốn thiết lập thẩm quyền truy cập hệ thống.",
@@ -1113,8 +1113,8 @@ export const APP_SCREEN_TOURS: ScreenGuideItem[] = [
     iconName: "Award",
     category: "trade",
     themeColor: "#D97706",
-    screenSummary: "Hệ thống quản lý đối tác tài trợ cho các sự kiện và đại hội hiệp hội. Thiết lập gói tài trợ, quản lý logo thương hiệu và giám sát thực hiện quyền lợi tài trợ.",
-    mockupMockTitle: "Quản Lý Nhà Tài Trợ Hiệp Hội",
+    screenSummary: "Hệ thống quản lý đối tác tài trợ cho các sự kiện và đại hội CEOHN10. Thiết lập gói tài trợ, quản lý logo thương hiệu và giám sát thực hiện quyền lợi tài trợ.",
+    mockupMockTitle: "Quản Lý Nhà Tài Trợ CEOHN10",
     mockupElements: [
       { id: "tour-admin-sponsor-create", stepIndex: 1, label: "Thêm Đơn Vị Tài Trợ Mới", x: 85, y: 15, badgePosition: "left" },
       { id: "tour-admin-sponsor-packages", stepIndex: 2, label: "Gói Tài Trợ Kim Cương / Vàng / Bạc", x: 50, y: 40, badgePosition: "bottom" },

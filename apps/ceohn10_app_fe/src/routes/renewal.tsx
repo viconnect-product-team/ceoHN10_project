@@ -362,7 +362,7 @@ function RenewalPage() {
   const handleExport = () => {
     exportToExcel<RenewalRecord>({
       title: "BÁO CÁO THEO DÕI GIA HẠN TƯ CÁCH Học viên THƯỜNG NIÊN",
-      subtitle: "Hiệp Hội Doanh Nhân CEO HN10 - HanoiBA",
+      subtitle: "CEOHN10 Doanh Nhân CEO HN10 - HanoiBA",
       filename: "theo-doi-gia-han-hoi-vien",
       sheetName: "Theo_Doi_Gia_Han",
       data: filtered,
@@ -571,7 +571,7 @@ function RenewalPage() {
                   onSort={tc.toggleSort}
                 />
                 <th className="px-4 py-3 text-right font-bold uppercase tracking-wider text-muted-foreground whitespace-nowrap min-w-[130px] border-b border-border">
-                  Số tiền hội phí
+                  Số tiền phí tham gia CLB
                 </th>
                 <th className="sticky right-0 z-20 min-w-[140px] bg-secondary px-4 py-3 text-right border-l border-b border-border shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)]">
                   {t("renewal.col.actions")}

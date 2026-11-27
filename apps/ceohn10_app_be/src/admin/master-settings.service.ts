@@ -24,12 +24,12 @@ export const DEFAULT_FEE_CATEGORIES = [
   },
   {
     id: 'fee_annual',
-    name: 'Hội phí thường niên hàng năm',
+    name: 'Phí tham gia CLB thường niên hàng năm',
     prefix: 'CEOHN10_HP',
     target_fund_name: 'Quỹ Tổng CLB CEO HN10',
     action_type: 'membership_annual',
     action_label: 'Gia hạn niên liễm & thẻ hội viên',
-    description: 'Tự động gạch nợ hóa đơn hội phí, gia hạn niên hạn sử dụng thẻ',
+    description: 'Tự động gạch nợ hóa đơn phí tham gia CLB, gia hạn niên hạn sử dụng thẻ',
     is_active: true,
   },
   {
@@ -365,7 +365,7 @@ export class MasterSettingsService {
         name: 'Hệ thống CRM CEOHN10',
         code: 'CEOHN10_CRM_WEB',
         category: 'crm',
-        categoryLabel: 'CRM Hiệp hội',
+        categoryLabel: 'CRM CEOHN10',
         description: 'Cổng Quản trị CRM Học viên, Sự kiện, Tài chính, Phân quyền RBAC',
         endpointUrl: 'https://crm.ceohn10.viconnect.vn',
         healthcheckUrl: '/api/health',

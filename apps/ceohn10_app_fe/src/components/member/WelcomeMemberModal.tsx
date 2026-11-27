@@ -116,7 +116,7 @@ export function WelcomeMemberModal({ forceOpen = false, onClose }: WelcomeMember
         {/* Feature Highlights List */}
         <div className="p-4 sm:p-5 overflow-y-auto space-y-3.5 flex-1">
           <p className="text-xs text-slate-600 dark:text-slate-300 text-center leading-relaxed">
-            Nền tảng kết nối giao thương tinh hoa, số hóa danh bạ và quản trị hiệp hội chuẩn mực dành riêng cho thế hệ Doanh nhân CEO HN10.
+            Nền tảng kết nối giao thương tinh hoa, số hóa danh bạ và quản trị CEOHN10 chuẩn mực dành riêng cho thế hệ Doanh nhân CEO HN10.
           </p>
 
           <div className="space-y-2.5">
@@ -194,7 +194,7 @@ export function WelcomeMemberModal({ forceOpen = false, onClose }: WelcomeMember
           </button>
 
           <p className="text-[10px] text-slate-400 text-center">
-            Hiệp hội Doanh nghiệp Trẻ Hà Nội (HanoiBA) • CLB Doanh Nhân CEO HN10
+            CEOHN10 Doanh nghiệp Trẻ Hà Nội (HanoiBA) • CLB Doanh Nhân CEO HN10
           </p>
         </div>
       </div>

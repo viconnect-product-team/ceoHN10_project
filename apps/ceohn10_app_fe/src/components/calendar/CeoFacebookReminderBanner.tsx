@@ -84,7 +84,7 @@ export const CeoFacebookReminderBanner: React.FC<CeoFacebookReminderBannerProps>
                 <span>{isMorningDigest ? "🔔 Nhắc lịch 7:00 Sáng" : "⏰ Nhắc Lịch Sắp Diễn Ra"}</span>
                 <span className="size-2 rounded-full bg-amber-300 animate-ping" />
               </div>
-              <div className="text-[10px] text-white/85">Hiệp hội Doanh nhân CEO HN10</div>
+              <div className="text-[10px] text-white/85">CEOHN10 Doanh nhân CEO HN10</div>
             </div>
           </div>
 

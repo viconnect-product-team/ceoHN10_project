@@ -21,8 +21,8 @@ export const Route = createFileRoute("/h/$slug")({
   },
   head: ({ loaderData }) => {
     const a = loaderData as PublicAssociation | undefined;
-    const title = a ? `${a.name} — Học viên` : "Hiệp hội";
-    const desc = a?.tagline ?? a?.about ?? "Trang giới thiệu Hiệp hội và ứng dụng Học viên.";
+    const title = a ? `${a.name} — Học viên` : "CEOHN10";
+    const desc = a?.tagline ?? a?.about ?? "Trang giới thiệu CEOHN10 và ứng dụng Học viên.";
     return {
       meta: [
         { title },
@@ -42,7 +42,7 @@ function NotFound() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 text-center">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Không tìm thấy Hiệp hội</h1>
+        <h1 className="text-2xl font-bold text-foreground">Không tìm thấy CEOHN10</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Trang giới thiệu chưa được công bố hoặc đường dẫn không đúng.
         </p>

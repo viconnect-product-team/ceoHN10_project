@@ -171,14 +171,14 @@ export const AI_WORKFLOWS: AiWorkflow[] = [
   },
   {
     id: "fee-reminder",
-    name: "Nhắc Học viên chưa đóng hội phí",
+    name: "Nhắc Học viên chưa đóng phí tham gia CLB",
     description: "Tìm công nợ, soạn bản nháp nhắc và xem trước danh sách nhận.",
     icon: Wallet,
     supportedCapabilities: ["fee"],
     requiredRole: "moderator",
     requiredPermissions: ["fee.read"],
     confirmationPolicy: "per-protected-step",
-    triggers: ["chưa đóng hội phí", "nhắc hội phí", "công nợ", "quá hạn", "nhắc đóng phí"],
+    triggers: ["chưa đóng phí tham gia CLB", "nhắc phí tham gia CLB", "công nợ", "quá hạn", "nhắc đóng phí"],
     steps: [
       step(
         "find",
@@ -357,7 +357,7 @@ function stepAvailability(
   s: AiWorkflowStep,
   ctx: WorkflowRunContext,
 ): ToolAvailability {
-  if (ctx.hasAssociation === false) return { allowed: false, reason: "Chưa chọn hiệp hội" };
+  if (ctx.hasAssociation === false) return { allowed: false, reason: "Chưa chọn CEOHN10" };
   if (ctx.rank < ROLE_RANK[wf.requiredRole]) {
     const roleLabel =
       wf.requiredRole === "admin"

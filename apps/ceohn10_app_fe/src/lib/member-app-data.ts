@@ -90,7 +90,7 @@ export const conversations: Conversation[] = [];
 export const memberBenefits = [
   { title: "Tham dự sự kiện", desc: "miễn phí & ưu đãi" },
   { title: "Kết nối hơn", desc: "1000+ doanh nghiệp" },
-  { title: "Quảng bá thương hiệu", desc: "trên kênh Hiệp hội" },
+  { title: "Quảng bá thương hiệu", desc: "trên kênh CEOHN10" },
 ];
 
 // ---- Event check-in (QR/NFC) ----

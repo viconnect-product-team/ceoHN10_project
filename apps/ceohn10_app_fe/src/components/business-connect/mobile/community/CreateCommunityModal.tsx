@@ -1,4 +1,4 @@
-// BC-Mobile — Modal Tạo Cộng Đồng / Hiệp Hội Mới (Executive Minimal Luxury)
+// BC-Mobile — Modal Tạo Cộng Đồng / CEOHN10 Mới (Executive Minimal Luxury)
 
 import { useState, useRef } from "react";
 import { X, Upload, Plus, Building2, Sparkles, Loader2, Image as ImageIcon, Trash2 } from "lucide-react";
@@ -110,7 +110,7 @@ export function CreateCommunityModal({ open, onClose, onCreated }: Props) {
     e.preventDefault();
     const cleanName = name.trim();
     if (!cleanName) {
-      toast.error("Vui lòng nhập tên cộng đồng / hiệp hội");
+      toast.error("Vui lòng nhập tên cộng đồng / CEOHN10");
       return;
     }
 
@@ -165,7 +165,7 @@ export function CreateCommunityModal({ open, onClose, onCreated }: Props) {
                 Tạo Cộng Đồng Mới
               </h2>
               <p className="text-xs text-[var(--bc-mobile-muted)]">
-                Khởi tạo CLB, Hiệp hội hoặc Liên minh doanh nghiệp
+                Khởi tạo CLB, CEOHN10 hoặc Liên minh doanh nghiệp
               </p>
             </div>
           </div>
@@ -286,7 +286,7 @@ export function CreateCommunityModal({ open, onClose, onCreated }: Props) {
           {/* Tên cộng đồng */}
           <div>
             <label className="block text-xs font-medium text-[var(--bc-mobile-muted)] mb-1">
-              Tên Cộng Đồng / Hiệp Hội <span className="text-red-400">*</span>
+              Tên Cộng Đồng / CEOHN10 <span className="text-red-400">*</span>
             </label>
             <input
               type="text"

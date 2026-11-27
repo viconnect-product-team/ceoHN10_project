@@ -330,7 +330,7 @@ export const DEFAULT_STARTUP_MOBILE_CONFIG: StartupMobileTemplateConfig = {
     },
     {
       question: "Điều kiện để gia nhập trở thành Học viên chính thức của CLB?",
-      answer: "Học viên là các Doanh nhân, Chủ tịch HĐQT, CEO, Tổng giám đốc hoặc Cấp quản lý doanh nghiệp CEO Hà Nội 10 (Quý Hợi). Hồ sơ gia nhập sẽ được Ban Thẩm định và Ban Điều hành phê duyệt theo đúng quy chế hiệp hội của HanoiBA.",
+      answer: "Học viên là các Doanh nhân, Chủ tịch HĐQT, CEO, Tổng giám đốc hoặc Cấp quản lý doanh nghiệp CEO Hà Nội 10 (Quý Hợi). Hồ sơ gia nhập sẽ được Ban Thẩm định và Ban Điều hành phê duyệt theo đúng quy chế CEOHN10 của HanoiBA.",
     },
     {
       question: "Ứng dụng di động CEO HN10 mang lại những lợi ích gì cho Học viên?",

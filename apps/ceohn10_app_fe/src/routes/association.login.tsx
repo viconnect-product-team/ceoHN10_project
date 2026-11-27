@@ -36,7 +36,7 @@ export const Route = createFileRoute("/association/login")({
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       { name: "theme-color", content: "#001D4A" },
       { name: "apple-mobile-web-app-title", content: "CEO HN10" },
-      { title: "Đăng nhập — Hiệp hội Doanh nhân CEO HN10" },
+      { title: "Đăng nhập — CEOHN10 Doanh nhân CEO HN10" },
     ],
     links: [
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png?v=ceohn10_v4w" },
@@ -93,7 +93,7 @@ function AssociationLoginPage() {
 
   useEffect(() => {
     if (registered === "true") {
-      toast.success("🎉 Đăng ký thành công! Quý CEO vui lòng nhập mật khẩu để đăng nhập vào App Hiệp Hội.");
+      toast.success("🎉 Đăng ký thành công! Quý CEO vui lòng nhập mật khẩu để đăng nhập vào App CEOHN10.");
     }
   }, [registered]);
 

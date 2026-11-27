@@ -35,12 +35,12 @@ export const Route = createFileRoute("/demo")({
       {
         name: "description",
         content:
-          "Chọn ngày và khung giờ phù hợp để nhận buổi demo 1:1 nền tảng quản lý hiệp hội & kết nối doanh nghiệp.",
+          "Chọn ngày và khung giờ phù hợp để nhận buổi demo 1:1 nền tảng quản lý CEOHN10 & kết nối doanh nghiệp.",
       },
       { property: "og:title", content: "Đặt lịch demo — Business Connect Platform" },
       {
         property: "og:description",
-        content: "Đặt lịch demo 1:1 nền tảng số quản lý hiệp hội và kết nối doanh nghiệp.",
+        content: "Đặt lịch demo 1:1 nền tảng số quản lý CEOHN10 và kết nối doanh nghiệp.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

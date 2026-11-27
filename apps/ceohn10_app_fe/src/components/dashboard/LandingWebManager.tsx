@@ -113,7 +113,7 @@ export const DEFAULT_LANDING_CONFIG: LandingWebConfig = {
   orgName: "CLB Doanh Nhân CEO HN10 (HanoiBA)",
   tagline: "Gắn kết doanh nhân — Nâng tầm giá trị thương hiệu",
   about:
-    "Cộng đồng kết nối giao thương, xúc tiến thương mại và nâng tầm năng lực quản trị cho các doanh nhân CEO Hà Nội 10 trực thuộc Hiệp Hội Doanh Nghiệp Trẻ Hà Nội (HanoiBA).",
+    "Cộng đồng kết nối giao thương, xúc tiến thương mại và nâng tầm năng lực quản trị cho các doanh nhân CEO Hà Nội 10 trực thuộc CEOHN10 Doanh Nghiệp Trẻ Hà Nội (HanoiBA).",
   logoUrl: "/ceohn10-emblem-8.png",
   faviconUrl: "/favicon.ico",
   brandPrimary: "#003B95",
@@ -517,7 +517,7 @@ export function LandingWebManager({ onSwitchTab }: { onSwitchTab?: (tab: string)
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                  Tên Tổ Chức / Hiệp Hội *
+                  Tên Tổ Chức / CEOHN10 *
                 </label>
                 <input
                   type="text"
@@ -543,7 +543,7 @@ export function LandingWebManager({ onSwitchTab }: { onSwitchTab?: (tab: string)
 
               <div className="md:col-span-2">
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                  Giới Thiệu Tổng Quan Về Hiệp Hội
+                  Giới Thiệu Tổng Quan Về CEOHN10
                 </label>
                 <textarea
                   rows={3}

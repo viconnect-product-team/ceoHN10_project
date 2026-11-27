@@ -274,7 +274,7 @@ function SponsorsPage() {
           header: "Nội Dung / Diễn Giải Tài Trợ",
           key: "content",
           width: 40,
-          value: (s) => s.inKindDescription || "Tài trợ hiệp hội",
+          value: (s) => s.inKindDescription || "Tài trợ CEOHN10",
         },
         { header: "Đại Diện / Người Liên Hệ", key: "contact", width: 22, value: (s) => s.contact || "—" },
         { header: "Email", key: "email", width: 24, value: (s) => s.email || "—" },
@@ -309,7 +309,7 @@ function SponsorsPage() {
         subtitle={
           tab === "funds"
             ? "Theo dõi độc lập 2 khối quỹ: Quỹ Hoạt Động & Sự Kiện (Tiền mặt/Hiện vật) và Quỹ Dành Cho Thiện Nguyện (Tiền mặt/Hiện vật)"
-            : "Hệ thống đối tác & nhà tài trợ chính thức đồng hành cùng Hiệp Hội Doanh Nhân CEO HN10"
+            : "Hệ thống đối tác & nhà tài trợ chính thức đồng hành cùng CEOHN10 Doanh Nhân CEO HN10"
         }
         actions={
           <div className="flex items-center gap-2">
@@ -622,7 +622,7 @@ function SponsorsPage() {
                     <td className="px-4 py-3">
                       <div
                         className="text-xs text-foreground font-medium line-clamp-2 leading-relaxed"
-                        title={s.inKindDescription || "Tài trợ hiệp hội"}
+                        title={s.inKindDescription || "Tài trợ CEOHN10"}
                       >
                         {s.inKindDescription || "Tài trợ hoạt động CLB"}
                       </div>

@@ -157,7 +157,7 @@ export const getCompanyHistoryFn = createServerFn({ method: "GET" })
       invoice: (i.invoice_no as string) ?? "—",
       date: (i.paid_at as string) ?? (i.due_date as string) ?? new Date().toISOString(),
       kind: "fee",
-      description: `Hội phí ${i.year ?? ""}`.trim(),
+      description: `Phí tham gia CLB ${i.year ?? ""}`.trim(),
       amount: Number(i.amount ?? 0),
       method: payMethod(i.method as string | null),
       status: payStatus(i.status as string | null),

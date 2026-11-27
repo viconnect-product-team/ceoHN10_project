@@ -54,7 +54,7 @@ export class MeetingsService implements OnModuleInit {
    */
   async createMeeting(userId: string, data: any) {
     const title = (data.title || 'Gặp gỡ kết nối & Trao đổi cơ hội hợp tác').trim();
-    const hostName = (data.hostName || 'Lãnh đạo Hiệp hội').trim();
+    const hostName = (data.hostName || 'Lãnh đạo CEOHN10').trim();
     const partnerName = (data.partnerName || '').trim();
     const partnerPhone = (data.partnerPhone || '').trim();
     const partnerCompany = (data.partnerCompany || '').trim();
@@ -62,7 +62,7 @@ export class MeetingsService implements OnModuleInit {
     const time = data.time || '09:30';
     const isOnlineRequested = Boolean(data.zoomUrl || data.venueType === 'online' || String(data.location || data.venue || '').toLowerCase().startsWith('http'));
     const venueType = data.venueType || (isOnlineRequested ? 'online' : 'offline');
-    const venue = (data.venue || data.location || (isOnlineRequested ? (data.zoomUrl || 'Họp trực tuyến') : 'Văn phòng Hiệp hội CEO HN10, Tòa V-Tower, 649 Kim Mã, Hà Nội')).trim();
+    const venue = (data.venue || data.location || (isOnlineRequested ? (data.zoomUrl || 'Họp trực tuyến') : 'Văn phòng CEOHN10 CEO HN10, Tòa V-Tower, 649 Kim Mã, Hà Nội')).trim();
     const notes = (data.notes || '').trim();
 
     // Validate địa điểm cuộc họp trực tiếp
@@ -1381,7 +1381,7 @@ export class MeetingsService implements OnModuleInit {
         const inviteePart = participants.find((p: any) => p.role === 'required' || p.role === 'invitee' || p.role === 'optional');
 
         const hostName = hostPart?.name || m.host_name || 'Lãnh đạo Ban Điều Hành';
-        const hostCompany = hostPart?.company || m.host_company || 'Hiệp hội CEO HN10';
+        const hostCompany = hostPart?.company || m.host_company || 'CEOHN10 CEO HN10';
         const hostPhone = hostPart?.phone || m.host_phone || '';
         const hostCode = hostPart?.code || m.host_code || '';
         const hostAvatar = hostPart?.avatar_url || m.host_avatar || '';
@@ -1392,7 +1392,7 @@ export class MeetingsService implements OnModuleInit {
         let partnerPhone = inviteePart?.phone || '';
         let partnerCode = inviteePart?.code || '';
         let partnerAvatar = inviteePart?.avatar_url || '';
-        let venue = 'Văn phòng Hiệp hội CEO HN10, Tòa V-Tower, 649 Kim Mã, Hà Nội';
+        let venue = 'Văn phòng CEOHN10 CEO HN10, Tòa V-Tower, 649 Kim Mã, Hà Nội';
         let notes = '';
 
         if (m.description) {
@@ -1498,12 +1498,12 @@ export class MeetingsService implements OnModuleInit {
 
         const tm = cm.target_members;
         let hostName = 'Học viên kết nối';
-        let hostCompany = 'Hiệp hội CEO HN10';
+        let hostCompany = 'CEOHN10 CEO HN10';
         let hostPhone = '';
         let partnerName = 'Đối tác';
         let partnerCompany = 'Doanh nghiệp CEO HN10';
         let partnerPhone = '';
-        let venue = cm.location || cm.zoom_url || 'Văn phòng Hiệp hội CEO HN10';
+        let venue = cm.location || cm.zoom_url || 'Văn phòng CEOHN10 CEO HN10';
         let venueType = cm.zoom_url ? 'online' : 'offline';
         let onlineUrl = cm.zoom_url || undefined;
         let notes = cm.notes || 'Hẹn gặp kết nối giao thương B2B';
@@ -1649,8 +1649,8 @@ export class MeetingsService implements OnModuleInit {
           date: dateStr,
           time: timeStr,
           venueType: 'offline',
-          venue: 'Văn phòng Hiệp hội CEO HN10 / Trực tiếp',
-          notes: 'Kết nối 1-on-1 đã được đối tác chấp nhận trên App Hiệp hội',
+          venue: 'Văn phòng CEOHN10 CEO HN10 / Trực tiếp',
+          notes: 'Kết nối 1-on-1 đã được đối tác chấp nhận trên App CEOHN10',
           status: 'confirmed',
           source: 'user_connection',
           createdAt: conn.created_at || new Date().toISOString(),
@@ -1796,7 +1796,7 @@ export class MeetingsService implements OnModuleInit {
     const date = data.date || now.toISOString().slice(0, 10);
     const time = data.time || '09:30 - 10:30';
     const venueType = data.venueType || 'online';
-    const venue = data.venue || (venueType === 'online' ? 'https://meet.jit.si/CEOHN10_Connect_1on1' : 'Văn phòng Hiệp hội CEO HN10, Tòa V-Tower, 649 Kim Mã, Hà Nội');
+    const venue = data.venue || (venueType === 'online' ? 'https://meet.jit.si/CEOHN10_Connect_1on1' : 'Văn phòng CEOHN10 CEO HN10, Tòa V-Tower, 649 Kim Mã, Hà Nội');
 
     const scheduledStartAt = new Date(`${date}T09:30:00Z`);
 

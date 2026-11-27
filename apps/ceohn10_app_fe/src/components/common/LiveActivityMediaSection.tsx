@@ -175,7 +175,7 @@ export const LiveActivityMediaSection: React.FC<LiveActivityMediaSectionProps> =
             }),
           });
           pushed = true;
-          toast.success("Đã đẩy khoảnh khắc trực tiếp lên Mạng lưới Hiệp hội thành công!");
+          toast.success("Đã đẩy khoảnh khắc trực tiếp lên Mạng lưới CEOHN10 thành công!");
         } catch (feedErr) {
           console.warn("Push to feed error:", feedErr);
         }

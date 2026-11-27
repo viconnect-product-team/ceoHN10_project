@@ -446,7 +446,7 @@ export function MemberProfileModal({
               <X className="h-4.5 w-4.5" />
             </button>
 
-            {/* Badge Hiệp Hội CEO HN10 top-left */}
+            {/* Badge CEOHN10 CEO HN10 top-left */}
             <div className="absolute top-3 left-3 bg-[#001B54]/85 backdrop-blur-xs border border-amber-400/40 text-amber-300 font-black text-[9px] uppercase px-2.5 py-0.5 rounded-full shadow-xs">
               Học viên CLB CEO HN10
             </div>

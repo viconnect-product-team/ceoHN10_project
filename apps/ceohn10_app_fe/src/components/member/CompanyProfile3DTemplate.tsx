@@ -238,7 +238,7 @@ export function CompanyProfile3DTemplate({
             <div className="size-72 rounded-full border-4 border-dashed border-amber-300/40 flex flex-col items-center justify-center text-center p-6">
               <span className="text-3xl font-black tracking-widest text-amber-300">CEO HN10</span>
               <span className="text-[11px] font-bold tracking-widest text-amber-200 uppercase mt-1">
-                BẢO CHỨNG HIỆP HỘI
+                BẢO CHỨNG CEOHN10
               </span>
             </div>
           </div>

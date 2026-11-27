@@ -314,7 +314,7 @@ export function recommendTemplate(hint: string | null | undefined): CardTemplate
     [/(medic|clinic|hospital|y tế|dược|health|phòng khám|bệnh viện)/, "clinical-white"],
     [/(school|university|đại học|giáo dục|academic|research|nghiên cứu)/, "campus-oxford"],
     [/(real ?estate|bất động sản|property|nhà đất|realtor)/, "emerald-estate"],
-    [/(government|chính phủ|nhà nước|ngo|non-?profit|phi lợi nhuận|hiệp hội)/, "civic-navy"],
+    [/(government|chính phủ|nhà nước|ngo|non-?profit|phi lợi nhuận|CEOHN10)/, "civic-navy"],
     [/(manufactur|sản xuất|logistic|vận tải|công nghiệp|nhà máy)/, "industrial-slate"],
   ];
   for (const [re, id] of map) {

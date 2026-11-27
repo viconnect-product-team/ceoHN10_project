@@ -88,7 +88,7 @@ function VerifyScreen() {
             to="/association"
             className="mt-3 flex items-center justify-center gap-2 rounded-2xl bg-[#003B95] hover:bg-[#002B70] text-white px-5 py-3 text-[13px] font-bold shadow-md transition active:scale-[0.99]"
           >
-            <ArrowLeft className="h-4 w-4" /> Về trang chủ Hiệp hội CEO HN10
+            <ArrowLeft className="h-4 w-4" /> Về trang chủ CEOHN10 CEO HN10
           </Link>
         </div>
       </Shell>
@@ -108,7 +108,7 @@ function VerifyScreen() {
             to="/association"
             className="mt-3 flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/10 hover:bg-white/20 px-5 py-3 text-[13px] font-bold text-white transition"
           >
-            <ArrowLeft className="h-4 w-4" /> Về trang chủ Hiệp hội CEO HN10
+            <ArrowLeft className="h-4 w-4" /> Về trang chủ CEOHN10 CEO HN10
           </Link>
         </div>
       </Shell>
@@ -167,7 +167,7 @@ function VerifyScreen() {
         to="/association"
         className="mt-5 flex items-center justify-center gap-2 rounded-2xl bg-[#003B95] hover:bg-[#002B70] text-white py-3.5 text-[14px] font-bold shadow-md transition active:scale-[0.99]"
       >
-        <ArrowLeft className="h-4 w-4" /> Về trang chủ Hiệp hội CEO HN10
+        <ArrowLeft className="h-4 w-4" /> Về trang chủ CEOHN10 CEO HN10
       </Link>
     </Shell>
   );

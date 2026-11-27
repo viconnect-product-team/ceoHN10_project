@@ -182,7 +182,7 @@ function BenefitsAdminPage() {
         method: "POST",
         body: JSON.stringify({
           title: `🏆 VINH DANH & KHEN THƯỞNG: ${rewardingMember.name} đạt ${rewardingMember.tier}`,
-          content: `Ban Chấp Hành CLB Doanh Nhân CEO HN10 trân trọng vinh danh và trao tặng phần thưởng: ${rewardVoucherTitle} (Trị giá ${rewardVoucherValue}) tới CEO ${rewardingMember.name} (${rewardingMember.company}) vì thành tích xuất sắc đứng Top ${rewardingMember.rank} thống kê toàn hiệp hội!`,
+          content: `Ban Chấp Hành CLB Doanh Nhân CEO HN10 trân trọng vinh danh và trao tặng phần thưởng: ${rewardVoucherTitle} (Trị giá ${rewardVoucherValue}) tới CEO ${rewardingMember.name} (${rewardingMember.company}) vì thành tích xuất sắc đứng Top ${rewardingMember.rank} thống kê toàn CEOHN10!`,
           category: "HONOR",
           department: "Ban Thi Đua Khen Thưởng",
         }),
@@ -339,7 +339,7 @@ function BenefitsAdminPage() {
                   }`}
               >
                 <Award className="h-3.5 w-3.5" />
-                <span>Danh Mục Quyền Lợi Hiệp Hội</span>
+                <span>Danh Mục Quyền Lợi CEOHN10</span>
               </button>
             </div>
 
@@ -568,7 +568,7 @@ function BenefitsAdminPage() {
         </div>
       ) : (
         /* ══════════════════════════════════════════════════════════════
-           TAB 2: QUẢN TRỊ DANH MỤC QUYỀN LỢI HIỆP HỘI
+           TAB 2: QUẢN TRỊ DANH MỤC QUYỀN LỢI CEOHN10
            ══════════════════════════════════════════════════════════════ */
         <div className="space-y-5">
           <div className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2">

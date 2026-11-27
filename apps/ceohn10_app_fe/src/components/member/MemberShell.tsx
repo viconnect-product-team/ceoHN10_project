@@ -121,7 +121,7 @@ export function MemberScreen({ children }: { children: ReactNode }) {
       const partnerCode = data?.accepterProfile?.memberCode || data?.accepterProfile?.code;
       const partnerUserId = data?.accepterProfile?.userId;
 
-      // 1. Lưu vào vba_notifications (đẩy về chuông thông báo hiệp hội)
+      // 1. Lưu vào vba_notifications (đẩy về chuông thông báo CEOHN10)
       try {
         const newNotif = {
           id: `conn_acc_${Date.now()}`,

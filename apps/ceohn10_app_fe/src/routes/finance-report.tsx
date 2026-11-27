@@ -97,6 +97,7 @@ export function FinanceReport() {
   const [period, setPeriod] = useState<PeriodFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<"all" | "tuition" | "events" | "sponsors" | "transfers">("all");
+  const [selectedStatsFundId, setSelectedStatsFundId] = useState<string>("ALL");
 
   // Modal State: Chi tiết nguồn thu
   const [activeInflowModal, setActiveInflowModal] = useState<{
@@ -551,7 +552,7 @@ export function FinanceReport() {
               Báo Cáo &amp; Dòng Tiền Tài Chính
             </h1>
             <p className="text-xs text-slate-500 mt-1">
-              Quản trị dòng tiền Quỹ Tổng Hiệp Hội CLB Doanh Nhân CEO HN10 (HanoiBA)
+              Quản trị dòng tiền Quỹ Tổng CEOHN10 CLB Doanh Nhân CEO HN10 (HanoiBA)
             </p>
           </div>
 
@@ -583,13 +584,13 @@ export function FinanceReport() {
           </div>
         </div>
 
-        {/* ── 2. HERO CARD: QUỸ TỔNG HIỆP HỘI (SỐ DƯ BIẾN ĐỘNG THỜI GIAN THỰC) ── */}
+        {/* ── 2. HERO CARD: QUỸ TỔNG CEOHN10 (SỐ DƯ BIẾN ĐỘNG THỜI GIAN THỰC) ── */}
         <div className="rounded-3xl p-6 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 text-white shadow-xl relative overflow-hidden border border-slate-700">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <span className="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-blue-600/30 text-blue-300 border border-blue-400/30">
-                  TỔNG QUỸ HIỆP HỘI CEO HN10
+                  TỔNG QUỸ CEOHN10 CEO HN10
                 </span>
                 <span className="text-[11px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
                   ● Dòng Tiền Thời Gian Thực
@@ -605,7 +606,7 @@ export function FinanceReport() {
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 mt-2">
-                Tài khoản ngân hàng liên kết: <b>Techcombank - 1903668899 (Quỹ Tổng Hiệp Hội)</b>
+                Tài khoản ngân hàng liên kết: <b>Techcombank - 1903668899 (Quỹ Tổng CEOHN10)</b>
               </p>
             </div>
 
@@ -638,65 +639,234 @@ export function FinanceReport() {
           </div>
         </div>
 
-        {/* ── 2B. THỐNG KÊ BIẾN ĐỘNG DÒNG TIỀN VÀO / RA THEO 7 QUỸ BAN ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="lg:col-span-2 p-5 rounded-3xl bg-white border border-slate-200 shadow-xs">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <BarChart3 className="w-4 h-4 text-[#003B95]" />
-                <h3 className="text-sm font-black text-slate-900">Biểu Đồ Biến Động Dòng Tiền (Vào / Ra) Theo 7 Quỹ Ban</h3>
-              </div>
-              <span className="text-[11px] font-semibold text-slate-500">Đơn vị: VNĐ (Dữ liệu thật)</span>
-            </div>
-            <div className="h-60 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={departments.map((d: any) => ({
-                    name: d.name.replace("Quỹ ", "").replace("Ban ", ""),
-                    inflow: Number(d.totalInflow || 0),
-                    outflow: Number(d.totalOutflow || 0),
-                  }))}
-                >
-                  <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                  <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => (v >= 1000000 ? `${Math.round(v / 1000000)}tr` : `${Math.round(v / 1000)}k`)} />
-                  <RechartsTooltip formatter={(v: any) => `${Number(v || 0).toLocaleString("vi-VN")} đ`} />
-                  <Legend wrapperStyle={{ fontSize: "11px" }} />
-                  <Bar dataKey="inflow" name="Tiền Vào" fill="#10B981" radius={[6, 6, 0, 0]} />
-                  <Bar dataKey="outflow" name="Tiền Ra" fill="#EF4444" radius={[6, 6, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+        {/* ── 2B. THỐNG KÊ BIẾN ĐỘNG DÒNG TIỀN VÀO / RA THEO QUỸ BAN ── */}
+        {(() => {
+          const selectedFundObj =
+            selectedStatsFundId === "FUND_GENERAL"
+              ? generalFund
+              : selectedStatsFundId !== "ALL"
+              ? departments.find((d: any) => d.id === selectedStatsFundId || d.code === selectedStatsFundId)
+              : null;
 
-          <div className="p-5 rounded-3xl bg-white border border-slate-200 shadow-xs">
-            <h3 className="text-sm font-black text-slate-900 mb-3">Tỷ Trọng Quỹ Tổng &amp; Quỹ Ban</h3>
-            <div className="h-60 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <RechartsPieChart>
-                  <Pie
-                    data={[
-                      { name: "Quỹ Tổng", value: Math.max(0, currentMasterBalance) },
-                      { name: "7 Quỹ Ban", value: Math.max(0, totalAllocatedToDepts) },
-                      { name: "Thu Vé Sự Kiện", value: Math.max(0, totalEventIn) },
-                    ].filter((x) => x.value > 0)}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={72}
-                    label={false}
+          const statsTitle = selectedFundObj
+            ? `Biến Động Dòng Tiền: ${selectedFundObj.name}`
+            : "Biểu Đồ Biến Động Dòng Tiền (Vào / Ra) Theo 7 Quỹ Ban";
+
+          const selectedInflow = selectedFundObj
+            ? Number(selectedFundObj.total_inflow ?? selectedFundObj.totalInflow ?? 0)
+            : departments.reduce((s: number, d: any) => s + Number(d.totalInflow || 0), 0);
+
+          const selectedOutflow = selectedFundObj
+            ? Number(selectedFundObj.total_outflow ?? selectedFundObj.totalOutflow ?? 0)
+            : departments.reduce((s: number, d: any) => s + Number(d.totalOutflow || 0), 0);
+
+          const selectedBalance = selectedFundObj
+            ? Number(selectedFundObj.current_balance ?? selectedFundObj.totalAllocated ?? 0)
+            : totalAllocatedToDepts;
+
+          const selectedTxs: any[] = selectedFundObj
+            ? Array.isArray(selectedFundObj.transactions)
+              ? selectedFundObj.transactions
+              : []
+            : departments.flatMap((d: any) => (Array.isArray(d.transactions) ? d.transactions : []));
+
+          const barData = selectedFundObj
+            ? (() => {
+                const byDate = new Map<string, { name: string; inflow: number; outflow: number }>();
+                for (const tx of selectedTxs) {
+                  const key = String(tx.date || "").slice(0, 10) || "Chưa rõ";
+                  const cur = byDate.get(key) || { name: key, inflow: 0, outflow: 0 };
+                  if (tx.type === "IN") cur.inflow += Number(tx.amount || 0);
+                  else cur.outflow += Number(tx.amount || 0);
+                  byDate.set(key, cur);
+                }
+                const rows = Array.from(byDate.values()).sort((a, b) => a.name.localeCompare(b.name));
+                return rows.length > 0
+                  ? rows
+                  : [{ name: selectedFundObj.name.replace("Quỹ ", "").replace("Ban ", ""), inflow: selectedInflow, outflow: selectedOutflow }];
+              })()
+            : departments.map((d: any) => ({
+                name: d.name.replace("Quỹ ", "").replace("Ban ", ""),
+                inflow: Number(d.totalInflow || 0),
+                outflow: Number(d.totalOutflow || 0),
+              }));
+
+          const pieData = selectedFundObj
+            ? [
+                { name: "Tiền Vào", value: Math.max(0, selectedInflow) },
+                { name: "Tiền Ra", value: Math.max(0, selectedOutflow) },
+              ].filter((x) => x.value > 0)
+            : [
+                { name: "Quỹ Tổng", value: Math.max(0, currentMasterBalance) },
+                { name: "7 Quỹ Ban", value: Math.max(0, totalAllocatedToDepts) },
+                { name: "Thu Vé Sự Kiện", value: Math.max(0, totalEventIn) },
+              ].filter((x) => x.value > 0);
+
+          const pieColors = selectedFundObj ? ["#10B981", "#EF4444"] : ["#003B95", "#F59E0B", "#10B981"];
+
+          return (
+            <div className="space-y-4">
+              {/* Bộ lọc chọn Quỹ cần xem thống kê */}
+              <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-xs flex flex-col gap-3">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <Filter className="w-4 h-4 text-[#003B95]" />
+                    <span className="text-xs font-black text-slate-800 uppercase tracking-wider">
+                      Chọn Quỹ Xem Thống Kê
+                    </span>
+                  </div>
+                  <select
+                    value={selectedStatsFundId}
+                    onChange={(e) => setSelectedStatsFundId(e.target.value)}
+                    className="px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    {["#003B95", "#F59E0B", "#10B981"].map((c, idx) => (
-                      <Cell key={idx} fill={c} />
+                    <option value="ALL">Tất cả 7 Quỹ Ban (Tổng hợp)</option>
+                    {generalFund && <option value="FUND_GENERAL">{generalFund.name} (Quỹ Tổng)</option>}
+                    {departments.map((d: any) => (
+                      <option key={d.id} value={d.id}>
+                        {d.name}
+                      </option>
                     ))}
-                  </Pie>
-                  <RechartsTooltip formatter={(v: any) => `${Number(v || 0).toLocaleString("vi-VN")} đ`} />
-                  <Legend wrapperStyle={{ fontSize: "11px" }} />
-                </RechartsPieChart>
-              </ResponsiveContainer>
+                  </select>
+                </div>
+
+                {/* Quick pills */}
+                <div className="flex flex-wrap gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedStatsFundId("ALL")}
+                    className={`px-3 py-1 rounded-full text-[11px] font-bold transition cursor-pointer ${
+                      selectedStatsFundId === "ALL"
+                        ? "bg-[#003B95] text-white shadow-xs"
+                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    }`}
+                  >
+                    Tất cả 7 Quỹ Ban
+                  </button>
+                  {generalFund && (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedStatsFundId("FUND_GENERAL")}
+                      className={`px-3 py-1 rounded-full text-[11px] font-bold transition cursor-pointer ${
+                        selectedStatsFundId === "FUND_GENERAL"
+                          ? "bg-[#003B95] text-white shadow-xs"
+                          : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                      }`}
+                    >
+                      Quỹ Tổng
+                    </button>
+                  )}
+                  {departments.map((d: any) => (
+                    <button
+                      key={d.id}
+                      type="button"
+                      onClick={() => setSelectedStatsFundId(d.id)}
+                      className={`px-3 py-1 rounded-full text-[11px] font-bold transition cursor-pointer ${
+                        selectedStatsFundId === d.id
+                          ? "bg-[#003B95] text-white shadow-xs"
+                          : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                      }`}
+                    >
+                      {d.name.replace("Quỹ ", "")}
+                    </button>
+                  ))}
+                </div>
+
+                {/* 4 thẻ KPI của Quỹ đang chọn */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-1">
+                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
+                    <span className="text-[11px] text-slate-500 font-medium block">Số dư hiện tại</span>
+                    <span className="text-sm font-black text-slate-900 font-mono mt-0.5 block">
+                      {selectedBalance.toLocaleString("vi-VN")} đ
+                    </span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200/80">
+                    <span className="text-[11px] text-emerald-700 font-medium block">Tổng Tiền Vào</span>
+                    <span className="text-sm font-black text-emerald-700 font-mono mt-0.5 block">
+                      +{selectedInflow.toLocaleString("vi-VN")} đ
+                    </span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-rose-50/70 border border-rose-200/80">
+                    <span className="text-[11px] text-rose-700 font-medium block">Tổng Tiền Ra</span>
+                    <span className="text-sm font-black text-rose-700 font-mono mt-0.5 block">
+                      -{selectedOutflow.toLocaleString("vi-VN")} đ
+                    </span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-blue-50/70 border border-blue-200/80">
+                    <span className="text-[11px] text-blue-800 font-medium block">Số giao dịch phát sinh</span>
+                    <span className="text-sm font-black text-blue-900 font-mono mt-0.5 block">
+                      {selectedTxs.length} giao dịch
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div className="lg:col-span-2 p-5 rounded-3xl bg-white border border-slate-200 shadow-xs">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <BarChart3 className="w-4 h-4 text-[#003B95]" />
+                      <h3 className="text-sm font-black text-slate-900">{statsTitle}</h3>
+                    </div>
+                    <span className="text-[11px] font-semibold text-slate-500">Đơn vị: VNĐ (Dữ liệu thật)</span>
+                  </div>
+                  <div className="h-60 w-full">
+                    {barData.length === 0 ? (
+                      <div className="h-full flex items-center justify-center text-xs text-slate-400">
+                        Chưa có dữ liệu quỹ để hiển thị biểu đồ
+                      </div>
+                    ) : (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={barData}>
+                          <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                          <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => (v >= 1000000 ? `${Math.round(v / 1000000)}tr` : `${Math.round(v / 1000)}k`)} />
+                          <RechartsTooltip formatter={(v: any) => `${Number(v || 0).toLocaleString("vi-VN")} đ`} />
+                          <Legend wrapperStyle={{ fontSize: "11px" }} />
+                          <Bar dataKey="inflow" name="Tiền Vào" fill="#10B981" radius={[6, 6, 0, 0]} />
+                          <Bar dataKey="outflow" name="Tiền Ra" fill="#EF4444" radius={[6, 6, 0, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    )}
+                  </div>
+                </div>
+
+                <div className="p-5 rounded-3xl bg-white border border-slate-200 shadow-xs">
+                  <h3 className="text-sm font-black text-slate-900 mb-3">
+                    {selectedFundObj ? "Tỷ Trọng Tiền Vào / Tiền Ra" : "Tỷ Trọng Quỹ Tổng & Quỹ Ban"}
+                  </h3>
+                  <div className="h-60 w-full">
+                    {pieData.length === 0 ? (
+                      <div className="h-full flex flex-col items-center justify-center text-center px-4 text-xs text-slate-400 gap-1">
+                        <span className="font-bold text-slate-500">Chưa có phát sinh dòng tiền (0 đ)</span>
+                        <span>Biểu đồ tỷ trọng sẽ tự động hiển thị khi có thu hoặc chi.</span>
+                      </div>
+                    ) : (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <RechartsPieChart>
+                          <Pie
+                            data={pieData}
+                            dataKey="value"
+                            nameKey="name"
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={72}
+                            label={false}
+                          >
+                            {pieColors.map((c, idx) => (
+                              <Cell key={idx} fill={c} />
+                            ))}
+                          </Pie>
+                          <RechartsTooltip formatter={(v: any) => `${Number(v || 0).toLocaleString("vi-VN")} đ`} />
+                          <Legend wrapperStyle={{ fontSize: "11px" }} />
+                        </RechartsPieChart>
+                      </ResponsiveContainer>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          );
+        })()}
 
         {/* ── 3. PHÂN HỆ LUỒNG THU VÀO THỰC TẾ (KHÔNG DỮ LIỆU ẢO) ── */}
         <div className="space-y-3">
@@ -1452,7 +1622,7 @@ export function FinanceReport() {
           isOpen={showDynamicImportModal}
           onClose={() => setShowDynamicImportModal(false)}
           entityType="finance"
-          entityTitle="Sổ quỹ & Dòng tiền Hiệp hội CEO HN10"
+          entityTitle="Sổ quỹ & Dòng tiền CEOHN10 CEO HN10"
           onSuccess={() => {
             toast.success("Đã đồng bộ dữ liệu tài chính từ tệp import thành công!");
           }}

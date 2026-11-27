@@ -113,7 +113,7 @@ function eventDetail(
   return {
     event: eventSummary(registrationState),
     communityId: COMMUNITY_A,
-    communityName: "Hiệp hội A",
+    communityName: "CEOHN10 A",
     canRegister: registrationState === "available",
     checkinHandoff: registrationState === "registered",
   };
@@ -148,7 +148,7 @@ function oppDetail(interested: boolean): CommunityOpportunityDetailDTO {
     budgetMax: 900_000_000,
     poster: { memberRef: "member-poster-1", displayName: "Người đăng" },
     communityId: COMMUNITY_A,
-    communityName: "Hiệp hội A",
+    communityName: "CEOHN10 A",
     canExpressInterest: !interested,
     followUp: null,
     followUpHistory: [],

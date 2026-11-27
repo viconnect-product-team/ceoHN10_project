@@ -252,7 +252,7 @@ export function AllFeaturesModal({
     },
     {
       id: "renew",
-      name: "Hội phí",
+      name: "Phí tham gia CLB",
       category: "Đặc quyền & Học viên",
       desc: "Gia hạn tư cách Học viên, thanh toán VietQR",
       to: "/association/renew",

@@ -817,7 +817,7 @@ function EventDetailPage() {
                   <span>Chính sách hoàn tiền (Sự kiện có thu phí)</span>
                 </div>
                 <p className="text-[11px] leading-relaxed">
-                  Sự kiện này có người tham gia có phí. Theo quy chế của Hiệp hội, các khoản phí đã thanh toán sẽ được
+                  Sự kiện này có người tham gia có phí. Theo quy chế của CEOHN10, các khoản phí đã thanh toán sẽ được
                   hoàn trả trong vòng 3 - 5 ngày làm việc.
                 </p>
                 <input

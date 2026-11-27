@@ -147,7 +147,7 @@ export function TaskFormModal({
 
   const creatorRole = useMemo(() => {
     if (user?.title) return user.title;
-    if (isPresident) return 'Chủ tịch Hiệp hội';
+    if (isPresident) return 'Chủ tịch CEOHN10';
     if (isAdmin) return 'Quản trị viên';
     if (isGeneralSecretary) return 'Tổng thư ký';
     if (isDepartmentLeader) return `Trưởng ${userDepartment || 'Ban chuyên môn'}`;

@@ -133,7 +133,7 @@ export function GoogleFormEventRegistrationModal({
           seatOrTable: form.banquetChoice,
           ticketType: form.role,
           eventTime: event.date,
-          eventAddress: event.location || "Văn phòng Hiệp hội CEO HN10",
+          eventAddress: event.location || "Văn phòng CEOHN10 CEO HN10",
           qrCodeDataUrl: `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=CEO HN10-${finalTicketCode}`,
         });
       }
@@ -292,7 +292,7 @@ export function GoogleFormEventRegistrationModal({
                       <CalendarDays className="h-3.5 w-3.5 text-[#673ab7]" /> {event.date}
                     </span>
                     <span className="flex items-center gap-1.5 font-medium text-gray-700">
-                      <MapPin className="h-3.5 w-3.5 text-[#673ab7]" /> {event.location || "Văn phòng Hiệp hội"}
+                      <MapPin className="h-3.5 w-3.5 text-[#673ab7]" /> {event.location || "Văn phòng CEOHN10"}
                     </span>
                     <span className="text-red-500 font-semibold">* Bắt buộc</span>
                   </div>
@@ -407,7 +407,7 @@ export function GoogleFormEventRegistrationModal({
                     "Học viên chính thức (Official Member)",
                     "Khách mời VIP / Diễn giả (VIP Speaker)",
                     "Đại diện Nhà tài trợ (Sponsor Delegate)",
-                    "Doanh nhân tìm hiểu gia nhập Hiệp hội",
+                    "Doanh nhân tìm hiểu gia nhập CEOHN10",
                   ].map((r) => (
                     <label key={r} className="flex items-center gap-3 text-sm text-gray-700 cursor-pointer">
                       <input

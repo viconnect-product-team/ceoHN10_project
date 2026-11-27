@@ -157,11 +157,11 @@ export function SponsorExcelImportModal({
     const wb = XLSX.utils.book_new();
 
     const sampleData = [
-      ["HIỆP HỘI DOANH NHÂN CEO HN10 (HANOIBA)", "", "", "", "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM"],
+      ["CEOHN10 DOANH NHÂN CEO HN10 (HANOIBA)", "", "", "", "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM"],
       ["BAN XÚC TIẾN THƯƠNG MẠI & TÀI TRỢ", "", "", "", "Độc lập - Tự do - Hạnh phúc"],
       [],
       ["", "", "BẢNG MẪU NHẬP DỮ LIỆU ĐỐI TÁC & NHÀ TÀI TRỢ CHÍNH THỨC"],
-      ["(Mẫu chuẩn hóa hệ thống quản trị dữ liệu Hiệp Hội Doanh Nhân CEO HN10)"],
+      ["(Mẫu chuẩn hóa hệ thống quản trị dữ liệu CEOHN10 Doanh Nhân CEO HN10)"],
       [],
       [
         "STT",

@@ -31,10 +31,10 @@ type AiChatInput = {
 const MAX_MESSAGES = 20;
 const MAX_CHARS = 4000;
 
-const SYSTEM_PROMPT = `Bạn là Trợ lý AI của nền tảng quản trị Hiệp hội (Association Hub).
+const SYSTEM_PROMPT = `Bạn là Trợ lý AI của nền tảng quản trị CEOHN10 (Association Hub).
 Nguyên tắc bắt buộc:
-- Chỉ trả lời dựa trên dữ liệu và ngữ cảnh được cung cấp. TUYỆT ĐỐI không bịa số liệu, tên Học viên, số tiền hội phí, hay nguồn tham chiếu.
-- Nếu chưa có dữ liệu thực để trả lời, hãy nói rõ giới hạn: bạn đang ở chế độ chỉ đọc và chưa được kết nối trực tiếp với dữ liệu hiệp hội trong phiên này.
+- Chỉ trả lời dựa trên dữ liệu và ngữ cảnh được cung cấp. TUYỆT ĐỐI không bịa số liệu, tên Học viên, số tiền phí tham gia CLB, hay nguồn tham chiếu.
+- Nếu chưa có dữ liệu thực để trả lời, hãy nói rõ giới hạn: bạn đang ở chế độ chỉ đọc và chưa được kết nối trực tiếp với dữ liệu CEOHN10 trong phiên này.
 - Không tiết lộ thông tin nhạy cảm hoặc dữ liệu vượt quá quyền của người dùng.
 - Trả lời ngắn gọn, chuyên nghiệp, bằng tiếng Việt (trừ khi người dùng dùng ngôn ngữ khác).
 - Khi được yêu cầu soạn thảo (thông báo, email), hãy soạn nội dung nhưng nhắc người dùng kiểm tra trước khi gửi.`;
@@ -98,15 +98,15 @@ export const askAssistant = createServerFn({ method: "POST" })
       "marketplace",
       "thông báo",
       ...(canAccessAdminData
-        ? ["hội phí / tài chính", "báo cáo lãnh đạo", "quản trị Học viên"]
+        ? ["phí tham gia CLB / tài chính", "báo cáo lãnh đạo", "quản trị Học viên"]
         : []),
     ];
     const deniedNote = canAccessAdminData
       ? "Người dùng có quyền quản trị."
-      : "Người dùng KHÔNG có quyền quản trị: TUYỆT ĐỐI không tiết lộ hội phí, số liệu tài chính, báo cáo lãnh đạo hay dữ liệu quản trị. Nếu được hỏi, hãy từ chối và giải thích rằng cần quyền quản trị.";
+      : "Người dùng KHÔNG có quyền quản trị: TUYỆT ĐỐI không tiết lộ phí tham gia CLB, số liệu tài chính, báo cáo lãnh đạo hay dữ liệu quản trị. Nếu được hỏi, hãy từ chối và giải thích rằng cần quyền quản trị.";
 
     const scopePrompt = `Bối cảnh phân quyền:
-- Người dùng thuộc hiệp hội có mã ${associationId ?? "unknown"}. Chỉ trả lời trong phạm vi hiệp hội này.
+- Người dùng thuộc CEOHN10 có mã ${associationId ?? "unknown"}. Chỉ trả lời trong phạm vi CEOHN10 này.
 - Vai trò: ${[...roleSet].join(", ") || "member"}.
 - Nguồn dữ liệu được phép: ${allowedScopes.join("; ")}.
 - ${deniedNote}

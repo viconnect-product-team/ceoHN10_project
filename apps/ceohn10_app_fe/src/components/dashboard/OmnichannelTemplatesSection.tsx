@@ -25,7 +25,7 @@ export function OmnichannelTemplatesSection() {
               Hệ Thống Mẫu Email &amp; Câu Trả Lời Nhanh
             </h3>
             <p className="max-w-2xl text-xs text-slate-500 dark:text-slate-400">
-              Quản lý tập trung các mẫu Email HTML Dynamic visual phục vụ gửi thư mời, hội phí, kỷ niệm và kho phản hồi nhanh cho Học viên CLB CEO HN10.
+              Quản lý tập trung các mẫu Email HTML Dynamic visual phục vụ gửi thư mời, phí tham gia CLB, kỷ niệm và kho phản hồi nhanh cho Học viên CLB CEO HN10.
             </p>
           </div>
 

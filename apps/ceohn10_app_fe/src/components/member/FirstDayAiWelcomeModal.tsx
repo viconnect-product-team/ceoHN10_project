@@ -217,7 +217,7 @@ export function FirstDayAiWelcomeModal({ onOpenTour }: FirstDayAiWelcomeModalPro
                 <span className="px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-[#003B95] dark:text-blue-300 font-extrabold text-[10px] uppercase">
                   {greetingInfo.subBadge}
                 </span>
-                <span className="text-xs text-slate-500 dark:text-slate-400">Hiệp hội Doanh nhân CEO HN10</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">CEOHN10 Doanh nhân CEO HN10</span>
               </div>
               <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white mt-1">
                 {greetingInfo.greeting} {memberName}!

@@ -56,7 +56,7 @@ export class VotingRepository {
             title:
               'Thông qua Báo cáo Tài chính kiểm toán 2025 & Dự toán Ngân sách 2026',
             description:
-              'Căn cứ Điều lệ Hiệp hội, Ban Điều Hành kính trình toàn thể Quý Học viên biểu quyết thông qua báo cáo quyết toán tài chính năm 2025 và hạn mức phân bổ ngân sách xúc tiến thương mại năm 2026.',
+              'Căn cứ Điều lệ CEOHN10, Ban Điều Hành kính trình toàn thể Quý Học viên biểu quyết thông qua báo cáo quyết toán tài chính năm 2025 và hạn mức phân bổ ngân sách xúc tiến thương mại năm 2026.',
             status: 'open',
             startDate: new Date('2026-09-20'),
             endDate: new Date('2026-12-31'),

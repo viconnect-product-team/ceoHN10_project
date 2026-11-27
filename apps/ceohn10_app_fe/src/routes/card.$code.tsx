@@ -54,7 +54,7 @@ export const Route = createFileRoute("/card/$code")({
         to="/association"
         className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#003B95] px-5 py-2.5 text-xs font-bold text-white shadow-md hover:bg-[#002B70] transition"
       >
-        <ArrowLeft className="h-4 w-4" /> Về ứng dụng Hiệp hội
+        <ArrowLeft className="h-4 w-4" /> Về ứng dụng CEOHN10
       </Link>
     </div>
   ),
@@ -69,7 +69,7 @@ export const Route = createFileRoute("/card/$code")({
         to="/association"
         className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#003B95] px-5 py-2.5 text-xs font-bold text-white shadow-md hover:bg-[#002B70] transition"
       >
-        <ArrowLeft className="h-4 w-4" /> Về ứng dụng Hiệp hội
+        <ArrowLeft className="h-4 w-4" /> Về ứng dụng CEOHN10
       </Link>
     </div>
   ),
@@ -94,7 +94,7 @@ const T = {
   region: { vi: "Khu vực hoạt động", en: "Region" },
   address: { vi: "Trụ sở / Địa chỉ", en: "Address" },
   website: { vi: "Website doanh nghiệp", en: "Website" },
-  back: { vi: "Về App Hiệp Hội", en: "Back to Association App" },
+  back: { vi: "Về App CEOHN10", en: "Back to Association App" },
   saveContact: { vi: "Lưu danh bạ", en: "Save Contact" },
   shareCard: { vi: "Chia sẻ", en: "Share" },
   flipCard: { vi: "Lật thẻ", en: "Flip Card" },
@@ -175,7 +175,7 @@ function PublicCardView() {
           to="/association"
           className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#003B95] px-5 py-2.5 text-xs font-bold text-white shadow-md hover:bg-[#002B70] transition"
         >
-          <ArrowLeft className="h-4 w-4" /> Về trang chủ Hiệp hội
+          <ArrowLeft className="h-4 w-4" /> Về trang chủ CEOHN10
         </Link>
       </div>
     );

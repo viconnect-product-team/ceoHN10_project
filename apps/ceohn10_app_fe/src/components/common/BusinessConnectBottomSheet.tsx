@@ -70,7 +70,7 @@ export function BusinessConnectBottomSheet({
   });
   const [meetingTime, setMeetingTime] = useState("09:30");
   const [offlineVenue, setOfflineVenue] = useState(
-    "Văn phòng Hiệp hội CEO HN10, Tòa V-Tower, 649 Kim Mã, Hà Nội"
+    "Văn phòng CEOHN10 CEO HN10, Tòa V-Tower, 649 Kim Mã, Hà Nội"
   );
   const [onlinePlatform, setOnlinePlatform] = useState<"google_meet" | "zoom" | "uniwork">("google_meet");
   const [onlineUrl, setOnlineUrl] = useState("https://meet.google.com/ceohn10-vip");
@@ -588,7 +588,7 @@ export function BusinessConnectBottomSheet({
                 </label>
                 <div className="flex flex-wrap gap-1 mb-1">
                   {[
-                    "Văn phòng Hiệp hội CEO HN10, Tòa V-Tower, 649 Kim Mã, Hà Nội",
+                    "Văn phòng CEOHN10 CEO HN10, Tòa V-Tower, 649 Kim Mã, Hà Nội",
                     "Trụ sở văn phòng của tôi",
                     "Trụ sở văn phòng của đối tác",
                   ].map((loc) => (

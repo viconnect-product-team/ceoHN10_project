@@ -48,7 +48,7 @@ interface UnitNode {
 export function FinanceUnitTreeSection({
   transactions,
   type = "both",
-  title = "Cây Cấu Trúc Đơn Vị & Ngân Sách Hiệp Hội CEO HN10",
+  title = "Cây Cấu Trúc Đơn Vị & Ngân Sách CEOHN10 CEO HN10",
   subtitle = "Sơ đồ phân bổ và thực hiện ngân sách chi tiết theo 6 Ban chuyên môn và Khối Doanh nghiệp",
   className = "",
   onSelectUnit,
@@ -93,7 +93,7 @@ export function FinanceUnitTreeSection({
     };
 
     const boardTx = filterTx(["điều hành", "ban điều hành", "đại hội", "tiếp khách", "hội đồng", "chiến lược", "văn phòng"]);
-    const memberTx = filterTx(["thành viên", "hội phí", "Học viên", "kết nạp", "gia hạn", "thẻ"]);
+    const memberTx = filterTx(["thành viên", "phí tham gia CLB", "Học viên", "kết nạp", "gia hạn", "thẻ"]);
     const tradeTx = filterTx(["xúc tiến", "giao thương", "b2b", "thương mại", "diễn đàn", "hội chợ", "kết nối"]);
     const mediaTx = filterTx(["truyền thông", "sự kiện", "gala", "kỷ yếu", "báo chí", "vé", "ấn phẩm", "quà tặng"]);
     const financeTx = filterTx(["tài chính", "sổ quỹ", "ngân hàng", "lãi", "kiểm toán", "vận hành"]);
@@ -121,7 +121,7 @@ export function FinanceUnitTreeSection({
 
     return {
       id: "root",
-      name: "HIỆP HỘI DOANH NHÂN CEO HN10 (HANOIBA)",
+      name: "CEOHN10 DOANH NHÂN CEO HN10 (HANOIBA)",
       code: "CEO HN10-HQ",
       roleDesc: "Cấp điều hành trung tâm toàn bộ hệ thống tài chính & ngân sách",
       icon: Building2,
@@ -134,7 +134,7 @@ export function FinanceUnitTreeSection({
       children: [
         {
           id: "board",
-          name: "Ban Điều Hành Hiệp Hội",
+          name: "Ban Điều Hành CEOHN10",
           code: "DEPT-BĐH",
           roleDesc: "Chủ tịch & Thường trực BĐH phê duyệt hạn mức thu chi chiến lược",
           icon: ShieldCheck,
@@ -149,7 +149,7 @@ export function FinanceUnitTreeSection({
           id: "membership",
           name: "Ban Thành Viên & Phát Triển Học viên",
           code: "DEPT-BTV",
-          roleDesc: "Phụ trách thu Hội phí niên liễm, thẩm định hồ sơ kết nạp và gia hạn Học viên",
+          roleDesc: "Phụ trách thu Phí tham gia CLB niên liễm, thẩm định hồ sơ kết nạp và gia hạn Học viên",
           icon: Users,
           color: "text-blue-600 dark:text-blue-400",
           bgColor: "bg-blue-50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-900/50",
@@ -447,7 +447,7 @@ export function FinanceUnitTreeSection({
         <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tổng Thu Theo Cây</span>
           <h4 className="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-1 font-mono">{fmt.money(totalSystemIncome || 1250000000)}</h4>
-          <p className="text-[11px] text-slate-500 mt-0.5">Hội phí, Vé sự kiện &amp; Tài trợ</p>
+          <p className="text-[11px] text-slate-500 mt-0.5">Phí tham gia CLB, Vé sự kiện &amp; Tài trợ</p>
         </div>
         <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tổng Chi Theo Cây</span>

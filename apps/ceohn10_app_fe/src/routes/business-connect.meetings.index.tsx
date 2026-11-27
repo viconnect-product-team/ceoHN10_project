@@ -112,7 +112,7 @@ function MeetingsWorkspacePage() {
           venueType: isOnline ? "online" : "offline",
           venue: isOnline
             ? (platform === "uniwork" ? "Phòng họp trực tuyến Uniwork" : (m.location || tm.venue || "Họp trực tuyến"))
-            : (m.location || tm.venue || "Văn phòng Hiệp hội CEO HN10"),
+            : (m.location || tm.venue || "Văn phòng CEOHN10 CEO HN10"),
           onlineUrl: meetingUrl,
           onlinePlatform: platform,
           notes: tm.notes || m.urgent_reason,

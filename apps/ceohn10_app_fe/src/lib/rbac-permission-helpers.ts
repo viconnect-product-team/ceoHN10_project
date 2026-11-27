@@ -570,7 +570,7 @@ export const GRANULAR_PERMISSION_CATEGORIES: GranularPermCategory[] = [
   {
     category: "7. Quản trị & Cài đặt hệ thống",
     items: [
-      { key: "/documents", name: "Quản lý Tài liệu & Học liệu", desc: "Quản lý tài liệu lớp học và hiệp hội" },
+      { key: "/documents", name: "Quản lý Tài liệu & Học liệu", desc: "Quản lý tài liệu lớp học và CEOHN10" },
       { key: "/accounts", name: "Quản trị Người dùng & Phân quyền", desc: "Thêm mới và gán quyền tài khoản" },
       { key: "/permissions", name: "Ma Trận Phân Quyền RBAC", desc: "Cấu hình phân quyền hệ thống" },
       { key: "/settings", name: "Cài đặt Cấu hình SePay / Zalo OA", desc: "Cấu hình tích hợp thanh toán và Zalo" },

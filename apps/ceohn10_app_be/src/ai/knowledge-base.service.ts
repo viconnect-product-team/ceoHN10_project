@@ -131,7 +131,7 @@ Bạn đã được nạp đầy đủ và nắm vững 100% các tài liệu ng
 - 7 Ban chuyên môn nòng cốt:
   + Ban Học tập: Quản lý 30 khóa học, lịch đào tạo, học liệu số, phòng họp Jitsi Meet.
   + Ban Sự kiện & Hậu cần: Tổ chức sự kiện lớn, đăng ký vé điện tử, bốc thăm may mắn, check-in mã QR.
-  + Ban Tài chính & Tài trợ: Quản lý 2 túi quỹ (Quỹ hoạt động tiền mặt/hiện vật & Quỹ thiện nguyện CSR), thu hội phí, báo cáo tài trợ không gán gói cố định (mở rộng tự điền nội dung, phân loại tiền/hiện vật rõ ràng).
+  + Ban Tài chính & Tài trợ: Quản lý 2 túi quỹ (Quỹ hoạt động tiền mặt/hiện vật & Quỹ thiện nguyện CSR), thu phí tham gia CLB, báo cáo tài trợ không gán gói cố định (mở rộng tự điền nội dung, phân loại tiền/hiện vật rõ ràng).
   + Ban Truyền thông: Thông báo sự kiện/lớp học, tin tức báo chí, album ảnh sự kiện.
   + Ban Công nghệ: Hạ tầng Docker Nginx, bảo mật JWT, phân quyền RBAC, AI Trợ lý.
   + Ban Đối ngoại & Giao thương: Kết nối B2B, phân loại doanh nghiệp, xúc tiến thương mại.
@@ -142,12 +142,12 @@ Bạn đã được nạp đầy đủ và nắm vững 100% các tài liệu ng
 - Nguyên tắc bất di bất dịch: TUYỆT ĐỐI KHÔNG HARDCODE MOCK DATA, mọi thao tác lưu/đọc đều từ PostgreSQL này.
 - Các bảng CSDL cốt lõi:
   * \`public.ceohn10_users\`: Tài khoản người dùng, email, mật khẩu băm, role.
-  * \`public.members\`: Hồ sơ Học viên doanh nhân, mã HV (code), chức vụ, doanh nghiệp, ban bệ, tình trạng hội phí.
+  * \`public.members\`: Hồ sơ Học viên doanh nhân, mã HV (code), chức vụ, doanh nghiệp, ban bệ, tình trạng phí tham gia CLB.
   * \`public.events\`: Sự kiện, ngày giờ, địa điểm, kinh phí, loại quỹ (fund_type: general/csr), số vé.
   * \`public.event_registrations\`: Đăng ký sự kiện, mã vé, mã lucky draw, trạng thái điểm danh.
   * \`public.trainings\`: Lịch học, khóa đào tạo, giảng viên, link phòng họp Jitsi, tài liệu đính kèm.
   * \`public.sponsors\`: Nhà tài trợ, loại tài trợ (tiền mặt / hiện vật / quỹ thiện nguyện CSR), giá trị tài trợ.
-  * \`public.invoices\` & \`public.transactions\`: Hóa đơn hội phí và sổ quỹ thu chi thời gian thực.
+  * \`public.invoices\` & \`public.transactions\`: Hóa đơn phí tham gia CLB và sổ quỹ thu chi thời gian thực.
   * \`public.templates\`: Danh mục biểu mẫu định dạng Excel, Word, PDF (không hardcode cấu trúc báo cáo).
   * \`public.app_settings\`: Cấu hình hệ thống, ma trận phân quyền CRM (crm_permission_matrix) và phân quyền AI (ai_permission_matrix).
 
@@ -162,7 +162,7 @@ Bạn đã được nạp đầy đủ và nắm vững 100% các tài liệu ng
   * \`/api/sponsors\`: Quản lý tài trợ, tự động cộng dồn vào quỹ tiền mặt, hiện vật hoặc thiện nguyện.
   * \`/api/admin/transactions\`: Sổ quỹ thu chi thời gian thực.
   * \`/api/templates\`: Quản lý biểu mẫu tải lên và xuất báo cáo.
-  * \`/api/ai/*\`: Trợ lý AI, phân tích tài liệu, nhắc hội phí, cố vấn kinh doanh.
+  * \`/api/ai/*\`: Trợ lý AI, phân tích tài liệu, nhắc phí tham gia CLB, cố vấn kinh doanh.
 
 4. NGUYÊN TẮC HÀNH ĐỘNG CỦA AI:
 - Khi người dùng hỏi về nghiệp vụ, hãy giải thích rõ ràng theo tài liệu BRD và SRS.

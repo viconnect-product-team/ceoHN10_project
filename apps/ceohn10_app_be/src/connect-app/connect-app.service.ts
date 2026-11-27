@@ -1164,7 +1164,7 @@ export class ConnectAppService implements OnModuleInit {
       }
     }
 
-    // Bổ sung thông báo từ Hiệp hội CEO HN10 (member_notifications, hội phí quá hạn, cơ hội, tin nhắn BQT)
+    // Bổ sung thông báo từ CEOHN10 CEO HN10 (member_notifications, phí tham gia CLB quá hạn, cơ hội, tin nhắn BQT)
     try {
       const members = await this.prisma.$queryRaw<any[]>`
         SELECT id, code, name, email, payment_status, level, term_end
@@ -1188,7 +1188,7 @@ export class ConnectAppService implements OnModuleInit {
         if (m.email) memberKeys.push(String(m.email).toLowerCase());
       }
 
-      // 1. Lấy thông báo cá nhân từ hiệp hội (public.member_notifications)
+      // 1. Lấy thông báo cá nhân từ CEOHN10 (public.member_notifications)
       const memNotifs = await this.prisma.$queryRaw<any[]>`
         SELECT id, recipient_id, title, body, read, dismissed, ref_type, ref_id, created_at
         FROM public.member_notifications
@@ -1256,7 +1256,7 @@ export class ConnectAppService implements OnModuleInit {
         });
       }
 
-      // 2. Kiểm tra trạng thái hội phí quá hạn chưa thanh toán
+      // 2. Kiểm tra trạng thái phí tham gia CLB quá hạn chưa thanh toán
       const overdueMember = (members as any[]).find(
         (m: any) => m.payment_status === 'overdue' || m.dues_status === 'overdue',
       );
@@ -1274,8 +1274,8 @@ export class ConnectAppService implements OnModuleInit {
         const invAmount = inv?.amount
           ? Number(inv.amount).toLocaleString('vi-VN') + ' đ'
           : 'Cần thanh toán';
-        const invTitle = 'Thông báo: Hội phí Học viên quá hạn chưa thanh toán';
-        const invBody = `Hội phí của Học viên ${overdueMember.name || overdueMember.full_name || 'CEO HN10'} (${invAmount}) đã quá hạn thanh toán. Vui lòng hoàn tất đóng phí để tiếp tục duy trì quyền lợi và kết nối B2B trên hệ thống.`;
+        const invTitle = 'Thông báo: Phí tham gia CLB Học viên quá hạn chưa thanh toán';
+        const invBody = `Phí tham gia CLB của Học viên ${overdueMember.name || overdueMember.full_name || 'CEO HN10'} (${invAmount}) đã quá hạn thanh toán. Vui lòng hoàn tất đóng phí để tiếp tục duy trì quyền lợi và kết nối B2B trên hệ thống.`;
 
         // Chỉ thêm nếu chưa có thông báo tương đương
         const alreadyHasOverdue = mapped.some(
@@ -1410,12 +1410,12 @@ export class ConnectAppService implements OnModuleInit {
             sourceRecordId: msg.id,
             eventKind: 'system_broadcast',
             notificationKind: 'system_broadcast',
-            titleKey: 'Tin nhắn từ Ban Quản Trị Hiệp Hội',
+            titleKey: 'Tin nhắn từ Ban Quản Trị CEOHN10',
             bodyKey: cleanText,
             appScope: 'all',
             targetApp: 'all',
             safeDisplayData: {
-              title: 'Tin nhắn từ Ban Quản Trị Hiệp Hội',
+              title: 'Tin nhắn từ Ban Quản Trị CEOHN10',
               message: cleanText,
               body: cleanText,
               actionUrl: '/association/messages',

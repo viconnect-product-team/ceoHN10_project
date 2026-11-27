@@ -1577,7 +1577,7 @@ function RegPage() {
                   Email: {selectedSurveyReg.email} · Mã: {selectedSurveyReg.id}
                 </p>
                 <p className="text-muted-foreground mt-0.5">
-                  Doanh nghiệp: <strong>{selectedSurveyReg.company || "Công ty Học viên Hiệp Hội"}</strong>
+                  Doanh nghiệp: <strong>{selectedSurveyReg.company || "Công ty Học viên CEOHN10"}</strong>
                 </p>
               </div>
 

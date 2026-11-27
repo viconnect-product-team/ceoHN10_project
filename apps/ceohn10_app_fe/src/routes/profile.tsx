@@ -56,7 +56,7 @@ const PERMISSION_DESCRIPTIONS: Record<string, { label: string; desc: string }> =
   "member:view": { label: "Xem Danh bạ Học viên", desc: "Tra cứu hồ sơ và danh sách các doanh nghiệp Học viên" },
   "member:edit": { label: "Chỉnh sửa Hồ sơ Học viên", desc: "Cập nhật thông tin chi tiết của Học viên" },
   "member:approve": { label: "Phê duyệt Học viên", desc: "Xét duyệt hồ sơ đăng ký gia nhập CLB mới" },
-  "member:renew": { label: "Gia hạn Niên liễm", desc: "Xác nhận và gia hạn hội phí định kỳ cho Học viên" },
+  "member:renew": { label: "Gia hạn Niên liễm", desc: "Xác nhận và gia hạn phí tham gia CLB định kỳ cho Học viên" },
   "event:view": { label: "Xem Sự kiện", desc: "Theo dõi lịch trình các sự kiện và hội thảo" },
   "event:create": { label: "Quản lý Sự kiện", desc: "Khởi tạo, điều chỉnh và phát hành sự kiện CLB" },
   "event:checkin": { label: "Quét vé Check-in", desc: "Quét mã QR soát vé Học viên tại cổng sự kiện" },

@@ -68,7 +68,7 @@ const INITIAL_VOTES: MeetingVoteSession[] = [
     organizer: "Ban Thường Trực CLB CEO HN10",
     voteTitle: "Thông qua Báo cáo Tài chính kiểm toán 2025 & Dự toán Ngân sách 2026",
     voteDescription:
-      "Căn cứ Điều lệ Hiệp hội, Ban Điều Hành kính trình toàn thể Quý Học viên biểu quyết thông qua báo cáo quyết toán tài chính năm 2025 và hạn mức phân bổ ngân sách xúc tiến thương mại năm 2026.",
+      "Căn cứ Điều lệ CEOHN10, Ban Điều Hành kính trình toàn thể Quý Học viên biểu quyết thông qua báo cáo quyết toán tài chính năm 2025 và hạn mức phân bổ ngân sách xúc tiến thương mại năm 2026.",
     status: "active",
     totalEligibleMembers: 320,
     totalVoted: 248,
@@ -191,15 +191,15 @@ function AssociationVotingScreen() {
             eventId: p.event_id || p.eventId,
             meetingTitle: p.event_name
               ? `Sự kiện: ${p.event_name}`
-              : p.title || "Kỳ Họp Hiệp Hội CEO HN10",
+              : p.title || "Kỳ Họp CEOHN10 CEO HN10",
             meetingType: "dai-hoi",
-            meetingTypeName: p.event_name ? "Sự Kiện Hiệp Hội" : "Biểu Quyết Trực Tuyến",
+            meetingTypeName: p.event_name ? "Sự Kiện CEOHN10" : "Biểu Quyết Trực Tuyến",
             meetingDate: p.created_at
               ? new Date(p.created_at).toLocaleDateString("vi-VN")
               : "28/09/2026",
             meetingTime: "Toàn phiên",
-            meetingLocation: "Hội nghị Hiệp hội & Trực tuyến qua App",
-            organizer: "Ban Quản Trị Hiệp Hội CEO HN10",
+            meetingLocation: "Hội nghị CEOHN10 & Trực tuyến qua App",
+            organizer: "Ban Quản Trị CEOHN10 CEO HN10",
             voteTitle: p.title,
             voteDescription:
               p.description ||
@@ -268,7 +268,7 @@ function AssociationVotingScreen() {
     });
 
     toast.success("Học viên đã biểu quyết thành công!", {
-      description: "Ý kiến của Quý CEO đã được ghi nhận trực tiếp vào hệ thống CRM Hiệp hội.",
+      description: "Ý kiến của Quý CEO đã được ghi nhận trực tiếp vào hệ thống CRM CEOHN10.",
     });
 
     setTimeout(() => {
@@ -309,7 +309,7 @@ function AssociationVotingScreen() {
             <div>
               <h2 className="text-sm font-black tracking-tight">BIỂU QUYẾT THEO SỰ KIỆN & CUỘC HỌP</h2>
               <p className="text-[11px] text-sky-200/90 mt-0.5">
-                Gắn liền với các kỳ đại hội, hội nghị Ban Chấp Hành & sự kiện hiệp hội
+                Gắn liền với các kỳ đại hội, hội nghị Ban Chấp Hành & sự kiện CEOHN10
               </p>
             </div>
           </div>

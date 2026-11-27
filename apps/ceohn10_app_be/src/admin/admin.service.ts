@@ -273,7 +273,7 @@ export class AdminService implements OnModuleInit {
       `.catch(() => []);
 
       if (!rows || rows.length === 0) {
-        // Tự động đồng bộ hóa đơn hội phí niên khóa từ bảng members
+        // Tự động đồng bộ hóa đơn phí tham gia CLB niên khóa từ bảng members
         const memberRows = await this.prisma.$queryRaw<any[]>`
           SELECT * FROM public.members ORDER BY created_at ASC
         `.catch(() => []);
@@ -293,7 +293,7 @@ export class AdminService implements OnModuleInit {
             await this.prisma.$executeRawUnsafe(
               `INSERT INTO public.invoices (
                 id, member_id, invoice_no, year, amount, due_date, paid_at, status, method, category, customer_name, customer_email, customer_phone
-              ) VALUES ($1, $2, $3, $4, $5, $6::date, $7::date, $8, $9, 'Hội phí niên khóa 2026', $10, $11, $12)
+              ) VALUES ($1, $2, $3, $4, $5, $6::date, $7::date, $8, $9, 'Phí tham gia CLB niên khóa 2026', $10, $11, $12)
               ON CONFLICT (id) DO NOTHING`,
               invId,
               String(m.id),
@@ -612,7 +612,7 @@ export class AdminService implements OnModuleInit {
           const formattedAmount = Number(
             existing.invoice.amount || 0,
           ).toLocaleString('vi-VN');
-          const notifTitle = `[Nhắc nhở] Quá hạn thanh toán hội phí`;
+          const notifTitle = `[Nhắc nhở] Quá hạn thanh toán phí tham gia CLB`;
           const notifBody = `Hóa đơn ${existing.invoice.invoiceNo || id} (Số tiền: ${formattedAmount} đ) của Quý Học viên đã quá hạn thanh toán ngày ${existing.invoice.dueDate || 'gần nhất'}. Vui lòng kiểm tra và hoàn tất thanh toán.`;
           const dedupeKey = `reminder-${id}-${Date.now()}`;
           const safeDisplayData = JSON.stringify({
@@ -920,8 +920,8 @@ export class AdminService implements OnModuleInit {
   /**
    * Tự động quét và đồng bộ các cảnh báo hệ thống vào public.notifications:
    * 1. 👤 Hồ sơ Học viên mới nộp đơn đang chờ duyệt (status = 'pending')
-   * 2. ⚠️ Học viên quá hạn hội phí (fee_paid = false && (new_term_end || term_end) < NOW())
-   * 3. ⏳ Học viên sắp đến hạn hội phí trong 30 ngày (term_end BETWEEN NOW() AND NOW() + 30 days)
+   * 2. ⚠️ Học viên quá hạn phí tham gia CLB (fee_paid = false && (new_term_end || term_end) < NOW())
+   * 3. ⏳ Học viên sắp đến hạn phí tham gia CLB trong 30 ngày (term_end BETWEEN NOW() AND NOW() + 30 days)
    * 4. Tự động dọn dẹp các cảnh báo đã xử lý xong (đã duyệt hoặc đã nộp phí)
    */
   async syncSystemAlertNotifications(associationId?: string): Promise<void> {
@@ -972,7 +972,7 @@ export class AdminService implements OnModuleInit {
         )
         .catch(() => { });
 
-      // 2. Quét Học viên quá hạn hội phí
+      // 2. Quét Học viên quá hạn phí tham gia CLB
       const overdueMembers = await this.prisma.$queryRaw<any[]>`
         SELECT id, code, name, company_name, term_end, new_term_end, fee_paid, payment_status, association_id
         FROM public.members
@@ -990,7 +990,7 @@ export class AdminService implements OnModuleInit {
         const dateStr = m.term_end
           ? new Date(m.term_end).toLocaleDateString('vi-VN')
           : 'kỳ trước';
-        const notifTitle = `⚠️ [Quá hạn hội phí] ${m.name} (${company})`;
+        const notifTitle = `⚠️ [Quá hạn phí tham gia CLB] ${m.name} (${company})`;
         const notifBody = `Học viên ${m.name} (${company}) đã quá hạn đóng phí niên liễm (Hạn đóng: ${dateStr}). Đề nghị Ban Thư Ký & Kế toán kiểm tra và đôn đốc thu phí.`;
 
         await this.prisma
@@ -1023,7 +1023,7 @@ export class AdminService implements OnModuleInit {
         )
         .catch(() => { });
 
-      // 3. Quét Học viên sắp đến hạn hội phí trong 30 ngày
+      // 3. Quét Học viên sắp đến hạn phí tham gia CLB trong 30 ngày
       const soonExpiringMembers = await this.prisma.$queryRaw<any[]>`
         SELECT id, code, name, company_name, term_end, new_term_end, fee_paid, association_id,
                ROUND(EXTRACT(EPOCH FROM (COALESCE(new_term_end, term_end)::timestamp - NOW())) / 86400) as days_left
@@ -1043,8 +1043,8 @@ export class AdminService implements OnModuleInit {
         const dateStr = m.term_end
           ? new Date(m.term_end).toLocaleDateString('vi-VN')
           : '';
-        const notifTitle = `⏳ [Cảnh báo sắp hết hạn hội phí] ${m.name}`;
-        const notifBody = `Học viên ${m.name} (${company}) sắp đến hạn đóng phí thường niên (còn ${days} ngày nữa, hạn: ${dateStr}). Đề nghị phát thông báo gia hạn hội phí.`;
+        const notifTitle = `⏳ [Cảnh báo sắp hết hạn phí tham gia CLB] ${m.name}`;
+        const notifBody = `Học viên ${m.name} (${company}) sắp đến hạn đóng phí thường niên (còn ${days} ngày nữa, hạn: ${dateStr}). Đề nghị phát thông báo gia hạn phí tham gia CLB.`;
 
         await this.prisma
           .$executeRawUnsafe(
@@ -2055,7 +2055,7 @@ export class AdminService implements OnModuleInit {
       channel_events: 'Kênh Sự Kiện & Hội Nghị',
     };
     const channelLabel =
-      channelLabelMap[targetChannel] || 'Ban Điều Hành Hiệp Hội CEO HN10';
+      channelLabelMap[targetChannel] || 'Ban Điều Hành CEOHN10 CEO HN10';
     const broadcastMsgText = `📢 [${channelLabel.toUpperCase()}] ${title}\n\n${body}`;
 
     await this.prisma
@@ -2328,7 +2328,7 @@ export class AdminService implements OnModuleInit {
           .catch(() => { });
       }
 
-      // B. Ghi vào public.member_notifications cho App Hiệp Hội
+      // B. Ghi vào public.member_notifications cho App CEOHN10
       const memberRecipientId = targetMemberCode || targetUserId || att.id;
       if (memberRecipientId) {
         await this.prisma
@@ -2714,7 +2714,7 @@ export class AdminService implements OnModuleInit {
         SELECT COALESCE(SUM(amount), 0) as total_dues, COUNT(*) as cnt
         FROM public.transactions
         WHERE type = 'income' AND (
-          category ILIKE '%due%' OR category ILIKE '%hội phí%' OR category ILIKE '%fee%' OR fund_type = 'general'
+          category ILIKE '%due%' OR category ILIKE '%phí tham gia CLB%' OR category ILIKE '%fee%' OR fund_type = 'general'
         );
       `).catch(() => [{ total_dues: 0, cnt: 0 }]);
 
@@ -2814,7 +2814,7 @@ export class AdminService implements OnModuleInit {
       return {
         generalFund: {
           name: 'Quỹ Chung CLB CEO HN10',
-          source: 'Hội phí niên liễm Học viên',
+          source: 'Phí tham gia CLB niên liễm Học viên',
           totalIncome: totalDues,
           totalExpense: totalGeneralExpense,
           balance: generalBalance,
@@ -3365,7 +3365,7 @@ export class AdminService implements OnModuleInit {
             id: 'feat_income',
             name: 'Khoản thu',
             route: '/income',
-            description: 'Quản lý các khoản thu và hội phí',
+            description: 'Quản lý các khoản thu và phí tham gia CLB',
             enabled: true,
             actions: [
               { id: 'act_inc_view', name: '[Xem] Xem phiếu thu', code: 'INC_VIEW', description: 'Tra cứu phiếu thu', apiEndpoint: 'GET /api/finance/income', roles: { ...allRolesGranted } },
@@ -5001,7 +5001,7 @@ export class AdminService implements OnModuleInit {
       const totalIncome = Math.max(
         Number(transIncomeRows[0]?.total_income || 0),
         Number(invoicePaidRows[0]?.total_invoice_paid || 0),
-        2560000000 // 2.56 tỷ hội phí & tài trợ CEO HN10
+        2560000000 // 2.56 tỷ phí tham gia CLB & tài trợ CEO HN10
       );
 
       const totalExpense = Math.max(
@@ -5014,7 +5014,7 @@ export class AdminService implements OnModuleInit {
       const calculatedSurplus = totalIncome - totalExpense;
 
       // 3. Phân bổ các túi quỹ chi tiết
-      // Quỹ Chung CLB (từ hội phí)
+      // Quỹ Chung CLB (từ phí tham gia CLB)
       const generalFundIncome = Math.round(totalIncome * 0.55);
       const generalFundExpense = Math.round(totalExpense * 0.60);
       const generalFundBalance = generalFundIncome - generalFundExpense;
@@ -5058,8 +5058,8 @@ export class AdminService implements OnModuleInit {
         fundsBreakdown: [
           {
             id: 'general_fund',
-            name: 'Túi Quỹ Chung CLB (Hội phí)',
-            category: 'Hội phí & Vận hành',
+            name: 'Túi Quỹ Chung CLB (Phí tham gia CLB)',
+            category: 'Phí tham gia CLB & Vận hành',
             balance: generalFundBalance,
             income: generalFundIncome,
             expense: generalFundExpense,
@@ -5073,7 +5073,7 @@ export class AdminService implements OnModuleInit {
             balance: sponsorCashBalance,
             income: sponsorCashIncome,
             expense: sponsorCashExpense,
-            description: 'Nguồn tiền mặt nhận tài trợ từ các doanh nghiệp hội viên và nhà tài trợ vàng/kim cương',
+            description: 'Nguồn tiền mặt nhận tài trợ từ các doanh ngCEOHN10 viên và nhà tài trợ vàng/kim cương',
             status: 'normal',
           },
           {
@@ -5251,7 +5251,7 @@ export class AdminService implements OnModuleInit {
         code: 'APP_ERP_A',
         category: 'erp',
         categoryLabel: 'ERP Doanh Nghiệp',
-        description: 'Tích hợp đồng bộ dữ liệu giao thương B2B, quản lý hàng hóa chuỗi cung ứng giữa các doanh nghiệp hội viên',
+        description: 'Tích hợp đồng bộ dữ liệu giao thương B2B, quản lý hàng hóa chuỗi cung ứng giữa các doanh ngCEOHN10 viên',
         endpointUrl: 'https://erp-a.viconnect.vn/api/v1',
         healthcheckUrl: 'https://erp-a.viconnect.vn/api/v1/health',
         authType: 'bearer_token',
@@ -5287,7 +5287,7 @@ export class AdminService implements OnModuleInit {
         code: 'APP_MISA_FINANCE_C',
         category: 'finance',
         categoryLabel: 'Kế Toán & Hóa Đơn',
-        description: 'Đồng bộ tự động hóa đơn hội phí, chứng từ chi tiêu sự kiện và báo cáo tài chính sang MISA',
+        description: 'Đồng bộ tự động hóa đơn phí tham gia CLB, chứng từ chi tiêu sự kiện và báo cáo tài chính sang MISA',
         endpointUrl: 'https://misa-api.connect.vn/api/v2',
         healthcheckUrl: 'https://misa-api.connect.vn/api/v2/ping',
         authType: 'oauth2',

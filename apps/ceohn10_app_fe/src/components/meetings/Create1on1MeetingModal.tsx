@@ -80,14 +80,14 @@ export function Create1on1MeetingModal({
   const [venueType, setVenueType] = useState<"offline" | "online">("offline");
   const [onlinePlatform, setOnlinePlatform] = useState<"uniwork" | "meet" | "zoom" | "custom">("uniwork");
   const [venue, setVenue] = useState(
-    "Văn phòng Hiệp hội CEO HN10, Tòa V-Tower, 649 Kim Mã, Hà Nội"
+    "Văn phòng CEOHN10 CEO HN10, Tòa V-Tower, 649 Kim Mã, Hà Nội"
   );
   const [onlineUrl, setOnlineUrl] = useState(
     () => `https://meet.uniwork.space/CEOHN10_Connect_${Math.floor(1000 + Math.random() * 9000)}`
   );
   const [reminderTier, setReminderTier] = useState<number>(2);
   const [notes, setNotes] = useState(
-    defaultNotes || "Trao đổi nhu cầu cung ứng nguyên vật liệu & giới thiệu các đối tác tiềm năng trong Hiệp hội."
+    defaultNotes || "Trao đổi nhu cầu cung ứng nguyên vật liệu & giới thiệu các đối tác tiềm năng trong CEOHN10."
   );
   const [externalLink, setExternalLink] = useState(defaultExternalLink || "");
 
@@ -276,7 +276,7 @@ export function Create1on1MeetingModal({
       createdAt: new Date().toISOString(),
     };
 
-    // Gọi API backend để lưu cuộc gặp vào CSDL hiệp hội & bắn thông báo tới đối tác
+    // Gọi API backend để lưu cuộc gặp vào CSDL CEOHN10 & bắn thông báo tới đối tác
     try {
       await fetchNestApi("/meetings", {
         method: "POST",
@@ -297,7 +297,7 @@ export function Create1on1MeetingModal({
             title: cleanMsg,
             date,
             time,
-            venue: isLoc ? venue : "Lịch họp hiệp hội",
+            venue: isLoc ? venue : "Lịch họp CEOHN10",
           },
           conflictingMeetings: [],
         });
@@ -393,7 +393,7 @@ export function Create1on1MeetingModal({
                 Tạo Cuộc Gặp Kết Nối 1-on-1
               </h3>
               <p className="text-xs text-muted-foreground">
-                Đồng bộ trực tiếp với Lịch kết nối giao thương Hiệp hội CEO HN10
+                Đồng bộ trực tiếp với Lịch kết nối giao thương CEOHN10 CEO HN10
               </p>
             </div>
           </div>
@@ -858,7 +858,7 @@ export function Create1on1MeetingModal({
                       ? `Đối tác: ${conflictModalData.primaryMeeting.partnerName}`
                       : `Người tổ chức: ${conflictModalData.primaryMeeting.organizer ||
                       conflictModalData.primaryMeeting.hostName ||
-                      "Hiệp hội"
+                      "CEOHN10"
                       }`}
                   </span>
                 </div>

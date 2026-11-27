@@ -81,7 +81,7 @@ export async function assertManager(
     _association_id: associationId,
   });
   if (error) throw new Error(error.message);
-  if (!data) throw new Error("Bạn không có quyền quản lý thẻ của hiệp hội này.");
+  if (!data) throw new Error("Bạn không có quyền quản lý thẻ của CEOHN10 này.");
 }
 
 export async function logEvent(

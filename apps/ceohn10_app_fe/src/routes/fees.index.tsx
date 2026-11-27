@@ -383,8 +383,8 @@ function FeesPage() {
       id: r.id,
       code: r.invoiceNo,
       date: r.paidAt || r.dueDate || new Date().toISOString(),
-      category: `Hội phí niên khóa ${r.year}`,
-      description: `Thu hội phí thường niên CLB Doanh Nhân CEO HN10 - ${r.member?.name || r.member?.contact || `Học viên ${r.member?.code || ""}`}`,
+      category: `Phí tham gia CLB niên khóa ${r.year}`,
+      description: `Thu phí tham gia CLB thường niên CLB Doanh Nhân CEO HN10 - ${r.member?.name || r.member?.contact || `Học viên ${r.member?.code || ""}`}`,
       amount: r.amount,
       recipient: r.member?.name || r.member?.contact || `Học viên ${r.member?.code || ""}`,
       method: r.method || "vnpay",
@@ -477,8 +477,8 @@ function FeesPage() {
   const handleExport = () => {
     const totalAmount = records.reduce((s, r) => s + (Number(r.amount) || 0), 0);
     exportToExcel<FeeRecord>({
-      title: `BÁO CÁO THEO DÕI THU HỘI PHÍ THƯỜNG NIÊN NĂM ${year}`,
-      subtitle: "Hiệp Hội Doanh Nhân CEO HN10 - HanoiBA",
+      title: `BÁO CÁO THEO DÕI THU PHÍ THAM GIA CLB THƯỜNG NIÊN NĂM ${year}`,
+      subtitle: "CEOHN10 Doanh Nhân CEO HN10 - HanoiBA",
       filename: `so-thu-hoi-phi-${year}`,
       sheetName: `Hoi_Phi_${year}`,
       data: records,
@@ -494,11 +494,11 @@ function FeesPage() {
         { header: "Phương thức", key: "method", width: 18, value: (r) => r.method ?? "Chuyển khoản" },
       ],
       summaryRows: [
-        ["TỔNG CỘNG HỘI PHÍ:", "", "", "", formatExcelCurrency(totalAmount) + " đ"],
+        ["TỔNG CỘNG PHÍ THAM GIA CLB:", "", "", "", formatExcelCurrency(totalAmount) + " đ"],
       ],
       signerTitles: ["NGƯỜI LẬP BIỂU", "THỦ QUỸ / KẾ TOÁN", "CHỦ TỊCH / ĐẠI DIỆN BQT"],
     });
-    toast.success("Đã xuất báo cáo hội phí chuẩn doanh nghiệp CEO HN10 (.xlsx)!");
+    toast.success("Đã xuất báo cáo phí tham gia CLB chuẩn doanh nghiệp CEO HN10 (.xlsx)!");
   };
 
   // Collection queue — overdue first (highest priority), then due-soon, then remaining unpaid.
@@ -524,8 +524,8 @@ function FeesPage() {
     if (rows.length === 0) return;
     const totalAmount = rows.reduce((s, r) => s + (Number(r.amount) || 0), 0);
     exportToExcel<FeeRecord>({
-      title: `DANH SÁCH HỘI PHÍ CHỌN LỌC - NĂM ${year}`,
-      subtitle: "Hiệp Hội Doanh Nhân CEO HN10 - HanoiBA",
+      title: `DANH SÁCH PHÍ THAM GIA CLB CHỌN LỌC - NĂM ${year}`,
+      subtitle: "CEOHN10 Doanh Nhân CEO HN10 - HanoiBA",
       filename: name,
       sheetName: "Hoi_Phi_Chon_Loc",
       data: rows,
@@ -545,7 +545,7 @@ function FeesPage() {
       ],
       signerTitles: ["NGƯỜI LẬP BIỂU", "THỦ QUỸ / KẾ TOÁN", "CHỦ TỊCH / ĐẠI DIỆN BQT"],
     });
-    toast.success("Đã xuất danh sách hội phí ra file Excel (.xlsx)!");
+    toast.success("Đã xuất danh sách phí tham gia CLB ra file Excel (.xlsx)!");
   };
 
   return (
@@ -1073,7 +1073,7 @@ function FeesPage() {
           onClose={() => setShowCreate(false)}
           onCreate={async (payload) => {
             if (!can(PERMISSIONS.FINANCE_MANAGE)) {
-              toast.error("Bạn không có quyền tạo hóa đơn hội phí!");
+              toast.error("Bạn không có quyền tạo hóa đơn phí tham gia CLB!");
               return;
             }
             try {
@@ -1101,7 +1101,7 @@ function FeesPage() {
         open={invoiceExportOpen}
         onClose={() => setInvoiceExportOpen(false)}
         sourceType="fees"
-        title={`BẢNG KÊ & HÓA ĐƠN HỘI PHÍ THƯỜNG NIÊN NĂM ${year}`}
+        title={`BẢNG KÊ & HÓA ĐƠN PHÍ THAM GIA CLB THƯỜNG NIÊN NĂM ${year}`}
         items={invoiceItems}
       />
 
@@ -1115,7 +1115,7 @@ function FeesPage() {
         type="fee"
         targetId={selectedVnpayFee?.id || ""}
         amount={selectedVnpayFee?.amount || 5000000}
-        title={`Thu hội phí CLB CEO HN10 - Niên khóa ${selectedVnpayFee?.year || year} (${selectedVnpayFee?.invoiceNo || ""})`}
+        title={`Thu phí tham gia CLB CLB CEO HN10 - Niên khóa ${selectedVnpayFee?.year || year} (${selectedVnpayFee?.invoiceNo || ""})`}
         attendeeName={selectedVnpayFee?.member?.name || selectedVnpayFee?.member?.contact}
         memberCode={selectedVnpayFee?.member?.code || selectedVnpayFee?.memberId}
         onSuccess={() => {

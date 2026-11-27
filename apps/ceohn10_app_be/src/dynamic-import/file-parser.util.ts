@@ -206,7 +206,7 @@ export function matchStandardCrmField(
       return { key: 'status', label: 'Trạng thái hoạt động', isCustom: false, confidence: 0.9, defaultType: 'select' };
     }
     if (/thanh\s*toán|đóng\s*phí|hội\s*phí|payment/i.test(norm)) {
-      return { key: 'payment_status', label: 'Tình trạng hội phí', isCustom: false, confidence: 0.9, defaultType: 'select' };
+      return { key: 'payment_status', label: 'Tình trạng phí tham gia CLB', isCustom: false, confidence: 0.9, defaultType: 'select' };
     }
     if (/ghi\s*chú|mô\s*tả|nội\s*dung|note|about/i.test(norm)) {
       return { key: 'about', label: 'Ghi chú / Giới thiệu', isCustom: false, confidence: 0.88, defaultType: 'textarea' };

@@ -260,7 +260,7 @@ export class VotingService {
       const notifTitle = `[Biểu quyết mới] ${data.title}`;
       const notifBody =
         data.description ||
-        'Tham gia biểu quyết ý kiến ngay trên ứng dụng Hiệp hội & CRM.';
+        'Tham gia biểu quyết ý kiến ngay trên ứng dụng CEOHN10 & CRM.';
       const safeDisplayData = JSON.stringify({
         title: data.title,
         body: notifBody,
@@ -323,7 +323,7 @@ export class VotingService {
     try {
       const users = await this.votingRepo.findAudienceUsers('all');
       const notifTitle = `[Kết quả biểu quyết] ${poll.title}`;
-      const notifBody = `Biểu quyết đã kết thúc. Phương án dẫn đầu: "${leadingOption?.title || 'Đã đóng'}" (${leadingOption?.percentage || 0}%). Tổng số: ${poll.totalVotes} lượt (${poll.sourceStats?.associationApp || 0} App Hiệp hội, ${poll.sourceStats?.crm || 0} CRM).`;
+      const notifBody = `Biểu quyết đã kết thúc. Phương án dẫn đầu: "${leadingOption?.title || 'Đã đóng'}" (${leadingOption?.percentage || 0}%). Tổng số: ${poll.totalVotes} lượt (${poll.sourceStats?.associationApp || 0} App CEOHN10, ${poll.sourceStats?.crm || 0} CRM).`;
 
       const safeDisplayData = JSON.stringify({
         title: poll.title,

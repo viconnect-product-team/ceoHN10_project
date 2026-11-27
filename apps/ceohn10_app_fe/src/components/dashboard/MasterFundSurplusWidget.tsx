@@ -50,8 +50,8 @@ export function MasterFundSurplusWidget({ data, isLoading }: Props) {
   const funds = data?.fundsBreakdown || [
     {
       id: "general_fund",
-      name: "Túi Quỹ Chung CLB (Hội phí)",
-      category: "Hội phí & Vận hành",
+      name: "Túi Quỹ Chung CLB (Phí tham gia CLB)",
+      category: "Phí tham gia CLB & Vận hành",
       balance: 820000000,
       income: 1408000000,
       expense: 588000000,
@@ -65,7 +65,7 @@ export function MasterFundSurplusWidget({ data, isLoading }: Props) {
       balance: 444000000,
       income: 640000000,
       expense: 196000000,
-      description: "Tiền mặt tài trợ từ các doanh nghiệp hội viên và nhà tài trợ",
+      description: "Tiền mặt tài trợ từ các doanh ngCEOHN10 viên và nhà tài trợ",
       status: "normal",
     },
     {
@@ -181,7 +181,7 @@ export function MasterFundSurplusWidget({ data, isLoading }: Props) {
             {fmtMoney(summary.totalIncome)} VNĐ
           </div>
           <div className="text-[11px] text-muted-foreground">
-            Hội phí học viên + Tài trợ đối tác
+            Phí tham gia CLB học viên + Tài trợ đối tác
           </div>
         </div>
 

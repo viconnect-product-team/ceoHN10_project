@@ -760,7 +760,7 @@ export function ChatThread({
       all.push(m);
     }
 
-    // Nếu là Kênh Ban chuyên môn của Hiệp hội và chưa có tin nhắn, tự động nạp tin tức chính thức
+    // Nếu là Kênh Ban chuyên môn của CEOHN10 và chưa có tin nhắn, tự động nạp tin tức chính thức
     if (all.length === 0 && peer.peerCode.startsWith("channel_")) {
       const channelDefaults: Record<string, string[]> = {
         channel_secretariat: [
@@ -769,12 +769,12 @@ export function ChatThread({
           "Văn bản chỉ đạo & kế hoạch hoạt động năm 2026 đã được Ban Thư Ký cập nhật. Kính mời Quý Học viên theo dõi và đồng hành.",
         ],
         channel_membership: [
-          "Chào mừng Quý Học viên đến với Kênh Ban Thành Viên Hiệp Hội CEO HN10.",
+          "Chào mừng Quý Học viên đến với Kênh Ban Thành Viên CEOHN10 CEO HN10.",
           "Ban Thành Viên thông báo: Công tác xét duyệt kết nạp Học viên mới và đồng bộ dữ liệu hồ sơ doanh nghiệp 3D đang được đẩy mạnh.",
           "Kính chúc Quý Học viên luôn gắn kết, mở rộng mạng lưới giao thương và cùng xây dựng cộng đồng CEO HN10 ngày càng vững mạnh.",
         ],
         channel_media: [
-          "Chào mừng Quý Học viên đến với Kênh Ban Truyền Thông Hiệp Hội CEO HN10.",
+          "Chào mừng Quý Học viên đến với Kênh Ban Truyền Thông CEOHN10 CEO HN10.",
           "Bản tin hoạt động CLB: Đẩy mạnh các chiến dịch truyền thông nhận diện thương hiệu cho các doanh nghiệp Học viên trên đa nền tảng.",
           "Thông cáo sự kiện: Ban Truyền Thông phụ trách cập nhật link kho ảnh Google Drive chất lượng cao sau mỗi sự kiện.",
         ],

@@ -211,7 +211,7 @@ export const Route = createFileRoute("/network")({
     meta: [
       { title: "Mạng Lưới Học viên & Bản Tin Doanh Nhân CEO HN10" },
       { property: "og:title", content: "Mạng Lưới Học viên & Bản Tin Doanh Nhân CEO HN10" },
-      { name: "description", content: "Mạng lưới kết nối giao thương B2B, trao đổi hợp tác và bản tin hiệp hội doanh nhân CEO HN10 (HanoiBA)." },
+      { name: "description", content: "Mạng lưới kết nối giao thương B2B, trao đổi hợp tác và bản tin CEOHN10 doanh nhân CEO HN10 (HanoiBA)." },
     ],
   }),
   validateSearch: (search: Record<string, unknown>): NetworkSearch => {
@@ -1547,7 +1547,7 @@ export function findMemberForFeed(authorId?: string, authorName?: string): Membe
       phone: "",
       type: "individual",
       level: "memberLevel.high",
-      industry: "Hiệp Hội Doanh Nhân",
+      industry: "CEOHN10 Doanh Nhân",
       region: "Hà Nội",
       status: "active",
       joinedAt: new Date().toISOString(),
@@ -2576,10 +2576,10 @@ function NetworkPage() {
         id: `news-${n.id}`,
         type: "news",
         title: n.title,
-        content: n.excerpt || "Tin tức & sự kiện mới nhất từ Hiệp hội Doanh nhân CEO HN10.",
+        content: n.excerpt || "Tin tức & sự kiện mới nhất từ CEOHN10 Doanh nhân CEO HN10.",
         authorId: mem.id,
         authorName: n.author || "Ban Truyền Thông",
-        authorSubtitle: n.category || "Hiệp Hội CEO HN10",
+        authorSubtitle: n.category || "CEOHN10 CEO HN10",
         authorCommittee: "Ban Truyền Thông",
         createdAt: n.publishedAt || "",
         badge: {
@@ -2694,7 +2694,7 @@ function NetworkPage() {
           className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground shadow-sm transition hover:bg-secondary"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          <span>Về App Hiệp Hội</span>
+          <span>Về App CEOHN10</span>
         </Link>
       </div>
 

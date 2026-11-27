@@ -162,7 +162,7 @@ function MasterAdminPortal() {
           name: "Hệ thống CRM CEOHN10",
           code: "CEOHN10_CRM_WEB",
           category: "crm",
-          categoryLabel: "CRM Hiệp hội",
+          categoryLabel: "CRM CEOHN10",
           description: "Cổng Quản trị CRM Học viên, Sự kiện, Khai giảng, Tài chính, Phân quyền, Tra cứu",
           endpointUrl: "/",
           isCore: true,
@@ -208,12 +208,12 @@ function MasterAdminPortal() {
     },
     {
       id: "fee_annual",
-      name: "Hội phí thường niên hàng năm",
+      name: "Phí tham gia CLB thường niên hàng năm",
       prefix: "CEOHN10_HP",
       target_fund_name: "Quỹ Tổng CLB CEO HN10",
       action_type: "membership_annual",
       action_label: "Gia hạn niên liễm & thẻ hội viên",
-      description: "Tự động gạch nợ hóa đơn hội phí, gia hạn niên hạn sử dụng thẻ",
+      description: "Tự động gạch nợ hóa đơn phí tham gia CLB, gia hạn niên hạn sử dụng thẻ",
       is_active: true,
     },
     {
@@ -2067,7 +2067,7 @@ function MasterAdminPortal() {
                         Cấu Hình Tích Hợp Cổng Thanh Toán SePay
                       </h3>
                       <p className="text-xs text-slate-500 mt-0.5">
-                        Khai báo một lần tại Master Platform · Tự động áp dụng cho toàn hệ thống CLB CEO HN10 (Vé sự kiện, Hội phí, Khóa học, Quản lý Sổ Quỹ)
+                        Khai báo một lần tại Master Platform · Tự động áp dụng cho toàn hệ thống CLB CEO HN10 (Vé sự kiện, Phí tham gia CLB, Khóa học, Quản lý Sổ Quỹ)
                       </p>
                     </div>
                   </div>
@@ -2413,7 +2413,7 @@ function MasterAdminPortal() {
                                 <SelectContent>
                                   <SelectItem value="event_ticket">Vé Sự Kiện: Tự duyệt vé &amp; cấp QR HMAC</SelectItem>
                                   <SelectItem value="membership_join">Phí Gia Nhập: Duyệt hội viên &amp; thẻ số 3D</SelectItem>
-                                  <SelectItem value="membership_annual">Hội Phí: Gia hạn niên liễm &amp; gạch nợ hóa đơn</SelectItem>
+                                  <SelectItem value="membership_annual">Phí Tham Gia CLB: Gia hạn niên liễm &amp; gạch nợ hóa đơn</SelectItem>
                                   <SelectItem value="course_enroll">Học Phí: Ghi danh lớp &amp; mở khóa tài liệu</SelectItem>
                                   <SelectItem value="sponsorship">Tài Trợ: Kích hoạt quyền lợi &amp; Logo App</SelectItem>
                                   <SelectItem value="charity">Thiện Nguyện: Ghi sổ Quỹ &amp; Vinh danh</SelectItem>
@@ -2499,7 +2499,7 @@ function MasterAdminPortal() {
                         Cấu Hình Tích Hợp Zalo Official Account &amp; ZBS
                       </h3>
                       <p className="text-xs text-slate-500 mt-0.5">
-                        Kết nối Zalo OA, tự động gửi thư mời sự kiện, mã vé QR Check-in, thông báo hội phí và chăm sóc hội viên
+                        Kết nối Zalo OA, tự động gửi thư mời sự kiện, mã vé QR Check-in, thông báo phí tham gia CLB và chăm sóc hội viên
                       </p>
                     </div>
                   </div>

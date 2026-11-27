@@ -71,7 +71,7 @@ export const SIDEBAR_ROUTE_NAMES: Record<string, string> = {
   "/sponsors": "Nhà tài trợ",
   "/sponsor-packages": "Gói tài trợ",
   "/sponsor-report": "Báo cáo tài trợ",
-  "/fees": "Hội phí",
+  "/fees": "Phí tham gia CLB",
   "/income": "Khoản thu & Niên liễm",
   "/expenses": "Khoản chi & Ngân sách",
   "/finance-report": "Báo cáo tài chính",
@@ -92,7 +92,7 @@ export const SIDEBAR_ROUTE_NAMES: Record<string, string> = {
   "/association/trainings": "Khóa Đào Tạo Trên App",
   "/association/events": "Sự Kiện & Vé Điện Tử E-Ticket",
   "/association/voting": "Biểu Quyết & Bầu Cử Trực Tuyến",
-  "/association/profile": "Hội Phí Cá Nhân & Hồ Sơ Lãnh Đạo",
+  "/association/profile": "Phí Tham Gia CLB Cá Nhân & Hồ Sơ Lãnh Đạo",
 };
 
 export function getSynchronizedFeatureName(route?: string, fallbackName?: string): string {
@@ -193,7 +193,7 @@ export function cleanActionName(name: string): string {
   return name.replace(/^\[(Xem|Thêm|Sửa|Xóa|READ|CREATE|UPDATE|DELETE|VIEW)\]\s*/i, '');
 }
 
-// ── CẤU TRÚC 8 NHÓM CHỨC NĂNG CHUẨN XÁC 100% THEO MENU SIDEBAR CRM HIỆP HỘI ──
+// ── CẤU TRÚC 8 NHÓM CHỨC NĂNG CHUẨN XÁC 100% THEO MENU SIDEBAR CRM CEOHN10 ──
 export const INITIAL_CATEGORIES: TreeCategory[] = [
   // NHÓM 1: Học viên
   {
@@ -210,7 +210,7 @@ export const INITIAL_CATEGORIES: TreeCategory[] = [
           { id: "act_mem_view", name: "Xem danh sách & hồ sơ Học viên", code: "MEM_VIEW", description: "Tra cứu thông tin cá nhân, chức danh, doanh nghiệp", apiEndpoint: "GET /api/members", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
           { id: "act_mem_add", name: "Thêm mới Học viên", code: "MEM_ADD", description: "Tạo mới tài khoản và hồ sơ Học viên vào hệ thống", apiEndpoint: "POST /api/members", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true, tong_thu_ky: true } },
           { id: "act_mem_edit", name: "Chỉnh sửa thông tin Học viên", code: "MEM_EDIT", description: "Cập nhật email, số điện thoại, chức danh, ảnh đại diện", apiEndpoint: "PUT /api/members/:id", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true, tong_thu_ky: true } },
-          { id: "act_mem_delete", name: "Xóa / Thu hồi tư cách Học viên", code: "MEM_DELETE", description: "Xóa hoặc đình chỉ tư cách Học viên trong hiệp hội", apiEndpoint: "DELETE /api/members/:id", roles: { bqt: true, quan_tri: true, admin: true } },
+          { id: "act_mem_delete", name: "Xóa / Thu hồi tư cách Học viên", code: "MEM_DELETE", description: "Xóa hoặc đình chỉ tư cách Học viên trong CEOHN10", apiEndpoint: "DELETE /api/members/:id", roles: { bqt: true, quan_tri: true, admin: true } },
           { id: "act_mem_approve", name: "Phê duyệt hồ sơ đăng ký", code: "MEM_APPROVE", description: "Duyệt hồ sơ gia nhập và cấp mã Học viên chính thức", apiEndpoint: "POST /api/members/:id/approve", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true, tong_thu_ky: true } },
           { id: "act_mem_export", name: "Xuất file Excel danh sách", code: "MEM_EXPORT", description: "Trích xuất danh bạ Học viên phục vụ kỷ yếu và báo cáo", apiEndpoint: "GET /api/members/export", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true, tong_thu_ky: true } },
         ],
@@ -278,7 +278,7 @@ export const INITIAL_CATEGORIES: TreeCategory[] = [
         id: "feat_events_overview",
         name: "Tổng quan sự kiện",
         route: "/events-overview",
-        description: "Báo cáo thống kê tổng quát các hoạt động sự kiện hiệp hội",
+        description: "Báo cáo thống kê tổng quát các hoạt động sự kiện CEOHN10",
         actions: [
           { id: "act_evto_view", name: "Xem tổng quan & chỉ số sự kiện", code: "EVTO_VIEW", description: "Xem biểu đồ số lượng người tham dự, tỷ lệ tham gia", apiEndpoint: "GET /api/events/overview", roles: { bqt: true, thu_ky: true, thanh_vien: true, truyen_thong: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true } },
           { id: "act_evto_export", name: "Xuất báo cáo tổng quan sự kiện", code: "EVTO_EXPORT", description: "Xuất file thống kê sự kiện theo quý/năm", apiEndpoint: "GET /api/events/overview/export", roles: { bqt: true, thu_ky: true, quan_tri: true, admin: true, tong_thu_ky: true } },
@@ -364,13 +364,13 @@ export const INITIAL_CATEGORIES: TreeCategory[] = [
     features: [
       {
         id: "feat_fees",
-        name: "Hội phí",
+        name: "Phí tham gia CLB",
         route: "/fees",
         description: "Quản lý niên liễm Học viên, hóa đơn thu tiền và đối soát VietQR",
         actions: [
-          { id: "act_fee_view", name: "Xem danh sách hội phí & công nợ", code: "FEE_VIEW", description: "Xem ai đã nộp, chưa nộp và số tiền hội phí", apiEndpoint: "GET /api/fees", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true, tong_thu_ky: true } },
-          { id: "act_fee_add", name: "Lập hóa đơn thu hội phí", code: "FEE_ADD", description: "Tạo phiếu thu hội phí cho Học viên", apiEndpoint: "POST /api/fees", roles: { bqt: true, thu_ky: true, quan_tri: true, admin: true } },
-          { id: "act_fee_edit", name: "Chỉnh sửa hóa đơn hội phí", code: "FEE_EDIT", description: "Điều chỉnh số tiền, hạn thanh toán hoặc miễn giảm", apiEndpoint: "PUT /api/fees/:id", roles: { bqt: true, thu_ky: true, quan_tri: true, admin: true } },
+          { id: "act_fee_view", name: "Xem danh sách phí tham gia CLB & công nợ", code: "FEE_VIEW", description: "Xem ai đã nộp, chưa nộp và số tiền phí tham gia CLB", apiEndpoint: "GET /api/fees", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true, tong_thu_ky: true } },
+          { id: "act_fee_add", name: "Lập hóa đơn thu phí tham gia CLB", code: "FEE_ADD", description: "Tạo phiếu thu phí tham gia CLB cho Học viên", apiEndpoint: "POST /api/fees", roles: { bqt: true, thu_ky: true, quan_tri: true, admin: true } },
+          { id: "act_fee_edit", name: "Chỉnh sửa hóa đơn phí tham gia CLB", code: "FEE_EDIT", description: "Điều chỉnh số tiền, hạn thanh toán hoặc miễn giảm", apiEndpoint: "PUT /api/fees/:id", roles: { bqt: true, thu_ky: true, quan_tri: true, admin: true } },
           { id: "act_fee_delete", name: "Xóa / Hủy hóa đơn", code: "FEE_DELETE", description: "Hủy phiếu thu lập sai sót", apiEndpoint: "DELETE /api/fees/:id", roles: { bqt: true, quan_tri: true, admin: true } },
           { id: "act_fee_reconcile", name: "Đối soát thanh toán VietQR", code: "FEE_RECONCILE", description: "Kiểm tra gạch nợ tự động qua ngân hàng", apiEndpoint: "POST /api/fees/reconcile", roles: { bqt: true, quan_tri: true, admin: true } },
         ],
@@ -379,7 +379,7 @@ export const INITIAL_CATEGORIES: TreeCategory[] = [
         id: "feat_income",
         name: "Quản lý Thu",
         route: "/income",
-        description: "Quản lý tất cả các nguồn thu từ hội phí, tài trợ, bán vé sự kiện",
+        description: "Quản lý tất cả các nguồn thu từ phí tham gia CLB, tài trợ, bán vé sự kiện",
         actions: [
           { id: "act_inc_view", name: "Xem danh sách phiếu thu", code: "INC_VIEW", description: "Xem tổng hợp các khoản tiền thu về của quỹ", apiEndpoint: "GET /api/income", roles: { bqt: true, thu_ky: true, quan_tri: true, admin: true, tong_thu_ky: true } },
           { id: "act_inc_add", name: "Lập phiếu thu mới", code: "INC_ADD", description: "Ghi nhận khoản thu phát sinh vào sổ quỹ", apiEndpoint: "POST /api/income", roles: { bqt: true, thu_ky: true, quan_tri: true, admin: true } },
@@ -465,7 +465,7 @@ export const INITIAL_CATEGORIES: TreeCategory[] = [
         description: "Quản lý các đặc quyền ưu đãi dành riêng cho Học viên",
         actions: [
           { id: "act_prk_view", name: "Xem danh sách đặc quyền", code: "PRK_VIEW", description: "Xem các đặc quyền dịch vụ, phòng chờ VIP, sân golf", apiEndpoint: "GET /api/perks", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
-          { id: "act_prk_add", name: "Thêm đặc quyền mới", code: "PRK_ADD", description: "Tạo dịch vụ đặc quyền mới cho hiệp hội", apiEndpoint: "POST /api/perks", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true } },
+          { id: "act_prk_add", name: "Thêm đặc quyền mới", code: "PRK_ADD", description: "Tạo dịch vụ đặc quyền mới cho CEOHN10", apiEndpoint: "POST /api/perks", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true } },
           { id: "act_prk_edit", name: "Chỉnh sửa đặc quyền", code: "PRK_EDIT", description: "Cập nhật điều kiện sử dụng đặc quyền", apiEndpoint: "PUT /api/perks/:id", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true } },
           { id: "act_prk_delete", name: "Xóa đặc quyền", code: "PRK_DELETE", description: "Xóa đặc quyền không còn hiệu lực", apiEndpoint: "DELETE /api/perks/:id", roles: { bqt: true, quan_tri: true, admin: true } },
         ],
@@ -528,10 +528,10 @@ export const INITIAL_CATEGORIES: TreeCategory[] = [
         id: "feat_settings",
         name: "Cài đặt",
         route: "/settings",
-        description: "Cấu hình thông tin hiệp hội, thông số hệ thống và bảo mật",
+        description: "Cấu hình thông tin CEOHN10, thông số hệ thống và bảo mật",
         actions: [
           { id: "act_set_view", name: "Xem cấu hình cài đặt", code: "SET_VIEW", description: "Xem thông số hệ thống, cổng thanh toán, SMS", apiEndpoint: "GET /api/settings", roles: { bqt: true, thu_ky: true, quan_tri: true, admin: true } },
-          { id: "act_set_edit", name: "Cập nhật cài đặt hệ thống", code: "SET_EDIT", description: "Thay đổi thông số và cấu hình hiệp hội", apiEndpoint: "PUT /api/settings", roles: { bqt: true, quan_tri: true, admin: true } },
+          { id: "act_set_edit", name: "Cập nhật cài đặt hệ thống", code: "SET_EDIT", description: "Thay đổi thông số và cấu hình CEOHN10", apiEndpoint: "PUT /api/settings", roles: { bqt: true, quan_tri: true, admin: true } },
         ],
       },
       {
@@ -616,7 +616,7 @@ export const INITIAL_CATEGORIES: TreeCategory[] = [
         id: "feat_app_home",
         name: "Trang chủ & Bảng tin App",
         route: "/association",
-        description: "Truy cập màn hình chính, xem tin tức nổi bật và hoạt động hiệp hội trên App",
+        description: "Truy cập màn hình chính, xem tin tức nổi bật và hoạt động CEOHN10 trên App",
         actions: [
           { id: "act_app_home_view", name: "Xem Trang chủ & Bảng tin", code: "APP_HOME_VIEW", description: "Truy cập Trang chủ và theo dõi bảng tin", apiEndpoint: "GET /api/app/feed", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
           { id: "act_app_news_post", name: "Đăng bài viết hoạt động lên App", code: "APP_NEWS_POST", description: "Đăng tải bài viết tin tức, thông báo trực tiếp lên App", apiEndpoint: "POST /api/app/news", roles: { bqt: true, thu_ky: true, truyen_thong: true, quan_tri: true, admin: true, tong_thu_ky: true } },
@@ -685,11 +685,11 @@ export const INITIAL_CATEGORIES: TreeCategory[] = [
       },
       {
         id: "feat_app_finance_profile",
-        name: "Hội Phí Cá Nhân & Hồ Sơ Lãnh Đạo",
+        name: "Phí Tham Gia CLB Cá Nhân & Hồ Sơ Lãnh Đạo",
         route: "/association/profile",
         description: "Quản lý niên liễm cá nhân và thông tin hồ sơ lãnh đạo",
         actions: [
-          { id: "act_app_fee_view", name: "Xem thông tin Hội phí & Niên liễm cá nhân", code: "APP_FEE_VIEW", description: "Xem hóa đơn niên liễm và lịch sử đóng phí", apiEndpoint: "GET /api/app/fees/me", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
+          { id: "act_app_fee_view", name: "Xem thông tin Phí tham gia CLB & Niên liễm cá nhân", code: "APP_FEE_VIEW", description: "Xem hóa đơn niên liễm và lịch sử đóng phí", apiEndpoint: "GET /api/app/fees/me", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
           { id: "act_app_profile_edit", name: "Chỉnh sửa Hồ sơ cá nhân & Logo công ty", code: "APP_PROFILE_EDIT", description: "Tự cập nhật chức danh, logo, hotline, giới thiệu", apiEndpoint: "PUT /api/app/profile", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
         ],
       },
@@ -710,10 +710,10 @@ export const DETECTABLE_SYSTEM_FEATURES = [
   { name: "Kết nối giao thương B2B", route: "/business-connect", catId: "cat_network", desc: "Sàn kết nối cung cầu, cơ hội hợp tác kinh doanh giữa các CEO" },
   { name: "Cuộc hẹn & Gặp gỡ", route: "/meetings", catId: "cat_network", desc: "Đặt lịch hẹn 1-on-1 và kết nối giao thương giữa các Học viên" },
   { name: "Quỹ hội & Báo cáo tài chính", route: "/finance-report", catId: "cat_finance", desc: "Tổng quan thu chi, số dư quỹ hội và báo cáo tài chính" },
-  { name: "Khoản thu & Hội phí", route: "/income", catId: "cat_finance", desc: "Quản lý thu hội phí thường niên, tài trợ và nhập file sao kê" },
+  { name: "Khoản thu & Phí tham gia CLB", route: "/income", catId: "cat_finance", desc: "Quản lý thu phí tham gia CLB thường niên, tài trợ và nhập file sao kê" },
   { name: "Khoản chi & Quyết toán", route: "/expenses", catId: "cat_finance", desc: "Quản lý phiếu chi, duyệt chi ngân sách và quyết toán" },
   { name: "Tin tức & Hoạt động", route: "/news", catId: "cat_media", desc: "Bản tin nội bộ, bài viết sự kiện và thông cáo báo chí" },
-  { name: "Thư viện truyền thông & Media", route: "/media", catId: "cat_media", desc: "Kho ảnh sự kiện, video hoạt động và tư liệu hiệp hội" },
+  { name: "Thư viện truyền thông & Media", route: "/media", catId: "cat_media", desc: "Kho ảnh sự kiện, video hoạt động và tư liệu CEOHN10" },
   { name: "Gian hàng & Sản phẩm", route: "/marketplace", catId: "cat_marketplace", desc: "Chợ giao thương sản phẩm, dịch vụ ưu đãi nội bộ" },
   { name: "Khảo sát & Biểu quyết", route: "/voting", catId: "cat_governance", desc: "Biểu quyết trực tuyến, bầu cử ban điều hành và khảo sát" },
   { name: "Thông báo & Tin nhắn", route: "/notifications", catId: "cat_system", desc: "Gửi thông báo đẩy, email và tin nhắn tức thời đến Học viên" },
@@ -726,7 +726,7 @@ export const DETECTABLE_SYSTEM_FEATURES = [
   { name: "App: Gian hàng Marketplace", route: "/association/products", catId: "cat_mobile_app", desc: "Quảng bá sản phẩm, dịch vụ và giải pháp doanh nghiệp trên App" },
   { name: "App: Sự kiện & Vé điện tử E-Ticket", route: "/association/events", catId: "cat_mobile_app", desc: "Đăng ký tham dự sự kiện, nhận vé QR và check-in trên App" },
   { name: "App: Biểu quyết & Bầu cử trực tuyến", route: "/association/voting", catId: "cat_mobile_app", desc: "Bỏ phiếu bầu cử ban điều hành và biểu quyết nghị quyết trên App" },
-  { name: "App: Hội phí cá nhân & Hồ sơ lãnh đạo", route: "/association/profile", catId: "cat_mobile_app", desc: "Quản lý niên liễm cá nhân và thông tin hồ sơ lãnh đạo trên App" },
+  { name: "App: Phí tham gia CLB cá nhân & Hồ sơ lãnh đạo", route: "/association/profile", catId: "cat_mobile_app", desc: "Quản lý niên liễm cá nhân và thông tin hồ sơ lãnh đạo trên App" },
 ];
 
 export interface RbacPermissionMatrixProps {

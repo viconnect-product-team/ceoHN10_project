@@ -156,7 +156,7 @@ export const DEFAULT_STARTUP_MOBILE_TEMPLATE: LandingWebConfig = {
       place: "Hệ Sinh Thái CEO HN10",
       title1: "KẾT NỐI",
       title2: "DOANH NHÂN",
-      description: "Ứng dụng chuyên biệt kết nối giao thương nội khối, đặt lịch hẹn 1-on-1, thanh toán hội phí MoMo/VNPay tự động và bảng xếp hạng số minh bạch.",
+      description: "Ứng dụng chuyên biệt kết nối giao thương nội khối, đặt lịch hẹn 1-on-1, thanh toán phí tham gia CLB MoMo/VNPay tự động và bảng xếp hạng số minh bạch.",
       image: "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=1200&q=80",
       ctaText: "Khám Phá Tính Năng",
       ctaLink: "#features",

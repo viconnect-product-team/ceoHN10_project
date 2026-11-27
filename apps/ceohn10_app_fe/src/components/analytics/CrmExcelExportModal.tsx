@@ -148,7 +148,7 @@ export function CrmExcelExportModal({
                 : `THÁNG ${selectedPeriodValue} - NĂM ${selectedYear}`;
 
         const rows: any[][] = [
-          ["HỆ THỐNG QUẢN TRỊ HIỆP HỘI & CLB DOANH NHÂN CEO HN10 - HANOIBA"],
+          ["HỆ THỐNG QUẢN TRỊ CEOHN10 & CLB DOANH NHÂN CEO HN10 - HANOIBA"],
           [`BÁO CÁO THỐNG KÊ GIAO THƯƠNG & CHỈ SỐ HOẠT ĐỘNG TOÀN DIỆN`],
           [`Kỳ báo cáo: ${periodStr} | Ngày kết xuất: ${new Date().toLocaleDateString("vi-VN")}`],
           [],
@@ -289,7 +289,7 @@ export function CrmExcelExportModal({
       } else {
         // MODE 3: XUẤT BIẾN ĐỘNG CỦA TỪNG Học viên (FLUCTUATIONS & TREND ANALYSIS)
         const rows: any[][] = [
-          ["HỆ THỐNG QUẢN TRỊ HIỆP HỘI & CLB DOANH NHÂN CEO HN10 - HANOIBA"],
+          ["HỆ THỐNG QUẢN TRỊ CEOHN10 & CLB DOANH NHÂN CEO HN10 - HANOIBA"],
           ["BÁO CÁO PHÂN TÍCH BIẾN ĐỘNG & XU HƯỚNG TỪNG Học viên (DELTA ANALYSIS)"],
           [`Thời gian phân tích: So sánh Kỳ Hiện Tại so với Kỳ Liền Kề`],
           [],

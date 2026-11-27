@@ -223,7 +223,7 @@ export function ViewMeetingModal({
               <span>{isOnline ? "Phòng họp trực tuyến" : "Địa điểm gặp gỡ"}</span>
             </div>
             <p className="text-sm font-semibold text-foreground">
-              {meeting.venue || (isOnline ? "Uniwork Online Meeting" : "Văn phòng Hiệp hội CEO HN10")}
+              {meeting.venue || (isOnline ? "Uniwork Online Meeting" : "Văn phòng CEOHN10 CEO HN10")}
             </p>
 
             {isOnline && meetingUrl && (

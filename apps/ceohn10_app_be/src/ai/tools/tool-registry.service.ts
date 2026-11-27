@@ -153,7 +153,7 @@ export class ToolRegistryService {
         name: 'query_finance_records',
         displayName: 'Tra cứu sổ quỹ thu chi & giao dịch tài chính',
         description:
-          'Truy vấn các giao dịch thu, chi, hội phí, tài trợ và số dư khả dụng thực tế từ sổ kế toán.',
+          'Truy vấn các giao dịch thu, chi, phí tham gia CLB, tài trợ và số dư khả dụng thực tế từ sổ kế toán.',
         category: 'data_query',
         safetyLevel: 'READ',
         requiredPermission: 'AI_READ_ANALYTICS',
@@ -175,7 +175,7 @@ export class ToolRegistryService {
             },
             category: {
               type: 'string',
-              description: 'Danh mục (Hội phí, Vé sự kiện, Tài trợ, Chi hoạt động...)',
+              description: 'Danh mục (Phí tham gia CLB, Vé sự kiện, Tài trợ, Chi hoạt động...)',
             },
             limit: {
               type: 'number',
@@ -1078,7 +1078,7 @@ export class ToolRegistryService {
       execute: async (params, context) => {
         try {
           const title = params.title || 'Cuộc họp Ban CLB Doanh Nhân CEO HN10';
-          const description = params.description || 'Cuộc họp triển khai kế hoạch hoạt động của Hiệp hội CEO HN10';
+          const description = params.description || 'Cuộc họp triển khai kế hoạch hoạt động của CEOHN10 CEO HN10';
           const eventType = params.eventType || 'meeting';
 
           // 1. Phân tích & chuẩn hóa thời gian bắt đầu
@@ -2074,7 +2074,7 @@ export class ToolRegistryService {
                     r.code || String(r.id).slice(0, 8),
                     r.date ? String(r.date).slice(0, 10) : 'Chưa định',
                     r.payer_display,
-                    r.category || 'Hội phí',
+                    r.category || 'Phí tham gia CLB',
                     Number(r.amount || 0).toLocaleString('vi-VN'),
                     r.method || 'Chuyển khoản',
                     r.status === 'failed' ? 'Thất bại' : r.status === 'cancelled' ? 'Đã hủy' : 'Chờ xử lý',
@@ -2256,7 +2256,7 @@ export class ToolRegistryService {
                   count: d.value,
                   percentage: `${d.percentage}%`,
                 })),
-                textSummary: `Toàn hiệp hội có ${deptRows.length} ban chuyên môn với ${totalMembers} hội viên. Ban có quy mô lớn nhất là "${deptRows[0]?.dept_name}" chiếm ${pieData[0]?.percentage || 0}% toàn CLB.`,
+                textSummary: `Toàn CEOHN10 có ${deptRows.length} ban chuyên môn với ${totalMembers} hội viên. Ban có quy mô lớn nhất là "${deptRows[0]?.dept_name}" chiếm ${pieData[0]?.percentage || 0}% toàn CLB.`,
               },
               auditMessage: `Tra cứu cơ cấu ban ngành: ${deptRows.length} ban, tổng ${totalMembers} hội viên.`,
             };

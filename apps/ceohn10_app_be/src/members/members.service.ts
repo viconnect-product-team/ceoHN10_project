@@ -1510,7 +1510,7 @@ export class MembersService implements OnModuleInit {
         invoice: i.invoice_no ?? '—',
         date: dateStr,
         kind: 'fee',
-        description: `Hội phí ${i.year ?? ''}`.trim(),
+        description: `Phí tham gia CLB ${i.year ?? ''}`.trim(),
         amount: Number(i.amount ?? 0),
         method,
         status,
@@ -2206,7 +2206,7 @@ export class MembersService implements OnModuleInit {
               ? 'Hồ sơ gia nhập CLB của bạn đang được xét duyệt'
               : 'Thông báo kết quả duyệt hồ sơ gia nhập CLB';
           const notifBody = isApproved
-            ? `Chúc mừng bạn đã chính thức trở thành Học viên của ${name || 'Hiệp hội'}. Thẻ VIP Số NFC và toàn bộ quyền lợi đã được kích hoạt trong App Học viên.`
+            ? `Chúc mừng bạn đã chính thức trở thành Học viên của ${name || 'CEOHN10'}. Thẻ VIP Số NFC và toàn bộ quyền lợi đã được kích hoạt trong App Học viên.`
             : `Hồ sơ gia nhập của bạn đã được cập nhật trạng thái: ${status}. Vui lòng mở App Học viên hoặc liên hệ Ban thư ký để biết thêm chi tiết.`;
 
           const safeData = JSON.stringify({
@@ -2240,7 +2240,7 @@ export class MembersService implements OnModuleInit {
             )
           `.catch(() => { });
 
-          // Đẩy thông báo chuông vào App Hiệp Hội
+          // Đẩy thông báo chuông vào App CEOHN10
           await this.prisma.$executeRaw`
             INSERT INTO public.notifications (
               id, user_id, title, message, type, is_read, created_at
@@ -2586,7 +2586,7 @@ export class MembersService implements OnModuleInit {
 
     // Activity log
     await this.logActivity(
-      'Gia hạn hội phí',
+      'Gia hạn phí tham gia CLB',
       `${current.name} (${current.code || cleanId})`,
       'fee',
       'admin@connect.vn',
@@ -2731,7 +2731,7 @@ export class MembersService implements OnModuleInit {
     `;
 
     await this.logActivity(
-      'Cập nhật trạng thái thanh toán hội phí',
+      'Cập nhật trạng thái thanh toán phí tham gia CLB',
       `${current.name} (${current.code || current.id}) -> ${paymentStatus}`,
       'fee',
       'admin@connect.vn',
@@ -2821,7 +2821,7 @@ export class MembersService implements OnModuleInit {
             <td style="font-weight: 700; color: #d97706; text-align: right;">${termEndStr}</td>
           </tr>
           <tr>
-            <td style="color: #64748b; padding: 6px 0;">Hội phí niên liễm:</td>
+            <td style="color: #64748b; padding: 6px 0;">Phí tham gia CLB niên liễm:</td>
             <td style="font-weight: 800; color: #dc2626; font-size: 15px; text-align: right;">2,000,000 VNĐ / năm</td>
           </tr>
         </table>
@@ -2831,7 +2831,7 @@ export class MembersService implements OnModuleInit {
         Để duy trì liên tục các quyền lợi đặc quyền: Danh thiếp số Titanium, gian hàng Marketplace B2B, quyền biểu quyết đại hội và cơ hội kết nối giao thương giữa các Học viên, Quý Anh/Chị vui lòng hoàn tất đóng phí niên liễm bằng cách:
       </p>
       <ul style="font-size: 13px; color: #475569; line-height: 1.6; padding-left: 20px; margin-bottom: 24px;">
-        <li><strong>Thanh toán VNPAY-QR:</strong> Quét mã VNPAY-QR trên App Hiệp Hội (hệ thống tự động gạch nợ và xuất hóa đơn sau 3-5 giây).</li>
+        <li><strong>Thanh toán VNPAY-QR:</strong> Quét mã VNPAY-QR trên App CEOHN10 (hệ thống tự động gạch nợ và xuất hóa đơn sau 3-5 giây).</li>
         <li><strong>Nộp tiền mặt:</strong> Đóng trực tiếp tại Văn phòng Ban Thư Ký CLB.</li>
       </ul>
 
@@ -2878,7 +2878,7 @@ export class MembersService implements OnModuleInit {
 Kính gửi Anh/Chị ${current.name} (${current.code || 'HN10'}),
 Ban Thư Ký CLB Doanh Nhân CEO HN10 xin trân trọng thông báo: Thời hạn niên liễm sinh hoạt Học viên của Quý Anh/Chị sắp kết thúc vào ngày ${termEndStr}.
 💰 Phí thường niên: 2.000.000 VNĐ / năm.
-📲 Vui lòng mở App Hiệp Hội để gia hạn trực tuyến bằng VNPAY/MoMo hoặc liên hệ Hotline: 0983 1010 10.
+📲 Vui lòng mở App CEOHN10 để gia hạn trực tuyến bằng VNPAY/MoMo hoặc liên hệ Hotline: 0983 1010 10.
 Trân trọng cảm ơn Anh/Chị!`;
 
         const accessToken = process.env.ZALO_OA_ACCESS_TOKEN || '';
@@ -2904,7 +2904,7 @@ Trân trọng cảm ơn Anh/Chị!`;
     if (current.user_id) {
       try {
         const notifTitle = 'Nhắc nhở gia hạn tư cách Học viên';
-        const notifBody = `Học viên ${current.name} thân mến, thời hạn Học viên của bạn sắp kết thúc (${current.term_end ? new Date(current.term_end).toISOString().slice(0, 10) : 'hôm nay'}). Vui lòng hoàn thành gia hạn hội phí để duy trì mọi quyền lợi kết nối và ưu đãi.`;
+        const notifBody = `Học viên ${current.name} thân mến, thời hạn Học viên của bạn sắp kết thúc (${current.term_end ? new Date(current.term_end).toISOString().slice(0, 10) : 'hôm nay'}). Vui lòng hoàn thành gia hạn phí tham gia CLB để duy trì mọi quyền lợi kết nối và ưu đãi.`;
         const notifId = crypto.randomUUID();
         const dedupeKey = `renew-remind-${current.id}-${Date.now()}`;
         const safeData = JSON.stringify({
@@ -3004,7 +3004,7 @@ Trân trọng cảm ơn Anh/Chị!`;
       {
         titleVi: 'Quảng bá thương hiệu',
         titleEn: 'Brand promotion',
-        descVi: 'trên kênh Hiệp hội',
+        descVi: 'trên kênh CEOHN10',
         descEn: 'on association channels',
       },
     ];
@@ -5124,7 +5124,7 @@ Trân trọng cảm ơn Anh/Chị!`;
     const appUrl = process.env.APP_URL || process.env.FRONTEND_URL || 'http://localhost:5173';
     const registerUrl = `${appUrl}/register?email=${encodeURIComponent(cleanEmail)}&ref=invite_${encodeURIComponent(adminUserId)}`;
 
-    const subject = `[CLB CEO HN10 - HanoiBA] Thư Mời Đăng Ký Gia Nhập Hiệp Hội Doanh Nhân`;
+    const subject = `[CLB CEO HN10 - HanoiBA] Thư Mời Đăng Ký Gia Nhập CEOHN10 Doanh Nhân`;
     const recipientName = data.name?.trim() || 'Quý Doanh Nhân';
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 620px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
@@ -5132,12 +5132,12 @@ Trân trọng cảm ơn Anh/Chị!`;
           <div style="display: inline-block; padding: 4px 14px; background: rgba(234, 179, 8, 0.25); border: 1px solid rgba(234, 179, 8, 0.5); border-radius: 9999px; font-size: 11px; font-weight: 800; color: #fde047; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">
             CLB DOANH NHÂN CEO HN10 (HANOIBA)
           </div>
-          <h1 style="margin: 0; font-size: 21px; font-weight: 900; color: #ffffff; text-transform: uppercase;">THƯ MỜI GIA NHẬP HIỆP HỘI</h1>
+          <h1 style="margin: 0; font-size: 21px; font-weight: 900; color: #ffffff; text-transform: uppercase;">THƯ MỜI GIA NHẬP CEOHN10</h1>
           <p style="margin: 8px 0 0; font-size: 13px; color: #93c5fd;">Kính gửi Quý Doanh Nhân: <strong>${recipientName}</strong></p>
         </div>
         <div style="padding: 26px 24px; color: #1e293b; line-height: 1.6; font-size: 14px;">
           <p>Kính gửi <strong>${recipientName}</strong>,</p>
-          <p>Ban Điều Hành CLB Doanh Nhân CEO HN10 (trực thuộc Hội Doanh Nghiệp Trẻ Hà Nội - HanoiBA) trân trọng gửi tới Anh/Chị thư mời tham gia đăng ký thông tin hội viên của Hiệp hội.</p>
+          <p>Ban Điều Hành CLB Doanh Nhân CEO HN10 (trực thuộc Hội Doanh Nghiệp Trẻ Hà Nội - HanoiBA) trân trọng gửi tới Anh/Chị thư mời tham gia đăng ký thông tin hội viên của CEOHN10.</p>
           <p>Để hoàn tất thủ tục gia nhập và nhận tài khoản định danh chính thức trên App CEO HN10, kính mời Anh/Chị nhấn vào nút đăng ký dưới đây để điền hồ sơ doanh nghiệp:</p>
           
           <div style="text-align: center; margin: 28px 0;">

@@ -294,7 +294,7 @@ export const INITIAL_DYNAMIC_TEMPLATES: DynamicTemplate[] = [
     ],
   },
 
-  // ── 3. NHÓM HỌC VIÊN & HỘI PHÍ ──
+  // ── 3. NHÓM HỌC VIÊN & PHÍ THAM GIA CLB ──
   {
     id: "tmpl-member-welcome",
     code: "MEMBER_WELCOME",

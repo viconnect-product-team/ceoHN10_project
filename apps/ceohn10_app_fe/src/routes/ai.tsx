@@ -89,11 +89,11 @@ export const Route = createFileRoute("/ai")({
   },
   head: () => ({
     meta: [
-      { title: "Trợ lý AI — Nền tảng quản trị Hiệp hội" },
+      { title: "Trợ lý AI — Nền tảng quản trị CEOHN10" },
       {
         name: "description",
         content:
-          "Lớp điều phối AI cho Hiệp hội — định tuyến năng lực, phản hồi có cấu trúc, dẫn chứng và hành động gợi ý, luôn tôn trọng phân quyền.",
+          "Lớp điều phối AI cho CEOHN10 — định tuyến năng lực, phản hồi có cấu trúc, dẫn chứng và hành động gợi ý, luôn tôn trọng phân quyền.",
       },
     ],
   }),
@@ -505,7 +505,7 @@ function AiAssistantPage() {
         <div>
           <h1 className="text-[24px] font-bold tracking-tight text-foreground">Trợ lý AI</h1>
           <p className="text-sm text-muted-foreground">
-            Lớp điều phối thông minh cho Hiệp hội — định tuyến năng lực, phản hồi có cấu trúc, dẫn
+            Lớp điều phối thông minh cho CEOHN10 — định tuyến năng lực, phản hồi có cấu trúc, dẫn
             chứng và hành động.
           </p>
         </div>
@@ -606,7 +606,7 @@ function AiAssistantPage() {
                   }
                 }}
                 rows={1}
-                placeholder="Hỏi bất cứ điều gì về hiệp hội của bạn…"
+                placeholder="Hỏi bất cứ điều gì về CEOHN10 của bạn…"
                 className="max-h-40 min-h-[48px] flex-1 resize-none rounded-xl border border-border bg-background px-4 py-3 text-[16px] text-foreground outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
               />
               <button
@@ -747,7 +747,7 @@ function AiAssistantPage() {
             {!contextActive ? (
               <p className="text-[12px] text-muted-foreground">
                 Chưa có ngữ cảnh. Ngữ cảnh chỉ tồn tại trong phiên và tự xóa khi bạn đăng xuất hoặc
-                đổi hiệp hội.
+                đổi CEOHN10.
               </p>
             ) : (
               <div className="space-y-3">
@@ -913,10 +913,10 @@ function WelcomePanel({
           <Sparkles className="h-6 w-6" />
         </div>
         <h2 className="text-xl font-bold text-foreground">
-          Xin chào, tôi là Trợ lý AI của Hiệp hội
+          Xin chào, tôi là Trợ lý AI của CEOHN10
         </h2>
         <p className="mx-auto mt-2 max-w-lg text-sm text-muted-foreground">
-          Tôi điều phối nhiều năng lực chuyên biệt — tài liệu, Học viên, kết nối, hội phí, sự kiện,
+          Tôi điều phối nhiều năng lực chuyên biệt — tài liệu, Học viên, kết nối, phí tham gia CLB, sự kiện,
           marketplace, thông báo và điều hành — và luôn trả lời dựa trên dữ liệu bạn có quyền truy
           cập.
         </p>
@@ -957,7 +957,7 @@ function WelcomePanel({
       {hasRestricted && (
         <p className="mt-6 flex items-center justify-center gap-1.5 text-center text-[11px] text-muted-foreground">
           <Lock className="h-3.5 w-3.5" aria-hidden="true" />
-          Một số năng lực (như hội phí, điều hành) chỉ dành cho quản trị viên.
+          Một số năng lực (như phí tham gia CLB, điều hành) chỉ dành cho quản trị viên.
         </p>
       )}
     </div>

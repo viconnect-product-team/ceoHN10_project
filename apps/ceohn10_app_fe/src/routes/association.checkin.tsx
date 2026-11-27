@@ -900,7 +900,7 @@ function CheckinScreen() {
     registeredEventPass?.name ||
     currentDisplayEvent?.name ||
     currentDisplayEvent?.title ||
-    "Sự kiện Hiệp hội CEO HN10";
+    "Sự kiện CEOHN10 CEO HN10";
   const ticketEventDate = currentDisplayEvent?.date
     ? new Date(currentDisplayEvent.date).toLocaleDateString("vi-VN") + " • " + (currentDisplayEvent.time || "07:30")
     : (registeredEventPass?.time || "Theo lịch sự kiện");

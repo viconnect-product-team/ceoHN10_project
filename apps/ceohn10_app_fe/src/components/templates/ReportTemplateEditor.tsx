@@ -101,7 +101,7 @@ export function ReportTemplateEditor({ type }: ReportTemplateEditorProps) {
         id: "CT-2026-001",
         date: "2026-03-10",
         type: "income",
-        category: currentTemplate.categoryLabel || "Hội phí",
+        category: currentTemplate.categoryLabel || "Phí tham gia CLB",
         description: "Thu niên liễm hội viên chính thức năm 2026",
         amount: 25000000,
         method: "bank",

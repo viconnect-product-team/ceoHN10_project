@@ -747,7 +747,7 @@ function MemberDetailPage() {
                         </p>
                       ) : (
                         <p className="text-sm leading-relaxed text-muted-foreground">
-                          Học viên chính thức Hiệp hội Doanh nhân CEO HN10 (HanoiBA). Sẵn sàng kết nối giao thương, hợp tác kinh doanh và phát triển chuỗi cung ứng bền vững.
+                          Học viên chính thức CEOHN10 Doanh nhân CEO HN10 (HanoiBA). Sẵn sàng kết nối giao thương, hợp tác kinh doanh và phát triển chuỗi cung ứng bền vững.
                         </p>
                       )}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 border-t border-border/60">

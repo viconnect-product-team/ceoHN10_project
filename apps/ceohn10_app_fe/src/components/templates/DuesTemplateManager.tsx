@@ -78,7 +78,7 @@ export function DuesTemplateManager() {
   };
 
   const handleSaveBankConfig = () => {
-    toast.success("Đã lưu cấu hình tài khoản thanh toán hội phí thành công!");
+    toast.success("Đã lưu cấu hình tài khoản thanh toán phí tham gia CLB thành công!");
   };
 
   return (
@@ -89,13 +89,13 @@ export function DuesTemplateManager() {
           <div className="space-y-1.5">
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300">
               <Wallet className="size-3.5 text-emerald-500" />
-              <span>Cổng Mẫu Thanh Toán Hội Phí &amp; VietQR Dynamic</span>
+              <span>Cổng Mẫu Thanh Toán Phí Tham Gia CLB &amp; VietQR Dynamic</span>
             </div>
             <h3 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-              Quản Lý Mẫu Trang &amp; Thông Báo Thanh Toán Hội Phí
+              Quản Lý Mẫu Trang &amp; Thông Báo Thanh Toán Phí Tham Gia CLB
             </h3>
             <p className="max-w-2xl text-xs text-slate-500 dark:text-slate-400">
-              Cấu hình tài khoản ngân hàng thụ hưởng, bảng định mức hội phí theo phân hạng Học viên, mã VietQR thanh toán tự sinh và mẫu thông báo nhắc nộp niên liễm đa kênh.
+              Cấu hình tài khoản ngân hàng thụ hưởng, bảng định mức phí tham gia CLB theo phân hạng Học viên, mã VietQR thanh toán tự sinh và mẫu thông báo nhắc nộp niên liễm đa kênh.
             </p>
           </div>
 
@@ -106,7 +106,7 @@ export function DuesTemplateManager() {
               className="inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-emerald-600 to-teal-700 px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-emerald-600/20 hover:brightness-110 transition cursor-pointer"
             >
               <Send className="size-4" />
-              <span>Gửi Thông Báo Hội Phí Đa Kênh</span>
+              <span>Gửi Thông Báo Phí Tham Gia CLB Đa Kênh</span>
             </button>
           </div>
         </div>
@@ -114,7 +114,7 @@ export function DuesTemplateManager() {
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Cột Trái: Cấu Hình Tài Khoản & Mức Hội Phí (7 Cột) */}
+        {/* Cột Trái: Cấu Hình Tài Khoản & Mức Phí Tham Gia CLB (7 Cột) */}
         <div className="lg:col-span-7 space-y-6">
           {/* CẤU HÌNH TÀI KHOẢN NGÂN HÀNG CLB */}
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
@@ -171,7 +171,7 @@ export function DuesTemplateManager() {
             </div>
           </div>
 
-          {/* BẢNG ĐỊNH MỨC HỘI PHÍ THEO HẠNG */}
+          {/* BẢNG ĐỊNH MỨC PHÍ THAM GIA CLB THEO HẠNG */}
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
               <Layers className="size-4 text-emerald-500" />
@@ -275,7 +275,7 @@ export function DuesTemplateManager() {
                 CLB DOANH NHÂN CEO HN10 (HANOIBA)
               </div>
               <h3 className="text-sm font-black text-white uppercase mt-0.5">
-                Phiếu Nộp Hội Phí Thường Niên
+                Phiếu Nộp Phí Tham Gia CLB Thường Niên
               </h3>
               <div className="text-xs text-slate-400 mt-1">
                 {selectedPkg.name}

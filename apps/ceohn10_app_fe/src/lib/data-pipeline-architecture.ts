@@ -97,7 +97,7 @@ export const REDIS_SPECIFICATION = {
   pubSubChannels: [
     { name: "ceohn10:crm:to:mobile", desc: "Bắn thông báo phê duyệt, lịch họp, thay đổi phòng họp từ Web xuống Mobile" },
     { name: "ceohn10:mobile:to:crm", desc: "Đẩy phiếu đăng ký sự kiện, check-in QR, yêu cầu book phòng từ Mobile lên Web" },
-    { name: "ceohn10:sync:association:{id}", desc: "Kênh dữ liệu chung của hiệp hội (tin tức, giao thương B2B)" },
+    { name: "ceohn10:sync:association:{id}", desc: "Kênh dữ liệu chung của CEOHN10 (tin tức, giao thương B2B)" },
   ],
 };
 

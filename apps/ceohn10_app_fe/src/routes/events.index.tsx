@@ -458,7 +458,7 @@ function EventsPage() {
         try {
           await createNotif({
             data: {
-              title: `[Sự kiện mới] ${payload.name || "Sự kiện Hiệp hội CEO HN10"}`,
+              title: `[Sự kiện mới] ${payload.name || "Sự kiện CEOHN10 CEO HN10"}`,
               body: `Sự kiện "${payload.name}" diễn ra vào ${payload.date} tại ${payload.location || "Hội trường CLB CEO HN10"}. Kính mời toàn thể Quý Học viên đăng ký tham gia!`,
               category: "event",
               audience: "all",
@@ -605,7 +605,7 @@ function EventsPage() {
 
   const handleExport = () => {
     exportToExcel<EventItem>({
-      title: "BÁO CÁO TỔNG HỢP SỰ KIỆN & HỘI NGHỊ HIỆP HỘI DOANH NHÂN CEO HN10",
+      title: "BÁO CÁO TỔNG HỢP SỰ KIỆN & HỘI NGHỊ CEOHN10 DOANH NHÂN CEO HN10",
       subtitle: "Trực thuộc Hội Doanh Nhân Trẻ Hà Nội (HanoiBA)",
       filename: "danh-sach-su-kien-ceohn10",
       sheetName: "Danh_Sach_Su_Kien",

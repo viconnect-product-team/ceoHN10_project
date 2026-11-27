@@ -177,14 +177,14 @@ function CompaniesPage() {
     { name: "phone", label: "Hotline / Số điện thoại", type: "text" },
     {
       name: "feePaid",
-      label: "Trạng thái hội phí",
+      label: "Trạng thái phí tham gia CLB",
       type: "select",
       options: [
         { value: "unpaid", label: "Chưa thanh toán" },
         { value: "paid", label: "Đã thanh toán" },
       ],
     },
-    { name: "feeYear", label: "Năm hội phí", type: "number" },
+    { name: "feeYear", label: "Năm phí tham gia CLB", type: "number" },
     { name: "about", label: "Giới thiệu doanh nghiệp", type: "textarea" },
   ];
 
@@ -207,7 +207,7 @@ function CompaniesPage() {
   const handleToggleFeePaid = async (m: Member) => {
     const nextStatus = !m.feePaid;
     try {
-      toast.info(`Đang cập nhật trạng thái hội phí của ${m.name}...`);
+      toast.info(`Đang cập nhật trạng thái phí tham gia CLB của ${m.name}...`);
       await fetchNestApi(`/members/${m.id}`, {
         method: "PUT",
         body: JSON.stringify({
@@ -222,7 +222,7 @@ function CompaniesPage() {
       );
       toast.success(
         nextStatus
-          ? `Đã đánh dấu "${m.name}" ĐÃ THANH TOÁN hội phí!`
+          ? `Đã đánh dấu "${m.name}" ĐÃ THANH TOÁN phí tham gia CLB!`
           : `Đã chuyển "${m.name}" sang CHƯA THANH TOÁN!`
       );
       await router.invalidate({ sync: true });
@@ -353,7 +353,7 @@ function CompaniesPage() {
 
   const handleExport = () => {
     exportToExcel<Member>({
-      title: "DANH BẠ DOANH NGHIỆP Học viên HIỆP HỘI DOANH NHÂN CEO HN10",
+      title: "DANH BẠ DOANH NGHIỆP Học viên CEOHN10 DOANH NHÂN CEO HN10",
       subtitle: "Trực thuộc Hội Doanh Nhân Trẻ Hà Nội (HanoiBA)",
       filename: "danh-ba-doanh-nghiep-ceohn10",
       sheetName: "Doanh_Nghiep_Hoi_Vien",
@@ -368,7 +368,7 @@ function CompaniesPage() {
         { header: "Ngành nghề kinh doanh", key: "industry", width: 24, value: (m) => m.industry },
         { header: "Khu vực hoạt động", key: "region", width: 18, value: (m) => m.region },
         { header: "Quy mô Học viên", key: "level", width: 18, value: (m) => m.level },
-        { header: "Hội phí", key: "feePaid", width: 16, value: (m) => (m.feePaid ? "Đã nộp" : "Chưa nộp") },
+        { header: "Phí tham gia CLB", key: "feePaid", width: 16, value: (m) => (m.feePaid ? "Đã nộp" : "Chưa nộp") },
         { header: "Số lao động", key: "employees", width: 16, value: (m) => m.employees ?? "—" },
         { header: "Trạng thái", key: "status", width: 16, value: (m) => (m.status === "active" ? "Hoạt động" : "Chờ duyệt") },
       ],
@@ -741,7 +741,7 @@ function CompanyCard({
         {/* Fee status indicator */}
         <div className="mt-3 flex items-center justify-between rounded-xl border border-border/60 bg-background/50 px-3 py-2 text-xs">
           <span className="text-[11px] font-medium text-muted-foreground">
-            Hội phí {m.feeYear || new Date().getFullYear()}:
+            Phí tham gia CLB {m.feeYear || new Date().getFullYear()}:
           </span>
           {isAdmin ? (
             <button
@@ -751,7 +751,7 @@ function CompanyCard({
                   ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/30"
                   : "bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 border border-amber-500/30"
                 }`}
-              title="Nhấn để đổi trạng thái đóng hội phí"
+              title="Nhấn để đổi trạng thái đóng phí tham gia CLB"
             >
               <span className={`h-1.5 w-1.5 rounded-full ${m.feePaid ? "bg-emerald-500" : "bg-amber-500"}`} />
               {m.feePaid ? "Đã thanh toán" : "Chưa thanh toán"}
@@ -882,7 +882,7 @@ function CompanyTable({
                 className="border-b border-border"
               />
               <SortHeader
-                label="Hội phí"
+                label="Phí tham gia CLB"
                 columnKey="feePaid"
                 sortKey={tc.sortKey}
                 sortDir={tc.sortDir}
@@ -952,7 +952,7 @@ function CompanyTable({
                             ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/30"
                             : "bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 border border-amber-500/30"
                           }`}
-                        title="Nhấp để chuyển trạng thái hội phí"
+                        title="Nhấp để chuyển trạng thái phí tham gia CLB"
                       >
                         <span className={`h-1.5 w-1.5 rounded-full ${m.feePaid ? "bg-emerald-500" : "bg-amber-500"}`} />
                         {m.feePaid ? "Đã thanh toán" : "Chưa thanh toán"}

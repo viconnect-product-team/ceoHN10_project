@@ -110,7 +110,7 @@ export const INITIAL_MAIL_TEMPLATES: MailTemplateItem[] = [
       {
         id: "f_fee",
         key: "activity_fee",
-        label: "Chi phí / Hội phí tham dự",
+        label: "Chi phí / Phí tham gia CLB tham dự",
         type: "price",
         value: "0",
         placeholder: "0 VNĐ (Miễn phí dành cho Học viên)",
@@ -288,7 +288,7 @@ export const INITIAL_MAIL_TEMPLATES: MailTemplateItem[] = [
       { key: "speaker_name", label: "Chủ trì cuộc họp", example: "Chủ tịch CLB Doanh Nhân CEO HN10 & Tổng Thư Ký" },
       { key: "event_summary", label: "Nội dung chính", example: "Đánh giá kết quả kết nối B2B quý 3, Thống nhất kế hoạch xúc tiến thương mại và phê duyệt tân Học viên quý 4" },
       { key: "event_date", label: "Thời gian", example: "14:00 - 17:00 Thứ Sáu, 16/10/2026" },
-      { key: "event_location", label: "Địa điểm / Phòng họp", example: "Văn phòng Hiệp hội HanoiBA, Tầng 5 Tháp Doanh Nhân" },
+      { key: "event_location", label: "Địa điểm / Phòng họp", example: "Văn phòng CEOHN10 HanoiBA, Tầng 5 Tháp Doanh Nhân" },
       { key: "event_fee", label: "Chi phí", example: "Kinh phí CLB đài thọ" },
       { key: "google_maps_url", label: "Google Maps", example: "https://maps.google.com/?q=HanoiBA+Office" },
       { key: "dress_code", label: "Trang phục", example: "Công sở lịch sự / Áo đồng phục CEO HN10" },
@@ -593,17 +593,17 @@ export const INITIAL_MAIL_TEMPLATES: MailTemplateItem[] = [
     id: "tmpl-fee-payment",
     code: "FEE_NOTICE_ANNUAL",
     category: "fee",
-    name: "Thông Báo Nộp Hội Phí Niên Liễm Định Kỳ",
-    description: "Mẫu thông báo hội phí niên liễm định kỳ với đầy đủ thông tin số tài khoản và ngân hàng CLB.",
+    name: "Thông Báo Nộp Phí Tham Gia CLB Niên Liễm Định Kỳ",
+    description: "Mẫu thông báo phí tham gia CLB niên liễm định kỳ với đầy đủ thông tin số tài khoản và ngân hàng CLB.",
     channels: ["email", "in_app", "zalo_oa"],
-    subject: "[CEO HN10] Thông báo nộp hội phí thường niên năm {{fee_year}} - {{full_name}}",
-    inAppTitle: "Thông báo nộp hội phí năm {{fee_year}}",
-    inAppBody: "Kính gửi Anh/Chị {{full_name}}\n- Ban Thường Trực CLB Doanh Nhân CEO HN10 trân trọng thông báo quyết toán niên liễm năm {{fee_year}}.\n- Mức hội phí: {{fee_amount}} VNĐ\n- Hạn nộp: {{due_date}}\n- Tên tài khoản: {{bank_owner}}\n- Số tài khoản CLB: {{bank_account}}\n- Ngân hàng: {{bank_name}}\n- Cú pháp chuyển khoản: {{transfer_content}}\n- Hotline Kế toán: 0973.205.683 / 0903.205.683 / 0903.203.204\n- Trân trọng! TM. BAN TÀI CHÍNH & KẾ TOÁN CLB DOANH NHÂN CEO HN10",
+    subject: "[CEO HN10] Thông báo nộp phí tham gia CLB thường niên năm {{fee_year}} - {{full_name}}",
+    inAppTitle: "Thông báo nộp phí tham gia CLB năm {{fee_year}}",
+    inAppBody: "Kính gửi Anh/Chị {{full_name}}\n- Ban Thường Trực CLB Doanh Nhân CEO HN10 trân trọng thông báo quyết toán niên liễm năm {{fee_year}}.\n- Mức phí tham gia CLB: {{fee_amount}} VNĐ\n- Hạn nộp: {{due_date}}\n- Tên tài khoản: {{bank_owner}}\n- Số tài khoản CLB: {{bank_account}}\n- Ngân hàng: {{bank_name}}\n- Cú pháp chuyển khoản: {{transfer_content}}\n- Hotline Kế toán: 0973.205.683 / 0903.205.683 / 0903.203.204\n- Trân trọng! TM. BAN TÀI CHÍNH & KẾ TOÁN CLB DOANH NHÂN CEO HN10",
     variables: [
       { key: "full_name", label: "Tên Học viên / Đại diện", example: "Phạm Hồng Nguyên" },
       { key: "company_name", label: "Tên doanh nghiệp", example: "Tập Đoàn An Phát" },
       { key: "fee_year", label: "Năm tài chính", example: "2026" },
-      { key: "fee_amount", label: "Mức hội phí", example: "5.000.000" },
+      { key: "fee_amount", label: "Mức phí tham gia CLB", example: "5.000.000" },
       { key: "due_date", label: "Hạn thanh toán", example: "31/12/2026" },
       { key: "bank_name", label: "Ngân hàng CLB", example: "MB Bank (Ngân hàng Quân Đội)" },
       { key: "bank_account", label: "Số tài khoản CLB", example: "19832026888" },
@@ -617,17 +617,17 @@ export const INITIAL_MAIL_TEMPLATES: MailTemplateItem[] = [
     <div style="display: inline-block; padding: 4px 14px; background: rgba(212, 160, 23, 0.25); border: 1px solid rgba(212, 160, 23, 0.5); border-radius: 9999px; font-size: 11px; font-weight: 700; color: #f6d365; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">
       THÔNG BÁO TÀI CHÍNH CLB
     </div>
-    <h1 style="margin: 0; font-size: 21px; font-weight: 800; color: #ffffff;">THÔNG BÁO NỘP HỘI PHÍ NIÊN LIỄM NĂM {{fee_year}}</h1>
+    <h1 style="margin: 0; font-size: 21px; font-weight: 800; color: #ffffff;">THÔNG BÁO NỘP PHÍ THAM GIA CLB NIÊN LIỄM NĂM {{fee_year}}</h1>
     <p style="margin: 8px 0 0; font-size: 13px; color: #cbd5e1;">CLB Doanh Nhân CEO HN10 (HanoiBA)</p>
   </div>
   <div style="padding: 26px 24px; color: #1e293b; line-height: 1.6; font-size: 14px;">
     <p style="margin: 0 0 10px; font-size: 15px;"><strong>Kính gửi Anh/Chị {{full_name}}</strong> ({{company_name}}),</p>
-    <p style="margin: 0 0 14px; color: #334155;">- Ban Thường Trực CLB Doanh Nhân CEO HN10 trân trọng thông báo quyết toán hội phí niên liễm năm {{fee_year}}:</p>
+    <p style="margin: 0 0 14px; color: #334155;">- Ban Thường Trực CLB Doanh Nhân CEO HN10 trân trọng thông báo quyết toán phí tham gia CLB niên liễm năm {{fee_year}}:</p>
 
     <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #f59e0b; border-radius: 10px; padding: 18px; margin: 16px 0;">
       <p style="margin: 0 0 8px; font-weight: bold; color: #001D4A; text-transform: uppercase; font-size: 12.5px;">- Thông tin nộp phí &amp; Tài khoản CLB:</p>
       <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
-        <tr><td style="padding: 4px 0; color: #64748b; width: 170px;">+ Mức hội phí:</td><td style="padding: 4px 0; font-weight: 700; color: #b45309; font-size: 15px;">{{fee_amount}} VNĐ</td></tr>
+        <tr><td style="padding: 4px 0; color: #64748b; width: 170px;">+ Mức phí tham gia CLB:</td><td style="padding: 4px 0; font-weight: 700; color: #b45309; font-size: 15px;">{{fee_amount}} VNĐ</td></tr>
         <tr><td style="padding: 4px 0; color: #64748b;">+ Hạn nộp:</td><td style="padding: 4px 0; font-weight: 600; color: #0f172a;">{{due_date}}</td></tr>
         <tr><td style="padding: 4px 0; color: #64748b;">+ Tên tài khoản:</td><td style="padding: 4px 0; font-weight: 600; color: #0f172a;">{{bank_owner}}</td></tr>
         <tr><td style="padding: 4px 0; color: #64748b;">+ Số tài khoản CLB:</td><td style="padding: 4px 0; font-family: monospace; font-weight: 800; color: #0284c7; font-size: 15px;">{{bank_account}}</td></tr>
@@ -776,7 +776,7 @@ export const INITIAL_MAIL_TEMPLATES: MailTemplateItem[] = [
     </div>
     <h1 style="margin: 0; font-size: 24px; font-weight: 900; color: #ffffff; letter-spacing: 0.5px;">CHÚC MỪNG SINH NHẬT Học viên</h1>
     <p style="margin: 8px 0 0; font-size: 15px; color: #fef08a; font-weight: 700;">Anh/Chị {{full_name}} ({{birth_date}})</p>
-    <p style="margin: 4px 0 0; font-size: 12px; color: #cbd5e1;">CLB Doanh Nhân CEO HN10 - Hiệp Hội Doanh Nghiệp Trẻ Hà Nội (HanoiBA)</p>
+    <p style="margin: 4px 0 0; font-size: 12px; color: #cbd5e1;">CLB Doanh Nhân CEO HN10 - CEOHN10 Doanh Nghiệp Trẻ Hà Nội (HanoiBA)</p>
   </div>
 
   <div style="padding: 16px 20px 0; text-align: center; background: #fafafa;">
@@ -809,7 +809,7 @@ export const INITIAL_MAIL_TEMPLATES: MailTemplateItem[] = [
       <div>
         <p style="margin: 0; font-size: 12px; color: #64748b; text-transform: uppercase;">Trân trọng chúc mừng,</p>
         <p style="margin: 4px 0 0; font-size: 14px; font-weight: 800; color: #002B66;">CHỦ TỊCH CLB DOANH NHÂN CEO HN10</p>
-        <p style="margin: 2px 0 0; font-size: 12px; color: #d97706; font-weight: 600;">Cùng Toàn Thể Ban Điều Hành Hiệp Hội</p>
+        <p style="margin: 2px 0 0; font-size: 12px; color: #d97706; font-weight: 600;">Cùng Toàn Thể Ban Điều Hành CEOHN10</p>
       </div>
     </div>
   </div>
@@ -841,7 +841,7 @@ export const INITIAL_MAIL_TEMPLATES: MailTemplateItem[] = [
       BẢN TIN XÚC TIẾN GIAO THƯƠNG B2B
     </div>
     <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #ffffff;">KẾT NỐI CƠ HỘI KINH DOANH THÁNG {{campaign_month}}</h1>
-    <p style="margin: 8px 0 0; font-size: 13px; color: #94a3b8;">Cộng đồng Doanh nhân CEO HN10 - Hiệp Hội HanoiBA</p>
+    <p style="margin: 8px 0 0; font-size: 13px; color: #94a3b8;">Cộng đồng Doanh nhân CEO HN10 - CEOHN10 HanoiBA</p>
   </div>
   <div style="padding: 28px 24px; color: #1e293b;">
     <p style="margin: 0 0 16px; font-size: 15px; line-height: 1.6;">
@@ -896,7 +896,7 @@ export interface VisualBlockContent {
   // Chữ ký / Lời kết
   signature?: string;
 
-  // Mẫu nộp hội phí (fee)
+  // Mẫu nộp phí tham gia CLB (fee)
   feeTitle?: string;
   feeAmount?: string;
   dueDate?: string;
@@ -931,7 +931,7 @@ export function buildInAppBodyFromVisualContent(c: VisualBlockContent, category?
   if (category === "fee") {
     return `${c.greeting || "Kính gửi Anh/Chị {{full_name}}"}
 - ${c.feeTitle || "Ban Thường Trực CLB Doanh Nhân CEO HN10 trân trọng thông báo quyết toán niên liễm năm {{fee_year}}."}
-- Mức hội phí: ${c.feeAmount || "{{fee_amount}} VNĐ"}
+- Mức phí tham gia CLB: ${c.feeAmount || "{{fee_amount}} VNĐ"}
 - Hạn nộp: ${c.dueDate || "{{due_date}}"}
 - Tên tài khoản: ${c.bankOwner || "CLB DOANH NHAN CEO HN10"}
 - Số tài khoản: ${c.bankAccount || "19832026888"}
@@ -979,16 +979,16 @@ export function buildHtmlFromVisualContent(c: VisualBlockContent, category?: Mai
     <div style="display: inline-block; padding: 4px 14px; background: rgba(212, 160, 23, 0.25); border: 1px solid rgba(212, 160, 23, 0.5); border-radius: 9999px; font-size: 11px; font-weight: 700; color: #f6d365; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">
       THÔNG BÁO TÀI CHÍNH CLB
     </div>
-    <h1 style="margin: 0; font-size: 20px; font-weight: 800; color: #ffffff;">${c.feeTitle || "THÔNG BÁO NỘP HỘI PHÍ NIÊN LIỄM NĂM {{fee_year}}"}</h1>
+    <h1 style="margin: 0; font-size: 20px; font-weight: 800; color: #ffffff;">${c.feeTitle || "THÔNG BÁO NỘP PHÍ THAM GIA CLB NIÊN LIỄM NĂM {{fee_year}}"}</h1>
     <p style="margin: 8px 0 0; font-size: 13px; color: #cbd5e1;">CLB Doanh Nhân CEO HN10 (HanoiBA)</p>
   </div>
   <div style="padding: 26px 24px; color: #1e293b; line-height: 1.6; font-size: 14px;">
     <p style="margin: 0 0 10px; font-size: 15px;"><strong>${c.greeting || "Kính gửi Anh/Chị {{full_name}}"}</strong></p>
-    <p style="margin: 0 0 14px; color: #334155;">- Ban Thường Trực CLB Doanh Nhân CEO HN10 trân trọng thông báo quyết toán hội phí niên liễm năm {{fee_year}}:</p>
+    <p style="margin: 0 0 14px; color: #334155;">- Ban Thường Trực CLB Doanh Nhân CEO HN10 trân trọng thông báo quyết toán phí tham gia CLB niên liễm năm {{fee_year}}:</p>
     <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #f59e0b; border-radius: 10px; padding: 18px; margin: 16px 0;">
       <p style="margin: 0 0 8px; font-weight: bold; color: #001D4A; text-transform: uppercase; font-size: 12.5px;">- Thông tin nộp phí & Tài khoản CLB:</p>
       <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
-        <tr><td style="padding: 4px 0; color: #64748b; width: 170px;">+ Mức hội phí:</td><td style="padding: 4px 0; font-weight: 700; color: #b45309; font-size: 15px;">${c.feeAmount || "{{fee_amount}} VNĐ"}</td></tr>
+        <tr><td style="padding: 4px 0; color: #64748b; width: 170px;">+ Mức phí tham gia CLB:</td><td style="padding: 4px 0; font-weight: 700; color: #b45309; font-size: 15px;">${c.feeAmount || "{{fee_amount}} VNĐ"}</td></tr>
         <tr><td style="padding: 4px 0; color: #64748b;">+ Hạn nộp:</td><td style="padding: 4px 0; font-weight: 600; color: #0f172a;">${c.dueDate || "{{due_date}}"}</td></tr>
         <tr><td style="padding: 4px 0; color: #64748b;">+ Tên tài khoản:</td><td style="padding: 4px 0; font-weight: 600; color: #0f172a;">${c.bankOwner || "CLB DOANH NHAN CEO HN10"}</td></tr>
         <tr><td style="padding: 4px 0; color: #64748b;">+ Số tài khoản CLB:</td><td style="padding: 4px 0; font-family: monospace; font-weight: 800; color: #0284c7; font-size: 15px;">${c.bankAccount || "19832026888"}</td></tr>
@@ -1088,7 +1088,7 @@ function extractVisualContentFromTemplate(t: MailTemplateItem): VisualBlockConte
   if (isFee) {
     return {
       greeting: "Kính gửi Anh/Chị {{full_name}}",
-      feeTitle: t.name || "THÔNG BÁO NỘP HỘI PHÍ NIÊN LIỄM NĂM {{fee_year}}",
+      feeTitle: t.name || "THÔNG BÁO NỘP PHÍ THAM GIA CLB NIÊN LIỄM NĂM {{fee_year}}",
       feeAmount: "{{fee_amount}} VNĐ",
       dueDate: "{{due_date}}",
       bankName: "MB Bank (Ngân Hàng Quân Đội) - CN Ba Đình",
@@ -1100,11 +1100,11 @@ function extractVisualContentFromTemplate(t: MailTemplateItem): VisualBlockConte
       headerBadge: "THÔNG BÁO TÀI CHÍNH",
       headerTitle: t.name,
       headerSubtitle: "CLB Doanh Nhân CEO HN10",
-      introMessage: "Ban Thường Trực CLB Doanh Nhân CEO HN10 trân trọng thông báo quyết toán hội phí niên liễm năm {{fee_year}}:",
+      introMessage: "Ban Thường Trực CLB Doanh Nhân CEO HN10 trân trọng thông báo quyết toán phí tham gia CLB niên liễm năm {{fee_year}}:",
       showHighlightBox: true,
-      highlightBoxTitle: "THÔNG TIN NỘP HỘI PHÍ",
+      highlightBoxTitle: "THÔNG TIN NỘP PHÍ THAM GIA CLB",
       highlightRows: [
-        { label: "Mức hội phí", value: "{{fee_amount}} VNĐ" },
+        { label: "Mức phí tham gia CLB", value: "{{fee_amount}} VNĐ" },
         { label: "Hạn nộp", value: "{{due_date}}" },
         { label: "Số tài khoản CLB", value: "19832026888" },
         { label: "Ngân hàng", value: "MB Bank" },
@@ -1762,7 +1762,7 @@ export function MailTemplateManager() {
           { key: "speaker_name", label: "Chủ trì cuộc họp", example: "Trưởng Ban & Phó Chủ Tịch CLB" },
           { key: "event_summary", label: "Nội dung chính", example: "Tổng kết giao thương quý 3 và định hướng triển khai quý 4/2026" },
           { key: "event_date", label: "Thời gian", example: "09:00 Thứ Bảy, 22/11/2026" },
-          { key: "event_location", label: "Địa điểm", example: "Văn phòng Hiệp hội HanoiBA, Keangnam Landmark 72" },
+          { key: "event_location", label: "Địa điểm", example: "Văn phòng CEOHN10 HanoiBA, Keangnam Landmark 72" },
           { key: "event_fee", label: "Chi phí", example: "Kinh phí CLB đài thọ" },
           { key: "google_maps_url", label: "Google Maps", example: "https://maps.app.goo.gl/hanoiba" },
           { key: "dress_code", label: "Trang phục", example: "Lịch sự / Đồng phục CLB" },
@@ -1779,7 +1779,7 @@ export function MailTemplateManager() {
     } else if (presetKey === "ANNUAL_FEE_NOTICE") {
       const visual: VisualBlockContent = {
         greeting: "Kính gửi Anh/Chị {{full_name}}",
-        feeTitle: "THÔNG BÁO NỘP HỘI PHÍ NIÊN LIỄM NĂM {{fee_year}}",
+        feeTitle: "THÔNG BÁO NỘP PHÍ THAM GIA CLB NIÊN LIỄM NĂM {{fee_year}}",
         feeAmount: "{{fee_amount}} VNĐ",
         dueDate: "{{due_date}}",
         bankOwner: "CLB DOANH NHAN CEO HN10",
@@ -1792,18 +1792,18 @@ export function MailTemplateManager() {
       const tmpl: MailTemplateItem = {
         ...editingTemplate,
         code: "FEE_NOTICE_ANNUAL",
-        name: "Thông Báo Nộp Hội Phí Niên Liễm Định Kỳ",
+        name: "Thông Báo Nộp Phí Tham Gia CLB Niên Liễm Định Kỳ",
         category: "fee",
-        description: "Mẫu thông báo hội phí niên liễm với đầy đủ số tài khoản và thông tin chuyển khoản CLB.",
-        subject: "[CEO HN10] Thông báo nộp hội phí thường niên năm {{fee_year}} - {{full_name}}",
-        inAppTitle: "Thông báo nộp hội phí năm {{fee_year}}",
+        description: "Mẫu thông báo phí tham gia CLB niên liễm với đầy đủ số tài khoản và thông tin chuyển khoản CLB.",
+        subject: "[CEO HN10] Thông báo nộp phí tham gia CLB thường niên năm {{fee_year}} - {{full_name}}",
+        inAppTitle: "Thông báo nộp phí tham gia CLB năm {{fee_year}}",
         inAppBody: buildInAppBodyFromVisualContent(visual, "fee"),
         htmlBody: buildHtmlFromVisualContent(visual, "fee"),
         variables: [
           { key: "full_name", label: "Tên Học viên", example: "Phạm Hồng Nguyên" },
           { key: "member_code", label: "Mã Học viên", example: "HN10-008" },
           { key: "fee_year", label: "Năm tài chính", example: "2026" },
-          { key: "fee_amount", label: "Mức hội phí", example: "5.000.000" },
+          { key: "fee_amount", label: "Mức phí tham gia CLB", example: "5.000.000" },
           { key: "due_date", label: "Hạn thanh toán", example: "31/12/2026" },
           { key: "bank_account", label: "Số tài khoản CLB", example: "19832026888" },
           { key: "bank_name", label: "Ngân hàng", example: "MB Bank - CN Ba Đình" },
@@ -1814,7 +1814,7 @@ export function MailTemplateManager() {
       };
       setEditingTemplate(tmpl);
       setVisualContent(visual);
-      toast.success("Đã áp dụng mẫu Thông báo hội phí niên liễm!");
+      toast.success("Đã áp dụng mẫu Thông báo phí tham gia CLB niên liễm!");
       return;
     } else if (presetKey === "MEMBER_WELCOME_THANKS") {
       const visual: VisualBlockContent = {
@@ -2284,7 +2284,7 @@ export function MailTemplateManager() {
             Hệ Thống Quản Lý Template Email & Thông Báo Đa Kênh Tự Động
           </h2>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Cấu hình giao diện, nội dung mẫu động (Hội phí, Thư cảm ơn Học viên mới, Nhắc phí, Vé QR sự kiện) và bắn thử nghiệm về mail Quản trị viên
+            Cấu hình giao diện, nội dung mẫu động (Phí tham gia CLB, Thư cảm ơn Học viên mới, Nhắc phí, Vé QR sự kiện) và bắn thử nghiệm về mail Quản trị viên
           </p>
         </div>
 
@@ -2310,7 +2310,7 @@ export function MailTemplateManager() {
             <div className="grid grid-cols-2 gap-1.5 text-xs font-medium">
               {[
                 { id: "all", label: "Tất cả", icon: Layers },
-                { id: "fee", label: "Hội phí & Niên liễm", icon: DollarSign },
+                { id: "fee", label: "Phí tham gia CLB & Niên liễm", icon: DollarSign },
                 { id: "welcome", label: "Chào mừng & Cảm ơn", icon: UserCheck },
                 { id: "birthday", label: "Chúc mừng Sinh nhật", icon: Gift },
                 { id: "marketing", label: "Email Marketing & B2B", icon: Mail },
@@ -3292,7 +3292,7 @@ export function MailTemplateManager() {
                       <option value="EVENT_INVITATION">Thư mời tham dự sự kiện (Format chuẩn tinh gọn)</option>
                       <option value="MEETING_INVITATION">Thư mời cuộc họp ban chuyên môn</option>
                       <option value="TRAINING_INVITATION">Thư mời chương trình đào tạo chuyên đề</option>
-                      <option value="ANNUAL_FEE_NOTICE">Thông báo hội phí niên liễm (Để trống QR, thêm STK CLB)</option>
+                      <option value="ANNUAL_FEE_NOTICE">Thông báo phí tham gia CLB niên liễm (Để trống QR, thêm STK CLB)</option>
                       <option value="MEMBER_WELCOME_THANKS">Thư cảm ơn đăng ký Học viên mới</option>
                       <option value="MEMBER_ACCOUNT_CREDENTIALS">Template gửi tài khoản đăng nhập cho Học viên mới</option>
                     </select>
@@ -3349,7 +3349,7 @@ export function MailTemplateManager() {
                     onChange={(e) => setEditingTemplate({ ...editingTemplate, category: e.target.value as MailCategory })}
                     className="w-full rounded-xl border border-border bg-background p-2 text-xs font-medium"
                   >
-                    <option value="fee">Hội phí & Niên liễm</option>
+                    <option value="fee">Phí tham gia CLB & Niên liễm</option>
                     <option value="welcome">Chào mừng & Cảm ơn Học viên</option>
                     <option value="event">Sự kiện & Vé mời QR</option>
                     <option value="meeting">Cuộc họp & Lịch ban</option>
@@ -3365,7 +3365,7 @@ export function MailTemplateManager() {
                   required
                   value={editingTemplate.subject}
                   onChange={(e) => setEditingTemplate({ ...editingTemplate, subject: e.target.value })}
-                  placeholder="Ví dụ: [CEO HN10] Thông báo nộp hội phí {{fee_year}}"
+                  placeholder="Ví dụ: [CEO HN10] Thông báo nộp phí tham gia CLB {{fee_year}}"
                   className="w-full rounded-xl border border-border bg-background p-2.5 text-xs font-semibold"
                 />
               </div>
@@ -3452,10 +3452,10 @@ export function MailTemplateManager() {
                 {/* VISUAL BLOCK MODE */}
                 {modalEditorMode === "visual" ? (
                   editingTemplate.category === "fee" ? (
-                    /* DÀNH CHO MẪU HỘI PHÍ (FEE) - TỰ CHỈNH SỬA TẤT CẢ CÁC TRƯỜNG */
+                    /* DÀNH CHO MẪU PHÍ THAM GIA CLB (FEE) - TỰ CHỈNH SỬA TẤT CẢ CÁC TRƯỜNG */
                     <div className="space-y-3.5 bg-slate-50/70 dark:bg-slate-900/40 p-3 sm:p-4 rounded-2xl border border-border">
                       <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 text-xs text-amber-800 dark:text-amber-300">
-                        <strong>Mẫu Thông Báo Nộp Hội Phí:</strong> Mẫu riêng biệt cho kế toán/tài chính, người dùng có thể tự do chỉnh sửa từng trường thông tin tài khoản và mức phí bên dưới.
+                        <strong>Mẫu Thông Báo Nộp Phí Tham Gia CLB:</strong> Mẫu riêng biệt cho kế toán/tài chính, người dùng có thể tự do chỉnh sửa từng trường thông tin tài khoản và mức phí bên dưới.
                       </div>
                       <div className="bg-card p-3 rounded-xl border border-border space-y-1.5">
                         <span className="font-bold text-foreground text-xs block">Khối 1: Lời chào (Kính gửi Anh/Chị)</span>
@@ -3470,7 +3470,7 @@ export function MailTemplateManager() {
                         <span className="font-bold text-foreground text-xs block">Khối 2: Tiêu đề / Lời thông báo nộp phí</span>
                         <input
                           type="text"
-                          value={visualContent.feeTitle || "THÔNG BÁO NỘP HỘI PHÍ NIÊN LIỄM NĂM {{fee_year}}"}
+                          value={visualContent.feeTitle || "THÔNG BÁO NỘP PHÍ THAM GIA CLB NIÊN LIỄM NĂM {{fee_year}}"}
                           onChange={(e) => handleUpdateVisualField("feeTitle", e.target.value)}
                           className="w-full rounded-lg border border-border bg-background p-2 text-xs font-bold text-amber-600 dark:text-amber-400"
                         />
@@ -3479,7 +3479,7 @@ export function MailTemplateManager() {
                         <span className="font-bold text-foreground text-xs block">Khối 3: Thông tin nộp phí &amp; Tài khoản CLB</span>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                           <div>
-                            <label className="text-[11px] font-semibold text-muted-foreground block mb-0.5">+ Mức hội phí</label>
+                            <label className="text-[11px] font-semibold text-muted-foreground block mb-0.5">+ Mức phí tham gia CLB</label>
                             <input
                               type="text"
                               value={visualContent.feeAmount || "{{fee_amount}} VNĐ"}

@@ -19,7 +19,7 @@ const DEFAULT_BIRTHDAY_POLICY: BirthdayPromoPolicy = {
   enabled: true,
   title: "Chúc Mừng Sinh Nhật Học viên CLB Doanh Nhân CEO HN10! 🎂🎉",
   greetingMessage:
-    "Ban Chấp Hành và toàn thể Học viên CLB CEO HN10 kính chúc Quý Anh/Chị tuổi mới dồi dào sức khỏe, gia đình thịnh vượng, doanh nghiệp bứt phá và luôn đồng hành gắn kết cùng Hiệp hội!",
+    "Ban Chấp Hành và toàn thể Học viên CLB CEO HN10 kính chúc Quý Anh/Chị tuổi mới dồi dào sức khỏe, gia đình thịnh vượng, doanh nghiệp bứt phá và luôn đồng hành gắn kết cùng CEOHN10!",
   giftTitle: "Voucher Ưu Đãi Độc Quyền Học viên & Quà Tặng Sự Kiện",
   voucherCode: "CEO HN10-BDAY-VIP",
   discountValue: "2,000,000 đ hoặc Giảm 20% Dịch vụ Thành viên",
@@ -82,7 +82,7 @@ export function BirthdayPromoManager() {
               </span>
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-              Cấu hình tại CRM Hiệp hội. Tự động hiển thị popup chúc mừng & tặng quà khi Học viên có sinh nhật mở App Hiệp hội.
+              Cấu hình tại CRM CEOHN10. Tự động hiển thị popup chúc mừng & tặng quà khi Học viên có sinh nhật mở App CEOHN10.
             </p>
           </div>
         </div>
@@ -149,7 +149,7 @@ export function BirthdayPromoManager() {
 
         <div className="md:col-span-2">
           <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-            Nội dung thông điệp chúc mừng từ Hiệp hội
+            Nội dung thông điệp chúc mừng từ CEOHN10
           </label>
           <textarea
             rows={2}

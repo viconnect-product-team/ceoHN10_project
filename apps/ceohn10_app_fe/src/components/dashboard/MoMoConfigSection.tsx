@@ -74,7 +74,7 @@ export const MoMoConfigSection: React.FC = () => {
   }, []);
 
   const [testAmount, setTestAmount] = useState(50000);
-  const [testOrderInfo, setTestOrderInfo] = useState("CLB CEO HN10 - Thanh toán hội phí thử nghiệm");
+  const [testOrderInfo, setTestOrderInfo] = useState("CLB CEO HN10 - Thanh toán phí tham gia CLB thử nghiệm");
   const [testPaymentData, setTestPaymentData] = useState<{
     orderId?: string;
     payUrl?: string;
@@ -200,7 +200,7 @@ export const MoMoConfigSection: React.FC = () => {
               </span>
             </div>
             <p className="text-xs text-pink-100 mt-0.5">
-              Hỗ trợ thanh toán hội phí, vé sự kiện, B2B qua Ví MoMo, Mã QR, Thẻ ATM Nội Địa & Visa/Mastercard
+              Hỗ trợ thanh toán phí tham gia CLB, vé sự kiện, B2B qua Ví MoMo, Mã QR, Thẻ ATM Nội Địa & Visa/Mastercard
             </p>
           </div>
         </div>
@@ -358,7 +358,7 @@ export const MoMoConfigSection: React.FC = () => {
               </button>
             </div>
             <p className="text-[11px] text-muted-foreground mt-1">
-              Cung cấp URL này vào Cổng Đối tác MoMo để hệ thống tự động gạch nợ hội phí và cấp vé ngay khi Học viên quét MoMo
+              Cung cấp URL này vào Cổng Đối tác MoMo để hệ thống tự động gạch nợ phí tham gia CLB và cấp vé ngay khi Học viên quét MoMo
             </p>
           </div>
         </div>
@@ -612,7 +612,7 @@ export const MoMoConfigSection: React.FC = () => {
                   </button>
 
                   <span className="text-[11px] text-muted-foreground">
-                    Kiểm tra luồng gạch nợ hội phí tự động khi MoMo bắn IPN về CRM
+                    Kiểm tra luồng gạch nợ phí tham gia CLB tự động khi MoMo bắn IPN về CRM
                   </span>
                 </div>
               </div>

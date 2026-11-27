@@ -13,7 +13,7 @@ describe("ai-capability-router", () => {
   it("routes documents / members / fees by keyword", () => {
     expect(detectCapability("Tóm tắt tài liệu quyết định mới").capability).toBe("document_qa");
     expect(detectCapability("Tìm Học viên ngành logistics").capability).toBe("member_search");
-    expect(detectCapability("Hội phí quá hạn còn bao nhiêu?").capability).toBe("fee_analysis");
+    expect(detectCapability("Phí tham gia CLB quá hạn còn bao nhiêu?").capability).toBe("fee_analysis");
     expect(detectCapability("Viết thông báo mời họp").capability).toBe("announcement_draft");
   });
 
@@ -104,13 +104,13 @@ describe("ai-mock-answer-engine", () => {
 
   it("is deterministic for identical input", () => {
     const bundle = buildContextBundle({
-      message: "Hội phí quá hạn",
+      message: "Phí tham gia CLB quá hạn",
       capability: "fee_analysis",
       permissionLevel: "admin",
       data: { fees: { outstanding: 42, overdue: 11, collectionRate: 78 } },
     });
-    const a = generateMockAnswer("Hội phí quá hạn", "fee_analysis", bundle);
-    const b = generateMockAnswer("Hội phí quá hạn", "fee_analysis", bundle);
+    const a = generateMockAnswer("Phí tham gia CLB quá hạn", "fee_analysis", bundle);
+    const b = generateMockAnswer("Phí tham gia CLB quá hạn", "fee_analysis", bundle);
     expect(a.answer).toBe(b.answer);
     expect(a.answer).toContain("42");
     expect(a.answer).toContain("78%");

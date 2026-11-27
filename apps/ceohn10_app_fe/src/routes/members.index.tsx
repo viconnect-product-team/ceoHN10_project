@@ -1598,7 +1598,7 @@ function MembersPage() {
                     </div>
                   </th>
                   <th className="px-4 py-3 border-r border-b border-slate-200 dark:border-slate-800 text-right min-w-[130px] font-bold uppercase tracking-wider text-muted-foreground whitespace-nowrap">
-                    Số tiền hội phí
+                    Số tiền phí tham gia CLB
                   </th>
                   <SortHeader
                     label={t("tbl.joined")}

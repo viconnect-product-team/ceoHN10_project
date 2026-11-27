@@ -34,19 +34,19 @@ type Row = {
 // Mirrors the RLS-enforced access matrix used in /platform/permissions.
 const ROWS: Row[] = [
   {
-    feature: { vi: "Quản lý hiệp hội", en: "Manage associations" },
+    feature: { vi: "Quản lý CEOHN10", en: "Manage associations" },
     platform_admin: "full",
     admin: "none",
     member: "none",
   },
   {
-    feature: { vi: "Chỉ định quản trị viên hiệp hội", en: "Assign association admins" },
+    feature: { vi: "Chỉ định quản trị viên CEOHN10", en: "Assign association admins" },
     platform_admin: "full",
     admin: "none",
     member: "none",
   },
   {
-    feature: { vi: "Cài đặt & logo hiệp hội", en: "Association settings & logo" },
+    feature: { vi: "Cài đặt & logo CEOHN10", en: "Association settings & logo" },
     platform_admin: "full",
     admin: "scoped",
     member: "none",

@@ -89,7 +89,7 @@ function UnifiedCheckinManagementPage() {
           const res = await fetchNestApi<any[]>("/events").catch(() => []);
           const list: TargetSession[] = (Array.isArray(res) ? res : []).map((e: any) => ({
             id: e.id,
-            title: e.title || e.name || "Sự kiện Hiệp Hội",
+            title: e.title || e.name || "Sự kiện CEOHN10",
             type: "events",
             date: e.date || e.startDate || new Date().toISOString(),
             time: e.time || "08:30 - 12:00",

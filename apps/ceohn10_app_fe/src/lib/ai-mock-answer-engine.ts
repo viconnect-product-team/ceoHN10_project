@@ -63,7 +63,7 @@ function composeDynamicAnswer(capability: AiCapability, bundle: ContextBundle, u
     lower.includes("tôn chỉ") ||
     lower.includes("mục đích") ||
     lower.includes("clb ceo hn10") ||
-    lower.includes("hiệp hội ceo hn10")
+    lower.includes("CEOHN10 ceo hn10")
   ) {
     return [
       "🌟 **CLB Doanh Nhân CEO HN10 (Trực thuộc HanoiBA - Hội Doanh Nghiệp Trẻ Hà Nội):**",
@@ -79,25 +79,25 @@ function composeDynamicAnswer(capability: AiCapability, bundle: ContextBundle, u
     ].join("\n");
   }
 
-  // 2.3 Phân biệt tài liệu Hiệp Hội & Doanh Nghiệp (Câu hỏi tài liệu)
+  // 2.3 Phân biệt tài liệu CEOHN10 & Doanh Nghiệp (Câu hỏi tài liệu)
   if (
     lower.includes("quy chế tài liệu") ||
     lower.includes("phân quyền tài liệu") ||
-    lower.includes("tài liệu hiệp hội") ||
+    lower.includes("tài liệu CEOHN10") ||
     lower.includes("tài liệu doanh nghiệp")
   ) {
     return [
       "📚 **Quy chế Quản lý & Phân quyền Tài liệu CLB CEO HN10:**",
       "",
-      "• **Tài liệu Hiệp Hội (🏛️):** Bao gồm điều lệ, quy chế kết nối B2B, biên bản đại hội, báo cáo tài chính nội bộ. **Phân quyền nghiêm ngặt:** Chỉ có Quản trị viên, Chủ tịch, Tổng thư ký và Trưởng các ban chuyên môn mới có quyền upload, chỉnh sửa và xóa. Học viên thường chỉ có quyền xem & tải về.",
+      "• **Tài liệu CEOHN10 (🏛️):** Bao gồm điều lệ, quy chế kết nối B2B, biên bản đại hội, báo cáo tài chính nội bộ. **Phân quyền nghiêm ngặt:** Chỉ có Quản trị viên, Chủ tịch, Tổng thư ký và Trưởng các ban chuyên môn mới có quyền upload, chỉnh sửa và xóa. Học viên thường chỉ có quyền xem & tải về.",
       "• **Tài liệu Doanh Nghiệp (🏢):** Hồ sơ năng lực (Profile), catalogue, bảng giá, hợp đồng mẫu do từng doanh nghiệp Học viên tự quản lý. Học viên có toàn quyền upload và chỉnh sửa tài liệu của doanh nghiệp mình.",
       "",
       "Hệ thống đã phân loại rõ ràng thành 2 tab tại mục **Tài liệu** trên cả ứng dụng di động và cổng CRM.",
     ].join("\n");
   }
 
-  // 2.4 Hội phí & Tài chính
-  if (lower.includes("hội phí") || lower.includes("đóng phí") || lower.includes("tài chính") || capability === "fee_analysis") {
+  // 2.4 Phí tham gia CLB & Tài chính
+  if (lower.includes("phí tham gia CLB") || lower.includes("đóng phí") || lower.includes("tài chính") || capability === "fee_analysis") {
     const outstanding = metricNum(bundle, "outstanding");
     const overdue = metricNum(bundle, "overdue");
     const total = metricNum(bundle, "expected");
@@ -113,15 +113,15 @@ function composeDynamicAnswer(capability: AiCapability, bundle: ContextBundle, u
       if (rate != null) parts.push(`Tỷ lệ thu: **${rate}%**`);
 
       return [
-        "💰 **Tình hình Hội phí & Tài chính CLB CEO HN10 (Niên liễm 2026):**",
+        "💰 **Tình hình Phí tham gia CLB & Tài chính CLB CEO HN10 (Niên liễm 2026):**",
         "",
         parts.join("\n• "),
         "",
-        "Hội phí được sử dụng minh bạch phục vụ công tác tổ chức sự kiện, duy trì hạ tầng công nghệ và trích lập Quỹ Thiện nguyện Mái Ấm Yêu Thương.",
+        "Phí tham gia CLB được sử dụng minh bạch phục vụ công tác tổ chức sự kiện, duy trì hạ tầng công nghệ và trích lập Quỹ Thiện nguyện Mái Ấm Yêu Thương.",
       ].join("\n");
     }
 
-    return "Tình trạng hội phí của anh/chị: **Đã hoàn thành hội phí niên liễm 2026**. Cảm ơn anh/chị đã luôn đồng hành cùng CLB CEO HN10!";
+    return "Tình trạng phí tham gia CLB của anh/chị: **Đã hoàn thành phí tham gia CLB niên liễm 2026**. Cảm ơn anh/chị đã luôn đồng hành cùng CLB CEO HN10!";
   }
 
   // 2.5 Sự kiện (Event)
@@ -204,10 +204,10 @@ function composeDynamicAnswer(capability: AiCapability, bundle: ContextBundle, u
   if (capability === "executive_report") {
     const m = bundle.metrics;
     return [
-      "📊 **Báo Cáo Tổng Hợp Điều Hành Hiệp Hội CEO HN10:**",
+      "📊 **Báo Cáo Tổng Hợp Điều Hành CEOHN10 CEO HN10:**",
       "",
       `• Tổng số Học viên chính thức: **${m.members ?? 100}+ doanh nghiệp**`,
-      `• Kế hoạch ngân sách & hội phí 2026: **${(typeof m.fees === "number" ? m.fees.toLocaleString("vi-VN") : m.fees) ?? "60,000,000"} đ**`,
+      `• Kế hoạch ngân sách & phí tham gia CLB 2026: **${(typeof m.fees === "number" ? m.fees.toLocaleString("vi-VN") : m.fees) ?? "60,000,000"} đ**`,
       `• Sự kiện & Hội thảo kết nối: **${m.events ?? 5} sự kiện trọng điểm**`,
       `• Cơ hội giao thương B2B niêm yết: **${m.opportunities ?? 5}+ dự án**`,
       "",
@@ -244,7 +244,7 @@ function composeDynamicAnswer(capability: AiCapability, bundle: ContextBundle, u
       "Dưới đây là một số thông tin liên quan tìm thấy trong hệ thống:",
       sourcesPreview,
       "",
-      "Anh/chị có thể đặt câu hỏi chi tiết hơn về từng mục (ví dụ: *Điều lệ CLB*, *Học viên ngành xây dựng/thương mại*, *Sự kiện Đại hội*, hoặc *Tình hình hội phí*).",
+      "Anh/chị có thể đặt câu hỏi chi tiết hơn về từng mục (ví dụ: *Điều lệ CLB*, *Học viên ngành xây dựng/thương mại*, *Sự kiện Đại hội*, hoặc *Tình hình phí tham gia CLB*).",
     ].join("\n");
   }
 
@@ -256,7 +256,7 @@ function composeDynamicAnswer(capability: AiCapability, bundle: ContextBundle, u
     "2. **Danh bạ Học viên & Ban Lãnh Đạo:** Thông tin Chủ tịch, các Phó chủ tịch, trưởng ban và Học viên theo ngành/khu vực.",
     "3. **Sự kiện & Hội thảo:** Lịch đại hội gala, workshop AI, caravan thiện nguyện và lấy vé QR.",
     "4. **Cơ hội Giao thương:** Tìm kiếm đối tác cung ứng, phân phối, đầu tư nội khối.",
-    "5. **Hội phí & Báo cáo:** Tra cứu hạn đóng hội phí và số liệu điều hành.",
+    "5. **Phí tham gia CLB & Báo cáo:** Tra cứu hạn đóng phí tham gia CLB và số liệu điều hành.",
     "",
     "Anh/chị muốn tìm hiểu nội dung nào trước ạ?",
   ].join("\n");
@@ -264,7 +264,7 @@ function composeDynamicAnswer(capability: AiCapability, bundle: ContextBundle, u
 
 function composeReasoning(capability: AiCapability, bundle: ContextBundle): string {
   const sourceCount = bundle.sources.length;
-  return `Trợ lý AI đã xử lý câu hỏi theo năng lực "${capability}", phân tích ngữ cảnh từ ${sourceCount} thực thể an toàn trong phạm vi quyền truy cập "${bundle.permissionLevel}" của hiệp hội CEO HN10.`;
+  return `Trợ lý AI đã xử lý câu hỏi theo năng lực "${capability}", phân tích ngữ cảnh từ ${sourceCount} thực thể an toàn trong phạm vi quyền truy cập "${bundle.permissionLevel}" của CEOHN10 CEO HN10.`;
 }
 
 export function generateMockAnswer(

@@ -487,10 +487,10 @@ export class AiService {
   /**
    * Lấy toàn bộ ngữ cảnh động của Học viên tại phiên đăng nhập:
    * - Hồ sơ định danh (Tên, mã Học viên, doanh nghiệp, chức vụ, ban bệ)
-   * - Hội phí & Hóa đơn (Chưa đóng, đã đóng, số tiền nợ, hạn nộp)
+   * - Phí tham gia CLB & Hóa đơn (Chưa đóng, đã đóng, số tiền nợ, hạn nộp)
    * - Thông báo chưa đọc (Số lượng & nội dung mới nhất)
    * - Sự kiện của tôi (Danh sách sự kiện đã đăng ký vé)
-   * - Top sự kiện nhiều người đăng ký nhất trong Hiệp hội
+   * - Top sự kiện nhiều người đăng ký nhất trong CEOHN10
    */
   async getLiveMemberAssistantContext(userId: string) {
     const [userRows, memberRows] = await Promise.all([
@@ -934,12 +934,12 @@ export class AiService {
         : '_Không có hóa đơn nào chưa thanh toán._';
       return {
         ...base,
-        answer: `💳 **Hóa đơn / hội phí của Anh/Chị:** ${d.feePaid ? '✅ Đã thanh toán đầy đủ' : `⚠️ Còn nợ **${fmtVnd(d.totalOutstanding)} đ**`}\n\n${lines}`,
+        answer: `💳 **Hóa đơn / phí tham gia CLB của Anh/Chị:** ${d.feePaid ? '✅ Đã thanh toán đầy đủ' : `⚠️ Còn nợ **${fmtVnd(d.totalOutstanding)} đ**`}\n\n${lines}`,
         speechText: d.feePaid
-          ? 'Anh chị đã thanh toán đầy đủ hội phí.'
+          ? 'Anh chị đã thanh toán đầy đủ phí tham gia CLB.'
           : `Anh chị còn ${d.unpaidInvoices.length} hóa đơn chưa thanh toán.`,
         route: '/association/profile',
-        featureName: 'Hội phí',
+        featureName: 'Phí tham gia CLB',
         dynamicData: { dues: d },
         model: 'personal-invoices',
       };
@@ -1017,7 +1017,7 @@ export class AiService {
     return [
       `👤 **${u.name}** — ${u.title} tại **${u.company}**`,
       `- Mã Học viên: \`${u.code}\` | Vai trò: **${context.roleLabel}**`,
-      `- Hội phí: ${context.dues.feePaid ? '✅ đã thanh toán đầy đủ' : `⚠️ còn nợ **${fmtVnd(context.dues.totalOutstanding)} đ** (${context.dues.unpaidInvoices.length} hóa đơn)`}`,
+      `- Phí tham gia CLB: ${context.dues.feePaid ? '✅ đã thanh toán đầy đủ' : `⚠️ còn nợ **${fmtVnd(context.dues.totalOutstanding)} đ** (${context.dues.unpaidInvoices.length} hóa đơn)`}`,
       `- Sự kiện đã đăng ký: **${context.myEvents.length}**`,
       `- Bạn bè đã kết nối: **${context.connections.friendsCount}** (chờ duyệt ${context.connections.pendingIncoming})`,
       `- Lịch hẹn B2B sắp tới: **${upcomingMeetings}**`,
@@ -1052,7 +1052,7 @@ export class AiService {
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/đ/g, 'd');
 
-    // Kiểm tra câu hỏi có liên quan đến dòng tiền, hội phí, chia sẻ cơ hội, vốn, đầu tư, lời lỗ, ROI, deal
+    // Kiểm tra câu hỏi có liên quan đến dòng tiền, phí tham gia CLB, chia sẻ cơ hội, vốn, đầu tư, lời lỗ, ROI, deal
     const isDealKeywords =
       /(co hoi|kinh doanh|dau tu|deal|loi lo|roi|von|dam phan|nang luc|muc deal|dong tien|hoi phi|da chi|chia se co hoi|thu chi|loi nhuan|50000000|50 trieu|50tr|100tr|200tr|1 ty)/.test(
         norm,
@@ -1102,7 +1102,7 @@ export class AiService {
     if (memberCode) userIdRefs.push(String(memberCode));
 
     const [txRows, oppInterestRows, myPostedOppRows] = await Promise.all([
-      // Lịch sử giao dịch hội phí và sự kiện
+      // Lịch sử giao dịch phí tham gia CLB và sự kiện
       this.prisma.$queryRaw<any[]>`
         SELECT id, amount, category, type, status, description, date, created_at
         FROM public.transactions
@@ -1135,7 +1135,7 @@ export class AiService {
     const feeTransactions = txRows.filter(
       (t) =>
         t.category === 'membership_fee' ||
-        (t.description || '').toLowerCase().includes('hội phí') ||
+        (t.description || '').toLowerCase().includes('phí tham gia CLB') ||
         (t.description || '').toLowerCase().includes('hoi phi'),
     );
     const totalFeePaid = feeTransactions.reduce(
@@ -1243,7 +1243,7 @@ export class AiService {
       `### 📊 PHẦN 1: BÁO CÁO DÒNG TIỀN Học viên & HIỆU QUẢ ĐẦU TƯ CLB`,
       `| Hạng Mục Dòng Tiền | Số Tiền Đã Chi / Thu | Trạng Thái Ghi Nhận | Đánh Giá Hiệu Quả |`,
       `| :--- | :--- | :--- | :--- |`,
-      `| **1. Hội phí đã chi** | **${fmtVnd(totalFeePaid)} VNĐ** | ${context.dues.feePaid ? '✅ Đã hoàn thành nghĩa vụ' : '⚠️ Có kỳ hạn cần đối soát'} | Đầu tư mở rộng mạng lưới uy tín HanoiBA |`,
+      `| **1. Phí tham gia CLB đã chi** | **${fmtVnd(totalFeePaid)} VNĐ** | ${context.dues.feePaid ? '✅ Đã hoàn thành nghĩa vụ' : '⚠️ Có kỳ hạn cần đối soát'} | Đầu tư mở rộng mạng lưới uy tín HanoiBA |`,
       `| **2. Vé sự kiện & Gala** | **${fmtVnd(totalEventPaid)} VNĐ** | ${eventTransactions.length} sự kiện kết nối trực tiếp | Xúc tiến thương hiệu và gặp gỡ đối tác VIP |`,
       `| **3. Tổng chi phí gia nhập**| **${fmtVnd(totalCashSpent)} VNĐ** | Dòng tiền chi ra thực tế | Suất đầu tư quan hệ chiến lược |`,
       `| **4. Cơ hội B2B đã chia sẻ**| **${myPostedOppRows.length} cơ hội** (${fmtVnd(totalOppPostedValue)} VNĐ) | Đã công khai trên Sàn B2B | Tạo phễu đón nhận dòng tiền liên danh |`,
@@ -1384,12 +1384,12 @@ export class AiService {
         ...base,
         answer:
           `Dạ em là **Trợ lý AI của CLB Doanh Nhân CEO HN10**, nắm toàn bộ dữ liệu tài khoản của Anh/Chị **${name}** và các tính năng của app. Em có thể:\n\n` +
-          `1. 📊 **Tra cứu tài khoản của Anh/Chị**: sự kiện đã đăng ký & vé, hội phí/hóa đơn chưa thanh toán, số bạn bè & lời mời kết nối, lịch hẹn B2B, cơ hội đang quan tâm/đã đăng, sản phẩm đang bán, thông báo chưa đọc.\n` +
+          `1. 📊 **Tra cứu tài khoản của Anh/Chị**: sự kiện đã đăng ký & vé, phí tham gia CLB/hóa đơn chưa thanh toán, số bạn bè & lời mời kết nối, lịch hẹn B2B, cơ hội đang quan tâm/đã đăng, sản phẩm đang bán, thông báo chưa đọc.\n` +
           `2. 🔎 **Tìm kiếm trong CLB**: Học viên/doanh nghiệp, sản phẩm trên sàn, cơ hội giao thương, sự kiện, văn bản – điều lệ, thông tin các Ban.\n` +
-          `3. 🧭 **Hướng dẫn & mở nhanh tính năng**: đăng ký sự kiện, danh thiếp số, quét QR check-in, đăng sản phẩm/cơ hội, nhắn tin, thanh toán hội phí VietQR.\n` +
+          `3. 🧭 **Hướng dẫn & mở nhanh tính năng**: đăng ký sự kiện, danh thiếp số, quét QR check-in, đăng sản phẩm/cơ hội, nhắn tin, thanh toán phí tham gia CLB VietQR.\n` +
           `4. 💬 **Tư vấn, soạn nội dung** kinh doanh – networking.\n\n` +
           `**Tình hình tài khoản hiện tại:**\n${this.buildAccountOverview(context)}\n\nAnh/Chị muốn em hỗ trợ việc gì trước ạ?`,
-        speechText: `Dạ em là trợ lý AI CEO HN10. Em tra cứu được sự kiện, hội phí, bạn bè, lịch hẹn, cơ hội, sản phẩm của anh chị và hướng dẫn mọi tính năng trong app.`,
+        speechText: `Dạ em là trợ lý AI CEO HN10. Em tra cứu được sự kiện, phí tham gia CLB, bạn bè, lịch hẹn, cơ hội, sản phẩm của anh chị và hướng dẫn mọi tính năng trong app.`,
         model: 'meta-capability',
       };
     }
@@ -1401,7 +1401,7 @@ export class AiService {
     ) {
       return {
         ...base,
-        answer: `Dạ em chào Anh/Chị **${name}**! 👋 Em có thể tra cứu sự kiện, hội phí, bạn bè, lịch hẹn, cơ hội, sản phẩm của Anh/Chị hoặc hướng dẫn mọi tính năng trong app. Anh/Chị cần gì ạ?`,
+        answer: `Dạ em chào Anh/Chị **${name}**! 👋 Em có thể tra cứu sự kiện, phí tham gia CLB, bạn bè, lịch hẹn, cơ hội, sản phẩm của Anh/Chị hoặc hướng dẫn mọi tính năng trong app. Anh/Chị cần gì ạ?`,
         speechText: `Dạ em chào anh chị ${name}. Anh chị cần em hỗ trợ gì ạ?`,
         model: 'meta-greeting',
       };
@@ -1784,9 +1784,9 @@ export class AiService {
       };
     }
 
-    // 9. Hồ sơ cá nhân & Đóng hội phí VietQR
+    // 9. Hồ sơ cá nhân & Đóng phí tham gia CLB VietQR
     if (
-      q.includes('hội phí') ||
+      q.includes('phí tham gia CLB') ||
       q.includes('đóng phí') ||
       q.includes('hồ sơ cá nhân') ||
       q.includes('hồ sơ của tôi') ||
@@ -1798,7 +1798,7 @@ export class AiService {
     ) {
       return {
         route: '/association/profile',
-        featureName: 'Hồ Sơ Cá Nhân & Đóng Hội Phí VietQR',
+        featureName: 'Hồ Sơ Cá Nhân & Đóng Phí Tham Gia CLB VietQR',
         tourId: 'association-profile',
         actionType: 'navigate',
       };
@@ -1876,7 +1876,7 @@ export class AiService {
   /**
    * Tra cứu tri thức & Dữ liệu động toàn diện trên hệ thống CEO HN10:
    * Tìm kiếm song song: Danh bạ Học viên & Lãnh đạo, Sản phẩm Marketplace, Cơ hội giao thương B2B,
-   * Lịch sự kiện & Đại hội, Kho văn bản & Kỷ yếu, Cơ cấu 7 Ban chuyên trách, Chính sách hội phí & MB Bank.
+   * Lịch sự kiện & Đại hội, Kho văn bản & Kỷ yếu, Cơ cấu 7 Ban chuyên trách, Chính sách phí tham gia CLB & MB Bank.
    */
   async searchAssociationData(rawPrompt: string, userId: string) {
     const q = (rawPrompt || '').toLowerCase().trim();
@@ -2050,7 +2050,7 @@ export class AiService {
         name: 'Ban Quản trị',
         leadership: 'Trần Quốc Toản (Trưởng ban)',
         scope:
-          'Điều hành nền tảng công nghệ CRM, giám sát ma trận phân quyền RBAC và kiểm toán hoạt động hiệp hội.',
+          'Điều hành nền tảng công nghệ CRM, giám sát ma trận phân quyền RBAC và kiểm toán hoạt động CEOHN10.',
         contact: 'Hotline Ban Quản trị: 0983 198 305',
         route: '/permissions',
         keywords: [
@@ -2068,13 +2068,13 @@ export class AiService {
         name: 'Ban Tài chính',
         leadership: 'Đặng Thị Lan (Trưởng ban)',
         scope:
-          'Quản lý thu chi ngân sách, đối soát hội phí thường niên qua VietQR MB Bank, quyết toán tài chính định kỳ.',
+          'Quản lý thu chi ngân sách, đối soát phí tham gia CLB thường niên qua VietQR MB Bank, quyết toán tài chính định kỳ.',
         contact: 'Hotline Ban Tài chính: 0983 198 306',
         route: '/association/profile',
         keywords: [
           'tài chính',
           'ngân sách',
-          'hội phí',
+          'phí tham gia CLB',
           'thu chi',
           'kế toán',
           'quyết toán',
@@ -2110,7 +2110,7 @@ export class AiService {
     );
 
     const isFeeQuery =
-      q.includes('hội phí') ||
+      q.includes('phí tham gia CLB') ||
       q.includes('niên liễm') ||
       q.includes('đóng phí') ||
       q.includes('số tài khoản') ||
@@ -2437,7 +2437,7 @@ BẢN ĐỒ TOÀN BỘ 19 MODULE HỆ THỐNG & API BACKEND CEO HN10 (API CATALO
 7. Module Biểu quyết & Đại hội (/api/voting): Bỏ phiếu tín nhiệm, biểu quyết nghị quyết trực tuyến, quay số may mắn Lucky Draw. (Route: /association/voting, Tour: association-voting)
 8. Module Tin nhắn & Kết nối (/api/connect-app): Hộp thư B2B, phòng chat ban chuyên môn, đặt lịch hẹn kết nối 1-on-1. (Route: /association/messages, Tour: association-messages)
 9. Module Kho Văn bản & Kỷ yếu (/api/documents): Thư viện số, điều lệ CLB, nghị quyết ban điều hành, kỷ yếu doanh nhân số. (Route: /association/library, Tour: association-library)
-10. Module Hội phí & Ngân sách (/api/fees, /api/finance): Tra cứu niên liễm, ngân sách thu chi, cổng thanh toán VietQR MB Bank tự động 24/7. (Route: /association/profile, Tour: association-profile)
+10. Module Phí tham gia CLB & Ngân sách (/api/fees, /api/finance): Tra cứu niên liễm, ngân sách thu chi, cổng thanh toán VietQR MB Bank tự động 24/7. (Route: /association/profile, Tour: association-profile)
 11. Module Nhiệm vụ & Ban Thư ký (/api/tasks): Giao việc, phân công nhiệm vụ các ban chuyên môn, theo dõi tiến độ công việc. (Route: /tasks, Tour: tasks-admin)
 12. Module Quản lý Nhà tài trợ (/api/sponsors): Gói tài trợ Kim Cương/Vàng/Bạc, quyền lợi tài trợ sự kiện, hợp đồng tài trợ. (Route: /sponsors, Tour: sponsors-admin)
 13. Module Cuộc họp Ban Điều hành (/api/meetings): Lịch họp ban thường trực, họp định kỳ ban chuyên môn, biên bản họp số. (Route: /meetings, Tour: meetings-admin)
@@ -2451,10 +2451,10 @@ BẢN ĐỒ TOÀN BỘ 19 MODULE HỆ THỐNG & API BACKEND CEO HN10 (API CATALO
 DỮ LIỆU ĐỘNG THỜI GIAN THỰC CỦA Học viên ĐANG ĐĂNG NHẬP:
 - Họ tên: ${context.user.name} | Mã Học viên: ${context.user.code}
 - Công ty: ${context.user.company} | Chức vụ: ${context.user.title} | Cấp bậc: ${context.user.level}
-- Trạng thái hội phí: ${context.dues.feePaid ? 'ĐÃ ĐÓNG ĐẦY ĐỦ' : `CHƯA ĐÓNG - Còn nợ ${new Intl.NumberFormat('vi-VN').format(context.dues.totalOutstanding)} đ (Kỳ ${context.dues.feeYear})`}
+- Trạng thái phí tham gia CLB: ${context.dues.feePaid ? 'ĐÃ ĐÓNG ĐẦY ĐỦ' : `CHƯA ĐÓNG - Còn nợ ${new Intl.NumberFormat('vi-VN').format(context.dues.totalOutstanding)} đ (Kỳ ${context.dues.feeYear})`}
 - Thông báo chưa đọc: ${context.notifications.unreadCount} thông báo
 - Sự kiện đã đăng ký (${context.myEvents.length} sự kiện): ${JSON.stringify(context.myEvents)}
-- Sự kiện nhiều người đăng ký nhất trong Hiệp hội: ${JSON.stringify(context.topEvents)}
+- Sự kiện nhiều người đăng ký nhất trong CEOHN10: ${JSON.stringify(context.topEvents)}
 - Kết nối bạn bè: ${context.connections.friendsCount} người đã kết nối, ${context.connections.pendingIncoming} lời mời chờ duyệt, ${context.connections.pendingOutgoing} lời mời đã gửi
 - Cơ hội kinh doanh đang quan tâm (${context.interestedOpportunities.length}): ${JSON.stringify(context.interestedOpportunities)}
 - Cơ hội kinh doanh đã đăng (${context.myOpportunities.length}): ${JSON.stringify(context.myOpportunities)}
@@ -2466,7 +2466,7 @@ KHI NGƯỜI DÙNG HỎI VỀ TÀI KHOẢN CỦA HỌ (sự kiện của tôi, b
 
 DỮ LIỆU ĐỘNG THỜI GIAN THỰC ĐƯỢC TRÍCH XUẤT TỪ HỆ THỐNG (RAG GROUND TRUTH):
 - Ban chuyên trách: ${JSON.stringify(searchData?.matchedCommittees || [])}
-- Chính sách hội phí & MB Bank: ${JSON.stringify(searchData?.feePolicy || {})}
+- Chính sách phí tham gia CLB & MB Bank: ${JSON.stringify(searchData?.feePolicy || {})}
 - Danh bạ Học viên / Lãnh đạo tìm thấy: ${JSON.stringify(searchData?.members || [])}
 - Sản phẩm Marketplace: ${JSON.stringify(searchData?.products || [])}
 - Cơ hội giao thương B2B: ${JSON.stringify(searchData?.opportunities || [])}
@@ -2614,14 +2614,14 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
       };
     }
 
-    // 2.2. Phản hồi về Chính sách Hội Phí & MB Bank
+    // 2.2. Phản hồi về Chính sách Phí Tham Gia CLB & MB Bank
     if (searchData?.isFeeQuery) {
       const dues = context.dues;
       const formattedOwed = new Intl.NumberFormat('vi-VN').format(
         dues.totalOutstanding || 0,
       );
-      const answer = `💳 **Quy định & Kênh đóng Hội phí CLB Doanh Nhân CEO HN10:**\n\n- 🏦 **Ngân hàng thụ hưởng:** ${process.env.SEPAY_BANK_NAME || 'MB Bank (Ngân hàng Quân Đội)'}\n- 🔢 **Số tài khoản:** \`${process.env.SEPAY_ACCOUNT_NO || 'Xem tại mục Hồ sơ'}\`\n- 👤 **Chủ tài khoản:** **${process.env.SEPAY_ACCOUNT_HOLDER || 'CLB DOANH NHAN CEO HN10'}**\n- 💰 **Định mức niên liễm:**\n  + Tiêu chuẩn: **10.000.000 VNĐ / năm**\n  + VIP Gold: **20.000.000 VNĐ / năm**\n  + Kim cương: **50.000.000 VNĐ / năm**\n- 📝 **Cú pháp chuyển khoản:** \`${context.user.code} HP2026\` hoặc \`${context.user.name} HP2026\`\n\n*Trạng thái của Quý Anh/Chị:* ${dues.feePaid ? '✅ **ĐÃ HOÀN TẤT ĐẦY ĐỦ**' : `⚠️ **Còn nợ ${formattedOwed} VNĐ (Kỳ ${dues.feeYear || 2026})**`}\n\n👉 *Quý Anh/Chị có muốn tôi mở mục Hồ sơ để quét mã VietQR MB Bank thanh toán tự động trong 1 giây không?*`;
-      const speechText = `Hội phí CEO HN10 được tiếp nhận qua cổng VietQR tự động. Quý anh chị có muốn tôi mở mã VietQR để thanh toán ngay không ạ?`;
+      const answer = `💳 **Quy định & Kênh đóng Phí tham gia CLB CLB Doanh Nhân CEO HN10:**\n\n- 🏦 **Ngân hàng thụ hưởng:** ${process.env.SEPAY_BANK_NAME || 'MB Bank (Ngân hàng Quân Đội)'}\n- 🔢 **Số tài khoản:** \`${process.env.SEPAY_ACCOUNT_NO || 'Xem tại mục Hồ sơ'}\`\n- 👤 **Chủ tài khoản:** **${process.env.SEPAY_ACCOUNT_HOLDER || 'CLB DOANH NHAN CEO HN10'}**\n- 💰 **Định mức niên liễm:**\n  + Tiêu chuẩn: **10.000.000 VNĐ / năm**\n  + VIP Gold: **20.000.000 VNĐ / năm**\n  + Kim cương: **50.000.000 VNĐ / năm**\n- 📝 **Cú pháp chuyển khoản:** \`${context.user.code} HP2026\` hoặc \`${context.user.name} HP2026\`\n\n*Trạng thái của Quý Anh/Chị:* ${dues.feePaid ? '✅ **ĐÃ HOÀN TẤT ĐẦY ĐỦ**' : `⚠️ **Còn nợ ${formattedOwed} VNĐ (Kỳ ${dues.feeYear || 2026})**`}\n\n👉 *Quý Anh/Chị có muốn tôi mở mục Hồ sơ để quét mã VietQR MB Bank thanh toán tự động trong 1 giây không?*`;
+      const speechText = `Phí tham gia CLB CEO HN10 được tiếp nhận qua cổng VietQR tự động. Quý anh chị có muốn tôi mở mã VietQR để thanh toán ngay không ạ?`;
       return {
         answer,
         speechText,
@@ -2629,7 +2629,7 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
         suggestTour: true,
         tourId: 'association-profile',
         route: '/association/profile',
-        featureName: 'Hồ Sơ & Đóng Hội Phí VietQR',
+        featureName: 'Hồ Sơ & Đóng Phí Tham Gia CLB VietQR',
         dynamicData: { dues: context.dues, feePolicy: searchData.feePolicy },
         provider: 'ceohn10-smart-engine',
         model: 'rag-fees-v1',
@@ -2857,7 +2857,7 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
           model: 'rule-nlp-v3',
         };
       } else {
-        const answer = `Dạ Quý Anh/Chị hiện **chưa đăng ký sự kiện nào**. Sắp tới Hiệp hội có sự kiện **"${context.topEvents[0]?.name || 'Gala Doanh nhân CEO HN10'}"** rất đặc sắc.\n\n👉 **Quý Anh/Chị có muốn tôi hướng dẫn thao tác trực tiếp đăng ký vé không? Tôi sẽ lái màn hình và chỉ dẫn từng bước cho Quý Anh/Chị!**`;
+        const answer = `Dạ Quý Anh/Chị hiện **chưa đăng ký sự kiện nào**. Sắp tới CEOHN10 có sự kiện **"${context.topEvents[0]?.name || 'Gala Doanh nhân CEO HN10'}"** rất đặc sắc.\n\n👉 **Quý Anh/Chị có muốn tôi hướng dẫn thao tác trực tiếp đăng ký vé không? Tôi sẽ lái màn hình và chỉ dẫn từng bước cho Quý Anh/Chị!**`;
         const speechText = `Quý anh chị hiện chưa đăng ký sự kiện nào. Hãy để tôi hướng dẫn thao tác trực tiếp cho anh chị đăng ký sự kiện hot nhất sắp tới nhé!`;
 
         return {
@@ -2921,9 +2921,9 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
       }
     }
 
-    // D. Câu hỏi: Tôi có hội phí nào chưa đóng không?
+    // D. Câu hỏi: Tôi có phí tham gia CLB nào chưa đóng không?
     if (
-      (q.includes('hội phí') ||
+      (q.includes('phí tham gia CLB') ||
         q.includes('niên liễm') ||
         q.includes('nợ phí') ||
         q.includes('hóa đơn')) &&
@@ -2940,9 +2940,9 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
           inv.amount || 0,
         );
 
-        const answer = `💳 **Thông tin Hội phí Hiệp hội CEO HN10:**\n\n- **Trạng thái:** ⚠️ **Chưa hoàn tất**\n- **Kỳ phí:** Năm ${inv.year || context.dues.feeYear || 2026}\n- **Số tiền cần thanh toán:** **${formattedAmount} VNĐ**\n- **Mã hóa đơn:** \`${inv.invoiceNo || 'INV-2026'}\`\n- **Hạn nộp:** ${inv.dueDate || '31/03/2026'}\n\n*Thông tin tài khoản tiếp nhận:*\n- **Ngân hàng:** ${process.env.SEPAY_BANK_NAME || 'MB Bank'}\n- **Số tài khoản:** \`${process.env.SEPAY_ACCOUNT_NO || 'Xem tại mục Hồ sơ'}\`\n- **Chủ tài khoản:** ${process.env.SEPAY_ACCOUNT_HOLDER || 'CLB DOANH NHAN CEO HN10'}\n- **Nội dung:** \`${inv.invoiceNo || context.user.code} HP2026\`\n\n👉 **Quý Anh/Chị có muốn tôi hướng dẫn thao tác trực tiếp đóng hội phí qua VietQR MB Bank không? Tôi sẽ lái màn hình và chỉ dẫn từng bước cho Quý Anh/Chị!**`;
+        const answer = `💳 **Thông tin Phí tham gia CLB CEOHN10 CEO HN10:**\n\n- **Trạng thái:** ⚠️ **Chưa hoàn tất**\n- **Kỳ phí:** Năm ${inv.year || context.dues.feeYear || 2026}\n- **Số tiền cần thanh toán:** **${formattedAmount} VNĐ**\n- **Mã hóa đơn:** \`${inv.invoiceNo || 'INV-2026'}\`\n- **Hạn nộp:** ${inv.dueDate || '31/03/2026'}\n\n*Thông tin tài khoản tiếp nhận:*\n- **Ngân hàng:** ${process.env.SEPAY_BANK_NAME || 'MB Bank'}\n- **Số tài khoản:** \`${process.env.SEPAY_ACCOUNT_NO || 'Xem tại mục Hồ sơ'}\`\n- **Chủ tài khoản:** ${process.env.SEPAY_ACCOUNT_HOLDER || 'CLB DOANH NHAN CEO HN10'}\n- **Nội dung:** \`${inv.invoiceNo || context.user.code} HP2026\`\n\n👉 **Quý Anh/Chị có muốn tôi hướng dẫn thao tác trực tiếp đóng phí tham gia CLB qua VietQR MB Bank không? Tôi sẽ lái màn hình và chỉ dẫn từng bước cho Quý Anh/Chị!**`;
 
-        const speechText = `Quý anh chị hiện còn khoản hội phí kỳ ${inv.year || 2026} chưa đóng với số tiền ${formattedAmount} đồng. Quý anh chị có muốn tôi hướng dẫn thao tác trực tiếp quét mã VietQR để hoàn tất không? Hãy chọn Có để tôi dẫn đường nhé!`;
+        const speechText = `Quý anh chị hiện còn khoản phí tham gia CLB kỳ ${inv.year || 2026} chưa đóng với số tiền ${formattedAmount} đồng. Quý anh chị có muốn tôi hướng dẫn thao tác trực tiếp quét mã VietQR để hoàn tất không? Hãy chọn Có để tôi dẫn đường nhé!`;
 
         return {
           answer,
@@ -2951,14 +2951,14 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
           suggestTour: true,
           tourId: 'association-profile',
           route: '/association/profile',
-          featureName: 'Đóng Hội Phí Thường Niên VietQR',
+          featureName: 'Đóng Phí Tham Gia CLB Thường Niên VietQR',
           dynamicData: { dues: context.dues },
           provider: 'ceohn10-smart-engine',
           model: 'rule-nlp-v3',
         };
       } else {
-        const answer = `✅ **Hội phí hoàn tất:** Quý Anh/Chị đã hoàn thành đầy đủ nghĩa vụ hội phí thường niên. Thẻ Học viên **${context.user.level}** của Quý Anh/Chị đang ở trạng thái Hoạt động chuẩn mực 5 sao!`;
-        const speechText = `Tuyệt vời! Quý anh chị đã đóng đầy đủ toàn bộ hội phí thường niên. Thẻ Học viên của anh chị đang hoạt động rất tốt!`;
+        const answer = `✅ **Phí tham gia CLB hoàn tất:** Quý Anh/Chị đã hoàn thành đầy đủ nghĩa vụ phí tham gia CLB thường niên. Thẻ Học viên **${context.user.level}** của Quý Anh/Chị đang ở trạng thái Hoạt động chuẩn mực 5 sao!`;
+        const speechText = `Tuyệt vời! Quý anh chị đã đóng đầy đủ toàn bộ phí tham gia CLB thường niên. Thẻ Học viên của anh chị đang hoạt động rất tốt!`;
 
         return {
           answer,
@@ -3355,22 +3355,22 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
           speechSummary:
             'Để tham gia Lucky Draw: Vào mục Biểu quyết, chuyển sang tab Quay số trúng thưởng và theo dõi màn hình khi MC quay số.',
         },
-        // 16. Đóng hội phí thường niên VietQR MB Bank
+        // 16. Đóng phí tham gia CLB thường niên VietQR MB Bank
         {
           id: 'dues-pay',
           keywords: [
-            'đóng hội phí',
-            'nộp tiền hội phí',
+            'đóng phí tham gia CLB',
+            'nộp tiền phí tham gia CLB',
             'quét vietqr',
             'chuyển khoản mb',
             'phí niên liễm',
-            'thanh toán hội phí',
+            'thanh toán phí tham gia CLB',
           ],
-          featureName: 'Tra Cứu & Đóng Hội Phí Thường Niên Qua VietQR MB Bank',
+          featureName: 'Tra Cứu & Đóng Phí Tham Gia CLB Thường Niên Qua VietQR MB Bank',
           tourId: 'association-profile',
           route: '/association/profile',
           steps: [
-            'Vào màn hình **Cá nhân** (Hồ sơ), chạm vào mục **"Hội phí & Hóa đơn"**.',
+            'Vào màn hình **Cá nhân** (Hồ sơ), chạm vào mục **"Phí tham gia CLB & Hóa đơn"**.',
             'Kiểm tra số tiền niên liễm chưa đóng và hạn thanh toán.',
             'Bấm nút **"Quét mã VietQR"**.',
             'Mở app ngân hàng bất kỳ (MB Bank, Vietcombank...) quét mã QR, hệ thống tự động điền STK, số tiền và cú pháp.',
@@ -3379,7 +3379,7 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
           proTip:
             'Hệ thống tự động tích hợp cổng thanh toán VietQR kết nối tài khoản CLB CEO HN10.',
           speechSummary:
-            'Để đóng hội phí: Vào mục Cá nhân, chọn Hội phí, bấm Quét mã VietQR và dùng app ngân hàng quét mã chuyển khoản tự động.',
+            'Để đóng phí tham gia CLB: Vào mục Cá nhân, chọn Phí tham gia CLB, bấm Quét mã VietQR và dùng app ngân hàng quét mã chuyển khoản tự động.',
         },
         // 17. Kho Văn bản, Điều lệ & Kỷ yếu
         {
@@ -3490,12 +3490,12 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
             'trợ giúp',
             'tổng đài',
           ],
-          featureName: 'Hotline Trực Tiếp 5 Ban Chuyên Môn Hiệp Hội',
+          featureName: 'Hotline Trực Tiếp 5 Ban Chuyên Môn CEOHN10',
           tourId: 'association-profile',
           route: '/association/profile',
           steps: [
             'Vào màn hình **Cá nhân**, chọn mục **"Liên hệ 5 Ban Chuyên Môn"**.',
-            'Chọn ban phụ trách vấn đề bạn cần: Ban Truyền Thông (soát vé), Ban Thư Ký (hồ sơ), Ban Tài Chính (hội phí)...',
+            'Chọn ban phụ trách vấn đề bạn cần: Ban Truyền Thông (soát vé), Ban Thư Ký (hồ sơ), Ban Tài Chính (phí tham gia CLB)...',
             'Bấm gọi điện thoại trực tiếp hoặc mở chat Zalo OA với Trưởng ban.',
           ],
           proTip:
@@ -3553,23 +3553,23 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
           speechSummary:
             'Để quản lý Học viên: Vào Quản lý Học viên, kiểm tra hồ sơ chờ duyệt, xác nhận thông tin và bấm Phê duyệt cấp mã M1983.',
         },
-        // 24. Quản trị hội phí & Thu chi - CRM NGOÀI
+        // 24. Quản trị phí tham gia CLB & Thu chi - CRM NGOÀI
         {
           id: 'finance-mgmt',
           keywords: [
-            'quản trị hội phí',
+            'quản trị phí tham gia CLB',
             'tạo đợt thu',
-            'kế toán hiệp hội',
+            'kế toán CEOHN10',
             'báo cáo tài chính',
             'đối soát ngân hàng',
             'thu chi',
           ],
           featureName:
-            'Quản Trị Hội Phí & Kế Toán Thu Chi Minh Bạch (Ban Tài Chính)',
+            'Quản Trị Phí Tham Gia CLB & Kế Toán Thu Chi Minh Bạch (Ban Tài Chính)',
           tourId: 'fees-admin',
           route: '/fees',
           steps: [
-            'Truy cập màn hình **Quản lý Hội phí** (/fees).',
+            'Truy cập màn hình **Quản lý Phí tham gia CLB** (/fees).',
             'Bấm **"Tạo đợt thu mới"**, nhập mức niên liễm năm và phát hành cho toàn thể Học viên.',
             'Theo dõi tỷ lệ thanh toán thời gian thực qua biểu đồ trực quan.',
             'Bấm **"Báo cáo thu chi"** để xuất tệp Excel gửi Ban Chấp Hành.',
@@ -3577,7 +3577,7 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
           proTip:
             'Hệ thống tự động đối soát giao dịch VietQR MB Bank mà không cần kiểm tra sao kê thủ công.',
           speechSummary:
-            'Để quản trị hội phí: Vào mục Quản lý hội phí, tạo đợt thu niên liễm mới, theo dõi tỷ lệ thanh toán và xuất báo cáo kế toán.',
+            'Để quản trị phí tham gia CLB: Vào mục Quản lý phí tham gia CLB, tạo đợt thu niên liễm mới, theo dõi tỷ lệ thanh toán và xuất báo cáo kế toán.',
         },
         // 25. Giao việc & Quản lý nhiệm vụ điều hành - CRM NGOÀI
         {
@@ -3716,9 +3716,9 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
       q.includes('ở đâu') ||
       q.includes('tính năng')
     ) {
-      const answer = `🗺️ **Trung Tâm Hướng Dẫn Sử Dụng CLB Doanh Nhân CEO HN10:**\n\nỨng dụng hỗ trợ đầy đủ toàn bộ chức năng trong và ngoài:\n1. 🎟️ **Sự kiện & Hội nghị:** Đăng ký vé, xem lịch sinh hoạt ban, sơ đồ bàn VIP.\n2. 🎫 **Vé Check-in:** Quét QR tại cổng, máy quét dành cho Ban Truyền Thông.\n3. 📇 **Danh thiếp số 5.0:** Chạm thẻ thông minh NFC, quét card visit bằng AI.\n4. 👥 **Danh bạ 200+ CEO:** Lọc ngành nghề, gửi thư mời hẹn gặp 1-on-1.\n5. 💼 **Sàn Giao thương B2B & Chợ Marketplace:** Đăng tin Cung - Cầu, bán sản phẩm.\n6. 🗳️ **Biểu quyết & Lucky Draw:** Bỏ phiếu bầu BCH, quay số may mắn Gala.\n7. 💳 **Hội phí & Hóa đơn:** Đóng phí niên liễm qua VietQR MB Bank tự động.\n8. 🏛️ **Quản trị CRM Ngoài:** Tạo sự kiện mới, duyệt Học viên, giao việc, phân quyền RBAC.\n\n⚡ **Đang tự động chuyển màn hình sang Trang Chủ để Quý Anh/Chị thao tác ngay...**`;
+      const answer = `🗺️ **Trung Tâm Hướng Dẫn Sử Dụng CLB Doanh Nhân CEO HN10:**\n\nỨng dụng hỗ trợ đầy đủ toàn bộ chức năng trong và ngoài:\n1. 🎟️ **Sự kiện & Hội nghị:** Đăng ký vé, xem lịch sinh hoạt ban, sơ đồ bàn VIP.\n2. 🎫 **Vé Check-in:** Quét QR tại cổng, máy quét dành cho Ban Truyền Thông.\n3. 📇 **Danh thiếp số 5.0:** Chạm thẻ thông minh NFC, quét card visit bằng AI.\n4. 👥 **Danh bạ 200+ CEO:** Lọc ngành nghề, gửi thư mời hẹn gặp 1-on-1.\n5. 💼 **Sàn Giao thương B2B & Chợ Marketplace:** Đăng tin Cung - Cầu, bán sản phẩm.\n6. 🗳️ **Biểu quyết & Lucky Draw:** Bỏ phiếu bầu BCH, quay số may mắn Gala.\n7. 💳 **Phí tham gia CLB & Hóa đơn:** Đóng phí niên liễm qua VietQR MB Bank tự động.\n8. 🏛️ **Quản trị CRM Ngoài:** Tạo sự kiện mới, duyệt Học viên, giao việc, phân quyền RBAC.\n\n⚡ **Đang tự động chuyển màn hình sang Trang Chủ để Quý Anh/Chị thao tác ngay...**`;
 
-      const speechText = `Ứng dụng CEO HN10 hỗ trợ đầy đủ các tính năng: Đăng ký sự kiện, Danh thiếp NFC, Check in vé QR, Danh bạ 200 CEO, Sàn B2B, Biểu quyết và Đóng hội phí VietQR. Em chuyển sang Trang chủ cho Quý Anh/Chị ngay đây ạ!`;
+      const speechText = `Ứng dụng CEO HN10 hỗ trợ đầy đủ các tính năng: Đăng ký sự kiện, Danh thiếp NFC, Check in vé QR, Danh bạ 200 CEO, Sàn B2B, Biểu quyết và Đóng phí tham gia CLB VietQR. Em chuyển sang Trang chủ cho Quý Anh/Chị ngay đây ạ!`;
 
       return {
         answer,
@@ -3740,7 +3740,7 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
       q.includes('mã Học viên') ||
       q.includes('hồ sơ của tôi')
     ) {
-      const answer = `👤 **Hồ sơ Học viên của Quý Anh/Chị:**\n\n- **Họ tên:** **${context.user.name}**\n- **Mã Học viên:** \`${context.user.code}\`\n- **Doanh nghiệp:** ${context.user.company}\n- **Chức vụ:** ${context.user.title}\n- **Hạng thẻ:** ⭐ **${context.user.level}**\n- **Ban chuyên môn:** ${context.user.department}\n- **Trạng thái:** ${context.dues.feePaid ? '🟢 Đã nộp hội phí' : '🟡 Còn khoản phí chờ nộp'}\n\n👉 **Quý Anh/Chị có muốn tôi hướng dẫn thao tác trực tiếp xem và chỉnh sửa hồ sơ không?**`;
+      const answer = `👤 **Hồ sơ Học viên của Quý Anh/Chị:**\n\n- **Họ tên:** **${context.user.name}**\n- **Mã Học viên:** \`${context.user.code}\`\n- **Doanh nghiệp:** ${context.user.company}\n- **Chức vụ:** ${context.user.title}\n- **Hạng thẻ:** ⭐ **${context.user.level}**\n- **Ban chuyên môn:** ${context.user.department}\n- **Trạng thái:** ${context.dues.feePaid ? '🟢 Đã nộp phí tham gia CLB' : '🟡 Còn khoản phí chờ nộp'}\n\n👉 **Quý Anh/Chị có muốn tôi hướng dẫn thao tác trực tiếp xem và chỉnh sửa hồ sơ không?**`;
       const speechText = `Xin chào ${context.user.name}, mã Học viên của anh chị là ${context.user.code}, chức vụ ${context.user.title} tại ${context.user.company}. Anh chị có muốn tôi hướng dẫn thao tác trực tiếp xem hồ sơ không?`;
 
       return {
@@ -3771,8 +3771,8 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
       q.includes('tên là gì') ||
       q.includes('giới thiệu')
     ) {
-      const answer = `👋 **Dạ em chào Quý Anh/Chị ${context.user.name}!**\n\nEm là **Trợ lý AI Điều Hành Thông Minh** của **CLB Doanh Nhân CEO HN10**.\n\nRất vui được đồng hành cùng Anh/Chị hôm nay ạ! Em có thể giúp Quý Anh/Chị tra cứu nhanh lịch sự kiện, kiểm tra hội phí niên liễm, kết nối giao thương với 200+ CEO trong danh bạ, hoặc tự động dẫn đường từng bước trên màn hình.\n\n👉 *Hôm nay công việc của Anh/Chị thế nào rồi ạ? Anh/Chị cần em hỗ trợ việc gì ngay bây giờ không ạ?*`;
-      const speechText = `Dạ em chào Quý anh chị ${context.user.name}! Em là Trợ lý AI điều hành của CEO HN10. Hôm nay công việc của anh chị thế nào rồi ạ? Em có thể giúp anh chị tra cứu sự kiện, kiểm tra hội phí và dẫn đường trên app ạ!`;
+      const answer = `👋 **Dạ em chào Quý Anh/Chị ${context.user.name}!**\n\nEm là **Trợ lý AI Điều Hành Thông Minh** của **CLB Doanh Nhân CEO HN10**.\n\nRất vui được đồng hành cùng Anh/Chị hôm nay ạ! Em có thể giúp Quý Anh/Chị tra cứu nhanh lịch sự kiện, kiểm tra phí tham gia CLB niên liễm, kết nối giao thương với 200+ CEO trong danh bạ, hoặc tự động dẫn đường từng bước trên màn hình.\n\n👉 *Hôm nay công việc của Anh/Chị thế nào rồi ạ? Anh/Chị cần em hỗ trợ việc gì ngay bây giờ không ạ?*`;
+      const speechText = `Dạ em chào Quý anh chị ${context.user.name}! Em là Trợ lý AI điều hành của CEO HN10. Hôm nay công việc của anh chị thế nào rồi ạ? Em có thể giúp anh chị tra cứu sự kiện, kiểm tra phí tham gia CLB và dẫn đường trên app ạ!`;
 
       return {
         answer,
@@ -3927,10 +3927,10 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
       q.includes('lịch sử') ||
       q.includes('thành lập') ||
       q.includes('clb ceo 1983') ||
-      q.includes('hiệp hội ceo 1983') ||
+      q.includes('CEOHN10 ceo 1983') ||
       q.includes('giới thiệu clb')
     ) {
-      const answer = `🏛️ **Thông Tin Ban Lãnh Đạo, Lịch Sử & Tôn Chỉ CLB Doanh Nhân CEO HN10 (HanoiBA):**\n\nKính gửi Quý Anh/Chị **${userName}**, em xin gửi thông tin chuẩn mực và đầy đủ nhất về Hiệp hội:\n\n1. 👑 **Chủ Tịch Hiệp Hội:**\n   - **Anh Lê Phụng Thắng** — Chủ tịch HĐQT kiêm Tổng Giám đốc Tập đoàn Thép Citicom, Phó Chủ tịch Thường trực Hội Doanh nghiệp Trẻ Hà Nội (HanoiBA).\n   - Là người đặt nền móng kiến tạo, định hình tầm nhìn chiến lược và văn hóa đoàn kết, hào sảng, phụng sự cộng đồng doanh nhân.\n2. 🌟 **Tôn Chỉ Hoạt Động:**\n   - *"Gắn kết doanh nhân — Chia sẻ cơ hội — Phát triển bền vững"*.\n   - Nơi hội tụ các nhà lãnh đạo tài năng sinh năm 1983 (tuổi Quý Hợi) — thế hệ doanh nhân chín muồi về bản lĩnh, khát vọng và tinh thần đổi mới sáng tạo.\n3. 🏢 **Tổ Chức Chủ Quản & Trụ Sở:**\n   - Trực thuộc **Hội Doanh nghiệp Trẻ Hà Nội (HanoiBA)**.\n   - **Trụ sở:** Cung Trí Thức Hà Nội, Số 1 Tôn Thất Thuyết, Cầu Giấy, TP. Hà Nội.\n   - **Hotline Ban Thư Ký:** **0983 198 307** (Hỗ trợ 24/7).\n4. ⚙️ **Cơ Cấu 6 Ban Chuyên Môn:**\n   - **Ban Điều Hành & Ban Thư Ký:** Điều phối chung và vận hành nền tảng số.\n   - **Ban Thành Viên:** Kết nạp, thẩm định và chăm sóc quyền lợi Học viên.\n   - **Ban Xúc Tiến Thương Mại:** Điều phối giao thương B2B và chuỗi giá trị.\n   - **Ban Truyền Thông:** Xây dựng thương hiệu cá nhân CEO và kỷ yếu số.\n   - **Ban Tài Chính:** Quản lý quỹ, hội phí niên liễm và đối soát tài chính tự động.\n   - **Ban Thiện Nguyện:** Các chương trình an sinh xã hội và CSR cộng đồng.\n\n👉 *Quý Anh/Chị có muốn em mở mục Danh Bạ Ban Điều Hành hoặc kết nối Ban Thư Ký ngay không ạ?*`;
+      const answer = `🏛️ **Thông Tin Ban Lãnh Đạo, Lịch Sử & Tôn Chỉ CLB Doanh Nhân CEO HN10 (HanoiBA):**\n\nKính gửi Quý Anh/Chị **${userName}**, em xin gửi thông tin chuẩn mực và đầy đủ nhất về CEOHN10:\n\n1. 👑 **Chủ Tịch CEOHN10:**\n   - **Anh Lê Phụng Thắng** — Chủ tịch HĐQT kiêm Tổng Giám đốc Tập đoàn Thép Citicom, Phó Chủ tịch Thường trực Hội Doanh nghiệp Trẻ Hà Nội (HanoiBA).\n   - Là người đặt nền móng kiến tạo, định hình tầm nhìn chiến lược và văn hóa đoàn kết, hào sảng, phụng sự cộng đồng doanh nhân.\n2. 🌟 **Tôn Chỉ Hoạt Động:**\n   - *"Gắn kết doanh nhân — Chia sẻ cơ hội — Phát triển bền vững"*.\n   - Nơi hội tụ các nhà lãnh đạo tài năng sinh năm 1983 (tuổi Quý Hợi) — thế hệ doanh nhân chín muồi về bản lĩnh, khát vọng và tinh thần đổi mới sáng tạo.\n3. 🏢 **Tổ Chức Chủ Quản & Trụ Sở:**\n   - Trực thuộc **Hội Doanh nghiệp Trẻ Hà Nội (HanoiBA)**.\n   - **Trụ sở:** Cung Trí Thức Hà Nội, Số 1 Tôn Thất Thuyết, Cầu Giấy, TP. Hà Nội.\n   - **Hotline Ban Thư Ký:** **0983 198 307** (Hỗ trợ 24/7).\n4. ⚙️ **Cơ Cấu 6 Ban Chuyên Môn:**\n   - **Ban Điều Hành & Ban Thư Ký:** Điều phối chung và vận hành nền tảng số.\n   - **Ban Thành Viên:** Kết nạp, thẩm định và chăm sóc quyền lợi Học viên.\n   - **Ban Xúc Tiến Thương Mại:** Điều phối giao thương B2B và chuỗi giá trị.\n   - **Ban Truyền Thông:** Xây dựng thương hiệu cá nhân CEO và kỷ yếu số.\n   - **Ban Tài Chính:** Quản lý quỹ, phí tham gia CLB niên liễm và đối soát tài chính tự động.\n   - **Ban Thiện Nguyện:** Các chương trình an sinh xã hội và CSR cộng đồng.\n\n👉 *Quý Anh/Chị có muốn em mở mục Danh Bạ Ban Điều Hành hoặc kết nối Ban Thư Ký ngay không ạ?*`;
       const speechText = `Chủ tịch CLB Doanh Nhân CEO HN10 là anh Lê Phụng Thắng, Chủ tịch HĐQT Citicom kiêm Phó Chủ tịch Thường trực HanoiBA. CLB hoạt động theo tôn chỉ Gắn kết doanh nhân, Chia sẻ cơ hội, Phát triển bền vững ạ!`;
 
       return {
@@ -4020,8 +4020,8 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
       q.includes('dso') ||
       q.includes('dpo')
     ) {
-      const answer = `💼 **Chiến lược Quản trị Dòng tiền & Tài chính Doanh nghiệp (Executive Financial Advisory):**\n\nKính gửi Quý Anh/Chị **${userName}**, trong bối cảnh thương trường nhiều biến động, dòng tiền chính là "mạch máu" sống còn của doanh nghiệp. Em xin chia sẻ 4 nguyên tắc thực chiến:\n\n1. 💰 **Quy tắc Dự phòng An toàn 3-6 tháng:** Luôn duy trì quỹ dự phòng tương đương tối thiểu 3 đến 6 tháng chi phí vận hành cố định (Opex). Dòng tiền âm ngắn hạn có thể đánh gục cả những doanh nghiệp đang có lãi trên sổ sách.\n2. ⏱️ **Tối ưu Vòng quay Tiền mặt (Cash Conversion Cycle):**\n   - **Rút ngắn kỳ thu tiền bình quân (DSO):** Áp dụng chiết khấu thanh toán sớm 1 - 2% cho khách hàng thanh toán trong vòng 7 - 10 ngày; phân loại khách hàng theo nhóm rủi ro tín dụng.\n   - **Kéo dài kỳ trả nợ nhà cung cấp (DPO):** Đàm phán nâng thời hạn thanh toán từ 30 lên 45 - 60 ngày dựa trên cam kết sản lượng dài hạn.\n3. ✂️ **Thanh lọc Chi phí & Danh mục Sản phẩm:** Tinh gọn các hạng mục chi phí vô hình (Unseen Costs), rà soát sản phẩm theo ma trận BCG để dồn lực vào các dòng sản phẩm "Bò sữa" (Cash Cow) sinh dòng tiền ròng cao nhất.\n4. 📊 **Minh bạch Thuế & Hóa đơn Điện tử:** Tuân thủ chuẩn mực kế toán và lưu trữ chứng từ số hóa để sẵn sàng tiếp cận các gói tín dụng doanh nghiệp ưu đãi của MB Bank.\n\n👉 *Quý Anh/Chị có cần em hỗ trợ mở mục Hồ sơ để kiểm tra hội phí hiệp hội hoặc kết nối cùng Ban Tài chính không ạ?*`;
-      const speechText = `Thưa Quý Anh/Chị ${userName}, về quản trị dòng tiền, nguyên tắc số một là duy trì quỹ dự phòng ba đến sáu tháng chi phí vận hành và rút ngắn vòng quay thu hồi công nợ bằng chiết khấu thanh toán sớm. Em luôn sẵn sàng hỗ trợ Quý Anh/Chị kết nối với Ban Tài chính Hiệp hội ạ!`;
+      const answer = `💼 **Chiến lược Quản trị Dòng tiền & Tài chính Doanh nghiệp (Executive Financial Advisory):**\n\nKính gửi Quý Anh/Chị **${userName}**, trong bối cảnh thương trường nhiều biến động, dòng tiền chính là "mạch máu" sống còn của doanh nghiệp. Em xin chia sẻ 4 nguyên tắc thực chiến:\n\n1. 💰 **Quy tắc Dự phòng An toàn 3-6 tháng:** Luôn duy trì quỹ dự phòng tương đương tối thiểu 3 đến 6 tháng chi phí vận hành cố định (Opex). Dòng tiền âm ngắn hạn có thể đánh gục cả những doanh nghiệp đang có lãi trên sổ sách.\n2. ⏱️ **Tối ưu Vòng quay Tiền mặt (Cash Conversion Cycle):**\n   - **Rút ngắn kỳ thu tiền bình quân (DSO):** Áp dụng chiết khấu thanh toán sớm 1 - 2% cho khách hàng thanh toán trong vòng 7 - 10 ngày; phân loại khách hàng theo nhóm rủi ro tín dụng.\n   - **Kéo dài kỳ trả nợ nhà cung cấp (DPO):** Đàm phán nâng thời hạn thanh toán từ 30 lên 45 - 60 ngày dựa trên cam kết sản lượng dài hạn.\n3. ✂️ **Thanh lọc Chi phí & Danh mục Sản phẩm:** Tinh gọn các hạng mục chi phí vô hình (Unseen Costs), rà soát sản phẩm theo ma trận BCG để dồn lực vào các dòng sản phẩm "Bò sữa" (Cash Cow) sinh dòng tiền ròng cao nhất.\n4. 📊 **Minh bạch Thuế & Hóa đơn Điện tử:** Tuân thủ chuẩn mực kế toán và lưu trữ chứng từ số hóa để sẵn sàng tiếp cận các gói tín dụng doanh nghiệp ưu đãi của MB Bank.\n\n👉 *Quý Anh/Chị có cần em hỗ trợ mở mục Hồ sơ để kiểm tra phí tham gia CLB CEOHN10 hoặc kết nối cùng Ban Tài chính không ạ?*`;
+      const speechText = `Thưa Quý Anh/Chị ${userName}, về quản trị dòng tiền, nguyên tắc số một là duy trì quỹ dự phòng ba đến sáu tháng chi phí vận hành và rút ngắn vòng quay thu hồi công nợ bằng chiết khấu thanh toán sớm. Em luôn sẵn sàng hỗ trợ Quý Anh/Chị kết nối với Ban Tài chính CEOHN10 ạ!`;
 
       return {
         answer,
@@ -4077,8 +4077,8 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
       q.includes('tiếp cận') ||
       q.includes('doanh thu')
     ) {
-      const answer = `🤝 **Chiến lược Tăng trưởng Doanh thu B2B & Đàm phán Thương mại Cấp cao:**\n\nKính gửi Quý Anh/Chị **${userName}**, bán hàng B2B giữa các doanh nghiệp đòi hỏi sự tin cậy tuyệt đối và giải pháp giá trị toàn diện:\n\n1. 🎯 **Chiến lược Tiếp cận Tài khoản Trọng điểm (Account-Based Marketing - ABM):** Thay vì tiếp cận đại trà, hãy lập danh sách 20-50 doanh nghiệp mục tiêu hàng đầu. Phân tích sâu điểm nghẽn (Pain points) của Chủ tịch/Tổng giám đốc đối tác để chuẩn bị giải pháp "may đo".\n2. 💼 **Đàm phán Thương mại Win-Win:**\n   - Không bao giờ nhượng bộ giá mà không đòi hỏi lại điều kiện đối ứng (như thanh toán sớm hơn, tăng khối lượng hợp đồng hoặc hợp đồng dài hạn).\n   - Bán tổng chi phí sở hữu (Total Cost of Ownership - TCO) và giá trị gia tăng chứ không chỉ cạnh tranh giá thành đơn thuần.\n3. 🌐 **Đòn bẩy Mạng lưới Hiệp hội CEO HN10:**\n   - Đăng tải sản phẩm lên **Chợ B2B Marketplace** của CLB để tiếp cận mạng lưới 200+ chủ doanh nghiệp uy tín.\n   - Đặt lịch hẹn **1-on-1** thông qua Danh bạ Học viên để tìm kiếm cơ hội hợp tác chiến lược, chia sẻ khách hàng chéo trong cùng hệ sinh thái.\n\n👉 *Quý Anh/Chị có muốn em dẫn đường mở ngay Sàn Sản Phẩm B2B để đăng bán hoặc tìm kiếm đối tác không ạ?*`;
-      const speechText = `Thưa Quý Anh/Chị ${userName}, bán hàng B2B hiệu quả nhất là tập trung vào tài khoản trọng điểm và bán giải pháp tổng thể thay vì cạnh tranh giá. Em có thể mở Chợ B2B để Quý Anh/Chị kết nối với hai trăm CEO trong hiệp hội ngay ạ!`;
+      const answer = `🤝 **Chiến lược Tăng trưởng Doanh thu B2B & Đàm phán Thương mại Cấp cao:**\n\nKính gửi Quý Anh/Chị **${userName}**, bán hàng B2B giữa các doanh nghiệp đòi hỏi sự tin cậy tuyệt đối và giải pháp giá trị toàn diện:\n\n1. 🎯 **Chiến lược Tiếp cận Tài khoản Trọng điểm (Account-Based Marketing - ABM):** Thay vì tiếp cận đại trà, hãy lập danh sách 20-50 doanh nghiệp mục tiêu hàng đầu. Phân tích sâu điểm nghẽn (Pain points) của Chủ tịch/Tổng giám đốc đối tác để chuẩn bị giải pháp "may đo".\n2. 💼 **Đàm phán Thương mại Win-Win:**\n   - Không bao giờ nhượng bộ giá mà không đòi hỏi lại điều kiện đối ứng (như thanh toán sớm hơn, tăng khối lượng hợp đồng hoặc hợp đồng dài hạn).\n   - Bán tổng chi phí sở hữu (Total Cost of Ownership - TCO) và giá trị gia tăng chứ không chỉ cạnh tranh giá thành đơn thuần.\n3. 🌐 **Đòn bẩy Mạng lưới CEOHN10 CEO HN10:**\n   - Đăng tải sản phẩm lên **Chợ B2B Marketplace** của CLB để tiếp cận mạng lưới 200+ chủ doanh nghiệp uy tín.\n   - Đặt lịch hẹn **1-on-1** thông qua Danh bạ Học viên để tìm kiếm cơ hội hợp tác chiến lược, chia sẻ khách hàng chéo trong cùng hệ sinh thái.\n\n👉 *Quý Anh/Chị có muốn em dẫn đường mở ngay Sàn Sản Phẩm B2B để đăng bán hoặc tìm kiếm đối tác không ạ?*`;
+      const speechText = `Thưa Quý Anh/Chị ${userName}, bán hàng B2B hiệu quả nhất là tập trung vào tài khoản trọng điểm và bán giải pháp tổng thể thay vì cạnh tranh giá. Em có thể mở Chợ B2B để Quý Anh/Chị kết nối với hai trăm CEO trong CEOHN10 ngay ạ!`;
 
       return {
         answer,
@@ -4133,7 +4133,7 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
       q.includes('hà nội') ||
       q.includes('ăn tối')
     ) {
-      const answer = `🍷 **Địa điểm Tiếp khách VIP & Sân Golf Đẳng cấp tại Hà Nội:**\n\nKính gửi Quý Anh/Chị **${userName}**, một không gian ẩm thực riêng tư, đẳng cấp là tiền đề quan trọng cho những hợp đồng thành công:\n\n1. 🏛️ **Nhà hàng Tiếp đối tác VIP có phòng riêng sang trọng:**\n   - **French Grill (JW Marriott Hà Nội):** Đẳng cấp quốc tế, hải sản cao cấp và bò Wagyu thượng hạng, phòng riêng bảo mật cao.\n   - **Gia Restaurant & Chapter Grill:** Ẩm thực đương đại tinh tế, phù hợp tiếp các đối tác nước ngoài và lãnh đạo cấp cao.\n   - **Tầm Vị & Quán Ăn Ngon VIP Room:** Hương vị ẩm thực Việt truyền thống đậm đà bản sắc Tràng An, không gian ấm cúng, tao nhã.\n   - **Long Đình (Quán Sứ):** Ẩm thực Hong Kong đỉnh cao, điểm hẹn quen thuộc của giới doanh nhân thủ đô.\n2. ⛳ **Sân Golf Tiêu biểu Kết nối Giao thương:**\n   - **Long Biên Golf Course:** Ngay nội đô, thuận tiện cho các trận đánh chiều sau giờ làm việc.\n   - **Sky Lake Resort & Golf Club (Chương Mỹ):** Độ thử thách cao, cảnh quan thiên nhiên tuyệt mỹ.\n   - **BRG Kings Island Golf Resort (Đồng Mô):** Đẳng cấp sân đảo nước độc đáo, không khí trong lành.\n\n👉 *Quý Anh/Chị có muốn mở Danh bạ Học viên để mời anh chị em trong Hiệp hội cùng giao lưu kết nối 1-on-1 không ạ?*`;
+      const answer = `🍷 **Địa điểm Tiếp khách VIP & Sân Golf Đẳng cấp tại Hà Nội:**\n\nKính gửi Quý Anh/Chị **${userName}**, một không gian ẩm thực riêng tư, đẳng cấp là tiền đề quan trọng cho những hợp đồng thành công:\n\n1. 🏛️ **Nhà hàng Tiếp đối tác VIP có phòng riêng sang trọng:**\n   - **French Grill (JW Marriott Hà Nội):** Đẳng cấp quốc tế, hải sản cao cấp và bò Wagyu thượng hạng, phòng riêng bảo mật cao.\n   - **Gia Restaurant & Chapter Grill:** Ẩm thực đương đại tinh tế, phù hợp tiếp các đối tác nước ngoài và lãnh đạo cấp cao.\n   - **Tầm Vị & Quán Ăn Ngon VIP Room:** Hương vị ẩm thực Việt truyền thống đậm đà bản sắc Tràng An, không gian ấm cúng, tao nhã.\n   - **Long Đình (Quán Sứ):** Ẩm thực Hong Kong đỉnh cao, điểm hẹn quen thuộc của giới doanh nhân thủ đô.\n2. ⛳ **Sân Golf Tiêu biểu Kết nối Giao thương:**\n   - **Long Biên Golf Course:** Ngay nội đô, thuận tiện cho các trận đánh chiều sau giờ làm việc.\n   - **Sky Lake Resort & Golf Club (Chương Mỹ):** Độ thử thách cao, cảnh quan thiên nhiên tuyệt mỹ.\n   - **BRG Kings Island Golf Resort (Đồng Mô):** Đẳng cấp sân đảo nước độc đáo, không khí trong lành.\n\n👉 *Quý Anh/Chị có muốn mở Danh bạ Học viên để mời anh chị em trong CEOHN10 cùng giao lưu kết nối 1-on-1 không ạ?*`;
       const speechText = `Em gợi ý các địa điểm tiếp khách sang trọng như French Grill tại JW Marriott, hoặc giao lưu trên sân Long Biên và Sky Lake. Em có thể mở Danh bạ để Quý Anh/Chị mời Học viên giao lưu ngay ạ!`;
 
       return {
@@ -4198,7 +4198,7 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
 
     // 8. Tri thức Tổng hợp & Đối thoại Tự nhiên Đẳng cấp (Universal Knowledge Engine)
     // Trả lời toàn diện, sâu sắc cho BẤT KỲ câu hỏi nào, không bao giờ báo lỗi dữ liệu!
-    const answer = `💡 **Ý kiến Phân tích & Tham vấn từ Trợ lý AI Điều Hành:**\n\nKính gửi Quý Anh/Chị **${userName}**, đối với vấn đề Quý Anh/Chị vừa trao đổi: **"${rawPrompt}"**:\n\n1. 🔍 **Góc nhìn Tổng quan & Bản chất Vấn đề:**\n   Mọi khía cạnh trong điều hành kinh doanh và cuộc sống đều có những nguyên lý vận hành cốt lõi. Việc nhìn nhận thấu đáo bản chất sẽ giúp chúng ta có quyết sách điềm tĩnh, chính xác và giảm thiểu rủi ro.\n2. 🧭 **Gợi ý Giải pháp & Định hướng Thực tế:**\n   - **Đánh giá Thực trạng:** Rà soát nguồn lực nội tại (tài chính, con người, thời gian) trước khi đưa ra quyết định cuối cùng.\n   - **Học hỏi Kinh nghiệm từ Mạng lưới:** Anh em doanh nhân trong CLB CEO HN10 luôn sẵn sàng chia sẻ bài học thực chiến, góc nhìn đa chiều từ nhiều ngành nghề khác nhau.\n   - **Hành động Quyết đoán:** Sau khi đã cân nhắc các phương án, việc triển khai dứt khoát và đo lường liên tục là chìa khóa để đạt kết quả tốt nhất.\n\nQuý Anh/Chị có thể ra lệnh giọng nói (*"Mở danh bạ"*, *"Vào sự kiện"*, *"Chợ B2B"*, *"Đóng hội phí"*) hoặc tiếp tục trao đổi sâu hơn về bất kỳ chủ đề nào nhé ạ!\n\n👉 *Chúc Quý Anh/Chị một ngày làm việc tràn đầy cảm hứng, sức khỏe dồi dào và vạn sự hanh thông!*`;
+    const answer = `💡 **Ý kiến Phân tích & Tham vấn từ Trợ lý AI Điều Hành:**\n\nKính gửi Quý Anh/Chị **${userName}**, đối với vấn đề Quý Anh/Chị vừa trao đổi: **"${rawPrompt}"**:\n\n1. 🔍 **Góc nhìn Tổng quan & Bản chất Vấn đề:**\n   Mọi khía cạnh trong điều hành kinh doanh và cuộc sống đều có những nguyên lý vận hành cốt lõi. Việc nhìn nhận thấu đáo bản chất sẽ giúp chúng ta có quyết sách điềm tĩnh, chính xác và giảm thiểu rủi ro.\n2. 🧭 **Gợi ý Giải pháp & Định hướng Thực tế:**\n   - **Đánh giá Thực trạng:** Rà soát nguồn lực nội tại (tài chính, con người, thời gian) trước khi đưa ra quyết định cuối cùng.\n   - **Học hỏi Kinh nghiệm từ Mạng lưới:** Anh em doanh nhân trong CLB CEO HN10 luôn sẵn sàng chia sẻ bài học thực chiến, góc nhìn đa chiều từ nhiều ngành nghề khác nhau.\n   - **Hành động Quyết đoán:** Sau khi đã cân nhắc các phương án, việc triển khai dứt khoát và đo lường liên tục là chìa khóa để đạt kết quả tốt nhất.\n\nQuý Anh/Chị có thể ra lệnh giọng nói (*"Mở danh bạ"*, *"Vào sự kiện"*, *"Chợ B2B"*, *"Đóng phí tham gia CLB"*) hoặc tiếp tục trao đổi sâu hơn về bất kỳ chủ đề nào nhé ạ!\n\n👉 *Chúc Quý Anh/Chị một ngày làm việc tràn đầy cảm hứng, sức khỏe dồi dào và vạn sự hanh thông!*`;
     const speechText = `Dạ thưa Quý Anh/Chị ${userName}, em đã ghi nhận câu hỏi và phân tích chi tiết trên màn hình. Quý Anh/Chị có thể ra lệnh giọng nói để mở các chức năng hoặc tiếp tục trò chuyện cùng em bất cứ lúc nào ạ!`;
 
     return {
@@ -4265,7 +4265,7 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
 Nhiệm vụ của bạn:
 1. Hãy lắng nghe đoạn ghi âm giọng nói tiếng Việt được cung cấp và chuyển thành văn bản chính xác nhất vào trường "userSpeech".
 2. Trả lời câu hỏi một cách thông minh, ấm áp, lịch thiệp, phong cách người thật xưng 'Em' gọi 'Quý Anh/Chị' ${context.user.name}.
-3. Tận dụng dữ liệu thời gian thực của Học viên: Tên ${context.user.name}, Công ty ${context.user.company}, Cấp bậc ${context.user.level}, Trạng thái hội phí ${context.dues.feePaid ? 'Đã đóng' : 'Chưa đóng'}.
+3. Tận dụng dữ liệu thời gian thực của Học viên: Tên ${context.user.name}, Công ty ${context.user.company}, Cấp bậc ${context.user.level}, Trạng thái phí tham gia CLB ${context.dues.feePaid ? 'Đã đóng' : 'Chưa đóng'}.
 4. Trả về JSON theo định dạng:
 {
   "userSpeech": "câu nói của Học viên nhận diện được",

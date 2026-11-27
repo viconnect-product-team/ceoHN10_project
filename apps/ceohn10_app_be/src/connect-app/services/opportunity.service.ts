@@ -282,7 +282,7 @@ export class ConnectOpportunityService {
         id, code, title, category, author, published_at, views, status, excerpt, content, cover_image, association_id, created_at, updated_at
       ) VALUES (
         ${newsId}, ${code}, ${data.title || 'Thông báo mới'},
-        ${data.category || 'Tin Hiệp Hội'}, ${authorName},
+        ${data.category || 'Tin CEOHN10'}, ${authorName},
         now(), 0, 'published', ${data.excerpt || ''},
         ${data.content || ''}, ${data.coverImage || '/ceohn10_hero_cosmos_skyline.jpg'},
         ${communityId}::uuid, now(), now()
