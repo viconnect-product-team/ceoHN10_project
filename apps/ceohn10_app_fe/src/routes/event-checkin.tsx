@@ -99,12 +99,107 @@ function PublicEventCheckinGatePage() {
   });
   const [additionalWalkins, setAdditionalWalkins] = useState<Array<{
     id: string;
+    lookupCode?: string;
+    lookupLoading?: boolean;
+    lookupStatus?: string;
+    ticketCode?: string;
+    memberCode?: string;
+    isRegistered?: boolean;
+    isCheckedIn?: boolean;
     fullName: string;
     phone: string;
     email: string;
     company: string;
     position: string;
   }>>([]);
+
+  const lookupCompanionByCode = async (idx: number, rawCode?: string) => {
+    const target = additionalWalkins[idx];
+    const clean = String(rawCode ?? target?.lookupCode ?? "").trim();
+    if (!clean) {
+      toast.info("Vui lòng nhập mã học viên hoặc mã vé của người nhờ check-in hộ");
+      return;
+    }
+    setAdditionalWalkins((prev) =>
+      prev.map((it, i) => (i === idx ? { ...it, lookupLoading: true, lookupStatus: undefined } : it)),
+    );
+    try {
+      const evQuery =
+        selectedEventId && selectedEventId !== "latest"
+          ? `?eventId=${encodeURIComponent(selectedEventId)}`
+          : "";
+      const res = await fetchNestApi<any>(
+        `/events/ticket-status/${encodeURIComponent(clean)}${evQuery}`,
+      );
+      if (res && res.found && res.ticket) {
+        const tk = res.ticket;
+        setAdditionalWalkins((prev) =>
+          prev.map((it, i) =>
+            i === idx
+              ? {
+                  ...it,
+                  lookupLoading: false,
+                  ticketCode: tk.id,
+                  memberCode: tk.memberCode || "",
+                  isRegistered: true,
+                  isCheckedIn: Boolean(tk.isCheckedIn),
+                  fullName: tk.memberName || it.fullName,
+                  phone: tk.phone || it.phone,
+                  email: tk.email || it.email,
+                  company: tk.company || it.company,
+                  position: tk.position || it.position,
+                  lookupStatus: tk.isCheckedIn
+                    ? `Đã check-in trước đó (${tk.id})`
+                    : `Đã đăng ký sự kiện (${tk.id}) — sẵn sàng check-in hộ`,
+                }
+              : it,
+          ),
+        );
+        toast.success(`Đã tìm thấy thông tin đại biểu: ${tk.memberName}`);
+      } else if (res && res.notRegisteredForEvent && res.member) {
+        const mb = res.member;
+        setAdditionalWalkins((prev) =>
+          prev.map((it, i) =>
+            i === idx
+              ? {
+                  ...it,
+                  lookupLoading: false,
+                  ticketCode: undefined,
+                  memberCode: mb.code || clean.toUpperCase(),
+                  isRegistered: false,
+                  isCheckedIn: false,
+                  fullName: mb.fullName || it.fullName,
+                  phone: mb.phone || it.phone,
+                  email: mb.email || it.email,
+                  company: mb.company || it.company,
+                  position: mb.position || it.position,
+                  lookupStatus: `Học viên (${mb.code || clean}) chưa đăng ký sự kiện này — sẽ tự đăng ký & check-in hộ`,
+                }
+              : it,
+          ),
+        );
+        toast.info(`Đã điền thông tin học viên ${mb.fullName} (chưa đăng ký sự kiện này)`);
+      } else {
+        setAdditionalWalkins((prev) =>
+          prev.map((it, i) =>
+            i === idx
+              ? {
+                  ...it,
+                  lookupLoading: false,
+                  lookupStatus: res?.message || "Không tìm thấy mã học viên hoặc mã vé này",
+                }
+              : it,
+          ),
+        );
+        toast.error(res?.message || "Không tìm thấy mã học viên hoặc mã vé này");
+      }
+    } catch {
+      setAdditionalWalkins((prev) =>
+        prev.map((it, i) => (i === idx ? { ...it, lookupLoading: false } : it)),
+      );
+      toast.error("Lỗi tra cứu thông tin người nhờ check-in hộ");
+    }
+  };
   const [submittingWalkin, setSubmittingWalkin] = useState(false);
 
   // ── OFFLINE CHECKIN STATE (MẤT SÓNG / KHÔNG CÓ MẠNG) ───────────────────────
@@ -606,6 +701,9 @@ function PublicEventCheckinGatePage() {
     const isInstantCheckin = walkinPaymentMethod === "cash_instant" || selectedEventIsFree;
     setSubmittingWalkin(true);
     try {
+      const preRegisteredCompanions = additionalWalkins.filter((a) => Boolean(a.ticketCode));
+      const newWalkinCompanions = additionalWalkins.filter((a) => !a.ticketCode);
+
       const allWalkins = [
         {
           fullName: walkinForm.fullName.trim(),
@@ -614,14 +712,29 @@ function PublicEventCheckinGatePage() {
           company: walkinForm.company.trim(),
           position: walkinForm.position.trim(),
         },
-        ...additionalWalkins.map((a) => ({
+        ...newWalkinCompanions.map((a) => ({
           fullName: a.fullName.trim(),
           phone: a.phone.trim(),
           email: a.email.trim().toLowerCase(),
           company: a.company.trim() || walkinForm.company.trim(),
           position: a.position.trim(),
+          memberCode: a.memberCode || undefined,
         })),
       ];
+
+      // Check-in hộ các đại biểu đã có vé / đã đăng ký sự kiện này
+      for (const comp of preRegisteredCompanions) {
+        if (comp.ticketCode && !comp.isCheckedIn) {
+          await fetchNestApi("/events/ticket-checkin", {
+            method: "POST",
+            body: JSON.stringify({
+              ticketCode: comp.ticketCode,
+              method: "companion_checkin",
+              attendedParts: walkinForm.selectedParts,
+            }),
+          }).catch(() => {});
+        }
+      }
 
       const res = await fetchNestApi<any>(`/events/${targetEventId}/guest-register`, {
         method: "POST",
@@ -915,21 +1028,23 @@ function PublicEventCheckinGatePage() {
     "/skyline_perspective_dark.jpg";
 
   return (
-    <div className="min-h-screen w-full relative overflow-x-hidden flex flex-col text-slate-950 font-sans selection:bg-slate-900 selection:text-white bg-[#dbe4f0]">
+    <div className="min-h-screen w-full relative overflow-x-hidden flex items-center justify-center p-5 text-[#0B0D12] font-sans selection:bg-[#0B0D12] selection:text-white bg-white">
       <style>{`
-        @keyframes iosCausticFloat {
-          0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-          50% { transform: translate3d(20px, -16px, 0) scale(1.06); }
-        }
-        @keyframes iosWaterSurfaceBounce {
-          0% { transform: scale(1); }
-          25% { transform: scale(0.978) translateY(1.5px); }
-          55% { transform: scale(1.01) translateY(-1px); }
-          80% { transform: scale(0.996); }
-          100% { transform: scale(1); }
-        }
-        .ios-water-surface-bounce {
-          animation: iosWaterSurfaceBounce 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+        :root {
+          --bg-canvas: #FFFFFF;
+          --caustic-cyan: rgba(110, 215, 255, 0.22);
+          --caustic-violet: rgba(190, 175, 255, 0.20);
+          --caustic-mint: rgba(130, 245, 210, 0.18);
+          --glass-bg: rgba(255, 255, 255, 0.58);
+          --glass-bg-elevated: rgba(255, 255, 255, 0.85);
+          --glass-input-bg: rgba(242, 244, 248, 0.55);
+          --glass-border-top: rgba(255, 255, 255, 0.98);
+          --glass-border-edge: rgba(205, 222, 240, 0.65);
+          --prism-glow: rgba(120, 210, 255, 0.35);
+          --glass-shadow: 0 20px 48px -12px rgba(15, 23, 42, 0.08),
+                          0 4px 16px -4px rgba(15, 23, 42, 0.04);
+          --pill-active-shadow: 0 8px 20px -4px rgba(15, 23, 42, 0.10),
+                                0 0 18px rgba(120, 215, 255, 0.32);
         }
         @keyframes iosWaterWave {
           0% {
@@ -968,73 +1083,109 @@ function PublicEventCheckinGatePage() {
         .ios-liquid-glass {
           position: relative;
           overflow: hidden;
-          background: radial-gradient(
-            130% 100% at 12% 8%,
-            rgba(255, 255, 255, 0.46) 0%,
-            rgba(255, 255, 255, 0.14) 45%,
-            rgba(255, 255, 255, 0.22) 100%
-          );
-          backdrop-filter: blur(15px) saturate(200%) brightness(106%);
-          -webkit-backdrop-filter: blur(15px) saturate(200%) brightness(106%);
-          border: 1px solid rgba(255, 255, 255, 0.72);
+          background: rgba(255, 255, 255, 0.58);
+          backdrop-filter: blur(28px) saturate(180%);
+          -webkit-backdrop-filter: blur(28px) saturate(180%);
+          border-radius: 28px;
+          border: 1px solid rgba(205, 222, 240, 0.65);
           box-shadow:
-            0 24px 48px -12px rgba(15, 23, 42, 0.25),
-            0 10px 22px -6px rgba(15, 23, 42, 0.12),
-            inset 0 2px 6px rgba(255, 255, 255, 0.98),
-            inset 0 -3px 8px rgba(15, 23, 42, 0.08),
-            inset 0 0 22px rgba(255, 255, 255, 0.28);
+            inset 0 1.5px 1px rgba(255, 255, 255, 0.98),
+            inset 0 -1px 2px rgba(120, 210, 255, 0.35),
+            0 20px 48px -12px rgba(15, 23, 42, 0.08),
+            0 4px 16px -4px rgba(15, 23, 42, 0.04);
         }
         .ios-liquid-glass-active {
           position: relative;
           overflow: hidden;
-          background: radial-gradient(
-            130% 100% at 12% 8%,
-            rgba(255, 255, 255, 0.64) 0%,
-            rgba(255, 255, 255, 0.28) 50%,
-            rgba(255, 255, 255, 0.38) 100%
-          );
-          backdrop-filter: blur(16px) saturate(215%) brightness(108%);
-          -webkit-backdrop-filter: blur(16px) saturate(215%) brightness(108%);
-          border: 1.5px solid rgba(255, 255, 255, 0.96);
+          background: rgba(255, 255, 255, 0.85);
+          backdrop-filter: blur(28px) saturate(180%);
+          -webkit-backdrop-filter: blur(28px) saturate(180%);
+          border: 1px solid rgba(205, 222, 240, 0.65);
           box-shadow:
-            0 26px 52px -10px rgba(15, 23, 42, 0.28),
-            0 8px 20px -4px rgba(15, 23, 42, 0.14),
-            inset 0 2.5px 6px rgba(255, 255, 255, 1),
-            inset 0 -3px 8px rgba(14, 165, 233, 0.16),
-            inset 0 0 28px rgba(255, 255, 255, 0.42);
+            inset 0 1px 1px rgba(255, 255, 255, 0.98),
+            0 8px 20px -4px rgba(15, 23, 42, 0.10),
+            0 0 18px rgba(120, 215, 255, 0.32);
         }
         .ios-liquid-pill {
           position: relative;
           overflow: hidden;
-          background: radial-gradient(
-            120% 90% at 15% 10%,
-            rgba(255, 255, 255, 0.5) 0%,
-            rgba(255, 255, 255, 0.16) 55%,
-            rgba(255, 255, 255, 0.24) 100%
-          );
-          backdrop-filter: blur(12px) saturate(195%);
-          -webkit-backdrop-filter: blur(12px) saturate(195%);
-          border: 1px solid rgba(255, 255, 255, 0.78);
+          background: rgba(255, 255, 255, 0.85);
+          border: 1px solid rgba(205, 222, 240, 0.65);
           box-shadow:
-            0 10px 24px -6px rgba(15, 23, 42, 0.16),
-            inset 0 2px 4px rgba(255, 255, 255, 0.98),
-            inset 0 -2px 4px rgba(15, 23, 42, 0.06);
+            inset 0 1px 0 rgba(255, 255, 255, 0.98),
+            0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+        .ios-seg-btn {
+          border: 1px solid transparent;
+          background: transparent;
+          padding: 10px 8px;
+          border-radius: 999px;
+          font-size: 13.5px;
+          font-weight: 500;
+          color: #525866;
+          cursor: pointer;
+          transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .ios-seg-btn.active {
+          background: rgba(255, 255, 255, 0.85);
+          color: #0B0D12;
+          font-weight: 700;
+          border-color: rgba(205, 222, 240, 0.65);
+          box-shadow:
+            inset 0 1px 1px rgba(255, 255, 255, 0.98),
+            0 8px 20px -4px rgba(15, 23, 42, 0.10),
+            0 0 18px rgba(120, 215, 255, 0.32);
         }
         .ios-liquid-input {
-          background: rgba(255, 255, 255, 0.32);
-          backdrop-filter: blur(12px) saturate(180%);
-          -webkit-backdrop-filter: blur(12px) saturate(180%);
-          border: 1.5px solid rgba(255, 255, 255, 0.9);
-          box-shadow:
-            inset 0 2px 4px rgba(255, 255, 255, 0.85),
-            0 4px 14px rgba(15, 23, 42, 0.06);
+          width: 100%;
+          padding: 13px 18px;
+          border-radius: 999px;
+          border: 1px solid rgba(205, 222, 240, 0.65);
+          background: rgba(242, 244, 248, 0.55);
+          color: #0B0D12;
+          font-size: 14.5px;
+          outline: none;
+          transition: all 0.2s ease;
+        }
+        .ios-liquid-input::placeholder {
+          color: #8A919E;
         }
         .ios-liquid-input:focus {
-          background: rgba(255, 255, 255, 0.52);
-          border-color: rgba(255, 255, 255, 1);
+          background: rgba(255, 255, 255, 0.85);
+          box-shadow: 0 0 0 3px rgba(120, 210, 255, 0.35);
+        }
+        .ios-btn-submit {
+          padding: 13px 20px;
+          border-radius: 999px;
+          border: none;
+          background: #0B0D12;
+          color: #FFFFFF;
+          font-size: 15px;
+          font-weight: 700;
+          cursor: pointer;
           box-shadow:
-            0 0 0 3px rgba(255, 255, 255, 0.55),
-            inset 0 1.5px 3px rgba(255, 255, 255, 1);
+            inset 0 1px 1px rgba(255, 255, 255, 0.25),
+            0 8px 20px rgba(11, 13, 18, 0.18);
+          transition: transform 0.15s ease, opacity 0.15s ease;
+        }
+        .ios-btn-submit:active {
+          transform: scale(0.98);
+        }
+        .ios-btn-qr {
+          width: 46px;
+          height: 46px;
+          border-radius: 16px;
+          border: 1px solid rgba(205, 222, 240, 0.65);
+          background: rgba(255, 255, 255, 0.85);
+          color: #0B0D12;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          flex-shrink: 0;
+          box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.98),
+            0 4px 12px rgba(0, 0, 0, 0.05);
         }
         .ios-water-btn {
           position: relative;
@@ -1045,7 +1196,7 @@ function PublicEventCheckinGatePage() {
             background 0.32s ease;
         }
         .ios-water-btn:active {
-          transform: scale(0.96);
+          transform: scale(0.97);
         }
         .ios-water-ripple-wave {
           position: absolute;
@@ -1084,120 +1235,116 @@ function PublicEventCheckinGatePage() {
         }
       `}</style>
 
-      {/* NỀN CÓ ẢNH CHÌM SANG TRỌNG + LỚP PHỦ TRONG SUỐT ĐỂ KÍNH LIQUID GLASS KHÚC XẠ RÕ NÉT */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105 transition-all duration-700"
-          style={{
-            backgroundImage: `url("${submergedBgImage}"), url("/skyline_perspective_dark.jpg")`,
-            filter: "saturate(120%) contrast(106%) brightness(104%)",
-          }}
-        />
-        {/* Lớp voan ngọc trai siêu trong suốt (0.32 - 0.42) để nhìn rõ ảnh chìm phía dưới lớp kính mà chữ đen vẫn nổi bật */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(155deg, rgba(248, 250, 252, 0.38) 0%, rgba(241, 245, 249, 0.32) 50%, rgba(226, 232, 240, 0.42) 100%)",
-          }}
-        />
-        <div
-          className="absolute -top-24 -left-16 w-[500px] h-[500px] rounded-full opacity-65 blur-3xl"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(186,230,253,0.4) 55%, transparent 100%)",
-            animation: "iosCausticFloat 12s ease-in-out infinite",
-          }}
-        />
-        <div
-          className="absolute bottom-0 right-0 w-[540px] h-[540px] rounded-full opacity-60 blur-3xl"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(254,243,199,0.45) 0%, rgba(255,255,255,0.5) 60%, transparent 100%)",
-            animation: "iosCausticFloat 15s ease-in-out infinite reverse",
-          }}
-        />
-      </div>
+      {/* Hiệu ứng vệt khúc xạ ánh sáng Caustics chuẩn iOS Light Liquid Glass trên nền trắng */}
+      <div
+        className="fixed inset-0 pointer-events-none z-0"
+        style={{
+          background: `
+            radial-gradient(circle at 18% 22%, rgba(110, 215, 255, 0.22) 0%, transparent 42%),
+            radial-gradient(circle at 82% 35%, rgba(190, 175, 255, 0.20) 0%, transparent 45%),
+            radial-gradient(circle at 50% 82%, rgba(130, 245, 210, 0.18) 0%, transparent 45%)
+          `,
+        }}
+      />
 
       {/* Main Content */}
-      <main className="relative z-10 flex-1 max-w-4xl w-full mx-auto px-3 sm:px-6 py-5 sm:py-8 space-y-4 flex flex-col justify-center">
-        {/* HEADER CHỈ CÓ LOGO CEO HN10 CÙNG TÊN SỰ KIỆN & THÔNG TIN (ĐÃ BỎ TIMELINE) */}
-        <div className="ios-liquid-glass rounded-3xl p-4 sm:p-6 text-center space-y-3.5 relative overflow-hidden">
-          <div className="flex flex-col items-center justify-center gap-2">
-            <div className="ios-liquid-pill px-4 py-1.5 rounded-2xl inline-flex items-center justify-center">
-              <img
-                src="/hn10-logo-2.png"
-                alt="CEO HN10"
-                className="h-7 sm:h-9 w-auto object-contain brightness-0"
-              />
-            </div>
-
-            <h1
-              className="text-xl sm:text-3xl font-black uppercase tracking-tight text-slate-950 leading-tight break-words"
-              style={{ textShadow: "0 1px 2px rgba(255,255,255,0.85)" }}
-            >
-              {selectedEventName}
-            </h1>
+      <main className="relative z-10 w-full max-w-[400px] mx-auto flex flex-col gap-[18px]">
+        {/* 1. Header Card */}
+        <section className="ios-liquid-glass px-5 py-6 text-center flex flex-col items-center gap-3">
+          <div className="ios-liquid-pill px-4 py-1.5 rounded-full inline-flex items-center justify-center gap-1.5 text-[11px] font-bold tracking-[0.08em] text-[#0B0D12]">
+            <img
+              src="/hn10-logo-2.png"
+              alt="CEOHN10"
+              className="h-4 w-auto object-contain brightness-0"
+            />
+            <span>CEOHN10</span>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-2 text-xs">
-            {(selectedEventObj?.date || selectedEventObj?.time) && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full ios-liquid-pill text-slate-950 font-bold">
-                <Calendar className="w-3.5 h-3.5 text-slate-900" />
-                <span>
-                  {[
-                    selectedEventObj?.date
-                      ? String(selectedEventObj.date).slice(0, 10)
-                      : null,
-                    selectedEventObj?.time ||
-                      [selectedEventObj?.start_time, selectedEventObj?.end_time].filter(Boolean).join(" - "),
+          <h1 className="text-[22px] font-extrabold tracking-[-0.02em] text-[#0B0D12] leading-tight break-words">
+            {selectedEventName}
+          </h1>
+
+          {(selectedEventObj?.date ||
+            selectedEventObj?.time ||
+            selectedEventObj?.start_time ||
+            selectedEventObj?.startTime ||
+            (Array.isArray(selectedEventObj?.parts) && selectedEventObj.parts.length > 0) ||
+            selectedEventObj?.venueName ||
+            selectedEventObj?.venue_name ||
+            selectedEventObj?.location) && (
+            <div
+              className="px-3.5 py-[7px] rounded-full text-[12.5px] font-medium text-[#525866] leading-snug"
+              style={{
+                background: "rgba(255, 255, 255, 0.65)",
+                border: "1px solid rgba(205, 222, 240, 0.65)",
+              }}
+            >
+              {[
+                selectedEventObj?.date
+                  ? (() => {
+                      const raw = String(selectedEventObj.date).trim();
+                      if (/^\d{4}-\d{2}-\d{2}/.test(raw)) {
+                        return raw.slice(0, 10).split("-").reverse().join("/");
+                      }
+                      return raw;
+                    })()
+                  : null,
+                selectedEventObj?.time ||
+                  [
+                    selectedEventObj?.start_time || selectedEventObj?.startTime,
+                    selectedEventObj?.end_time || selectedEventObj?.endTime,
                   ]
                     .filter(Boolean)
-                    .join(" · ")}
-                </span>
-              </span>
-            )}
-            {(selectedEventObj?.venueName || selectedEventObj?.venue_name || selectedEventObj?.location) && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full ios-liquid-pill text-slate-950 font-bold">
-                <MapPin className="w-3.5 h-3.5 text-slate-900" />
-                <span>
-                  {[selectedEventObj?.venueName || selectedEventObj?.venue_name, selectedEventObj?.location]
-                    .filter(Boolean)
-                    .join(" - ")}
-                </span>
-              </span>
-            )}
-            <span
-              className={`inline-flex items-center px-3 py-1 rounded-full font-black border backdrop-blur-md ${
-                selectedEventIsFree
-                  ? "bg-emerald-400/35 text-emerald-950 border-white/85"
-                  : "bg-amber-400/35 text-amber-950 border-white/85"
-              }`}
-            >
-              {selectedEventIsFree
-                ? "Miễn phí tham dự"
-                : `Phí: ${new Intl.NumberFormat("vi-VN").format(selectedEventFee)} VNĐ`}
-            </span>
+                    .join(" - ") ||
+                  (Array.isArray(selectedEventObj?.parts) && selectedEventObj.parts.length > 0
+                    ? [
+                        selectedEventObj.parts[0]?.startTime || selectedEventObj.parts[0]?.start_time,
+                        selectedEventObj.parts[selectedEventObj.parts.length - 1]?.endTime ||
+                          selectedEventObj.parts[selectedEventObj.parts.length - 1]?.end_time,
+                      ]
+                        .filter(Boolean)
+                        .join(" - ")
+                    : null),
+                selectedEventObj?.venueName ||
+                  selectedEventObj?.venue_name ||
+                  selectedEventObj?.location,
+              ]
+                .filter(Boolean)
+                .join(" • ")}
+            </div>
+          )}
 
-            {eventsList.length > 1 && (
-              <select
-                value={selectedEventId}
-                onChange={(e) => handleSelectEvent(e.target.value)}
-                className="text-xs font-bold ios-liquid-pill rounded-full px-3 py-1 text-slate-950 outline-none cursor-pointer max-w-[230px] truncate hover:border-white transition"
-                title="Đổi sự kiện để check-in"
-              >
-                {eventsList.map((evt) => (
-                  <option key={evt.id} value={evt.id} className="text-slate-950 bg-white">
-                    {evt.name || evt.title}
-                  </option>
-                ))}
-              </select>
-            )}
+          <div
+            className="px-3.5 py-[5px] rounded-full text-[12.5px] font-bold"
+            style={
+              selectedEventIsFree
+                ? { background: "rgba(16, 185, 129, 0.14)", color: "#047857" }
+                : { background: "rgba(245, 158, 11, 0.14)", color: "#B45309" }
+            }
+          >
+            {selectedEventIsFree
+              ? "Miễn phí"
+              : `Phí: ${new Intl.NumberFormat("vi-VN").format(selectedEventFee)} VNĐ`}
           </div>
-        </div>
 
-        {/* 3 DANH MỤC NẰM NGANG NGAY CẢ TRÊN MÀN ĐIỆN THOẠI + KÍNH TRONG SUỐT & CHẠM MẶT NƯỚC */}
-        <div className="grid grid-cols-3 gap-2 sm:gap-3.5">
+          {eventsList.length > 1 && (
+            <select
+              value={selectedEventId}
+              onChange={(e) => handleSelectEvent(e.target.value)}
+              className="text-xs font-semibold ios-liquid-pill rounded-full px-3.5 py-1.5 text-[#0B0D12] outline-none cursor-pointer max-w-[260px] truncate transition"
+              title="Đổi sự kiện để check-in"
+            >
+              {eventsList.map((evt) => (
+                <option key={evt.id} value={evt.id} className="text-[#0B0D12] bg-white">
+                  {evt.name || evt.title}
+                </option>
+              ))}
+            </select>
+          )}
+        </section>
+
+        {/* 2. Segmented Pill 3 danh mục tối giản */}
+        <nav className="ios-liquid-glass grid grid-cols-3 p-[5px] !rounded-full gap-1">
           <button
             type="button"
             onPointerDown={triggerWaterRipple}
@@ -1205,33 +1352,9 @@ function PublicEventCheckinGatePage() {
               setActiveCategory("member");
               setUnregisteredMember(null);
             }}
-            className={`ios-water-btn group rounded-2xl p-2.5 sm:p-4 text-left cursor-pointer text-slate-950 ${
-              activeCategory === "member"
-                ? "ios-liquid-glass-active scale-[1.02]"
-                : "ios-liquid-glass hover:bg-white/35"
-            }`}
+            className={`ios-water-btn ios-seg-btn ${activeCategory === "member" ? "active" : ""}`}
           >
-            <div className="flex items-center justify-between gap-1 mb-1 sm:mb-1.5">
-              <span
-                className={`inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-lg text-[10px] sm:text-xs font-black ${
-                  activeCategory === "member"
-                    ? "bg-slate-950 text-white shadow-sm"
-                    : "ios-liquid-pill text-slate-950"
-                }`}
-              >
-                01
-              </span>
-              <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-900" />
-            </div>
-            <div
-              className="text-[11px] sm:text-sm font-black tracking-tight leading-tight text-slate-950"
-              style={{ textShadow: "0 1px 1px rgba(255,255,255,0.8)" }}
-            >
-              Học viên CEO HN10
-            </div>
-            <div className="text-[9.5px] sm:text-[11px] mt-0.5 leading-tight line-clamp-2 text-slate-800 font-semibold">
-              Nhập mã HV tra cứu &amp; nhận Sticker số may mắn
-            </div>
+            Học viên
           </button>
 
           <button
@@ -1241,33 +1364,9 @@ function PublicEventCheckinGatePage() {
               setActiveCategory("ticket");
               setUnregisteredMember(null);
             }}
-            className={`ios-water-btn group rounded-2xl p-2.5 sm:p-4 text-left cursor-pointer text-slate-950 ${
-              activeCategory === "ticket"
-                ? "ios-liquid-glass-active scale-[1.02]"
-                : "ios-liquid-glass hover:bg-white/35"
-            }`}
+            className={`ios-water-btn ios-seg-btn ${activeCategory === "ticket" ? "active" : ""}`}
           >
-            <div className="flex items-center justify-between gap-1 mb-1 sm:mb-1.5">
-              <span
-                className={`inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-lg text-[10px] sm:text-xs font-black ${
-                  activeCategory === "ticket"
-                    ? "bg-slate-950 text-white shadow-sm"
-                    : "ios-liquid-pill text-slate-950"
-                }`}
-              >
-                02
-              </span>
-              <QrCode className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-900" />
-            </div>
-            <div
-              className="text-[11px] sm:text-sm font-black tracking-tight leading-tight text-slate-950"
-              style={{ textShadow: "0 1px 1px rgba(255,255,255,0.8)" }}
-            >
-              Khách đã có Mã Vé
-            </div>
-            <div className="text-[9.5px] sm:text-[11px] mt-0.5 leading-tight line-clamp-2 text-slate-800 font-semibold">
-              Nhập mã vé hoặc tải ảnh QR vé để Check-in
-            </div>
+            Có mã vé
           </button>
 
           <button
@@ -1278,83 +1377,47 @@ function PublicEventCheckinGatePage() {
               setUnregisteredMember(null);
               setWalkinQrResult(null);
             }}
-            className={`ios-water-btn group rounded-2xl p-2.5 sm:p-4 text-left cursor-pointer text-slate-950 ${
-              activeCategory === "walkin"
-                ? "ios-liquid-glass-active scale-[1.02]"
-                : "ios-liquid-glass hover:bg-white/35"
-            }`}
+            className={`ios-water-btn ios-seg-btn ${activeCategory === "walkin" ? "active" : ""}`}
           >
-            <div className="flex items-center justify-between gap-1 mb-1 sm:mb-1.5">
-              <span
-                className={`inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-lg text-[10px] sm:text-xs font-black ${
-                  activeCategory === "walkin"
-                    ? "bg-slate-950 text-white shadow-sm"
-                    : "ios-liquid-pill text-slate-950"
-                }`}
-              >
-                03
-              </span>
-              <UserPlus className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-900" />
-            </div>
-            <div
-              className="text-[11px] sm:text-sm font-black tracking-tight leading-tight text-slate-950"
-              style={{ textShadow: "0 1px 1px rgba(255,255,255,0.8)" }}
-            >
-              Khách mới đến
-            </div>
-            <div className="text-[9.5px] sm:text-[11px] mt-0.5 leading-tight line-clamp-2 text-slate-800 font-semibold">
-              Đăng ký tại quầy &amp; cấp Sticker số may mắn
-            </div>
+            Khách mới
           </button>
-        </div>
+        </nav>
 
-        {/* KHUNG NỘI DUNG TƯƠNG ỨNG VỚI DANH MỤC ĐANG CHỌN (TRUE iOS LIQUID GLASS PANEL) */}
-        <div className="ios-liquid-glass rounded-3xl text-slate-950 p-5 sm:p-7 space-y-4">
+        {/* 3. Khối nhập liệu Check-in */}
+        <section className="ios-liquid-glass px-5 py-[22px] flex flex-col gap-3.5">
           {activeCategory === "member" && (
-            <div className="space-y-3">
-              <div>
-                <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
-                  Tra Cứu &amp; Check-in Dành Cho Học Viên
-                </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Nhập mã học viên (VD: HN10-1234) để hệ thống kiểm tra dữ liệu đăng ký đúng sự kiện này.
-                </p>
+            <div className="flex flex-col gap-3.5">
+              <div className="text-center text-[14px] font-semibold text-[#0B0D12]">
+                Check-in Học Viên
               </div>
-              <div className="flex flex-col sm:flex-row gap-2.5">
-                <input
-                  type="text"
-                  placeholder="Nhập mã học viên (VD: HN10-1234)..."
-                  value={memberCodeInput}
-                  onChange={(e) => setMemberCodeInput(e.target.value.toUpperCase())}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") lookupTicket(memberCodeInput);
-                  }}
-                  className="flex-1 h-11 rounded-xl ios-liquid-input px-4 text-sm text-slate-950 font-mono uppercase placeholder:text-slate-500 focus:outline-none transition"
-                />
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    triggerWaterRipple(e);
-                    lookupTicket(memberCodeInput);
-                  }}
-                  disabled={loading}
-                  className="ios-water-btn h-11 px-6 rounded-xl bg-slate-950 hover:bg-slate-800 text-white font-bold text-sm shadow-md disabled:opacity-60 cursor-pointer shrink-0 transition"
-                >
-                  {loading ? "Đang tra cứu..." : "Tra cứu & Check-in"}
-                </button>
-              </div>
+              <input
+                type="text"
+                placeholder="Nhập mã học viên..."
+                value={memberCodeInput}
+                onChange={(e) => setMemberCodeInput(e.target.value.toUpperCase())}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") lookupTicket(memberCodeInput);
+                }}
+                className="ios-liquid-input font-mono uppercase"
+              />
+              <button
+                type="button"
+                onClick={(e) => {
+                  triggerWaterRipple(e);
+                  lookupTicket(memberCodeInput);
+                }}
+                disabled={loading}
+                className="ios-water-btn ios-btn-submit w-full disabled:opacity-60"
+              >
+                {loading ? "Đang tra cứu..." : "Check-in"}
+              </button>
             </div>
           )}
 
           {activeCategory === "ticket" && (
-            <div className="space-y-3">
-              <div>
-                <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
-                  Check-in Bằng Mã Vé Sự Kiện
-                </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Nhập mã vé (VD: REG-...) hoặc tải lên ảnh chứa mã QR vé của Quý đại biểu.
-                </p>
+            <div className="flex flex-col gap-3.5">
+              <div className="text-center text-[14px] font-semibold text-[#0B0D12]">
+                Check-in Bằng Mã Vé
               </div>
 
               <input
@@ -1365,56 +1428,49 @@ function PublicEventCheckinGatePage() {
                 onChange={handleQrImageUpload}
               />
 
-              <div className="flex flex-col sm:flex-row gap-2.5">
-                <input
-                  type="text"
-                  placeholder="Nhập mã vé (VD: REG-...)..."
-                  value={ticketInput}
-                  onChange={(e) => setTicketInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") lookupTicket(ticketInput);
+              <input
+                type="text"
+                placeholder="Nhập mã vé..."
+                value={ticketInput}
+                onChange={(e) => setTicketInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") lookupTicket(ticketInput);
+                }}
+                className="ios-liquid-input font-mono"
+              />
+
+              <div className="flex items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    triggerWaterRipple(e);
+                    lookupTicket(ticketInput);
                   }}
-                  className="flex-1 h-11 rounded-xl ios-liquid-input px-4 text-sm text-slate-950 font-mono placeholder:text-slate-500 focus:outline-none transition"
-                />
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      triggerWaterRipple(e);
-                      fileInputRef.current?.click();
-                    }}
-                    disabled={isDecodingImage || loading}
-                    className="ios-water-btn ios-liquid-pill h-11 px-4 rounded-xl hover:bg-white/75 text-slate-900 font-bold text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer shrink-0 transition"
-                    title="Tải ảnh mã QR vé"
-                  >
-                    <Upload className="w-4 h-4 text-slate-700" />
-                    <span>Ảnh QR</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      triggerWaterRipple(e);
-                      lookupTicket(ticketInput);
-                    }}
-                    disabled={loading || isDecodingImage}
-                    className="ios-water-btn h-11 px-6 rounded-xl bg-slate-950 hover:bg-slate-800 text-white font-bold text-sm shadow-md disabled:opacity-60 cursor-pointer shrink-0 transition"
-                  >
-                    {loading ? "Đang kiểm tra..." : "Check-in"}
-                  </button>
-                </div>
+                  disabled={loading || isDecodingImage}
+                  className="ios-water-btn ios-btn-submit flex-1 disabled:opacity-60"
+                >
+                  {loading ? "Đang kiểm tra..." : "Check-in"}
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    triggerWaterRipple(e);
+                    fileInputRef.current?.click();
+                  }}
+                  disabled={isDecodingImage || loading}
+                  className="ios-water-btn ios-btn-qr disabled:opacity-60"
+                  title="Tải ảnh QR"
+                >
+                  <Upload className="w-5 h-5" />
+                </button>
               </div>
             </div>
           )}
 
           {activeCategory === "walkin" && (
-            <form onSubmit={handleWalkinSubmit} className="space-y-4 text-xs">
-              <div className="border-b border-slate-200 pb-3">
-                <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
-                  Đăng Ký Vé &amp; Check-in Khách Mới Đến
-                </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Điền thông tin tham dự sự kiện <strong className="text-slate-800">{selectedEventName}</strong>. Thanh toán thành công sẽ tự động hoàn tất Check-in.
-                </p>
+            <form onSubmit={handleWalkinSubmit} className="space-y-3.5 text-xs">
+              <div className="text-center text-[14px] font-semibold text-[#0B0D12]">
+                Đăng Ký Khách Mới
               </div>
 
               {!selectedEventIsFree && (
@@ -1625,10 +1681,10 @@ function PublicEventCheckinGatePage() {
                   {additionalWalkins.map((w, idx) => (
                     <div
                       key={w.id}
-                      className="p-3 rounded-xl border border-slate-200 bg-slate-50 space-y-2"
+                      className="p-3.5 rounded-2xl border border-[#cdddf0] bg-white/75 space-y-2.5"
                     >
-                      <div className="flex items-center justify-between text-[11px] font-bold text-slate-700">
-                        <span>Đại biểu #{idx + 2}</span>
+                      <div className="flex items-center justify-between text-[11px] font-bold text-[#0B0D12]">
+                        <span>Đại biểu check-in hộ #{idx + 2}</span>
                         <button
                           type="button"
                           onClick={() =>
@@ -1639,6 +1695,52 @@ function PublicEventCheckinGatePage() {
                           Xóa
                         </button>
                       </div>
+
+                      {/* Nhập Mã học viên hoặc Mã vé để tự động điền thông tin người nhờ check-in hộ */}
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          placeholder="Nhập mã học viên (HN10-...) hoặc mã vé (REG-...)..."
+                          value={w.lookupCode || ""}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setAdditionalWalkins((prev) =>
+                              prev.map((it, i) => (i === idx ? { ...it, lookupCode: val } : it))
+                            );
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              void lookupCompanionByCode(idx);
+                            }
+                          }}
+                          className="ios-liquid-input !py-2 !px-3.5 !text-xs font-mono flex-1"
+                        />
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            triggerWaterRipple(e);
+                            void lookupCompanionByCode(idx);
+                          }}
+                          disabled={w.lookupLoading}
+                          className="ios-water-btn ios-btn-submit !py-2 !px-3.5 !text-xs shrink-0 disabled:opacity-60"
+                        >
+                          {w.lookupLoading ? "Đang tìm..." : "Tra cứu"}
+                        </button>
+                      </div>
+
+                      {w.lookupStatus && (
+                        <div
+                          className={`text-[11px] font-semibold px-3 py-1.5 rounded-xl ${
+                            w.isRegistered
+                              ? "bg-emerald-500/15 text-emerald-800"
+                              : "bg-amber-500/15 text-amber-900"
+                          }`}
+                        >
+                          {w.lookupStatus}
+                        </div>
+                      )}
+
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                         <input
                           type="text"
@@ -1651,7 +1753,7 @@ function PublicEventCheckinGatePage() {
                               prev.map((it, i) => (i === idx ? { ...it, fullName: val } : it))
                             );
                           }}
-                          className="h-9 px-2.5 rounded-lg border border-slate-300 bg-white text-xs text-slate-800"
+                          className="ios-liquid-input !py-2 !px-3 !text-xs"
                         />
                         <input
                           type="tel"
@@ -1664,7 +1766,7 @@ function PublicEventCheckinGatePage() {
                               prev.map((it, i) => (i === idx ? { ...it, phone: val } : it))
                             );
                           }}
-                          className="h-9 px-2.5 rounded-lg border border-slate-300 bg-white text-xs text-slate-800"
+                          className="ios-liquid-input !py-2 !px-3 !text-xs"
                         />
                         <input
                           type="email"
@@ -1677,7 +1779,7 @@ function PublicEventCheckinGatePage() {
                               prev.map((it, i) => (i === idx ? { ...it, email: val } : it))
                             );
                           }}
-                          className="h-9 px-2.5 rounded-lg border border-slate-300 bg-white text-xs text-slate-800"
+                          className="ios-liquid-input !py-2 !px-3 !text-xs"
                         />
                       </div>
                     </div>
@@ -1720,7 +1822,7 @@ function PublicEventCheckinGatePage() {
               </div>
             </form>
           )}
-        </div>
+        </section>
 
         {/* TÍCH XANH CẢM ƠN & STICKER SỐ MAY MẮN KHI CHECK-IN THÀNH CÔNG */}
         {thankYouSuccess && (
@@ -2302,23 +2404,20 @@ function PublicEventCheckinGatePage() {
           </div>
         )}
 
-        {/* NÚT THÊM NGƯỜI CHECK-IN GỌN GÀNG (ĐÃ BỎ NÚT CHỤP ẢNH, BỎ NÚT QUAY THƯỞNG & ẨN CHẾ ĐỘ ONLINE/OFFLINE) */}
+        {/* NÚT PHỤ DƯỚI CÙNG */}
         {activeCategory !== "walkin" && (
-          <div className="flex justify-center pt-1">
-            <button
-              type="button"
-              onClick={(e) => {
-                triggerWaterRipple(e);
-                setActiveCategory("walkin");
-                setWalkinQrResult(null);
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
-              className="ios-water-btn ios-liquid-pill inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-slate-950 hover:bg-white/80 text-xs font-black shadow-sm transition cursor-pointer"
-            >
-              <UserPlus className="w-3.5 h-3.5 text-slate-900" />
-              <span>+ Thêm người check-in</span>
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={(e) => {
+              triggerWaterRipple(e);
+              setActiveCategory("walkin");
+              setWalkinQrResult(null);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            className="ios-water-btn ios-liquid-glass self-center !rounded-full px-[22px] py-2.5 text-[13.5px] font-semibold text-[#0B0D12] cursor-pointer"
+          >
+            + Thêm người
+          </button>
         )}
       </main>
     </div>

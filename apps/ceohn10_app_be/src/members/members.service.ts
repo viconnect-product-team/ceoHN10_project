@@ -2053,6 +2053,25 @@ export class MembersService implements OnModuleInit {
       }
     }
 
+    const oldCode = String(current.code || '').trim();
+    const incomingCode = (data as any).code !== undefined ? String((data as any).code || '').trim().toUpperCase() : '';
+    const code = incomingCode || oldCode;
+
+    // Kiểm tra trùng Mã Học viên khi cập nhật
+    if (code && code.toUpperCase() !== oldCode.toUpperCase()) {
+      const dupCode = await this.prisma.$queryRaw<any[]>`
+        SELECT id FROM public.members
+        WHERE UPPER(TRIM(COALESCE(code, ''))) = UPPER(${code})
+          AND id != ${current.id}
+        LIMIT 1
+      `.catch(() => []);
+      if (dupCode.length > 0) {
+        throw new BadRequestException(
+          `Mã Học viên "${code}" đã được sử dụng bởi một Học viên khác trên hệ thống!`,
+        );
+      }
+    }
+
     const name = data.name !== undefined ? data.name : current.name;
     const contact = data.contact !== undefined ? data.contact : current.contact;
     const email = data.email !== undefined ? data.email : current.email;
@@ -2110,6 +2129,7 @@ export class MembersService implements OnModuleInit {
 
     await this.prisma.$executeRaw`
       UPDATE public.members SET
+        code = ${code},
         name = ${name},
         contact = ${contact},
         email = ${email},
@@ -2131,6 +2151,26 @@ export class MembersService implements OnModuleInit {
         updated_at = now()
       WHERE id = ${current.id}
     `;
+
+    // Đồng bộ mã học viên mới sang các bảng liên kết (Check-in / Vé sự kiện / Hồ sơ)
+    if (code && code.toUpperCase() !== oldCode.toUpperCase()) {
+      const memberEmailLower = String(email || current.email || '').trim().toLowerCase();
+      if (oldCode) {
+        await this.prisma.$executeRaw`
+          UPDATE public.event_registrations
+          SET member_code = ${code}
+          WHERE UPPER(TRIM(COALESCE(member_code, ''))) = UPPER(${oldCode})
+        `.catch(() => {});
+      }
+      if (memberEmailLower) {
+        await this.prisma.$executeRaw`
+          UPDATE public.event_registrations
+          SET member_code = ${code}
+          WHERE LOWER(TRIM(COALESCE(email, ''))) = ${memberEmailLower}
+            AND (member_code IS NULL OR TRIM(member_code) = '' OR UPPER(TRIM(member_code)) = UPPER(${oldCode}))
+        `.catch(() => {});
+      }
+    }
 
     // Sync corresponding user and user_profiles record if exists
     if (current.user_id) {

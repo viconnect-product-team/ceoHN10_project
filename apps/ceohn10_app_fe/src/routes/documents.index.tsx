@@ -368,6 +368,24 @@ function DocsPage() {
     } catch { }
   };
 
+  const onRenameFolder = async (folder: Document) => {
+    const nextName = window.prompt("Nhập tên thư mục / danh mục mới:", folder.name);
+    if (!nextName || !nextName.trim() || nextName.trim() === folder.name) return;
+    try {
+      await updateFn({
+        data: {
+          id: folder.id,
+          name: nextName.trim(),
+          title: nextName.trim(),
+        } as never,
+      });
+      toast.success(`Đã đổi tên thành "${nextName.trim()}"`);
+      await router.invalidate();
+    } catch (err: any) {
+      toast.error("Không thể đổi tên thư mục: " + (err?.message || ""));
+    }
+  };
+
   const onDelete = async (d: Document) => {
     const isAssoc = d.docScope === "association" || !d.docScope;
     if (isAssoc && !canWriteAssociation) {
@@ -601,11 +619,12 @@ function DocsPage() {
       .filter((d) => {
         // Nếu tìm kiếm từ khóa thì tìm trong toàn bộ hệ thống
         if (ql) return true;
-        // Nếu không tìm kiếm thì chỉ hiện tệp thuộc thư mục đang mở
+        // Khi bấm vào 1 thư mục/danh mục cụ thể -> chỉ hiện tài liệu chứa trong thư mục đó
         if (currentFolderId) {
           return d.folderId === currentFolderId;
         }
-        return !d.folderId;
+        // Khi đang ở "Tất cả" -> hiện toàn bộ tài liệu (ẩn item folder vì folder đã hiển thị ngang hàng với Tất cả)
+        return !(d.isFolder || d.type === "folder");
       })
       .filter(
         (d) =>
@@ -953,11 +972,10 @@ function DocsPage() {
         className="relative min-h-[calc(100vh-120px)]"
       >
         <PageHeader
-          title={docTab === "mail_templates" ? "Mẫu Biểu Văn Bản & Công Văn CEOHN10" : t("doc.title")}
-          subtitle={docTab === "mail_templates" ? "Kho biểu mẫu văn bản, hợp đồng mẫu chính thức và liên kết quản lý template thông báo CRM" : t("doc.subtitle")}
+          title={t("doc.title")}
+          subtitle={t("doc.subtitle")}
           actions={
-            docTab === "docs" ? (
-              <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
                 <div
                   className="flex items-center rounded-lg border border-border bg-card p-0.5 shadow-[var(--shadow-card)]"
                   role="group"
@@ -988,17 +1006,6 @@ function DocsPage() {
                 </div>
                 {canWrite && (
                   <>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setNewFolderName("");
-                        setCreateFolderModalOpen(true);
-                      }}
-                      className="inline-flex h-11 items-center gap-2 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 text-sm font-semibold text-amber-700 dark:text-amber-300 shadow-[var(--shadow-card)] hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
-                    >
-                      <FolderPlus className="h-4 w-4" aria-hidden="true" />
-                      <span>Tạo thư mục</span>
-                    </button>
                     <input
                       ref={fileRef}
                       type="file"
@@ -1036,268 +1043,163 @@ function DocsPage() {
                   </button>
                 )}
               </div>
-            ) : undefined
           }
         />
 
-        {/* Phân Loại Danh Mục Tài Liệu: CEOHN10 & Doanh Nghiệp */}
-        {docTab === "docs" && (
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card/60 p-2.5 backdrop-blur-md">
-            <div className="flex flex-wrap items-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => setScopeTab("all")}
-                className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition-all cursor-pointer ${scopeTab === "all"
+        {/* Bố trí Folder / Danh mục ngang hàng chuẩn máy tính */}
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card/70 p-2.5 backdrop-blur-md">
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Nút Tất cả */}
+            <button
+              type="button"
+              onClick={() => {
+                setCurrentFolderId(null);
+                setScopeTab("all");
+                setCat("all");
+              }}
+              className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition-all cursor-pointer ${
+                !currentFolderId && scopeTab === "all"
                   ? "bg-primary text-primary-foreground shadow-sm"
-                  : "bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground"
-                  }`}
-              >
-                <FolderOpen className="h-3.5 w-3.5" />
-                <span>Tất cả tài liệu</span>
-                <span className="ml-1 rounded-full bg-black/10 dark:bg-white/10 px-1.5 py-0.2 text-[10px]">
-                  {DOCUMENTS.length}
-                </span>
-              </button>
+                  : "bg-muted/50 text-foreground hover:bg-muted"
+              }`}
+            >
+              <FolderOpen className="h-3.5 w-3.5" />
+              <span>Tất cả</span>
+              <span className="ml-0.5 rounded-full bg-black/10 dark:bg-white/15 px-1.5 py-0.2 text-[10px]">
+                {DOCUMENTS.filter((d) => !(d.isFolder || d.type === "folder")).length}
+              </span>
+            </button>
 
-              <button
-                type="button"
-                onClick={() => setScopeTab("association")}
-                className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition-all cursor-pointer ${scopeTab === "association"
+            {/* Các thư mục / danh mục nằm ngang hàng với Tất cả */}
+            {DOCUMENTS.filter((d) => (d.isFolder || d.type === "folder") && !d.folderId).map((folder) => {
+              const isSelected = currentFolderId === folder.id;
+              const childCount = DOCUMENTS.filter(
+                (item) => item.folderId === folder.id && !(item.isFolder || item.type === "folder"),
+              ).length;
+              const canEditFolder =
+                canModifyRecord(folder.createdBy || folder.uploadedBy) ||
+                ((folder.docScope || "association") === "association" ? canWriteAssociation : canWrite);
+
+              return (
+                <div
+                  key={folder.id}
+                  className={`group inline-flex items-center rounded-xl border transition-all ${
+                    isSelected
+                      ? "border-primary bg-primary/10 text-primary shadow-sm"
+                      : "border-border bg-background/80 text-foreground hover:bg-muted/80"
+                  }`}
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCurrentFolderId(folder.id);
+                      setScopeTab("all");
+                      setCat("all");
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold cursor-pointer"
+                  >
+                    <Folder
+                      className="h-3.5 w-3.5 shrink-0"
+                      style={{ color: folder.colorTag || "#F59E0B" }}
+                    />
+                    <span className="max-w-[160px] truncate">{folder.name}</span>
+                    <span className="rounded-full bg-black/10 dark:bg-white/10 px-1.5 py-0.2 text-[10px]">
+                      {childCount}
+                    </span>
+                  </button>
+
+                  {canEditFolder && (
+                    <div className="flex items-center gap-0.5 pr-1.5 border-l border-border/60 pl-1">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          void onRenameFolder(folder);
+                        }}
+                        title="Đổi tên thư mục"
+                        aria-label="Đổi tên thư mục"
+                        className="inline-flex h-6 w-6 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer"
+                      >
+                        <Pencil className="h-3 w-3" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          void onDelete(folder);
+                        }}
+                        title="Xóa thư mục"
+                        aria-label="Xóa thư mục"
+                        className="inline-flex h-6 w-6 items-center justify-center rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive cursor-pointer"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+
+            {/* Phân nhóm nhanh CEOHN10 / Doanh nghiệp */}
+            <button
+              type="button"
+              onClick={() => {
+                setCurrentFolderId(null);
+                setScopeTab("association");
+              }}
+              className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all cursor-pointer ${
+                !currentFolderId && scopeTab === "association"
                   ? "bg-amber-600 text-white shadow-sm"
                   : "bg-transparent text-amber-700 dark:text-amber-400 hover:bg-amber-500/10"
-                  }`}
-              >
-                <ShieldCheck className="h-3.5 w-3.5" />
-                <span>Tài liệu CEOHN10</span>
-                <span className="ml-1 rounded-full bg-black/10 dark:bg-white/10 px-1.5 py-0.2 text-[10px]">
-                  {DOCUMENTS.filter((d) => (d.docScope || "association") === "association").length}
-                </span>
-                {!canWriteAssociation && (
-                  <span className="ml-1 text-[10px] font-normal opacity-80">(Chỉ xem)</span>
-                )}
-              </button>
+              }`}
+            >
+              <ShieldCheck className="h-3.5 w-3.5" />
+              <span>Tài liệu CEOHN10</span>
+              <span className="ml-0.5 rounded-full bg-black/10 dark:bg-white/10 px-1.5 py-0.2 text-[10px]">
+                {DOCUMENTS.filter((d) => !(d.isFolder || d.type === "folder") && (d.docScope || "association") === "association").length}
+              </span>
+            </button>
 
-              <button
-                type="button"
-                onClick={() => setScopeTab("enterprise")}
-                className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition-all cursor-pointer ${scopeTab === "enterprise"
+            <button
+              type="button"
+              onClick={() => {
+                setCurrentFolderId(null);
+                setScopeTab("enterprise");
+              }}
+              className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all cursor-pointer ${
+                !currentFolderId && scopeTab === "enterprise"
                   ? "bg-blue-600 text-white shadow-sm"
                   : "bg-transparent text-blue-700 dark:text-blue-400 hover:bg-blue-500/10"
-                  }`}
+              }`}
+            >
+              <Building className="h-3.5 w-3.5" />
+              <span>Tài liệu Doanh Nghiệp</span>
+              <span className="ml-0.5 rounded-full bg-black/10 dark:bg-white/10 px-1.5 py-0.2 text-[10px]">
+                {DOCUMENTS.filter((d) => !(d.isFolder || d.type === "folder") && (d.docScope === "enterprise" || Boolean(d.enterpriseName))).length}
+              </span>
+            </button>
+
+            {canWrite && (
+              <button
+                type="button"
+                onClick={() => {
+                  setNewFolderName("");
+                  setCreateFolderModalOpen(true);
+                }}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-dashed border-amber-500/50 bg-amber-500/10 px-3 py-2 text-xs font-bold text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 cursor-pointer"
               >
-                <Building className="h-3.5 w-3.5" />
-                <span>Tài liệu Doanh Nghiệp</span>
-                <span className="ml-1 rounded-full bg-black/10 dark:bg-white/10 px-1.5 py-0.2 text-[10px]">
-                  {DOCUMENTS.filter((d) => d.docScope === "enterprise" || Boolean(d.enterpriseName)).length}
-                </span>
+                <FolderPlus className="h-3.5 w-3.5" />
+                <span>+ Thư mục mới</span>
               </button>
-            </div>
-
-            <div className="text-xs text-muted-foreground flex items-center gap-1.5 pr-2">
-              <Lock className="h-3.5 w-3.5 text-amber-500" />
-              <span>Tài liệu CEOHN10: Quản trị, Chủ tịch &amp; Trưởng ban toàn quyền; Thành viên chỉ xem.</span>
-            </div>
+            )}
           </div>
-        )}
 
-        {/* Tabs Switcher */}
-        <div className="mb-6 flex flex-wrap items-center gap-2 border-b border-border pb-3">
-          <button
-            onClick={() => setDocTab("docs")}
-            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${docTab === "docs"
-              ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25"
-              : "border border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
-              }`}
-          >
-            <FolderOpen className="h-4 w-4" />
-            <span>Kho Tài Liệu &amp; Văn Bản</span>
-            <span
-              className={`ml-1 rounded-full px-2 py-0.5 text-xs font-bold ${docTab === "docs" ? "bg-white/20 text-white" : "bg-muted text-muted-foreground"
-                }`}
-            >
-              {DOCUMENTS.length}
-            </span>
-          </button>
-
-          <button
-            onClick={() => setDocTab("mail_templates")}
-            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${docTab === "mail_templates"
-              ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25"
-              : "border border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
-              }`}
-          >
-            <FileText className="h-4 w-4" />
-            <span>Mẫu Biểu &amp; Công Văn CLB</span>
-            <span
-              className={`ml-1 rounded-full px-2 py-0.5 text-xs font-bold ${docTab === "mail_templates" ? "bg-white/20 text-white" : "bg-primary/10 text-primary"
-                }`}
-            >
-              Biểu Mẫu
-            </span>
-          </button>
+          <div className="text-xs text-muted-foreground flex items-center gap-1.5 pr-1">
+            <Lock className="h-3.5 w-3.5 text-amber-500" />
+            <span>Tài liệu CEOHN10: Quản trị, Chủ tịch &amp; Trưởng ban toàn quyền; Thành viên chỉ xem.</span>
+          </div>
         </div>
 
-        {docTab === "mail_templates" ? (
-          <div className="space-y-6">
-            {/* BANNER THÔNG BÁO CHUYỂN GIAO TEMPLATE SANG CẤU HÌNH HỆ THỐNG */}
-            <div className="rounded-3xl border border-blue-200 bg-gradient-to-r from-blue-50 via-indigo-50 to-amber-50/40 p-5 dark:border-blue-900/50 dark:from-blue-950/40 dark:via-indigo-950/30 dark:to-slate-900 shadow-xs">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-start sm:items-center gap-3.5">
-                  <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-md">
-                    <Mail className="size-5" />
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">
-                        Quản Lý Mẫu Template Email &amp; Zalo OA Đã Chuyển Sang Cấu Hình Hệ Thống
-                      </h4>
-                      <span className="rounded-full bg-blue-600/10 px-2 py-0.5 text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase">
-                        Quy Hoạch Mới
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-600 dark:text-slate-400">
-                      Toàn bộ các mẫu Template Email CRM, mẫu tin nhắn Zalo OA và mẫu phản hồi nhanh đã được tích hợp tập trung tại <strong>Cài đặt hệ thống &rarr; Mẫu Thông Báo &amp; Phản Hồi Đa Kênh</strong>.
-                    </p>
-                  </div>
-                </div>
-                <Link
-                  to="/settings"
-                  search={{ tab: "templates" } as any}
-                  className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.98] px-4 py-2.5 text-xs font-black text-white shadow-md transition"
-                >
-                  <span>Đi Đến Cấu Hình Mẫu (/settings)</span>
-                  <ExternalLink className="size-3.5" />
-                </Link>
-              </div>
-            </div>
-
-            {/* DANH SÁCH MẪU BIỂU VĂN BẢN VÀ CÔNG VĂN CHÍNH THỨC */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-base font-bold text-foreground">
-                    Kho Mẫu Biểu Văn Bản, Hợp Đồng &amp; Công Văn CLB CEO HN10
-                  </h3>
-                  <p className="text-xs text-muted-foreground">
-                    Tài liệu biểu mẫu văn bản hành chính, quy chế và hợp đồng chuẩn mực ban hành bởi Ban Chấp Hành
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {[
-                  {
-                    code: "BM-01",
-                    title: "Đơn Đề Nghị Gia Nhập CLB Doanh Nhân CEO HN10",
-                    type: "Đơn / Phiếu Đăng Ký",
-                    format: "DOCX",
-                    desc: "Mẫu đơn chính thức dành cho Doanh nhân CEO Hà Nội 10 đăng ký xét duyệt gia nhập CEOHN10.",
-                    date: "01/11/2026",
-                    fileUrl: "/docs/KICH_BAN_LOI_NOI_HOC_THUOC_THUYET_TRINH_CEOHN10.docx",
-                  },
-                  {
-                    code: "BM-02",
-                    title: "Bản Cam Kết Đạo Đức Doanh Nhân & Văn Hóa CEO HN10",
-                    type: "Quy Chế & Cam Kết",
-                    format: "PDF",
-                    desc: "Cam kết 5 chuẩn mực văn hóa, tinh thần đoàn kết, tương trợ và trách nhiệm xã hội.",
-                    date: "25/10/2026",
-                    fileUrl: "/BAO_CAO_PENTEST_SECURITY_AUDIT_CEOHN10.pdf",
-                  },
-                  {
-                    code: "BM-03",
-                    title: "Hợp Đồng Tài Trợ Sự Kiện Đại Hội & Gala Thường Niên",
-                    type: "Hợp Đồng Mẫu",
-                    format: "DOCX",
-                    desc: "Mẫu hợp đồng tài trợ danh vị Kim Cương, Vàng, Bạc và đồng hành cùng các sự kiện kinh tế.",
-                    date: "15/10/2026",
-                    fileUrl: "/docs/KICH_BAN_LOI_NOI_HOC_THUOC_THUYET_TRINH_CEOHN10.docx",
-                  },
-                  {
-                    code: "BM-04",
-                    title: "Biên Bản Họp Phiên Thường Kỳ Ban Chấp Hành & Thư Ký",
-                    type: "Biên Bản Họp",
-                    format: "DOCX",
-                    desc: "Mẫu biên bản ghi nhận nghị quyết, phân công nhiệm vụ và chỉ tiêu các ban chuyên môn.",
-                    date: "10/10/2026",
-                    fileUrl: "/docs/KICH_BAN_LOI_NOI_HOC_THUOC_THUYET_TRINH_CEOHN10.docx",
-                  },
-                  {
-                    code: "BM-05",
-                    title: "Giấy Triệu Tập Hội Nghị Toàn Thể Doanh Nhân CEO HN10",
-                    type: "Giấy Triệu Tập / Thư Mời",
-                    format: "PDF",
-                    desc: "Mẫu công văn triệu tập hội nghị xúc tiến thương mại B2B và báo cáo tổng kết năm.",
-                    date: "01/10/2026",
-                    fileUrl: "/BAO_CAO_PENTEST_SECURITY_AUDIT_CEOHN10.pdf",
-                  },
-                  {
-                    code: "BM-06",
-                    title: "Quy Chế Quản Lý Thu - Chi & Quyết Toán Quỹ CEOHN10",
-                    type: "Quy Chế Tài Chính",
-                    format: "PDF",
-                    desc: "Quy định tài chính minh bạch, hạn mức tạm ứng, chứng từ quyết toán và sao kê ngân hàng MB Bank.",
-                    date: "15/09/2026",
-                    fileUrl: "/BAO_CAO_PENTEST_SECURITY_AUDIT_CEOHN10.pdf",
-                  },
-                ].map((item) => (
-                  <div
-                    key={item.code}
-                    className="flex flex-col justify-between rounded-2xl border border-border bg-card p-4 shadow-xs hover:border-primary/40 transition"
-                  >
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="rounded-md bg-muted px-2 py-0.5 text-[10px] font-mono font-bold text-muted-foreground">
-                          {item.code}
-                        </span>
-                        <span className="rounded-md bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
-                          {item.format}
-                        </span>
-                      </div>
-                      <h4 className="font-bold text-sm text-foreground line-clamp-2 leading-snug">
-                        {item.title}
-                      </h4>
-                      <p className="text-xs text-muted-foreground line-clamp-2">
-                        {item.desc}
-                      </p>
-                    </div>
-
-                    <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-3">
-                      <span className="text-[11px] text-muted-foreground">{item.date}</span>
-                      <a
-                        href={item.fileUrl}
-                        download
-                        className="inline-flex items-center gap-1.5 rounded-lg bg-secondary px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted transition"
-                      >
-                        <Download className="size-3.5" />
-                        <span>Tải Mẫu</span>
-                      </a>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* PHẦN XEM NHANH TRÌNH QUẢN LÝ TEMPLATE EMAIL (NẾU CẦN CHỈNH SỬA TRỰC TIẾP) */}
-            <div className="border-t border-border pt-4">
-              <details className="group rounded-2xl border border-border bg-card overflow-hidden">
-                <summary className="flex cursor-pointer items-center justify-between p-4 font-bold text-sm text-foreground hover:bg-muted/50 transition">
-                  <span className="flex items-center gap-2">
-                    <Mail className="size-4 text-primary" />
-                    <span>Mở Trình Quản Lý Template Email Trực Tiếp Tại Đây (Quick View)</span>
-                  </span>
-                  <span className="text-xs text-muted-foreground group-open:rotate-180 transition transform">
-                    ▼
-                  </span>
-                </summary>
-                <div className="p-4 border-t border-border bg-background">
-                  <MailTemplateManager />
-                </div>
-              </details>
-            </div>
-          </div>
-        ) : (
-          <>
             <div className="mb-5 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
               <StatCard
                 label={t("doc.kpi.total")}
@@ -1836,8 +1738,6 @@ function DocsPage() {
                 </section>
               </div>
             )}
-          </>
-        )}
 
         {/* Modal Tạo & Chỉnh Sửa Tài Liệu Phong Cách Google Drive */}
         <DriveDocumentModal

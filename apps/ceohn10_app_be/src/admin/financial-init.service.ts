@@ -322,20 +322,25 @@ export class FinancialInitService {
         data: { current_balance: nextBalance, updated_at: new Date() },
       });
 
-      // 2. Lưu chi tiết dòng tiền nhập tay vào financial_report_rows
+      // 2. Lưu chi tiết dòng tiền nhập tay vào financial_report_rows (tương thích cả cột title/amount và voucher_no/income_amount)
+      const rowId = crypto.randomUUID();
       await tx.$executeRawUnsafe(
         `INSERT INTO public.financial_report_rows (
-          id, transaction_date, voucher_no, category, description,
+          id, row_code, title, transaction_date, voucher_no, category, type, amount, description,
           income_amount, expense_amount, balance_after, party_name, status,
           custom_data, created_at, updated_at
         ) VALUES (
-          gen_random_uuid(), $1::date, $2, $3, $4,
-          $5, $6, $7, $8, 'completed',
-          $9::jsonb, NOW(), NOW()
+          $1, $2, $3, $4::date, $2, $5, $6, $7, $8,
+          $9, $10, $11, $12, 'completed',
+          $13::jsonb, NOW(), NOW()
         )`,
-        txDate,
+        rowId,
         voucherNo,
+        dto.description || `${flowType === 'IN' ? 'Thu' : 'Chi'} từ ${dto.payerName.trim()}`,
+        txDate,
         dto.category || (flowType === 'IN' ? 'Thu nhập tay' : 'Chi nhập tay'),
+        flowType === 'IN' ? 'income' : 'expense',
+        amount,
         dto.description || `${flowType === 'IN' ? 'Thu' : 'Chi'} từ ${dto.payerName.trim()}`,
         flowType === 'IN' ? amount : 0,
         flowType === 'OUT' ? amount : 0,

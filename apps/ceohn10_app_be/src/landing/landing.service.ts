@@ -1563,6 +1563,148 @@ export class LandingService implements OnModuleInit {
     };
   }
 
+  private buildSimplePdfBuffer(lines: string[]): Buffer {
+    const sanitize = (s: string) =>
+      String(s || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .replace(/Đ/g, 'D')
+        .replace(/[^\x20-\x7E]/g, ' ')
+        .replace(/\\/g, '\\\\')
+        .replace(/\(/g, '\\(')
+        .replace(/\)/g, '\\)');
+
+    const pageLines = lines.slice(0, 46);
+    const textCommands = [
+      'BT',
+      '/F1 11 Tf',
+      '45 790 Td',
+      '15 TL',
+      ...pageLines.map((ln, idx) =>
+        idx === 0 ? `(${sanitize(ln)}) Tj` : `T* (${sanitize(ln)}) Tj`,
+      ),
+      'ET',
+    ].join('\n');
+
+    const objects: string[] = [
+      '1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj',
+      '2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj',
+      '3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >> endobj',
+      `4 0 obj << /Length ${Buffer.byteLength(textCommands, 'utf8')} >> stream\n${textCommands}\nendstream endobj`,
+      '5 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj',
+    ];
+
+    let pdf = '%PDF-1.4\n';
+    const offsets: number[] = [0];
+    for (const obj of objects) {
+      offsets.push(Buffer.byteLength(pdf, 'utf8'));
+      pdf += `${obj}\n`;
+    }
+    const xrefPos = Buffer.byteLength(pdf, 'utf8');
+    pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+    for (let i = 1; i <= objects.length; i++) {
+      pdf += `${String(offsets[i]).padStart(10, '0')} 00000 n \n`;
+    }
+    pdf += `trailer << /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefPos}\n%%EOF\n`;
+    return Buffer.from(pdf, 'utf8');
+  }
+
+  /**
+   * Xuất kết quả Voting Video thành file PDF và lưu vào thư mục "Sự kiện" trong Quản lý Tài liệu
+   */
+  async exportVotingResultsPdfToDocuments(idOrSlug: string) {
+    const stats = await this.getVideoVotingStats(idOrSlug);
+    const fs = await import('fs');
+    const path = await import('path');
+    const os = await import('os');
+    const { randomUUID } = await import('crypto');
+
+    const lines: string[] = [
+      `BAO CAO KET QUA VOTING VIDEO - ${stats.name || 'CEO HN10'}`,
+      `Thoi gian xuat: ${new Date().toLocaleString('vi-VN')}`,
+      `Tong so nguoi binh chon: ${stats.totalVoters ?? 0}`,
+      '----------------------------------------------------------------------',
+    ];
+
+    for (const st of stats.slideStats || []) {
+      lines.push(`VIDEO 0${st.slideNumber}: ${st.title || st.votingQuestion} (${st.totalVotes} phieu)`);
+      for (const opt of st.options || []) {
+        lines.push(`   - ${opt.label}: ${opt.percentage}% (${opt.count} phieu)`);
+      }
+      lines.push('');
+    }
+
+    if (Array.isArray(stats.recentVoters) && stats.recentVoters.length > 0) {
+      lines.push('DANH SACH NGUOI BINH CHON:');
+      for (const v of stats.recentVoters.slice(0, 15)) {
+        lines.push(`   * ${v.voterName} (${v.voterEmail}) -> ${v.optionLabel}`);
+      }
+    }
+
+    const pdfBuffer = this.buildSimplePdfBuffer(lines);
+    const fileName = `voting-result-${Date.now()}.pdf`;
+    const fileUrl = `/upload/file/documents/${fileName}`;
+
+    for (const dir of [
+      path.join('/app', 'uploads', 'documents'),
+      path.join(os.tmpdir(), 'ceohn10_uploads', 'documents'),
+    ]) {
+      try {
+        fs.mkdirSync(dir, { recursive: true });
+        fs.writeFileSync(path.join(dir, fileName), pdfBuffer);
+      } catch {}
+    }
+
+    // Tìm hoặc tạo thư mục "Sự kiện" trong public.documents
+    const existingFolders = await this.prisma.$queryRawUnsafe<any[]>(
+      `SELECT id, name FROM public.documents
+       WHERE (is_folder = true OR type = 'folder')
+         AND (LOWER(TRIM(COALESCE(name, title, ''))) = 'sự kiện' OR LOWER(TRIM(COALESCE(category, ''))) = 'sự kiện')
+       LIMIT 1`,
+    ).catch(() => []);
+
+    let eventFolderId = existingFolders[0]?.id || null;
+    if (!eventFolderId) {
+      eventFolderId = randomUUID();
+      await this.prisma.$executeRawUnsafe(
+        `INSERT INTO public.documents (
+          id, title, name, category, type, is_folder, file_url, file_path,
+          doc_scope, color_tag, uploaded_by_name, created_by, created_at, updated_at
+        ) VALUES ($1, $2, $2, $3, 'folder', true, '', '', 'association', '#0EA5E9', 'Hệ thống Voting', 'system', NOW(), NOW())`,
+        eventFolderId,
+        'Sự kiện',
+        'Sự kiện',
+      ).catch(() => {});
+    }
+
+    const docId = randomUUID();
+    const docTitle = `Kết quả Voting Video - ${stats.name || 'Landing Page'} (${new Date().toLocaleDateString('vi-VN')}).pdf`;
+    const sizeLabel = `${Math.max(1, Math.round(pdfBuffer.length / 1024))} KB`;
+
+    await this.prisma.$executeRawUnsafe(
+      `INSERT INTO public.documents (
+        id, title, name, category, type, size, is_folder, folder_id,
+        file_url, file_path, doc_scope, uploaded_by_name, created_by, created_at, updated_at
+      ) VALUES ($1, $2, $2, 'Sự kiện', 'pdf', $3, false, $4, $5, $5, 'association', 'Hệ thống Voting', 'system', NOW(), NOW())`,
+      docId,
+      docTitle,
+      sizeLabel,
+      eventFolderId,
+      fileUrl,
+    );
+
+    return {
+      ok: true,
+      documentId: docId,
+      folderId: eventFolderId,
+      folderName: 'Sự kiện',
+      title: docTitle,
+      fileUrl,
+      totalVoters: stats.totalVoters ?? 0,
+    };
+  }
+
   /**
    * Tạo cấu hình mẫu chuẩn
    */

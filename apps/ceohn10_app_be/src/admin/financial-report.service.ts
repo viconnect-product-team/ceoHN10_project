@@ -53,10 +53,14 @@ export class FinancialReportService implements OnModuleInit {
       `);
       await this.prisma.$executeRawUnsafe(`
         CREATE TABLE IF NOT EXISTS public.financial_report_rows (
-          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-          transaction_date DATE NOT NULL,
+          id TEXT PRIMARY KEY,
+          row_code TEXT,
+          title TEXT NOT NULL,
+          transaction_date DATE,
           voucher_no TEXT,
-          category TEXT NOT NULL,
+          category TEXT,
+          type TEXT,
+          amount NUMERIC DEFAULT 0,
           description TEXT,
           income_amount BIGINT DEFAULT 0,
           expense_amount BIGINT DEFAULT 0,
@@ -64,10 +68,23 @@ export class FinancialReportService implements OnModuleInit {
           party_name TEXT,
           status TEXT DEFAULT 'completed',
           custom_data JSONB DEFAULT '{}'::jsonb,
+          notes TEXT,
           created_at TIMESTAMPTZ DEFAULT NOW(),
           updated_at TIMESTAMPTZ DEFAULT NOW()
         );
       `);
+      const rowCols = [
+        `ALTER TABLE public.financial_report_rows ADD COLUMN IF NOT EXISTS voucher_no TEXT`,
+        `ALTER TABLE public.financial_report_rows ADD COLUMN IF NOT EXISTS description TEXT`,
+        `ALTER TABLE public.financial_report_rows ADD COLUMN IF NOT EXISTS income_amount BIGINT DEFAULT 0`,
+        `ALTER TABLE public.financial_report_rows ADD COLUMN IF NOT EXISTS expense_amount BIGINT DEFAULT 0`,
+        `ALTER TABLE public.financial_report_rows ADD COLUMN IF NOT EXISTS balance_after BIGINT DEFAULT 0`,
+        `ALTER TABLE public.financial_report_rows ADD COLUMN IF NOT EXISTS party_name TEXT`,
+        `ALTER TABLE public.financial_report_rows ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'completed'`,
+      ];
+      for (const sql of rowCols) {
+        await this.prisma.$executeRawUnsafe(sql).catch(() => {});
+      }
       await this.prisma.$executeRawUnsafe(`
         CREATE TABLE IF NOT EXISTS public.fund_transfer_orders (
           id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -376,13 +393,19 @@ export class FinancialReportService implements OnModuleInit {
     };
     const customDataJson = JSON.stringify(customDataWithOwner);
 
+    const rowTitle = description || category || 'Giao dịch tài chính';
+    const rowType = income >= expense ? 'income' : 'expense';
+    const rowAmount = income >= expense ? income : expense;
+
     const inserted = await this.prisma.$queryRawUnsafe<any[]>(
       `INSERT INTO public.financial_report_rows (
-        id, transaction_date, voucher_no, category, description,
+        id, row_code, title, type, amount,
+        transaction_date, voucher_no, category, description,
         income_amount, expense_amount, balance_after, party_name, status,
         custom_data, created_at, updated_at
       ) VALUES (
-        gen_random_uuid(), $1::date, $2, $3, $4,
+        gen_random_uuid()::text, $10, $11, $12, $13,
+        $1::date, $2, $3, $4,
         $5, $6, 0, $7, $8,
         $9::jsonb, NOW(), NOW()
       ) RETURNING *`,
@@ -395,6 +418,10 @@ export class FinancialReportService implements OnModuleInit {
       partyName,
       status,
       customDataJson,
+      voucherNo,
+      rowTitle,
+      rowType,
+      rowAmount,
     );
 
     return inserted[0];
@@ -405,7 +432,7 @@ export class FinancialReportService implements OnModuleInit {
    */
   async updateRow(id: string, data: Partial<FinancialRow>, actor?: any) {
     const existing = await this.prisma.$queryRawUnsafe<any[]>(
-      `SELECT * FROM public.financial_report_rows WHERE id = $1::uuid LIMIT 1`,
+      `SELECT * FROM public.financial_report_rows WHERE id::text = $1 LIMIT 1`,
       id,
     );
     if (!existing[0]) throw new NotFoundException('Không tìm thấy bản ghi');
@@ -449,7 +476,7 @@ export class FinancialReportService implements OnModuleInit {
         status = $9,
         custom_data = $10::jsonb,
         updated_at = NOW()
-       WHERE id = $1::uuid
+       WHERE id::text = $1
        RETURNING *`,
       id,
       txDate,
@@ -472,7 +499,7 @@ export class FinancialReportService implements OnModuleInit {
   async deleteRow(id: string, actor?: any) {
     if (actor) {
       const existing = await this.prisma.$queryRawUnsafe<any[]>(
-        `SELECT * FROM public.financial_report_rows WHERE id = $1::uuid LIMIT 1`,
+        `SELECT * FROM public.financial_report_rows WHERE id::text = $1 LIMIT 1`,
         id,
       ).catch(() => []);
       if (existing[0]) {
@@ -489,7 +516,7 @@ export class FinancialReportService implements OnModuleInit {
       }
     }
     await this.prisma.$executeRawUnsafe(
-      `DELETE FROM public.financial_report_rows WHERE id = $1::uuid`,
+      `DELETE FROM public.financial_report_rows WHERE id::text = $1`,
       id,
     );
     return { success: true };

@@ -5033,8 +5033,10 @@ export class EventsService extends BaseService implements OnModuleInit {
           LIMIT 1
         `.catch(() => []);
 
-    if (rows.length === 0) {
-      // Kiểm tra xem mã nhập vào có phải Mã Học Viên trong danh sách CLB không (để báo chưa đăng ký sự kiện)
+    let matchedReg: any = rows[0] || null;
+
+    if (!matchedReg) {
+      // Kiểm tra xem mã nhập vào có phải Mã Học Viên trong danh sách CLB không
       const memberRows = await this.prisma.$queryRaw<any[]>`
         SELECT code, name, contact, email, phone, company_name, position
         FROM public.members
@@ -5045,26 +5047,61 @@ export class EventsService extends BaseService implements OnModuleInit {
 
       if (memberRows.length > 0) {
         const m = memberRows[0];
-        const fullName = m.contact || m.name || '';
-        return {
-          found: false,
-          notRegisteredForEvent: true,
-          member: {
-            code: m.code || clean.toUpperCase(),
-            fullName,
-            email: m.email || '',
-            phone: m.phone || '',
-            company: m.company_name || m.name || '',
-            position: m.position || '',
-          },
-          message: `Học viên ${fullName} (${m.code || clean.toUpperCase()}) chưa đăng ký sự kiện này. Vui lòng chọn danh mục Khách mới để đăng ký vé!`,
-        };
+        const mEmail = String(m.email || '').trim().toLowerCase();
+        const mPhone = String(m.phone || '').trim();
+        // Thử đối soát lại bảng event_registrations theo email / phone của học viên cho đúng sự kiện đang check-in
+        if (mEmail || mPhone) {
+          const fallbackReg = filterEventId
+            ? await this.prisma.$queryRaw<any[]>`
+                SELECT r.*, e.name as event_name, e.title as event_title, e.date as event_date, e.location as event_location, e.start_time, e.end_time, e.agenda as event_agenda
+                FROM public.event_registrations r
+                LEFT JOIN public.events e ON e.id = r.event_id
+                WHERE r.event_id = ${filterEventId}
+                  AND (
+                    (${mEmail} <> '' AND LOWER(TRIM(COALESCE(r.email, ''))) = ${mEmail})
+                    OR (${mPhone} <> '' AND TRIM(COALESCE(r.phone, '')) = ${mPhone})
+                  )
+                ORDER BY r.created_at DESC
+                LIMIT 1
+              `.catch(() => [])
+            : await this.prisma.$queryRaw<any[]>`
+                SELECT r.*, e.name as event_name, e.title as event_title, e.date as event_date, e.location as event_location, e.start_time, e.end_time, e.agenda as event_agenda
+                FROM public.event_registrations r
+                LEFT JOIN public.events e ON e.id = r.event_id
+                WHERE (${mEmail} <> '' AND LOWER(TRIM(COALESCE(r.email, ''))) = ${mEmail})
+                   OR (${mPhone} <> '' AND TRIM(COALESCE(r.phone, '')) = ${mPhone})
+                ORDER BY r.created_at DESC
+                LIMIT 1
+              `.catch(() => []);
+          if (fallbackReg.length > 0) {
+            matchedReg = fallbackReg[0];
+          }
+        }
+
+        if (!matchedReg) {
+          const fullName = m.contact || m.name || '';
+          return {
+            found: false,
+            notRegisteredForEvent: true,
+            member: {
+              code: m.code || clean.toUpperCase(),
+              fullName,
+              email: m.email || '',
+              phone: m.phone || '',
+              company: m.company_name || m.name || '',
+              position: m.position || '',
+            },
+            message: `Học viên ${fullName} (${m.code || clean.toUpperCase()}) chưa đăng ký sự kiện này. Vui lòng chọn danh mục Khách mới để đăng ký vé!`,
+          };
+        }
       }
 
-      return { found: false, message: 'Không tìm thấy vé hoặc mã học viên đã đăng ký trong sự kiện này.' };
+      if (!matchedReg) {
+        return { found: false, message: 'Không tìm thấy vé hoặc mã học viên đã đăng ký trong sự kiện này.' };
+      }
     }
 
-    const reg = rows[0];
+    const reg = matchedReg;
     const isCheckedIn = Boolean(reg.checked_in_at);
     const isCheckedOut = Boolean(reg.checked_out_at);
     const isWalkIn = reg.is_walkin === true || reg.registration_origin === 'walkin_at_door' || reg.registration_origin === 'walkin_unannounced';

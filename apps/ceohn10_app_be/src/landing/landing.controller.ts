@@ -75,6 +75,12 @@ export class LandingAdminController {
   async getAdminVoteStats(@Param('id') id: string) {
     return this.landingService.getVideoVotingStats(id);
   }
+
+  @Post(':id/export-voting-pdf')
+  @HttpCode(HttpStatus.OK)
+  async exportAdminVotingPdf(@Param('id') id: string) {
+    return this.landingService.exportVotingResultsPdfToDocuments(id);
+  }
 }
 
 @Controller(['public/landing-webs', 'api/public/landing-webs'])
@@ -98,5 +104,11 @@ export class LandingPublicController {
     @Body() body: CastLandingVideoVoteDto,
   ) {
     return this.landingService.castVideoVote(slugOrSubdomain, body);
+  }
+
+  @Post(':slugOrSubdomain/export-voting-pdf')
+  @HttpCode(HttpStatus.OK)
+  async exportVotingPdf(@Param('slugOrSubdomain') slugOrSubdomain: string) {
+    return this.landingService.exportVotingResultsPdfToDocuments(slugOrSubdomain);
   }
 }

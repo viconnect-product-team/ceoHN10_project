@@ -268,9 +268,7 @@ export function UniversalDocumentViewerModal({
     };
   }, [isOpen, doc, docType, fileUrl]);
 
-  if (!isOpen || !doc) return null;
-
-  // Active Excel Sheet & Filtered Rows
+  // Active Excel Sheet & Filtered Rows (must run before any early return to preserve hook order)
   const currentSheet = excelSheets[activeSheetIdx] || null;
   const filteredExcelRows = useMemo(() => {
     if (!currentSheet) return [];
@@ -281,6 +279,8 @@ export function UniversalDocumentViewerModal({
       return row.some((cell) => String(cell || "").toLowerCase().includes(q));
     });
   }, [currentSheet, excelSearch]);
+
+  if (!isOpen || !doc) return null;
 
   const handleCopyText = () => {
     if (docxText) {

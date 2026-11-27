@@ -204,6 +204,7 @@ export function VideoVotingShowcaseLanding({
     return null;
   });
 
+  const [activeScreen, setActiveScreen] = useState<"video" | "voting">("video");
   const [showStatsModal, setShowStatsModal] = useState<boolean>(false);
   const [showQrModal, setShowQrModal] = useState<boolean>(false);
   const [voteStats, setVoteStats] = useState<any>(null);
@@ -400,7 +401,7 @@ export function VideoVotingShowcaseLanding({
 
   return (
     <div
-      className="relative w-full min-h-screen bg-[#050507] text-white overflow-x-hidden flex flex-col justify-between select-none"
+      className="relative w-full min-h-screen bg-[#FFFFFF] text-[#0B0D12] overflow-x-hidden flex flex-col justify-between select-none"
       style={{
         fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
       }}
@@ -411,194 +412,223 @@ export function VideoVotingShowcaseLanding({
         @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Syne:wght@700;800&family=JetBrains+Mono:wght@500;700&display=swap");
 
         @keyframes pulseGlow {
-          0%, 100% { opacity: 0.38; transform: scale(1.06); }
-          50% { opacity: 0.55; transform: scale(1.14); }
+          0%, 100% { opacity: 0.16; transform: scale(1.04); }
+          50% { opacity: 0.24; transform: scale(1.1); }
         }
         @keyframes waterRipple {
           0% { transform: scale(0.92); opacity: 0.7; }
           100% { transform: scale(1.55); opacity: 0; }
         }
         .pin-glass-pill {
-          background: rgba(255, 255, 255, 0.08);
-          backdrop-filter: blur(28px) saturate(180%);
-          -webkit-backdrop-filter: blur(28px) saturate(180%);
-          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.38);
+          background: rgba(255, 255, 255, 0.78);
+          backdrop-filter: blur(24px) saturate(180%);
+          -webkit-backdrop-filter: blur(24px) saturate(180%);
+          border: 1px solid rgba(205, 222, 240, 0.7);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.98), 0 8px 24px -6px rgba(15, 23, 42, 0.08);
         }
         .pin-glass-card {
-          background: linear-gradient(145deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.035) 100%);
-          backdrop-filter: blur(36px) saturate(190%);
-          -webkit-backdrop-filter: blur(36px) saturate(190%);
-          box-shadow: 0 28px 80px rgba(0, 0, 0, 0.65);
-        }
-        .pin-vote-card {
-          background: linear-gradient(160deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.03) 100%);
+          background: rgba(255, 255, 255, 0.72);
           backdrop-filter: blur(28px) saturate(180%);
           -webkit-backdrop-filter: blur(28px) saturate(180%);
-          transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+          border: 1px solid rgba(205, 222, 240, 0.72);
+          box-shadow: inset 0 1.5px 1px rgba(255, 255, 255, 0.98), 0 20px 48px -12px rgba(15, 23, 42, 0.08);
+        }
+        .pin-vote-card {
+          background: rgba(255, 255, 255, 0.82);
+          backdrop-filter: blur(20px) saturate(180%);
+          -webkit-backdrop-filter: blur(20px) saturate(180%);
+          border: 1px solid rgba(205, 222, 240, 0.75);
+          box-shadow: 0 6px 18px -4px rgba(15, 23, 42, 0.05);
+          transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .pin-vote-card:hover {
-          background: linear-gradient(160deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.06) 100%);
-          transform: translateY(-3px);
-          box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5);
+          background: rgba(255, 255, 255, 0.96);
+          transform: translateY(-2px);
+          box-shadow: 0 14px 30px -6px rgba(15, 23, 42, 0.1);
         }
         .pin-vote-card:active {
-          transform: scale(0.97);
+          transform: scale(0.98);
+        }
+        @keyframes voterFlyIntoBar {
+          0% {
+            opacity: 0;
+            transform: translate3d(38px, 8px, 0) scale(0.75);
+            filter: blur(4px);
+          }
+          65% {
+            opacity: 1;
+            transform: translate3d(-4px, -1px, 0) scale(1.06);
+            filter: blur(0);
+          }
+          100% {
+            opacity: 1;
+            transform: translate3d(0, 0, 0) scale(1);
+            filter: blur(0);
+          }
+        }
+        .voter-chip-enter {
+          animation: voterFlyIntoBar 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
       `}</style>
 
-      {/* AMBIENT DYNAMIC CINEMA BACKDROP */}
+      {/* LIGHT THEME CAUSTIC BACKDROP */}
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-out"
+          className="absolute inset-0"
           style={{
-            backgroundImage: `url(${resolveMediaUrl(currentSlide.image) || currentSlide.image})`,
-            filter: "blur(75px) saturate(190%)",
-            animation: "pulseGlow 9s ease-in-out infinite",
-          }}
-        />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(5,5,7,0.35)_0%,rgba(5,5,7,0.88)_65%,#050507_100%)]" />
-        {/* Subtle fine grain grid overlay */}
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage:
-              "linear-gradient(to right, rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.5) 1px, transparent 1px)",
-            backgroundSize: "64px 64px",
+            background: `
+              radial-gradient(circle at 18% 20%, rgba(110, 215, 255, 0.22) 0%, transparent 44%),
+              radial-gradient(circle at 82% 30%, rgba(190, 175, 255, 0.20) 0%, transparent 46%),
+              radial-gradient(circle at 50% 85%, rgba(130, 245, 210, 0.18) 0%, transparent 46%)
+            `,
           }}
         />
       </div>
 
-      {/* PREVIEW MODE FLOATING HUD (Chỉ hiện khi Admin xem trước trong CRM) */}
+      {/* PREVIEW MODE FLOATING HUD (Tối giản) */}
       {previewMode && (
-        <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-5xl px-4 py-2 rounded-full pin-glass-pill flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2.5">
-            <span className="size-2 rounded-full bg-emerald-400 animate-ping" />
-            <span className="text-[11px] font-bold tracking-[0.18em] uppercase text-white/90">
-              STUDIO PREVIEW · 07 HORIZONTAL VIDEO SHOWCASE &amp; LIVE VOTING
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            {onEditConfig && (
-              <button
-                type="button"
-                onClick={onEditConfig}
-                className="px-3.5 py-1.5 rounded-full bg-white text-black hover:bg-white/90 text-[11px] font-bold flex items-center gap-1.5 cursor-pointer transition active:scale-95"
-              >
-                <Sliders className="size-3" />
-                <span>Chỉnh sửa Video &amp; Nội dung</span>
-              </button>
-            )}
-            {onClosePreview && (
-              <button
-                type="button"
-                onClick={onClosePreview}
-                className="size-7 rounded-full bg-white/10 hover:bg-rose-500 text-white grid place-items-center cursor-pointer transition"
-              >
-                <X className="size-3.5" />
-              </button>
-            )}
-          </div>
+        <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 px-3 py-1.5 rounded-full pin-glass-pill flex items-center gap-2 text-[#0B0D12]">
+          <span className="size-2 rounded-full bg-emerald-500 animate-ping" />
+          <span className="text-[11px] font-bold uppercase tracking-wider">Preview</span>
+          {onEditConfig && (
+            <button
+              type="button"
+              onClick={onEditConfig}
+              className="px-3 py-1 rounded-full bg-[#0B0D12] text-white hover:bg-slate-800 text-[11px] font-bold flex items-center gap-1 cursor-pointer transition active:scale-95"
+            >
+              <Sliders className="size-3" />
+              <span>Chỉnh sửa</span>
+            </button>
+          )}
+          {onClosePreview && (
+            <button
+              type="button"
+              onClick={onClosePreview}
+              className="size-6 rounded-full bg-slate-200 hover:bg-rose-500 hover:text-white text-[#0B0D12] grid place-items-center cursor-pointer transition"
+            >
+              <X className="size-3" />
+            </button>
+          )}
         </div>
       )}
 
-      {/* MINIMALIST EDITORIAL TOP NAVIGATION (BORDERLESS & MOBILE-FIRST RESPONSIVE) */}
+      {/* MINIMALIST LIGHT HEADER: CHỈ HIỆN TIÊU ĐỀ & MÔ TẢ VIDEO ĐANG CHẠY + CHUYỂN MÀN VIDEO / VOTING */}
       <header
         className={`relative z-30 w-full max-w-[1440px] mx-auto px-4 sm:px-10 ${
-          previewMode ? "pt-16" : "pt-4 sm:pt-6"
+          previewMode ? "pt-14" : "pt-4 sm:pt-6"
         } pb-2 flex flex-wrap items-center justify-between gap-3`}
       >
-        {/* Left: Brand Identity */}
-        <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
-          <div className="size-9 sm:size-10 rounded-full pin-glass-pill grid place-items-center shrink-0">
+        {/* Left: Active Video Title & Description */}
+        <div className="flex items-center gap-2.5 min-w-0 max-w-full sm:max-w-[42%]">
+          <div className="size-9 rounded-full pin-glass-pill grid place-items-center shrink-0">
             <span
-              className="text-xs font-black tracking-tighter"
-              style={{ color: primaryColor, fontFamily: "'Syne', sans-serif" }}
+              className="text-xs font-black tracking-tighter text-[#0B0D12]"
+              style={{ fontFamily: "'Syne', sans-serif" }}
             >
               HN10
             </span>
           </div>
           <div className="min-w-0">
-            <div className="text-[11px] sm:text-sm font-extrabold tracking-[0.2em] sm:tracking-[0.24em] uppercase text-white truncate">
-              {config.brand?.logoText || "CEO HN10 · EXHIBITION"}
+            <div className="text-xs sm:text-sm font-extrabold tracking-tight text-[#0B0D12] truncate">
+              {activeScreen === "video"
+                ? [currentSlide.title1, currentSlide.title2].filter(Boolean).join(" ") || `Video 0${currentIndex + 1}`
+                : "Voting & Biểu Đồ Bình Chọn"}
             </div>
-            <div className="text-[9px] sm:text-[10px] tracking-[0.16em] sm:tracking-[0.2em] uppercase text-white/50 font-mono truncate">
-              INTERACTIVE FILM &amp; REALTIME VOTING
-            </div>
+            {activeScreen === "video" && currentSlide.description && (
+              <div className="text-[11px] text-[#525866] truncate">
+                {currentSlide.description}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Center: Sleek 01 — 07 Filmstrip Chapter Indicator */}
-        <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-full pin-glass-pill">
-          {slides.map((s, idx) => {
-            const active = idx === currentIndex;
-            return (
-              <button
-                key={s.id}
-                type="button"
-                onClick={() => setCurrentIndex(idx)}
-                className={`relative px-3 py-1 rounded-full text-[11px] font-mono transition-all duration-500 cursor-pointer flex items-center gap-1.5 ${
-                  active
-                    ? "bg-white text-black font-bold shadow-[0_0_20px_rgba(255,255,255,0.45)]"
-                    : "text-white/50 hover:text-white hover:bg-white/5"
-                }`}
-              >
-                <span>0{idx + 1}</span>
-                {active && (
-                  <span className="text-[10px] font-sans font-bold uppercase tracking-wider max-w-[110px] truncate">
-                    · {s.title1}
-                  </span>
-                )}
-              </button>
-            );
-          })}
+        {/* Center: Screen Switcher (Video vs Voting & Biểu đồ) + 01..07 */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1 p-1 rounded-full pin-glass-pill">
+            <button
+              type="button"
+              onClick={() => setActiveScreen("video")}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition cursor-pointer ${
+                activeScreen === "video"
+                  ? "bg-[#0B0D12] text-white shadow-sm"
+                  : "text-[#525866] hover:text-[#0B0D12]"
+              }`}
+            >
+              Video (0{currentIndex + 1}/0{slides.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveScreen("voting");
+                setLoadingStats(true);
+                fetchRealtimeStats().finally(() => setLoadingStats(false));
+              }}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                activeScreen === "voting"
+                  ? "bg-[#0B0D12] text-white shadow-sm"
+                  : "text-[#525866] hover:text-[#0B0D12]"
+              }`}
+            >
+              <BarChart3 className="size-3.5" />
+              <span>Voting &amp; Biểu đồ ({voteStats?.totalVoters ?? 0})</span>
+            </button>
+          </div>
+
+          {activeScreen === "video" && (
+            <div className="hidden xl:flex items-center gap-1 px-2 py-1 rounded-full pin-glass-pill">
+              {slides.map((s, idx) => {
+                const active = idx === currentIndex;
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => setCurrentIndex(idx)}
+                    className={`relative px-2.5 py-1 rounded-full text-[11px] font-mono transition-all duration-300 cursor-pointer ${
+                      active
+                        ? "bg-[#0B0D12] text-white font-bold shadow-sm"
+                        : "text-[#525866] hover:text-[#0B0D12] hover:bg-slate-100"
+                    }`}
+                  >
+                    0{idx + 1}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
-        {/* Right: Countdown + Live Stats + QR Access */}
-        <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto justify-between sm:justify-end">
+        {/* Right: Countdown + QR */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <div
-            className={`px-2.5 sm:px-3.5 py-1.5 rounded-full text-[10px] sm:text-[11px] font-mono font-bold tracking-wider flex items-center gap-1.5 sm:gap-2 pin-glass-pill ${
-              isVotingWindowActive ? "text-emerald-300" : "text-rose-300"
+            className={`px-2.5 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-[11px] font-mono font-bold tracking-wider flex items-center gap-1.5 pin-glass-pill ${
+              isVotingWindowActive ? "text-emerald-700" : "text-rose-700"
             }`}
           >
             <span
               className={`size-1.5 rounded-full ${
-                isVotingWindowActive ? "bg-emerald-400 animate-ping" : "bg-rose-400"
+                isVotingWindowActive ? "bg-emerald-500 animate-ping" : "bg-rose-500"
               }`}
             />
-            <span className="truncate max-w-[125px] sm:max-w-none">{countdownText}</span>
+            <span className="truncate max-w-[120px] sm:max-w-none">{countdownText}</span>
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                setLoadingStats(true);
-                fetchRealtimeStats().finally(() => setLoadingStats(false));
-                setShowStatsModal(true);
-              }}
-              className="px-3 sm:px-3.5 py-1.5 rounded-full pin-glass-pill hover:bg-white/15 text-white text-[10px] sm:text-[11px] font-semibold tracking-wider uppercase flex items-center gap-1.5 cursor-pointer transition active:scale-95"
-            >
-              <BarChart3 className="size-3.5" style={{ color: primaryColor }} />
-              <span className="hidden sm:inline">Live Analytics</span>
-              <span className="font-mono font-bold text-white/90">({voteStats?.totalVoters ?? 0})</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setShowQrModal(true)}
-              className="px-3 sm:px-4 py-1.5 rounded-full bg-white text-black hover:bg-white/90 text-[10px] sm:text-[11px] font-extrabold tracking-wider uppercase flex items-center gap-1.5 cursor-pointer shadow-[0_0_25px_rgba(255,255,255,0.25)] transition active:scale-95"
-            >
-              <QrCode className="size-3.5" />
-              <span>QR Pass</span>
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => setShowQrModal(true)}
+            className="px-3.5 py-1.5 rounded-full bg-[#0B0D12] text-white hover:bg-slate-800 text-[11px] font-extrabold tracking-wider uppercase flex items-center gap-1.5 cursor-pointer shadow-sm transition active:scale-95"
+          >
+            <QrCode className="size-3.5" />
+            <span>QR</span>
+          </button>
         </div>
       </header>
 
-      {/* HORIZONTAL 3D PERSPECTIVE 7-VIDEO CAROUSEL STAGE (ZERO TEXT ON VIDEO, BORDERLESS, MOBILE RESPONSIVE) */}
-      <main className="relative z-20 flex-1 w-full max-w-[1440px] mx-auto flex flex-col justify-center py-2 sm:py-5">
-        {/* 1. CAROUSEL VIEWPORT WITH PEEKING ADJACENT VIDEO CARDS */}
-        <div className="relative w-full h-[230px] sm:h-[430px] lg:h-[520px] flex items-center justify-center overflow-hidden px-3 sm:px-4">
+      {/* MÀN 1: VIDEO SHOWCASE (KHÔNG LẪN MÀN VOTING) | MÀN 2: VOTING & BIỂU ĐỒ RIÊNG BIỆT (THEME SÁNG) */}
+      {activeScreen === "video" ? (
+        <>
+          <main className="relative z-20 flex-1 w-full max-w-[1440px] mx-auto flex flex-col justify-center py-2 sm:py-5">
+            {/* 1. CAROUSEL VIEWPORT WITH PEEKING ADJACENT VIDEO CARDS */}
+            <div className="relative w-full h-[250px] sm:h-[450px] lg:h-[540px] flex items-center justify-center overflow-hidden px-3 sm:px-4">
           {slides.map((slide, idx) => {
             const offset = getRelativeOffset(idx);
             const isCenter = offset === 0;
@@ -753,125 +783,25 @@ export function VideoVotingShowcaseLanding({
           </button>
         </div>
 
-        {/* 2. FLOATING INTERACTIVE VOTING DOCK DIRECTLY BELOW ACTIVE VIDEO (BORDERLESS & MOBILE RESPONSIVE) */}
-        <div className="w-[94%] sm:w-[82%] lg:w-[72%] max-w-[1020px] mx-auto mt-3 sm:mt-5">
-          <div className="rounded-[24px] sm:rounded-[34px] pin-glass-card p-4 sm:p-7 space-y-3.5 sm:space-y-4">
-            {/* Voting Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 sm:pb-3">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span
-                    className="size-2 rounded-full"
-                    style={{ backgroundColor: primaryColor }}
-                  />
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-[0.22em] text-white/60">
-                    INTERACTIVE POLL · SLIDE 0{currentIndex + 1}
-                  </span>
-                </div>
-                <h2 className="text-sm sm:text-lg font-bold text-white tracking-tight">
-                  {currentSlide.votingQuestion ||
-                    `Bình chọn đánh giá của bạn cho Video 0${currentIndex + 1}`}
-                </h2>
-              </div>
-
-              <div className="flex items-center gap-2 shrink-0 flex-wrap">
-                {hasVotedEmail ? (
-                  <span className="px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-300 text-[11px] font-medium flex items-center gap-1.5">
-                    <CheckCircle2 className="size-3.5" />
-                    <span className="truncate max-w-[180px]">Đã vote ({hasVotedEmail})</span>
-                  </span>
-                ) : (
-                  <span className="text-[11px] text-white/50 font-mono">
-                    1 VOTE / PERSON
-                  </span>
-                )}
-                <span className="px-3 py-1 rounded-full bg-white/10 text-[11px] font-mono text-white/90">
-                  {currentSlideStat?.totalVotes ?? 0} phiếu
-                </span>
-              </div>
-            </div>
-
-            {/* Voting Option Cards with Fluid Realtime Progress Bar */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {(currentSlide.votingOptions || []).map((opt, oIdx) => {
-                const optStat = currentSlideStat?.options?.find((o: any) => o.id === opt.id);
-                const count = optStat?.count ?? 0;
-                const pct = optStat?.percentage ?? 0;
-                const isSelected = selectedOptionBySlide[currentSlide.id] === opt.id;
-
-                return (
-                  <button
-                    key={opt.id || oIdx}
-                    type="button"
-                    onClick={() => handleChooseOption(currentSlide, opt)}
-                    className={`pin-vote-card group relative rounded-2xl p-3.5 sm:p-4 text-left flex flex-col justify-between gap-3 overflow-hidden cursor-pointer ${
-                      isSelected ? "bg-white/20 shadow-[0_0_25px_rgba(255,255,255,0.2)]" : ""
-                    }`}
-                  >
-                    {/* Animated Liquid Fill Percentage Backdrop */}
-                    <div
-                      className="absolute inset-y-0 left-0 pointer-events-none transition-all duration-1000 ease-out opacity-15"
-                      style={{
-                        width: `${Math.min(100, pct)}%`,
-                        background: `linear-gradient(90deg, ${primaryColor} 0%, transparent 100%)`,
-                      }}
-                    />
-
-                    <div className="relative z-10 space-y-1.5 w-full">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-white/50">
-                          OPTION 0{oIdx + 1}
-                        </span>
-                        <span
-                          className="text-xs font-mono font-bold"
-                          style={{ color: primaryColor }}
-                        >
-                          {pct}% <span className="text-white/40 font-normal">({count})</span>
-                        </span>
-                      </div>
-
-                      <div className="text-sm font-bold text-white group-hover:text-amber-200 transition leading-snug">
-                        {opt.label}
-                      </div>
-
-                      {opt.description && (
-                        <p className="text-[11px] text-white/55 line-clamp-2 leading-relaxed">
-                          {opt.description}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="relative z-10 w-full space-y-2">
-                      {/* Slim Progress Line */}
-                      <div className="w-full h-1 rounded-full bg-white/10 overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all duration-1000 ease-out"
-                          style={{
-                            width: `${Math.min(100, pct)}%`,
-                            backgroundColor: primaryColor,
-                          }}
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between text-[11px]">
-                        <span className="text-white/45 font-medium">
-                          {hasVotedEmail ? "Xem thống kê" : "Chạm để bình chọn"}
-                        </span>
-                        <span className="inline-flex items-center gap-1 font-bold text-white group-hover:translate-x-0.5 transition">
-                          <span>Vote</span>
-                          <ArrowUpRight className="size-3.5" style={{ color: primaryColor }} />
-                        </span>
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+        {/* 2. NÚT CHUYỂN NHANH SANG MÀN VOTING & BIỂU ĐỒ RIÊNG */}
+        <div className="flex justify-center mt-4">
+          <button
+            type="button"
+            onClick={() => {
+              setActiveScreen("voting");
+              setLoadingStats(true);
+              fetchRealtimeStats().finally(() => setLoadingStats(false));
+            }}
+            className="px-6 py-3 rounded-full bg-[#0B0D12] text-white hover:bg-slate-800 text-xs sm:text-sm font-bold flex items-center gap-2 shadow-lg cursor-pointer transition active:scale-95"
+          >
+            <BarChart3 className="size-4" />
+            <span>Mở Màn Voting &amp; Biểu Đồ Bình Chọn</span>
+            <ArrowUpRight className="size-4" />
+          </button>
         </div>
       </main>
 
-      {/* BOTTOM 7-SLIDE FILMSTRIP DOCK */}
+      {/* BOTTOM 7-SLIDE FILMSTRIP DOCK (LIGHT THEME) */}
       <footer className="relative z-20 w-full max-w-[1440px] mx-auto px-4 sm:px-10 pb-5 pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="flex items-center gap-2 overflow-x-auto max-w-full pb-1 scrollbar-none">
           {slides.map((s, idx) => {
@@ -881,10 +811,10 @@ export function VideoVotingShowcaseLanding({
                 key={s.id}
                 type="button"
                 onClick={() => setCurrentIndex(idx)}
-                className={`group relative flex items-center gap-2 p-1.5 pr-3 rounded-full transition-all duration-500 cursor-pointer shrink-0 ${
+                className={`group relative flex items-center gap-2 p-1.5 pr-3 rounded-full transition-all duration-300 cursor-pointer shrink-0 ${
                   active
-                    ? "bg-white text-black shadow-[0_0_25px_rgba(255,255,255,0.3)] scale-105"
-                    : "pin-glass-pill text-white/70 hover:text-white"
+                    ? "bg-[#0B0D12] text-white shadow-md scale-105"
+                    : "pin-glass-pill text-[#525866] hover:text-[#0B0D12]"
                 }`}
               >
                 <div className="relative w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden shrink-0">
@@ -896,25 +826,172 @@ export function VideoVotingShowcaseLanding({
                 </div>
                 <div className="text-left">
                   <div
-                    className={`text-[9px] font-mono uppercase tracking-widest ${
-                      active ? "text-black/60 font-bold" : "text-white/45"
+                    className={`text-[10px] font-mono font-bold ${
+                      active ? "text-white" : "text-[#0B0D12]"
                     }`}
                   >
                     0{idx + 1}
-                  </div>
-                  <div className="text-[11px] font-bold leading-none truncate max-w-[85px]">
-                    {s.title1}
                   </div>
                 </div>
               </button>
             );
           })}
         </div>
-
-        <div className="hidden sm:block text-[11px] font-mono text-white/40 tracking-wider uppercase">
-          SWIPE OR USE ← → KEYS TO GLIDE THROUGH 07 FILMS
-        </div>
       </footer>
+        </>
+      ) : (
+        /* MÀN 2: MÀN VOTING & BIỂU ĐỒ RIÊNG BIỆT (KHÔNG CÓ VIDEO, THEME SÁNG) */
+        <main className="relative z-20 flex-1 w-full max-w-[1320px] mx-auto px-4 sm:px-8 py-4 sm:py-6 space-y-5">
+          <div className="pin-glass-card rounded-3xl p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-base sm:text-xl font-extrabold text-[#0B0D12] tracking-tight">
+                Bình Chọn &amp; Biểu Đồ Thống Kê Realtime (7 Video)
+              </h2>
+              <p className="text-xs text-[#525866] mt-0.5">
+                Chọn phương án bên dưới để bình chọn · Tên người bình chọn sẽ hiển thị trực tiếp vào lựa chọn trong biểu đồ
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1.5 rounded-full bg-emerald-500/15 text-emerald-800 text-xs font-mono font-bold">
+                Tổng phiếu: {voteStats?.totalVoters ?? 0}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setLoadingStats(true);
+                  fetchRealtimeStats().finally(() => setLoadingStats(false));
+                }}
+                className="px-3.5 py-1.5 rounded-full pin-glass-pill text-[#0B0D12] text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+              >
+                <RefreshCw className={`size-3.5 ${loadingStats ? "animate-spin" : ""}`} />
+                <span>Làm mới</span>
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    const res = await fetchNestApi<any>(`/public/landing-webs/${encodeURIComponent(slugOrId)}/export-voting-pdf`, {
+                      method: "POST",
+                    });
+                    if (res?.ok) {
+                      toast.success("Đã lưu file PDF kết quả Voting vào thư mục Sự kiện trong Quản lý Tài liệu!");
+                    }
+                  } catch (err: any) {
+                    toast.error("Không thể xuất PDF: " + (err?.message || ""));
+                  }
+                }}
+                className="px-3.5 py-1.5 rounded-full bg-blue-600 text-white hover:bg-blue-700 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm"
+              >
+                <span>Lưu PDF về Tài liệu Sự kiện</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveScreen("video")}
+                className="px-3.5 py-1.5 rounded-full bg-[#0B0D12] text-white text-xs font-bold cursor-pointer"
+              >
+                ← Xem Video
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {slides.slice(0, 7).map((slide, sIdx) => {
+              const st =
+                (voteStats?.slideStats || []).find((x: any) => x.slideId === slide.id) || {
+                  slideId: slide.id,
+                  slideNumber: sIdx + 1,
+                  title: `${slide.title1 || ""} ${slide.title2 || ""}`.trim() || `Video 0${sIdx + 1}`,
+                  totalVotes: 0,
+                  options: (slide.votingOptions || []).map((o) => ({
+                    id: o.id,
+                    label: o.label,
+                    count: 0,
+                    percentage: 0,
+                  })),
+                };
+
+              return (
+                <div
+                  key={slide.id}
+                  className="pin-glass-card rounded-3xl p-4 sm:p-5 space-y-3.5"
+                >
+                  <div className="flex items-center justify-between gap-2 pb-1">
+                    <div className="min-w-0">
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-blue-700">
+                        VIDEO 0{sIdx + 1} · {[slide.title1, slide.title2].filter(Boolean).join(" ")}
+                      </span>
+                      <h3 className="text-sm font-extrabold text-[#0B0D12] truncate mt-0.5">
+                        {slide.votingQuestion || st.title}
+                      </h3>
+                    </div>
+                    <span className="px-3 py-1 rounded-full bg-[#0B0D12] text-white text-xs font-mono font-bold shrink-0">
+                      {st.totalVotes ?? 0} phiếu
+                    </span>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    {(slide.votingOptions || []).map((opt) => {
+                      const optStat = (st.options || []).find((o: any) => o.id === opt.id);
+                      const count = optStat?.count ?? 0;
+                      const pct = optStat?.percentage ?? 0;
+                      const isSelected = selectedOptionBySlide[slide.id] === opt.id;
+                      const optionVoters = (voteStats?.recentVoters || []).filter(
+                        (v: any) => v.slideId === slide.id && v.optionId === opt.id,
+                      );
+
+                      return (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => handleChooseOption(slide, opt)}
+                          className={`pin-vote-card w-full rounded-2xl p-3 text-left space-y-2 cursor-pointer ${
+                            isSelected ? "ring-2 ring-[#0B0D12]" : ""
+                          }`}
+                        >
+                          <div className="flex items-center justify-between text-xs gap-2">
+                            <span className="font-bold text-[#0B0D12]">{opt.label}</span>
+                            <span className="font-mono font-extrabold text-blue-700 shrink-0 tabular-nums transition-all duration-500">
+                              {pct}% ({count})
+                            </span>
+                          </div>
+
+                          {/* Thanh biểu đồ biến động realtime + Tên người vote bay vào lựa chọn */}
+                          <div className="relative w-full min-h-[30px] rounded-xl bg-slate-100/90 border border-slate-200/80 overflow-hidden p-1.5 flex flex-wrap items-center gap-1.5">
+                            <div
+                              className="absolute inset-y-0 left-0 rounded-xl transition-all duration-700 ease-out pointer-events-none"
+                              style={{
+                                width: `${Math.min(100, pct)}%`,
+                                background: "linear-gradient(90deg, rgba(59,130,246,0.22) 0%, rgba(14,165,233,0.14) 100%)",
+                              }}
+                            />
+                            {optionVoters.length > 0 ? (
+                              optionVoters.slice(0, 10).map((voter: any, vIdx: number) => (
+                                <span
+                                  key={voter.id || vIdx}
+                                  style={{ animationDelay: `${vIdx * 60}ms` }}
+                                  className="voter-chip-enter relative z-10 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#0B0D12] text-white text-[10px] font-semibold shadow-xs"
+                                >
+                                  <span className="size-1.5 rounded-full bg-emerald-400 shrink-0" />
+                                  <span className="max-w-[120px] truncate">{voter.voterName}</span>
+                                </span>
+                              ))
+                            ) : (
+                              <span className="relative z-10 text-[10px] text-[#8A919E] px-1">
+                                Chạm để bình chọn phương án này
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </main>
+      )}
 
       {/* MODAL ĐIỀN TÊN & EMAIL ĐỊNH DANH 1 LƯỢT VOTE DUY NHẤT (BORDERLESS) */}
       {voterModalOpen && pendingVote && (
@@ -1064,49 +1141,96 @@ export function VideoVotingShowcaseLanding({
 
             <div className="p-4 sm:p-7 overflow-y-auto flex-1 space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {(voteStats?.slideStats || []).map((st: any) => (
-                  <div
-                    key={st.slideId}
-                    className="p-4 sm:p-5 rounded-3xl bg-white/[0.05] space-y-3.5"
-                  >
-                    <div className="flex items-center justify-between pb-2">
-                      <div>
-                        <span
-                          className="text-[10px] font-mono font-bold uppercase tracking-widest"
-                          style={{ color: primaryColor }}
-                        >
-                          FILM 0{st.slideNumber} · {st.place}
-                        </span>
-                        <h4 className="text-sm font-extrabold text-white mt-0.5">{st.title}</h4>
-                      </div>
-                      <span className="px-3 py-1 rounded-full bg-white/10 text-white text-xs font-mono font-bold shrink-0">
-                        {st.totalVotes} votes
-                      </span>
-                    </div>
+                {slides.slice(0, 7).map((slide, sIdx) => {
+                  const st =
+                    (voteStats?.slideStats || []).find((x: any) => x.slideId === slide.id) || {
+                      slideId: slide.id,
+                      slideNumber: sIdx + 1,
+                      title: `${slide.title1 || ""} ${slide.title2 || ""}`.trim() || `Video 0${sIdx + 1}`,
+                      totalVotes: 0,
+                      options: (slide.votingOptions || []).map((o) => ({
+                        id: o.id,
+                        label: o.label,
+                        count: 0,
+                        percentage: 0,
+                      })),
+                    };
 
-                    <div className="space-y-3">
-                      {(st.options || []).map((opt: any) => (
-                        <div key={opt.id} className="space-y-1.5">
-                          <div className="flex items-center justify-between text-xs gap-2">
-                            <span className="font-medium text-white/85">{opt.label}</span>
-                            <span className="font-mono font-bold shrink-0" style={{ color: primaryColor }}>
-                              {opt.percentage}% ({opt.count})
-                            </span>
-                          </div>
-                          <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
-                            <div
-                              className="h-full rounded-full transition-all duration-700"
-                              style={{
-                                width: `${Math.min(100, opt.percentage)}%`,
-                                backgroundColor: primaryColor,
-                              }}
-                            />
-                          </div>
+                  return (
+                    <div
+                      key={slide.id}
+                      className="p-4 sm:p-5 rounded-3xl bg-white/[0.05] space-y-3.5"
+                    >
+                      <div className="flex items-center justify-between gap-2 pb-1">
+                        <div className="min-w-0">
+                          <span
+                            className="text-[10px] font-mono font-bold uppercase tracking-widest"
+                            style={{ color: primaryColor }}
+                          >
+                            VIDEO 0{sIdx + 1}
+                          </span>
+                          <h4 className="text-sm font-extrabold text-white truncate">
+                            {slide.votingQuestion || st.title || `Video 0${sIdx + 1}`}
+                          </h4>
                         </div>
-                      ))}
+                        <span className="px-3 py-1 rounded-full bg-white/10 text-white text-xs font-mono font-bold shrink-0 transition-all">
+                          {st.totalVotes ?? 0} phiếu
+                        </span>
+                      </div>
+
+                      <div className="space-y-3">
+                        {(st.options || []).map((opt: any) => {
+                          const optionVoters = (voteStats?.recentVoters || []).filter(
+                            (v: any) => v.slideId === slide.id && v.optionId === opt.id,
+                          );
+                          return (
+                            <div key={opt.id} className="space-y-1.5">
+                              <div className="flex items-center justify-between text-xs gap-2">
+                                <span className="font-semibold text-white/90 truncate">{opt.label}</span>
+                                <span
+                                  className="font-mono font-bold shrink-0 tabular-nums transition-all duration-500"
+                                  style={{ color: primaryColor }}
+                                >
+                                  {opt.percentage ?? 0}% ({opt.count ?? 0})
+                                </span>
+                              </div>
+
+                              {/* Thanh biểu đồ biến động realtime + tên người vote bay vào lựa chọn */}
+                              <div className="relative w-full min-h-[28px] rounded-xl bg-white/[0.08] overflow-hidden p-1 flex flex-wrap items-center gap-1">
+                                <div
+                                  className="absolute inset-y-0 left-0 rounded-xl transition-all duration-700 ease-out opacity-35 pointer-events-none"
+                                  style={{
+                                    width: `${Math.min(100, opt.percentage ?? 0)}%`,
+                                    backgroundColor: primaryColor,
+                                  }}
+                                />
+                                {optionVoters.length > 0 ? (
+                                  optionVoters.slice(0, 8).map((voter: any, vIdx: number) => (
+                                    <span
+                                      key={voter.id || vIdx}
+                                      style={{ animationDelay: `${vIdx * 60}ms` }}
+                                      className="voter-chip-enter relative z-10 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/55 text-white text-[10px] font-semibold shadow-sm"
+                                    >
+                                      <span
+                                        className="size-1.5 rounded-full shrink-0"
+                                        style={{ backgroundColor: primaryColor }}
+                                      />
+                                      <span className="max-w-[110px] truncate">{voter.voterName}</span>
+                                    </span>
+                                  ))
+                                ) : (
+                                  <span className="relative z-10 text-[10px] text-white/35 px-1.5">
+                                    0 lượt chọn
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {Array.isArray(voteStats?.recentVoters) && voteStats.recentVoters.length > 0 && (

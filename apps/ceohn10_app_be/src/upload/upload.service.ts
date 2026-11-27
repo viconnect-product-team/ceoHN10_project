@@ -358,7 +358,7 @@ export class UploadService {
     let saved = false;
     let url: string | null = null;
 
-    // Bắt buộc tải trực tiếp lên MinIO (S3 Object Storage) - không lưu cục bộ
+    // Ưu tiên tải lên MinIO (S3 Object Storage), fallback về ổ đĩa bền vững (/app/uploads) nếu MinIO chưa kết nối
     try {
       const minioUrl = await this.minioService.uploadFile(
         safeFilename,
@@ -370,9 +370,19 @@ export class UploadService {
         saved = true;
       }
     } catch (minioErr: any) {
-      throw new InternalServerErrorException(
-        `Không thể lưu tệp tin lên MinIO: ${minioErr?.message || 'MinIO unreachable'}`,
+      console.warn(
+        `MinIO upload warning in saveFile (${minioErr?.message || 'MinIO unreachable'}), falling back to disk storage.`,
       );
+    }
+
+    if (!saved || !url) {
+      url = await this.saveToLocalDisk(
+        folder,
+        baseFilename,
+        file.buffer,
+        file.mimetype,
+      );
+      saved = Boolean(url);
     }
 
     if (!saved || !url) {

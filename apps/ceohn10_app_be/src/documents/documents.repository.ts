@@ -24,7 +24,7 @@ export class DocumentsRepository {
     if (associationId) {
       return this.prisma.$queryRaw<any[]>`
         SELECT id, COALESCE(code, id::text) as code, COALESCE(name, title, 'Tài liệu') as name,
-               category, size, uploaded_at, uploaded_by, created_by, type,
+               category, size, uploaded_at, COALESCE(uploaded_by_name, uploaded_by::text, 'Ban Thư ký') as uploaded_by, created_by, type,
                COALESCE(file_path, file_url, drive_url, '') as file_path,
                association_id, folder_id, drive_url, is_folder,
                share_scope, share_role, shared_with, is_starred, color_tag, description, doc_scope, enterprise_name
@@ -35,7 +35,7 @@ export class DocumentsRepository {
     }
     return this.prisma.$queryRaw<any[]>`
       SELECT id, COALESCE(code, id::text) as code, COALESCE(name, title, 'Tài liệu') as name,
-             category, size, uploaded_at, uploaded_by, created_by, type,
+             category, size, uploaded_at, COALESCE(uploaded_by_name, uploaded_by::text, 'Ban Thư ký') as uploaded_by, created_by, type,
              COALESCE(file_path, file_url, drive_url, '') as file_path,
              association_id, folder_id, drive_url, is_folder,
              share_scope, share_role, shared_with, is_starred, color_tag, description, doc_scope, enterprise_name
@@ -106,46 +106,32 @@ export class DocumentsRepository {
       `ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS doc_scope TEXT DEFAULT 'association'`,
       `ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS enterprise_name TEXT`,
       `ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS created_by TEXT`,
+      `ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS uploaded_by_name TEXT`,
     ];
     for (const sql of ensureCols) {
       await this.prisma.$executeRawUnsafe(sql).catch(() => {});
     }
     const sharedWithJson = JSON.stringify(sharedWith || []);
     const docId = crypto.randomUUID();
-    try {
-      await this.prisma.$executeRaw`
-        INSERT INTO public.documents (
-          id, code, name, category, size, uploaded_by, created_by, type, file_path, association_id, 
-          folder_id, drive_url, is_folder, share_scope, share_role, shared_with, 
-          is_starred, color_tag, description, doc_scope, enterprise_name, uploaded_at
-        )
-        VALUES (
-          ${docId}::uuid, ${code}, ${name}, ${category}, ${size}, ${uploadedBy}, ${createdBy || null}, ${type}, ${filePath}, 
-          ${associationId ? associationId : null}::uuid, ${folderId || null}, ${driveUrl || null}, 
-          ${isFolder}, ${shareScope}, ${shareRole}, ${sharedWithJson}::jsonb, 
-          ${isStarred}, ${colorTag || null}, ${description || null}, ${docScope}, 
-          ${enterpriseName || null}, NOW()
-        )
-      `;
-    } catch {
-      await this.prisma.$executeRaw`
-        INSERT INTO public.documents (
-          id, code, name, category, size, uploaded_by, created_by, type, file_path, association_id, 
-          folder_id, drive_url, is_folder, share_scope, share_role, shared_with, 
-          is_starred, color_tag, description, doc_scope, enterprise_name, uploaded_at
-        )
-        VALUES (
-          ${docId}, ${code}, ${name}, ${category}, ${size}, ${uploadedBy}, ${createdBy || null}, ${type}, ${filePath}, 
-          ${associationId ? associationId : null}::uuid, ${folderId || null}, ${driveUrl || null}, 
-          ${isFolder}, ${shareScope}, ${shareRole}, ${sharedWithJson}::jsonb, 
-          ${isStarred}, ${colorTag || null}, ${description || null}, ${docScope}, 
-          ${enterpriseName || null}, NOW()
-        )
-      `;
-    }
+    const safeFileUrl = filePath || driveUrl || '';
+    const isUuidCreator = Boolean(createdBy && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(createdBy));
+    await this.prisma.$executeRaw`
+      INSERT INTO public.documents (
+        id, code, title, name, category, size, uploaded_by, uploaded_by_name, created_by, type, file_path, file_url, association_id,
+        folder_id, drive_url, is_folder, share_scope, share_role, shared_with,
+        is_starred, color_tag, description, doc_scope, enterprise_name, uploaded_at, created_at, updated_at
+      )
+      VALUES (
+        ${docId}, ${code}, ${name}, ${name}, ${category}, ${size}, ${isUuidCreator ? createdBy : null}::uuid, ${uploadedBy}, ${createdBy || null}, ${type}, ${filePath}, ${safeFileUrl},
+        ${associationId ? associationId : null}::uuid, ${folderId || null}, ${driveUrl || null},
+        ${isFolder}, ${shareScope}, ${shareRole}, ${sharedWithJson}::jsonb,
+        ${isStarred}, ${colorTag || null}, ${description || null}, ${docScope},
+        ${enterpriseName || null}, NOW(), NOW(), NOW()
+      )
+    `;
 
     const rows = await this.prisma.$queryRaw<any[]>`
-      SELECT code, name, category, size, uploaded_at, uploaded_by, created_by, type, file_path, folder_id, drive_url, is_folder,
+      SELECT code, COALESCE(name, title) as name, category, size, uploaded_at, COALESCE(uploaded_by_name, uploaded_by::text) as uploaded_by, created_by, type, COALESCE(file_path, file_url) as file_path, folder_id, drive_url, is_folder,
              share_scope, share_role, shared_with, is_starred, color_tag, description, doc_scope, enterprise_name
       FROM public.documents
       WHERE code = ${code}
@@ -180,11 +166,13 @@ export class DocumentsRepository {
     await this.prisma.$executeRaw`
       UPDATE public.documents
       SET name = COALESCE(${name !== undefined ? name : null}, name),
+          title = COALESCE(${name !== undefined ? name : null}, title),
           category = COALESCE(${category !== undefined ? category : null}, category),
           size = COALESCE(${size !== undefined ? size : null}, size),
-          uploaded_by = COALESCE(${uploadedBy !== undefined ? uploadedBy : null}, uploaded_by),
+          uploaded_by_name = COALESCE(${uploadedBy !== undefined ? uploadedBy : null}, uploaded_by_name),
           type = COALESCE(${type !== undefined ? type : null}, type),
           file_path = COALESCE(${filePath !== undefined ? filePath : null}, file_path),
+          file_url = COALESCE(${filePath !== undefined ? filePath : null}, file_url),
           folder_id = CASE WHEN ${folderId !== undefined} THEN ${folderId || null} ELSE folder_id END,
           drive_url = COALESCE(${driveUrl !== undefined ? driveUrl : null}, drive_url),
           is_folder = COALESCE(${isFolder !== undefined ? isFolder : null}, is_folder),
@@ -197,14 +185,14 @@ export class DocumentsRepository {
           doc_scope = COALESCE(${docScope !== undefined ? docScope : null}, doc_scope),
           enterprise_name = COALESCE(${enterpriseName !== undefined ? enterpriseName : null}, enterprise_name),
           updated_at = NOW()
-      WHERE code = ${id}
+      WHERE code = ${id} OR id = ${id}
     `;
 
     const rows = await this.prisma.$queryRaw<any[]>`
-      SELECT code, name, category, size, uploaded_at, uploaded_by, type, file_path, folder_id, drive_url, is_folder,
+      SELECT code, COALESCE(name, title) as name, category, size, uploaded_at, COALESCE(uploaded_by_name, uploaded_by::text) as uploaded_by, created_by, type, COALESCE(file_path, file_url) as file_path, folder_id, drive_url, is_folder,
              share_scope, share_role, shared_with, is_starred, color_tag, description, doc_scope, enterprise_name
       FROM public.documents
-      WHERE code = ${id}
+      WHERE code = ${id} OR id = ${id}
       LIMIT 1
     `.catch(() => []);
 
@@ -295,7 +283,10 @@ export class DocumentsRepository {
     id: string,
   ): Promise<{ filePath: string | null; name: string; createdBy: string | null; uploadedBy: string | null } | null> {
     const rows = await this.prisma.$queryRaw<any[]>`
-      SELECT file_path, name, created_by, uploaded_by FROM public.documents WHERE code = ${id} LIMIT 1
+      SELECT COALESCE(file_path, file_url) as file_path, COALESCE(name, title) as name, created_by, COALESCE(uploaded_by_name, uploaded_by::text) as uploaded_by
+      FROM public.documents
+      WHERE code = ${id} OR id = ${id}
+      LIMIT 1
     `.catch(() => []);
     if (!rows[0]) return null;
     return {
