@@ -2171,11 +2171,9 @@ export class MembersService implements OnModuleInit {
         await this.prisma.$executeRawUnsafe(
           `UPDATE public.event_registrations
            SET member_code = $1
-           WHERE LOWER(TRIM(COALESCE(email, ''))) = $2
-             AND (member_code IS NULL OR TRIM(member_code) = '' OR UPPER(TRIM(member_code)) = $3)`,
+           WHERE LOWER(TRIM(COALESCE(email, ''))) = $2`,
           code,
           memberEmailLower,
-          oldCodeUpper,
         ).catch((err) => {
           console.error('Cascade update member_code by email error:', err?.message);
         });

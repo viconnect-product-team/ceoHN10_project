@@ -5038,7 +5038,7 @@ export class EventsService extends BaseService implements OnModuleInit {
     if (!matchedReg) {
       // Kiểm tra xem mã nhập vào có phải Mã Học Viên trong danh sách CLB không
       const memberRows = await this.prisma.$queryRaw<any[]>`
-        SELECT code, name, contact, email, phone, company_name, position
+        SELECT code, name, contact, email, phone, company_name, executive_role AS position
         FROM public.members
         WHERE UPPER(TRIM(COALESCE(code, ''))) = UPPER(${clean})
            OR LOWER(TRIM(COALESCE(email, ''))) = LOWER(${clean})
