@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/dashboard/AppShell";
+import { TableActionsGroup } from "@/components/common/CustomTable";
 import { CrudModal, type CrudField, type CrudValues } from "@/components/dashboard/CrudModal";
 import { MemberAccountModal } from "@/components/dashboard/MemberAccountModal";
 import { DynamicSchemaEditorModal } from "@/components/dynamic-form/DynamicSchemaEditorModal";
@@ -1232,25 +1233,6 @@ function MembersPage() {
             </div>
           </div>
         </div>
-
-        <div className="flex h-32 flex-col justify-between rounded-2xl border border-border/80 bg-card p-4 shadow-[var(--shadow-card)] transition-all hover:border-blue-500/40 hover:shadow-sm">
-          <div className="flex items-center justify-between gap-2">
-            <span className="truncate text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Đã Thu Hội Phí
-            </span>
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600">
-              <Building2 className="h-4 w-4" />
-            </div>
-          </div>
-          <div>
-            <div className="truncate text-2xl font-bold tracking-tight text-blue-600 dark:text-blue-400">
-              {paidCount} / {members.length}
-            </div>
-            <div className="mt-1 truncate text-[11px] text-muted-foreground">
-              Còn {unpaidCount} Học viên chưa hoàn tất phí
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Pinned + recently viewed rails */}
@@ -1364,25 +1346,11 @@ function MembersPage() {
             renderOption={(v) => t(v)}
           />
           <FilterSelect
-            label={t("members.filter.type")}
-            value={type}
-            onChange={setType}
-            options={TYPES}
-            renderOption={(v) => t(v === "company" ? "type.company" : "type.individual")}
-          />
-          <FilterSelect
             label={t("mlist.filter.status")}
             value={status}
             onChange={setStatus}
             options={STATUSES}
             renderOption={(v) => t(`status.${v}` as TKey)}
-          />
-          <FilterSelect
-            label="Thanh toán"
-            value={paymentFilter}
-            onChange={setPaymentFilter}
-            options={["paid", "unpaid"]}
-            renderOption={(v) => (v === "paid" ? "Đã thanh toán" : "Chưa thanh toán")}
           />
         </div>
 
@@ -1758,7 +1726,7 @@ function MembersPage() {
                       );
                     })}
                     <td className="sticky right-0 z-10 min-w-[160px] bg-card group-hover:bg-muted/70 px-4 py-3.5 text-center border-l border-b border-slate-200 dark:border-slate-800 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)] transition-colors">
-                      <div className="inline-flex items-center justify-center gap-1.5">
+                      <TableActionsGroup maxVisible={3}>
                         {m.status === "pending" && canApprove && (
                           <button
                             onClick={() => handleApproveAndSendCredentials(m)}
@@ -1806,7 +1774,7 @@ function MembersPage() {
                             <Trash2 className="h-4 w-4" />
                           </button>
                         )}
-                      </div>
+                      </TableActionsGroup>
                     </td>
                   </tr>
                 ))}

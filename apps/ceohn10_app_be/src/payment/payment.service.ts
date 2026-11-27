@@ -388,29 +388,124 @@ export class PaymentService {
     const upperContent = content.toUpperCase();
 
     // 6. Xử lý nghiệp vụ theo loại giao dịch
-    // A. Khớp vé sự kiện: CEO1983_EVT_[REG_ID], CEOHN10_SK_[REG_ID], EV[REG_ID]
+    // A. Khớp vé sự kiện: CEO1983_EVT_[REG_ID], CEO1983EVT[REG_ID] (khi ngân hàng bỏ dấu _/-), CEOHN10_SK_[REG_ID], EV[REG_ID]
     const eventMatch =
-      upperContent.match(/CEO1983_EVT_([A-Z0-9-]+)/i) ||
-      upperContent.match(new RegExp(`${config.prefixEvent}_([A-Z0-9-]+)`, 'i')) ||
-      upperContent.match(/CEOHN10_([A-Z0-9-]+)/i) ||
-      upperContent.match(/EVT_([A-Z0-9-]+)/i) ||
+      upperContent.match(/CEO1983[_-]?EVT[_-]?([A-Z0-9-]+)/i) ||
+      upperContent.match(new RegExp(`${config.prefixEvent.replace(/[_-]/g, '[_-]?')}[_-]?([A-Z0-9-]+)`, 'i')) ||
+      upperContent.match(/CEOHN10[_-]?([A-Z0-9-]+)/i) ||
+      upperContent.match(/EVT[_-]?([A-Z0-9-]+)/i) ||
       upperContent.match(/(?:^|[^A-Z0-9])EV([A-Z0-9-]+)/i);
 
     if (eventMatch && eventMatch[1]) {
       const regId = eventMatch[1];
+
+      // Lấy thông tin đăng ký và sự kiện trước khi xác nhận thanh toán (hỗ trợ khớp cả khi ngân hàng bỏ dấu gạch ngang)
+      const regRows = await this.prisma.$queryRawUnsafe<any[]>(`
+        SELECT r.*, e.name as event_name, e.date as event_date, e.status as event_status, e.location as event_location, e.time as event_time 
+        FROM public.event_registrations r
+        LEFT JOIN public.events e ON e.id = r.event_id
+        WHERE r.id = $1
+           OR REPLACE(REPLACE(UPPER(r.id), '-', ''), '_', '') = REPLACE(REPLACE(UPPER($1), '-', ''), '_', '')
+           OR UPPER(r.member_code) = UPPER($1)
+           OR r.note ILIKE '%' || $1 || '%'
+      `, regId).catch(() => []);
+
+      const isEndedEvent = (row: any) => {
+        if (!row) return false;
+        const st = String(row.event_status || '').toLowerCase();
+        if (st === 'ended' || st === 'completed' || st === 'cancelled') return true;
+        if (row.event_date) {
+          const d = new Date(row.event_date);
+          if (!isNaN(d.getTime())) {
+            d.setHours(23, 59, 59, 999);
+            if (d.getTime() < Date.now()) return true;
+          }
+        }
+        return false;
+      };
+
+      if (regRows.length > 0 && regRows.some(isEndedEvent)) {
+        const endedReg = regRows[0];
+        await this.prisma.$executeRawUnsafe(`
+          UPDATE public.event_registrations
+          SET payment_status = 'refund_required', updated_at = NOW()
+          WHERE id = $1
+        `, endedReg.id).catch(() => {});
+
+        await this.prisma.$executeRawUnsafe(`
+          INSERT INTO public.financial_report_rows (
+            id, transaction_date, voucher_no, category, description,
+            income_amount, expense_amount, balance_after, party_name, status,
+            custom_data, created_at, updated_at
+          ) VALUES (
+            gen_random_uuid(), NOW()::date, $1, 'Hoàn tiền (Sự kiện đã kết thúc)', $2,
+            $3, 0, 0, $4, 'refund_required',
+            $5::jsonb, NOW(), NOW()
+          )
+        `,
+          `REFUND-${String(gatewayId || regId).slice(0, 18)}`,
+          `[CẦN HOÀN TIỀN] Giao dịch SePay cho sự kiện đã kết thúc "${endedReg.event_name || ''}" (Mã vé: ${endedReg.id})`,
+          transferAmount,
+          endedReg.member_name || 'Khách chuyển khoản',
+          JSON.stringify({
+            department: 'Ban Sự Kiện',
+            sourceFund: 'SePay VietQR',
+            targetFund: 'Chờ hoàn trả người thanh toán',
+            type: 'REFUND_REQUIRED',
+            refundRequired: true,
+            regId: endedReg.id,
+            eventId: endedReg.event_id,
+          }),
+        ).catch(() => {});
+
+        if (eventId) {
+          await this.prisma.sepay_webhook_events.update({
+            where: { id: eventId },
+            data: {
+              status: 'REFUND_REQUIRED',
+              matched_order_id: regId,
+              error_message: 'Sự kiện đã kết thúc — Cần hoàn trả lại tiền cho người thanh toán',
+            },
+          }).catch(() => {});
+        }
+
+        if (endedReg.email && String(endedReg.email).includes('@')) {
+          this.mailService.sendDirectEmail({
+            to: endedReg.email,
+            subject: `[CEO HN10] Thông báo hoàn trả giao dịch — Sự kiện "${endedReg.event_name || ''}" đã kết thúc`,
+            html: `<p>Kính gửi Anh/Chị <strong>${endedReg.member_name || 'Quý đại biểu'}</strong>,</p>
+              <p>Hệ thống vừa nhận được khoản chuyển khoản <strong>${Number(transferAmount).toLocaleString('vi-VN')} đ</strong> cho mã vé <strong>${endedReg.id}</strong>.</p>
+              <p>Tuy nhiên, sự kiện <strong>"${endedReg.event_name || ''}"</strong> đã kết thúc nên vé không thể kích hoạt. Hệ thống đã tự động ghi nhận yêu cầu <strong>hoàn trả tiền</strong> và thông báo cho Ban Tài Chính / Ban Sự Kiện để chuyển hoàn lại cho Quý Anh/Chị.</p>
+              <p>Trân trọng,<br/>CLB Doanh Nhân CEO HN10</p>`,
+          }).catch(() => {});
+        }
+
+        if (endedReg.phone && this.zaloService) {
+          this.zaloService.sendAutoNotification({
+            recipientPhone: endedReg.phone,
+            recipientName: endedReg.member_name || 'Quý Anh/Chị',
+            title: `Thông báo hoàn tiền: ${endedReg.event_name || 'Sự kiện đã kết thúc'}`,
+            content: `Sự kiện "${endedReg.event_name || ''}" đã kết thúc nên khoản thanh toán ${Number(transferAmount).toLocaleString('vi-VN')} đ (Mã vé: ${endedReg.id}) không thể kích hoạt vé. Hệ thống đã ghi nhận yêu cầu hoàn trả lại cho Anh/Chị.`,
+          }).catch(() => {});
+        }
+
+        return {
+          success: false,
+          status: 'REFUND_REQUIRED',
+          matched: 'event_ended',
+          regId: endedReg.id,
+          message: 'Sự kiện đã kết thúc, không thể thanh toán vé. Hệ thống đã ghi nhận yêu cầu hoàn trả tiền.',
+        };
+      }
+
       await this.prisma.$executeRawUnsafe(`
         UPDATE public.event_registrations 
         SET payment_status = 'paid', status = 'confirmed', payment_amount = $1, paid_at = NOW(), updated_at = NOW()
-        WHERE id = $2 OR UPPER(member_code) = UPPER($2) OR note ILIKE '%' || $2 || '%'
+        WHERE id = $2
+           OR REPLACE(REPLACE(UPPER(id), '-', ''), '_', '') = REPLACE(REPLACE(UPPER($2), '-', ''), '_', '')
+           OR UPPER(member_code) = UPPER($2)
+           OR note ILIKE '%' || $2 || '%'
       `, transferAmount, regId).catch(() => {});
-
-      // Ghi nhận vào sổ quỹ CRM
-      const regRows = await this.prisma.$queryRawUnsafe<any[]>(`
-        SELECT r.*, e.name as event_name, e.date as event_date, e.location as event_location, e.time as event_time 
-        FROM public.event_registrations r
-        LEFT JOIN public.events e ON e.id = r.event_id
-        WHERE r.id = $1 OR UPPER(r.member_code) = UPPER($1) OR r.note ILIKE '%' || $1 || '%'
-      `, regId).catch(() => []);
 
       if (regRows.length > 0) {
         for (const reg of regRows) {

@@ -8,6 +8,7 @@ import {
   Body,
   Query,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -34,7 +35,6 @@ export class FinancialReportController {
   @Post('columns')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @RequireActions('FIN_COL_ADD')
-  @DataScopeLevel('ALL')
   async addColumn(@Body() body: AddColumnDto) {
     return this.financialReportService.addColumn(body);
   }
@@ -64,8 +64,10 @@ export class FinancialReportController {
     @Query('fromDate') fromDate?: string,
     @Query('toDate') toDate?: string,
     @Query('category') category?: string,
+    @Query('fundId') fundId?: string,
+    @Query('department') department?: string,
   ) {
-    return this.financialReportService.getRows({ fromDate, toDate, category });
+    return this.financialReportService.getRows({ fromDate, toDate, category, fundId, department });
   }
 
   @Post('rows')
@@ -90,6 +92,43 @@ export class FinancialReportController {
   }
 
   // ── LỆNH ĐIỀU CHUYỂN NGÂN SÁCH QUỸ BAN CHUYÊN MÔN (BAN CÔNG NGHỆ) ───────────
+
+  @Get('fund-transfers')
+  @UseGuards(JwtAuthGuard)
+  async getFundTransferOrders() {
+    return this.financialReportService.getFundTransferOrders();
+  }
+
+  @Post('fund-transfers')
+  @UseGuards(JwtAuthGuard)
+  async createFundTransferOrder(
+    @Req() req: any,
+    @Body()
+    body: {
+      direction?: 'master_to_dept' | 'dept_to_master';
+      sourceFundId?: string;
+      destinationFundId?: string;
+      sourceFundName?: string;
+      destinationFundName?: string;
+      amount: number;
+      description?: string;
+      transferDate?: string;
+    },
+  ) {
+    return this.financialReportService.createFundTransferOrder(req.user, body);
+  }
+
+  @Post('fund-transfers/:id/accept')
+  @UseGuards(JwtAuthGuard)
+  async acceptFundTransferOrder(@Req() req: any, @Param('id') id: string) {
+    return this.financialReportService.acceptFundTransferOrder(req.user, id);
+  }
+
+  @Delete('fund-transfers/:id')
+  @UseGuards(JwtAuthGuard)
+  async deleteFundTransferOrder(@Param('id') id: string) {
+    return this.financialReportService.deleteFundTransferOrder(id);
+  }
 
   @Post('fund-transfer')
   @UseGuards(JwtAuthGuard, RolesGuard)

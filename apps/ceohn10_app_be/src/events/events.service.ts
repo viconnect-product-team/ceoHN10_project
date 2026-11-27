@@ -136,14 +136,26 @@ export class EventsService extends BaseService implements OnModuleInit {
     const roles = await this.prisma.$queryRaw<any[]>`
       SELECT role::text FROM public.user_roles WHERE user_id::text = ${userId}::text
     `.catch(() => [] as any[]);
-    if (
-      roles.some(
-        (r: any) =>
-          r.role === 'platform_admin' ||
-          r.role === 'tenant_admin' ||
-          r.role === 'admin',
-      )
-    ) {
+    const fullRoles = ['platform_admin', 'admin_platform', 'superadmin', 'tenant_admin', 'adm', 'admin', 'lop_truong', 'lớp trưởng', 'chu_tich', 'chủ tịch', 'quan_tri'];
+    if (roles.some((r: any) => fullRoles.includes(String(r.role || '').toLowerCase().trim()))) {
+      return true;
+    }
+    const memRoles = await this.prisma.$queryRaw<any[]>`
+      SELECT role::text FROM public.memberships WHERE user_id::text = ${userId}::text
+    `.catch(() => [] as any[]);
+    if (memRoles.some((r: any) => fullRoles.includes(String(r.role || '').toLowerCase().trim()))) {
+      return true;
+    }
+    const mExec = await this.prisma.$queryRaw<any[]>`
+      SELECT executive_role::text FROM public.members WHERE user_id::text = ${userId}::text OR id::text = ${userId}::text LIMIT 1
+    `.catch(() => [] as any[]);
+    if (mExec.some((r: any) => fullRoles.includes(String(r.executive_role || '').toLowerCase().trim()))) {
+      return true;
+    }
+    const cUsers = await this.prisma.$queryRaw<any[]>`
+      SELECT email, username, role FROM public.ceohn10_users WHERE id::text = ${userId}::text LIMIT 1
+    `.catch(() => [] as any[]);
+    if (cUsers.some((u: any) => fullRoles.includes(String(u.role || '').toLowerCase().trim()) || ['admin@ceohn10.vn', 'admin@viconnect.vn', 'admin@connect.vn', 'ceo.chutich@ceohn10.com'].includes(String(u.email || '').toLowerCase().trim()))) {
       return true;
     }
     const vUsers = await this.prisma.$queryRaw<any[]>`
@@ -879,6 +891,9 @@ export class EventsService extends BaseService implements OnModuleInit {
     await this.prisma.$executeRawUnsafe(
       `ALTER TABLE public.events ADD COLUMN IF NOT EXISTS category TEXT DEFAULT 'su_kien_clb'`,
     ).catch(() => {});
+    await this.prisma.$executeRawUnsafe(
+      `ALTER TABLE public.events ADD COLUMN IF NOT EXISTS created_by TEXT`,
+    ).catch(() => {});
 
     try {
       await this.prisma.$executeRaw`
@@ -965,6 +980,12 @@ export class EventsService extends BaseService implements OnModuleInit {
           )
         `;
       }
+    }
+
+    if (userId && userId !== 'guest') {
+      await this.prisma.$executeRaw`
+        UPDATE public.events SET created_by = ${String(userId)} WHERE id = ${eventId}
+      `.catch(() => {});
     }
 
     // Handle ticket types if provided (wizard)
@@ -1102,10 +1123,12 @@ export class EventsService extends BaseService implements OnModuleInit {
     }
 
     const current = existing[0];
-    const isAdmin = await this.checkIsAdmin(userId, current.association_id);
+    const isFullAdmin = await this.checkIsPlatformAdmin(userId);
+    const isOwner = Boolean(current.created_by && String(current.created_by) === String(userId));
+    const isAdmin = isFullAdmin || isOwner || (await this.checkIsAdmin(userId, current.association_id));
     if (!isAdmin) {
       throw new ForbiddenException(
-        'Chỉ quản trị viên mới có quyền cập nhật sự kiện',
+        'Chỉ Lớp trưởng, Platform Admin hoặc người tạo sự kiện mới có quyền cập nhật sự kiện này',
       );
     }
 
@@ -1491,10 +1514,12 @@ export class EventsService extends BaseService implements OnModuleInit {
     }
 
     const current = existing[0];
-    const isAdmin = await this.checkIsAdmin(userId, current.association_id);
+    const isFullAdmin = await this.checkIsPlatformAdmin(userId);
+    const isOwner = Boolean(current.created_by && String(current.created_by) === String(userId));
+    const isAdmin = isFullAdmin || isOwner || (await this.checkIsAdmin(userId, current.association_id));
     if (!isAdmin) {
       throw new ForbiddenException(
-        'Chỉ quản trị viên mới có quyền cập nhật sự kiện',
+        'Chỉ Lớp trưởng, Platform Admin hoặc người tạo sự kiện mới có quyền cập nhật sự kiện này',
       );
     }
 
@@ -1662,6 +1687,7 @@ export class EventsService extends BaseService implements OnModuleInit {
         qrStaff: parseJsonArraySafe(e.qr_scanners),
         sponsors: parseJsonArraySafe(e.sponsors),
         description: e.description ?? '',
+        createdBy: e.created_by ?? null,
         communityName: e.association_name ?? null,
         associationName: e.association_name ?? null,
         associationId: e.association_id ?? null,
@@ -1755,6 +1781,20 @@ export class EventsService extends BaseService implements OnModuleInit {
     }
 
     const event = eventRows[0];
+    const evStatus = String(event.status || '').toLowerCase();
+    const isDatePast = (() => {
+      if (!event.date) return false;
+      const d = new Date(event.date);
+      if (isNaN(d.getTime())) return false;
+      d.setHours(23, 59, 59, 999);
+      return d.getTime() < Date.now();
+    })();
+    if (evStatus === 'ended' || evStatus === 'completed' || evStatus === 'cancelled' || isDatePast) {
+      throw new BadRequestException(
+        'Sự kiện đã kết thúc, không thể đăng ký hoặc thực hiện thanh toán',
+      );
+    }
+
     const capacityNum = Number(event.capacity ?? 0);
     const registeredNum = Number(event.registered ?? 0);
     if (capacityNum > 0 && registeredNum >= capacityNum) {
@@ -4069,10 +4109,18 @@ export class EventsService extends BaseService implements OnModuleInit {
     id: string,
   ): Promise<{ success: boolean; id: string }> {
     const events = await this.prisma.$queryRaw<any[]>`
-      SELECT id FROM public.events WHERE id = ${id} LIMIT 1
+      SELECT id, created_by FROM public.events WHERE id = ${id} LIMIT 1
     `;
     if (!events.length) {
       throw new NotFoundException(`Không tìm thấy sự kiện với mã: ${id}`);
+    }
+
+    const isFullAdmin = await this.checkIsPlatformAdmin(userId);
+    const isOwner = Boolean(events[0].created_by && String(events[0].created_by) === String(userId));
+    if (!isFullAdmin && !isOwner) {
+      throw new ForbiddenException(
+        'Bạn không có quyền xóa dữ liệu sự kiện do tài khoản khác tạo. Chỉ Lớp trưởng hoặc Platform Admin mới có toàn quyền xóa.',
+      );
     }
 
     // Cascade cleanups
@@ -7164,6 +7212,19 @@ export class EventsService extends BaseService implements OnModuleInit {
     const eventTitle = ev.name || 'Sự kiện CLB CEO HN10';
 
     const attendMode: 'single_part' | 'full' | 'declined' = body.attendMode || 'full';
+    const evStatus = String(ev.status || '').toLowerCase();
+    const isDatePast = (() => {
+      if (!ev.date) return false;
+      const d = new Date(ev.date);
+      if (isNaN(d.getTime())) return false;
+      d.setHours(23, 59, 59, 999);
+      return d.getTime() < Date.now();
+    })();
+    if (attendMode !== 'declined' && (evStatus === 'ended' || evStatus === 'completed' || evStatus === 'cancelled' || isDatePast)) {
+      throw new BadRequestException(
+        'Sự kiện đã kết thúc, không thể đăng ký hoặc thực hiện thanh toán',
+      );
+    }
     const fullName = String(body.fullName || 'Khách mời').trim();
     const title = String(body.title || '').trim();
     const company = String(body.company || '').trim();

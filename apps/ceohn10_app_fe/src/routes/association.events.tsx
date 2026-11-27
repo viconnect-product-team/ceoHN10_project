@@ -37,7 +37,14 @@ import {
   AlertTriangle,
   Share2,
   Headphones,
+  ScanLine,
+  Camera,
+  LogIn,
+  LogOut,
+  Pencil,
+  Trash2,
 } from "lucide-react";
+import { useQrScanner } from "@/hooks/use-qr-scanner";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { MemberHeader } from "@/components/member/MemberShell";
@@ -859,201 +866,6 @@ export function formatEventTimeRange(ev: any, title?: string): string {
   return "08:00 - 17:30";
 }
 
-const defaultUpcomingEvents: MyEvent[] = [
-  {
-    id: "ev-upcoming-01",
-    title: "Hội Thảo Giao Thương & Chuyển Đổi Số CEO HN10 (Miễn Phí)",
-    date: "2026-11-12T00:00:00Z",
-    place: "Hội trường Cung Tri Thức Thành Phố, Cầu Giấy, Hà Nội",
-    time: "00:00",
-    ticketPrice: 0,
-    image: defaultEventImages[0],
-    category: "Giao thương B2B",
-  } as any,
-  {
-    id: "ev-upcoming-02",
-    title: "Diễn Đàn Quản Trị & Xúc Tiến Đầu Tư Quốc Tế CEO HN10",
-    date: "2026-11-20T08:30:00Z",
-    place: "Trung tâm Hội nghị Quốc gia, Hà Nội",
-    time: "08:30",
-    ticketPrice: 0,
-    image: defaultEventImages[1],
-    category: "Giao thương B2B",
-  } as any,
-  {
-    id: "ev-upcoming-03",
-    title: "Gala Doanh Nhân CEO HN10 Toàn Quốc",
-    date: "2026-12-05T18:00:00Z",
-    place: "Khách sạn JW Marriott, Hà Nội",
-    time: "18:00",
-    ticketPrice: 500000,
-    image: defaultEventImages[2],
-    category: "Gala & Đại hội",
-  } as any,
-];
-
-const defaultAllEvents: MyEvent[] = [
-  {
-    id: "e1983000-0000-4000-8000-000000000001",
-    title: "Đại Hội Thường Niên & Gala Vinh Danh CEO HN10 Xuất Sắc",
-    name: "Đại Hội Thường Niên & Gala Vinh Danh CEO HN10 Xuất Sắc",
-    date: "2026-11-28T18:00:00Z",
-    place: "Trung Tâm Hội Nghị Quốc Gia (NCC), Số 1 Đại Lộ Thăng Long, Hà Nội",
-    location: "Trung Tâm Hội Nghị Quốc Gia (NCC), Số 1 Đại Lộ Thăng Long, Hà Nội",
-    time: "18:00",
-    ticketPrice: 500000,
-    fee: 500000,
-    image: "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80",
-    category: "Gala & Đại Hội",
-    type: "Gala & Đại Hội",
-    statusText: "Đang mở bán vé (500.000 đ)",
-  } as any,
-  {
-    id: "e1983000-0000-4000-8000-000000000002",
-    title: "Diễn Đàn Kết Nối Giao Thương B2B & Chuỗi Cung Ứng 2026",
-    name: "Diễn Đàn Kết Nối Giao Thương B2B & Chuỗi Cung Ứng 2026",
-    date: "2026-11-18T08:30:00Z",
-    place: "Khách sạn JW Marriott Hanoi, Số 8 Đỗ Đức Dục, Nam Từ Liêm, Hà Nội",
-    location: "Khách sạn JW Marriott Hanoi, Số 8 Đỗ Đức Dục, Nam Từ Liêm, Hà Nội",
-    time: "08:30",
-    ticketPrice: 0,
-    fee: 0,
-    image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80",
-    category: "Giao thương B2B",
-    type: "Giao thương B2B",
-    statusText: "Miễn phí",
-  } as any,
-  {
-    id: "e1983000-0000-4000-8000-000000000003",
-    title: "Tọa Đàm: Quản Trị Tối Ưu Dòng Tiền & Tái Cấu Trúc Vốn Doanh Nghiệp",
-    name: "Tọa Đàm: Quản Trị Tối Ưu Dòng Tiền & Tái Cấu Trúc Vốn Doanh Nghiệp",
-    date: "2026-11-22T14:00:00Z",
-    place: "Cung Tri Thức Thành Phố, Số 1 Tôn Thất Thuyết, Cầu Giấy, Hà Nội",
-    location: "Cung Tri Thức Thành Phố, Số 1 Tôn Thất Thuyết, Cầu Giấy, Hà Nội",
-    time: "14:00",
-    ticketPrice: 0,
-    fee: 0,
-    image: "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=80",
-    category: "Đào tạo & Tọa đàm",
-    type: "Đào tạo & Tọa đàm",
-    statusText: "Miễn phí",
-  } as any,
-  {
-    id: "e1983000-0000-4000-8000-000000000004",
-    title: "Caravan Doanh Nhân CEO HN10: Hành Trình Kết Nối & Thiện Nguyện Tây Bắc",
-    name: "Caravan Doanh Nhân CEO HN10: Hành Trình Kết Nối & Thiện Nguyện Tây Bắc",
-    date: "2026-12-05T06:00:00Z",
-    place: "Xuất phát từ Hà Nội - Yên Bái - Sapa (Lào Cai)",
-    location: "Xuất phát từ Hà Nội - Yên Bái - Sapa (Lào Cai)",
-    time: "06:00",
-    ticketPrice: 3500000,
-    fee: 3500000,
-    image: "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1200&q=80",
-    category: "Caravan & Xúc tiến",
-    type: "Caravan & Xúc tiến",
-    statusText: "3.500.000 đ",
-  } as any,
-  {
-    id: "e1983000-0000-4000-8000-000000000005",
-    title: "Cafe Doanh Nhân Sáng Thứ 6: Chia Sẻ Cơ Hội Hợp Tác Đầu Tư B2B",
-    name: "Cafe Doanh Nhân Sáng Thứ 6: Chia Sẻ Cơ Hội Hợp Tác Đầu Tư B2B",
-    date: "2026-11-20T07:30:00Z",
-    place: "Trung Nguyên Legend Cafe, Tòa nhà Keangnam Landmark 72, Cầu Giấy, Hà Nội",
-    location: "Trung Nguyên Legend Cafe, Tòa nhà Keangnam Landmark 72, Cầu Giấy, Hà Nội",
-    time: "07:30",
-    ticketPrice: 0,
-    fee: 0,
-    image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=80",
-    category: "Cafe Doanh Nhân",
-    type: "Cafe Doanh Nhân",
-    statusText: "Miễn phí",
-  } as any,
-  {
-    id: "e1983000-0000-4000-8000-000000000006",
-    title: "Workshop: Ứng Dụng AI & Tự Động Hóa Vận Hành Doanh Nghiệp SME",
-    name: "Workshop: Ứng Dụng AI & Tự Động Hóa Vận Hành Doanh Nghiệp SME",
-    date: "2026-11-25T13:30:00Z",
-    place: "Phòng Hội Thảo Tầng 12, Tòa nhà CEO HN10 Tower, Hà Nội & Online Zoom",
-    location: "Phòng Hội Thảo Tầng 12, Tòa nhà CEO HN10 Tower, Hà Nội & Online Zoom",
-    time: "13:30",
-    ticketPrice: 0,
-    fee: 0,
-    image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1200&q=80",
-    category: "Đào tạo & Tọa đàm",
-    type: "Đào tạo & Tọa đàm",
-    statusText: "Miễn phí",
-  } as any,
-  {
-    id: "e1983000-0000-4000-8000-000000000007",
-    title: "Giải Golf Hữu Nghị CEO HN10 Championship 2026",
-    name: "Giải Golf Hữu Nghị CEO HN10 Championship 2026",
-    date: "2026-12-12T06:30:00Z",
-    place: "Sân Golf Long Biên, Phúc Đồng, Long Biên, Hà Nội",
-    location: "Sân Golf Long Biên, Phúc Đồng, Long Biên, Hà Nội",
-    time: "06:30",
-    ticketPrice: 2800000,
-    fee: 2800000,
-    image: "https://images.unsplash.com/photo-1535131749006-b7f58c99034b?auto=format&fit=crop&w=1200&q=80",
-    category: "Thể thao & Giao lưu",
-    type: "Thể thao & Giao lưu",
-    statusText: "2.800.000 đ",
-  } as any,
-  {
-    id: "e1983000-0000-4000-8000-000000000008",
-    title: "Lễ Kỷ Niệm 4 Năm Thành Lập CLB Doanh Nhân CEO HN10 (2022 - 2026)",
-    name: "Lễ Kỷ Niệm 4 Năm Thành Lập CLB Doanh Nhân CEO HN10 (2022 - 2026)",
-    date: "2026-10-15T18:30:00Z",
-    place: "Khách sạn Pan Pacific Hanoi, Số 1 Thanh Niên, Ba Đình, Hà Nội",
-    location: "Khách sạn Pan Pacific Hanoi, Số 1 Thanh Niên, Ba Đình, Hà Nội",
-    time: "18:30",
-    ticketPrice: 0,
-    fee: 0,
-    image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80",
-    category: "Gala & Đại Hội",
-    type: "Gala & Đại Hội",
-    statusText: "Đã diễn ra",
-  } as any,
-];
-
-const defaultRecentEvents = [
-  {
-    id: "rec-01",
-    title: "Test Event Paid ID Catch",
-    subtitle: "CEO HN10",
-    image: defaultEventImages[3],
-    event: defaultAllEvents[0],
-  },
-  {
-    id: "rec-02",
-    title: "Test Event Paid ID Catch",
-    subtitle: "CEO HN10",
-    image: defaultEventImages[4],
-    event: defaultAllEvents[1],
-  },
-];
-
-const defaultMeetingsList = [
-  {
-    id: "meet-demo-01",
-    title: "Họp Ban Chấp Hành Định Kỳ Tháng 11/2026",
-    time: "09:00 - 11:30",
-    location: "Cung Tri Thức Hà Nội, Số 1 Tôn Thất Thuyết",
-    isOnline: false,
-    category: "fixed_committee",
-    isExtraordinary: false,
-  },
-  {
-    id: "meet-demo-03",
-    title: "Họp Ban Thư Ký & Ban Truyền Thông Chuẩn Bị Sự Kiện",
-    time: "14:30 - 16:30",
-    location: "Văn phòng Hiệp hội CEO HN10",
-    meetingLink: "https://meet.jit.si/CEOHN10_Committee_Meeting",
-    isOnline: true,
-    category: "fixed_committee",
-    isExtraordinary: false,
-  },
-];
-
 function FeaturedUpcomingEventHero({
   events,
   onSelectEvent,
@@ -1189,6 +1001,233 @@ function EventsScreen() {
   const { data: serverEvents, loading, reload } = useServerData<MyEvent[]>(() => fetchEvents(), [], "vba_events");
   const { data: member } = useServerData<MyMember | null>(() => fetchMember(), null, "vba_my_member");
   const [clientEvents, setClientEvents] = useState<MyEvent[]>([]);
+
+  // ── PHÂN QUYỀN TOÀN HỆ THỐNG & QUYỀN SỞ HỮU DỮ LIỆU ──
+  const userRolesNorm = useMemo(() => {
+    const raw: any[] = [
+      (user as any)?.role,
+      ...(((user as any)?.roles as any[]) || []),
+      (user as any)?.executiveRole,
+      (member as any)?.executiveRole,
+      (member as any)?.role,
+    ].filter(Boolean);
+    return raw.map((r) => String(r).toLowerCase().trim());
+  }, [user, member]);
+
+  const isFullAdmin = useMemo(() => {
+    const email = String((user as any)?.email || "").toLowerCase().trim();
+    if (
+      email === "admin@ceohn10.vn" ||
+      email === "admin@viconnect.vn" ||
+      email === "admin@connect.vn" ||
+      email === "ceo.chutich@ceohn10.com" ||
+      Boolean((user as any)?.isAdmin)
+    ) {
+      return true;
+    }
+    return userRolesNorm.some((r) =>
+      [
+        "platform_admin",
+        "admin_platform",
+        "superadmin",
+        "adm",
+        "admin",
+        "lop_truong",
+        "lớp trưởng",
+        "chu_tich",
+        "chủ tịch",
+        "quan_tri",
+      ].includes(r),
+    );
+  }, [user, userRolesNorm]);
+
+  const userPermsNorm = useMemo(() => {
+    const perms = Array.isArray((user as any)?.permissions) ? (user as any).permissions : [];
+    return perms.map((p: any) => String(p).toLowerCase().trim());
+  }, [user]);
+
+  const isEventCreator = (ev: any) =>
+    Boolean(ev?.createdBy && (user as any)?.id && String(ev.createdBy) === String((user as any).id));
+
+  const canEditEvent = (ev: any) =>
+    isFullAdmin ||
+    isEventCreator(ev) ||
+    userPermsNorm.includes("*") ||
+    userPermsNorm.includes("evt_edit");
+
+  const canDeleteEvent = (ev: any) => isFullAdmin || isEventCreator(ev);
+
+  const canScanEventQr = (ev: any | null) => {
+    if (isFullAdmin) return true;
+    if (ev && isEventCreator(ev)) return true;
+    if (
+      userRolesNorm.some(
+        (r) =>
+          r.includes("truong_ban") ||
+          r.includes("ban_su_kien") ||
+          r.includes("ban_truyen_thong") ||
+          r === "btt" ||
+          r === "bqt",
+      )
+    ) {
+      return true;
+    }
+    if (ev && Array.isArray(ev.qrScanners)) {
+      const uid = String((user as any)?.id || "");
+      const uEmail = String((user as any)?.email || "").toLowerCase();
+      return ev.qrScanners.some((s: any) => {
+        const sId = String(s?.id || s?.userId || s || "");
+        const sEmail = String(s?.email || "").toLowerCase();
+        return (uid && sId === uid) || (uEmail && sEmail === uEmail);
+      });
+    }
+    return false;
+  };
+
+  // ── CHỈNH SỬA & XÓA SỰ KIỆN TRÊN APP ──
+  const [editingEvent, setEditingEvent] = useState<any | null>(null);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    date: "",
+    time: "",
+    location: "",
+    capacity: "200",
+    ticketPrice: "0",
+    status: "upcoming",
+    description: "",
+  });
+  const [savingEdit, setSavingEdit] = useState(false);
+
+  const handleOpenEditEvent = (ev: any) => {
+    setSelectedEvent(null);
+    setEditingEvent(ev);
+    const rawDate = ev.date ? String(ev.date).slice(0, 10) : "";
+    setEditForm({
+      name: ev.title || ev.name || "",
+      date: rawDate,
+      time: ev.time || "08:00 - 17:30",
+      location: ev.place || ev.location || "",
+      capacity: String(ev.capacity || 200),
+      ticketPrice: String(ev.ticketPrice ?? ev.fee ?? 0),
+      status: ev.status || "upcoming",
+      description: ev.description || "",
+    });
+  };
+
+  const handleSaveEditEvent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingEvent) return;
+    setSavingEdit(true);
+    try {
+      await fetchNestApi(`/events/${editingEvent.id}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          name: editForm.name,
+          date: editForm.date || undefined,
+          time: editForm.time,
+          location: editForm.location,
+          capacity: Number(editForm.capacity) || 200,
+          ticketPrice: Number(editForm.ticketPrice) || 0,
+          status: editForm.status,
+          description: editForm.description,
+        }),
+      });
+      toast.success("Đã cập nhật thông tin sự kiện!");
+      setEditingEvent(null);
+      await loadEventsDirect();
+      reload();
+    } catch (err: any) {
+      toast.error(err?.message || "Không thể cập nhật sự kiện");
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
+  const handleDeleteEvent = async (ev: any) => {
+    if (!ev?.id) return;
+    if (typeof window !== "undefined" && !window.confirm(`Bạn có chắc chắn muốn xóa sự kiện "${ev.title || ev.name}"? Thao tác này không thể hoàn tác.`)) {
+      return;
+    }
+    setBusy(ev.id);
+    try {
+      await fetchNestApi(`/events/${ev.id}`, { method: "DELETE" });
+      toast.success("Đã xóa sự kiện thành công!");
+      setSelectedEvent(null);
+      await loadEventsDirect();
+      reload();
+    } catch (err: any) {
+      toast.error(err?.message || "Không có quyền hoặc không thể xóa sự kiện");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  // ── MÁY QUÉT QR CHECK-IN / CHECK-OUT SỰ KIỆN ──
+  const [qrScannerOpen, setQrScannerOpen] = useState(false);
+  const [qrScannerEvent, setQrScannerEvent] = useState<any | null>(null);
+  const [qrScanMode, setQrScanMode] = useState<"checkin" | "checkout">("checkin");
+  const [manualTicketCode, setManualTicketCode] = useState("");
+  const [scanBusy, setScanBusy] = useState(false);
+  const [scanResult, setScanResult] = useState<{ ok: boolean; message: string; data?: any } | null>(null);
+
+  const handleProcessTicketQr = async (rawInput: string) => {
+    const trimmed = String(rawInput || "").trim();
+    if (!trimmed) {
+      toast.error("Vui lòng nhập hoặc quét mã vé / QR đại biểu");
+      return;
+    }
+    let code = trimmed;
+    try {
+      const parsed = JSON.parse(trimmed);
+      code = parsed.ticketCode || parsed.code || parsed.id || trimmed;
+    } catch {
+      if (trimmed.includes("ticket=")) {
+        const m = trimmed.match(/ticket=([^&\s]+)/);
+        if (m) code = decodeURIComponent(m[1]);
+      } else if (trimmed.includes("code=")) {
+        const m = trimmed.match(/code=([^&\s]+)/);
+        if (m) code = decodeURIComponent(m[1]);
+      }
+    }
+    setScanBusy(true);
+    setScanResult(null);
+    try {
+      const endpoint = qrScanMode === "checkout" ? "/events/ticket-checkout" : "/events/ticket-checkin";
+      const res: any = await fetchNestApi(endpoint, {
+        method: "POST",
+        body: JSON.stringify({ ticketCode: code, method: "app_qr_scanner" }),
+      });
+      const msg =
+        qrScanMode === "checkout"
+          ? `Check-out thành công cho vé ${code}`
+          : `Check-in thành công cho vé ${code}`;
+      setScanResult({ ok: true, message: res?.message || msg, data: res });
+      toast.success(res?.message || msg);
+      setManualTicketCode("");
+    } catch (err: any) {
+      const msg = err?.message || "Không tìm thấy vé hoặc vé đã được xử lý";
+      setScanResult({ ok: false, message: msg });
+      toast.error(msg);
+    } finally {
+      setScanBusy(false);
+    }
+  };
+
+  const {
+    videoRef: qrVideoRef,
+    status: qrCamStatus,
+  } = useQrScanner({
+    active: qrScannerOpen,
+    onDetect: (raw: string) => {
+      if (!scanBusy) handleProcessTicketQr(raw);
+    },
+  });
+
+  useEffect(() => {
+    if (!qrScannerOpen) {
+      setScanResult(null);
+    }
+  }, [qrScannerOpen]);
 
   const loadEventsDirect = async () => {
     try {
@@ -2095,14 +2134,30 @@ function EventsScreen() {
             </div>
           </div>
 
-          {/* Calendar / Action button */}
-          <Link
-            to="/association/calendar"
-            className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 flex justify-start items-center gap-1.5 active:scale-95 transition cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800"
-            title="Lịch sự kiện & cuộc họp"
-          >
-            <img src={mainTab === "meetings" ? "/icons/activities/calendar-02.svg" : "/icons/events/calendar-02.svg"} className="size-5" alt="calendar" />
-          </Link>
+          {/* Calendar & QR Check-in/Out Actions */}
+          <div className="flex items-center gap-1.5">
+            {(isFullAdmin || canScanEventQr(null)) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setQrScannerEvent(null);
+                  setQrScannerOpen(true);
+                }}
+                className="px-2.5 py-2 rounded-lg bg-[#003B95] hover:bg-[#002B70] text-white flex items-center gap-1.5 text-xs font-bold shadow-xs active:scale-95 transition cursor-pointer"
+                title="Quét QR Check-in / Check-out sự kiện"
+              >
+                <ScanLine className="size-4 text-amber-300" />
+                <span className="hidden sm:inline">Quét QR</span>
+              </button>
+            )}
+            <Link
+              to="/association/calendar"
+              className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 flex justify-start items-center gap-1.5 active:scale-95 transition cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800"
+              title="Lịch sự kiện & cuộc họp"
+            >
+              <img src={mainTab === "meetings" ? "/icons/activities/calendar-02.svg" : "/icons/events/calendar-02.svg"} className="size-5" alt="calendar" />
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -3091,6 +3146,16 @@ function EventsScreen() {
         onUnregister={(eventId, evt) => unregister(eventId, evt)}
         onOpenRegister={(evtObj, evt) => handleOpenRegister(evtObj, evt)}
         busy={busy}
+        canEdit={selectedEvent ? canEditEvent(selectedEvent) : false}
+        canDelete={selectedEvent ? canDeleteEvent(selectedEvent) : false}
+        canScanQr={selectedEvent ? canScanEventQr(selectedEvent) : false}
+        onEditEvent={(ev) => handleOpenEditEvent(ev)}
+        onDeleteEvent={(ev) => handleDeleteEvent(ev)}
+        onOpenQrScanner={(ev) => {
+          setSelectedEvent(null);
+          setQrScannerEvent(ev);
+          setQrScannerOpen(true);
+        }}
       />
 
       <EventRegistrationModal
@@ -3262,6 +3327,192 @@ function EventsScreen() {
         onClose={() => setRecapModalEvent(null)}
         event={recapModalEvent}
       />
+
+      {/* Modal Chỉnh Sửa Sự Kiện (Platform Admin / Lớp Trưởng / Người Tạo) */}
+      <Dialog open={!!editingEvent} onOpenChange={(open) => !open && setEditingEvent(null)}>
+        <DialogContent className="max-w-lg w-[94vw] p-0 overflow-hidden rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl">
+          <div className="bg-[#003B95] p-4 text-white flex items-center justify-between">
+            <div>
+              <DialogTitle className="text-base font-bold text-white flex items-center gap-2">
+                <Pencil className="w-4 h-4 text-amber-300" />
+                <span>Chỉnh Sửa Sự Kiện</span>
+              </DialogTitle>
+              <DialogDescription className="text-xs text-blue-100 mt-0.5">
+                Cập nhật thông tin sự kiện trực tiếp vào hệ thống
+              </DialogDescription>
+            </div>
+          </div>
+          <form onSubmit={handleSaveEditEvent} className="p-4 space-y-3 max-h-[75vh] overflow-y-auto">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Tên sự kiện *</label>
+              <input
+                type="text"
+                required
+                value={editForm.name}
+                onChange={(e) => setEditForm((p) => ({ ...p, name: e.target.value }))}
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-2.5">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Ngày tổ chức</label>
+                <input
+                  type="date"
+                  value={editForm.date}
+                  onChange={(e) => setEditForm((p) => ({ ...p, date: e.target.value }))}
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Thời gian</label>
+                <input
+                  type="text"
+                  value={editForm.time}
+                  onChange={(e) => setEditForm((p) => ({ ...p, time: e.target.value }))}
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Địa điểm</label>
+              <input
+                type="text"
+                value={editForm.location}
+                onChange={(e) => setEditForm((p) => ({ ...p, location: e.target.value }))}
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs"
+              />
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Sức chứa</label>
+                <input
+                  type="number"
+                  min={1}
+                  value={editForm.capacity}
+                  onChange={(e) => setEditForm((p) => ({ ...p, capacity: e.target.value }))}
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Phí vé (đ)</label>
+                <input
+                  type="number"
+                  min={0}
+                  value={editForm.ticketPrice}
+                  onChange={(e) => setEditForm((p) => ({ ...p, ticketPrice: e.target.value }))}
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Trạng thái</label>
+                <select
+                  value={editForm.status}
+                  onChange={(e) => setEditForm((p) => ({ ...p, status: e.target.value }))}
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-2 py-2 text-xs"
+                >
+                  <option value="upcoming">Sắp diễn ra</option>
+                  <option value="ongoing">Đang diễn ra</option>
+                  <option value="ended">Đã kết thúc</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Mô tả chi tiết</label>
+              <textarea
+                rows={3}
+                value={editForm.description}
+                onChange={(e) => setEditForm((p) => ({ ...p, description: e.target.value }))}
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs"
+              />
+            </div>
+            <div className="flex items-center gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setEditingEvent(null)}
+                className="flex-1 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold cursor-pointer"
+              >
+                Hủy
+              </button>
+              <button
+                type="submit"
+                disabled={savingEdit}
+                className="flex-1 py-2.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white text-xs font-bold cursor-pointer disabled:opacity-50"
+              >
+                {savingEdit ? "Đang lưu..." : "Lưu thay đổi"}
+              </button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal Quét QR Check-in / Check-out Sự Kiện */}
+      <Dialog open={qrScannerOpen} onOpenChange={(open) => !open && setQrScannerOpen(false)}>
+        <DialogContent className="max-w-md w-[94vw] p-0 overflow-hidden rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl">
+          <div className="bg-slate-900 p-4 text-white">
+            <DialogTitle className="text-base font-bold text-white flex items-center gap-2">
+              <ScanLine className="w-4 h-4 text-emerald-400" />
+              <span>Quét QR Check-in / Check-out</span>
+            </DialogTitle>
+            <DialogDescription className="text-xs text-slate-300 mt-0.5">
+              {qrScannerEvent ? qrScannerEvent.title || qrScannerEvent.name : "Quét vé điện tử đại biểu tham dự sự kiện"}
+            </DialogDescription>
+          </div>
+          <div className="p-4 space-y-3">
+            <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-slate-100 dark:bg-slate-800">
+              <button
+                type="button"
+                onClick={() => setQrScanMode("checkin")}
+                className={`py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition ${qrScanMode === "checkin" ? "bg-emerald-600 text-white shadow-xs" : "text-slate-600 dark:text-slate-300"}`}
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>Check-in (Vào)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setQrScanMode("checkout")}
+                className={`py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition ${qrScanMode === "checkout" ? "bg-amber-500 text-slate-950 shadow-xs" : "text-slate-600 dark:text-slate-300"}`}
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Check-out (Ra)</span>
+              </button>
+            </div>
+
+            <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-950 flex items-center justify-center border border-slate-800">
+              <video ref={qrVideoRef} className="w-full h-full object-cover" playsInline muted />
+              {qrCamStatus !== "scanning" && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4 bg-slate-950/80 text-slate-300 text-xs gap-2">
+                  <Camera className="w-7 h-7 text-slate-400" />
+                  <span>{qrCamStatus === "denied" ? "Chưa cấp quyền Camera — hãy nhập mã vé bên dưới" : "Đang mở Camera quét mã QR..."}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Nhập hoặc dán mã vé (VD: REG-...)..."
+                value={manualTicketCode}
+                onChange={(e) => setManualTicketCode(e.target.value)}
+                className="flex-1 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs"
+              />
+              <button
+                type="button"
+                disabled={scanBusy}
+                onClick={() => handleProcessTicketQr(manualTicketCode)}
+                className="px-4 py-2 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white text-xs font-bold cursor-pointer disabled:opacity-50"
+              >
+                {scanBusy ? "..." : "Xác nhận"}
+              </button>
+            </div>
+
+            {scanResult && (
+              <div className={`p-3 rounded-xl border text-xs font-medium ${scanResult.ok ? "bg-emerald-50 border-emerald-200 text-emerald-800" : "bg-rose-50 border-rose-200 text-rose-800"}`}>
+                {scanResult.message}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

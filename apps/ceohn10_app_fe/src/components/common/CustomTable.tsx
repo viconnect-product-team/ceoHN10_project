@@ -9,6 +9,7 @@ import {
   Plus,
   X,
   MoreHorizontal,
+  Trash2,
   type LucideIcon,
 } from "lucide-react";
 import { Pagination } from "@/components/dashboard/DataTablePagination";
@@ -307,6 +308,53 @@ export interface CustomTableProps<T> {
   emptyAction?: React.ReactNode;
   onRowClick?: (row: T) => void;
   className?: string;
+  selectable?: boolean;
+  selectedKeys?: Set<string | number>;
+  onSelectionChange?: (keys: Set<string | number>) => void;
+  onBulkDelete?: (keys: (string | number)[]) => void | Promise<void>;
+  bulkDeleteLabel?: string;
+}
+
+export function BulkDeleteBar({
+  selectedCount,
+  onBulkDelete,
+  onClear,
+  label = "Xóa các mục đã chọn",
+  busy = false,
+}: {
+  selectedCount: number;
+  onBulkDelete: () => void;
+  onClear: () => void;
+  label?: string;
+  busy?: boolean;
+}) {
+  if (selectedCount <= 0) return null;
+  return (
+    <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-rose-200 bg-rose-50/90 px-4 py-2.5 text-xs dark:border-rose-900/60 dark:bg-rose-950/40">
+      <span className="font-semibold text-rose-900 dark:text-rose-200">
+        Đã chọn <strong className="font-extrabold">{selectedCount}</strong> mục
+      </span>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={onClear}
+          disabled={busy}
+          className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 cursor-pointer"
+        >
+          Bỏ chọn
+        </button>
+        <button
+          type="button"
+          onClick={onBulkDelete}
+          disabled={busy}
+          className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-3 py-1.5 font-bold text-white shadow-xs hover:bg-rose-700 disabled:opacity-50 cursor-pointer"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+          <span>{busy ? "Đang xóa..." : label}</span>
+        </button>
+      </div>
+    </div>
+  );
 }
 
 /**
@@ -337,8 +385,54 @@ export function CustomTable<T>({
   emptyAction,
   onRowClick,
   className = "",
+  selectable = false,
+  selectedKeys,
+  onSelectionChange,
+  onBulkDelete,
+  bulkDeleteLabel = "Xóa các mục đã chọn",
 }: CustomTableProps<T>) {
   const [colWidths, setColWidths] = useState<Record<string, number>>({});
+  const [internalSelected, setInternalSelected] = useState<Set<string | number>>(new Set());
+  const [bulkBusy, setBulkBusy] = useState(false);
+
+  const isSelectEnabled = selectable || Boolean(onBulkDelete);
+  const activeSelected = selectedKeys ?? internalSelected;
+  const setActiveSelected = onSelectionChange ?? setInternalSelected;
+
+  const pageKeys = useMemo(
+    () => data.map((row, idx) => keyExtractor(row, idx)),
+    [data, keyExtractor],
+  );
+  const allPageSelected =
+    pageKeys.length > 0 && pageKeys.every((k) => activeSelected.has(k));
+
+  const toggleSelectAllPage = () => {
+    const next = new Set(activeSelected);
+    if (allPageSelected) {
+      pageKeys.forEach((k) => next.delete(k));
+    } else {
+      pageKeys.forEach((k) => next.add(k));
+    }
+    setActiveSelected(next);
+  };
+
+  const toggleSelectRow = (k: string | number) => {
+    const next = new Set(activeSelected);
+    if (next.has(k)) next.delete(k);
+    else next.add(k);
+    setActiveSelected(next);
+  };
+
+  const handleBulkDeleteClick = async () => {
+    if (!onBulkDelete || activeSelected.size === 0) return;
+    setBulkBusy(true);
+    try {
+      await onBulkDelete(Array.from(activeSelected));
+      setActiveSelected(new Set());
+    } finally {
+      setBulkBusy(false);
+    }
+  };
 
   const handleResize = useCallback((colKey: string, newW: number) => {
     setColWidths((prev) => ({ ...prev, [colKey]: newW }));
@@ -350,14 +444,35 @@ export function CustomTable<T>({
   const to = Math.min(page * pageSize, totalCount);
 
   return (
-    <div
-      className={`rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-card shadow-xs overflow-hidden ${className}`}
-    >
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse select-text">
-          <thead>
-            <tr className="h-11 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 tracking-wider">
-              {showStt && (
+    <div className="space-y-2">
+      {isSelectEnabled && onBulkDelete && (
+        <BulkDeleteBar
+          selectedCount={activeSelected.size}
+          onBulkDelete={handleBulkDeleteClick}
+          onClear={() => setActiveSelected(new Set())}
+          label={bulkDeleteLabel}
+          busy={bulkBusy}
+        />
+      )}
+      <div
+        className={`rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-card shadow-xs overflow-hidden ${className}`}
+      >
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse select-text">
+            <thead>
+              <tr className="h-11 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 tracking-wider">
+                {isSelectEnabled && (
+                  <th className="w-10 px-3 text-center border-r border-slate-200 dark:border-slate-800 select-none">
+                    <input
+                      type="checkbox"
+                      checked={allPageSelected}
+                      onChange={toggleSelectAllPage}
+                      aria-label="Chọn tất cả"
+                      className="h-4 w-4 rounded border-slate-300 text-[#003B95] focus:ring-[#003B95] cursor-pointer"
+                    />
+                  </th>
+                )}
+                {showStt && (
                 <th className="w-12 px-3 text-center border-r border-slate-200 dark:border-slate-800 select-none">
                   STT
                 </th>
@@ -442,7 +557,7 @@ export function CustomTable<T>({
               <tr>
                 <td
                   colSpan={
-                    columns.length + (showStt ? 1 : 0) + (actionColumn ? 1 : 0)
+                    columns.length + (isSelectEnabled ? 1 : 0) + (showStt ? 1 : 0) + (actionColumn ? 1 : 0)
                   }
                   className="py-12 text-center text-slate-500"
                 >
@@ -456,7 +571,7 @@ export function CustomTable<T>({
               <tr>
                 <td
                   colSpan={
-                    columns.length + (showStt ? 1 : 0) + (actionColumn ? 1 : 0)
+                    columns.length + (isSelectEnabled ? 1 : 0) + (showStt ? 1 : 0) + (actionColumn ? 1 : 0)
                   }
                   className="py-14 text-center text-slate-500"
                 >
@@ -468,15 +583,30 @@ export function CustomTable<T>({
               data.map((row, index) => {
                 const key = keyExtractor(row, index);
                 const stt = (page - 1) * pageSize + index + 1;
+                const isRowSelected = activeSelected.has(key);
 
                 return (
                   <tr
                     key={key}
                     onClick={() => onRowClick && onRowClick(row)}
                     className={`h-16 hover:bg-slate-50/60 dark:hover:bg-slate-900/40 transition ${
-                      onRowClick ? "cursor-pointer" : ""
-                    }`}
+                      isRowSelected ? "bg-blue-50/60 dark:bg-blue-950/30" : ""
+                    } ${onRowClick ? "cursor-pointer" : ""}`}
                   >
+                    {isSelectEnabled && (
+                      <td
+                        className="w-10 px-3 text-center border-r border-slate-200 dark:border-slate-800"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isRowSelected}
+                          onChange={() => toggleSelectRow(key)}
+                          aria-label="Chọn dòng"
+                          className="h-4 w-4 rounded border-slate-300 text-[#003B95] focus:ring-[#003B95] cursor-pointer"
+                        />
+                      </td>
+                    )}
                     {showStt && (
                       <td className="w-12 px-3 text-center text-slate-500 dark:text-slate-400 text-xs font-semibold border-r border-slate-200 dark:border-slate-800">
                         {stt}
@@ -548,6 +678,7 @@ export function CustomTable<T>({
           pageSizeOptions={pageSizeOptions}
         />
       )}
+      </div>
     </div>
   );
 }

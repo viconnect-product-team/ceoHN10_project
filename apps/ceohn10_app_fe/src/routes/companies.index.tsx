@@ -512,22 +512,7 @@ function CompaniesPage() {
                 placeholder={t("members.filter.region")}
                 options={REGIONS.map((k) => ({ value: k, label: t(k) }))}
               />
-              <FilterSelect
-                value={level}
-                onChange={(v) => setLevel(v as MemberLevelKey)}
-                placeholder={t("members.f.level")}
-                options={LEVELS.map((k) => ({ value: k, label: t(k) }))}
-              />
-              <FilterSelect
-                value={feeFilter}
-                onChange={(v) => setFeeFilter(v as any)}
-                placeholder="Trạng thái hội phí"
-                options={[
-                  { value: "paid", label: "Đã thanh toán hội phí" },
-                  { value: "unpaid", label: "Chưa thanh toán hội phí" },
-                ]}
-              />
-              {(q || industry || region || level || feeFilter) && (
+              {(q || industry || region) && (
                 <button
                   onClick={reset}
                   className="h-10 rounded-xl px-3 text-xs font-semibold text-muted-foreground hover:bg-muted"

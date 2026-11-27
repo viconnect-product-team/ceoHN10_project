@@ -24,6 +24,27 @@ export class FinancialInitController {
   }
 
   /**
+   * Cập nhật thông tin Quỹ & Tài khoản ngân hàng của Quỹ
+   */
+  @Put('funds/:id')
+  @UseGuards(JwtAuthGuard)
+  updateFund(
+    @Param('id') id: string,
+    @Body()
+    dto: {
+      name?: string;
+      description?: string;
+      leaderName?: string;
+      bankName?: string;
+      accountNumber?: string;
+      accountHolder?: string;
+      sepayAccountId?: string;
+    },
+  ) {
+    return this.finService.updateFund(id, dto);
+  }
+
+  /**
    * Chi tiết số dư đầu kỳ (2.1 tỷ)
    */
   @Get('opening-balance')

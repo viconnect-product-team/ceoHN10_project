@@ -276,7 +276,6 @@ export class EventsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('platform_admin', 'superadmin', 'adm', 'admin', 'bqt', 'btt')
   @Put(':id')
   async updateEvent(
     @Request() req: any,
@@ -401,7 +400,6 @@ export class EventsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('platform_admin', 'superadmin', 'adm', 'admin', 'bqt')
   @Delete(':id')
   async deleteEvent(@Request() req: any, @Param('id') id: string) {
     const userId = req.user?.id || req.user?.sub || 'system';

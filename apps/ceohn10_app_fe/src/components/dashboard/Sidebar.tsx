@@ -118,7 +118,6 @@ const crmClasses: Item[] = [
 
 // 4. NHÓM TÀI CHÍNH
 const crmFinance: Item[] = [
-  { key: "nav.fee" as TKey, icon: Wallet, to: "/fees", label: "Phí tham gia CLB" },
   { key: "nav.sponsors" as TKey, icon: Award, to: "/sponsors", label: "Nhà tài trợ & Quỹ tài trợ" },
   { key: "nav.financeReport" as TKey, icon: PieChart, to: "/finance-report", label: "Báo cáo tài chính" },
 ];

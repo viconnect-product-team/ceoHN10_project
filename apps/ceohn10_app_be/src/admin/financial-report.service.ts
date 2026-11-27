@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 export interface FinancialColumn {
@@ -63,6 +63,28 @@ export class FinancialReportService implements OnModuleInit {
           party_name TEXT,
           status TEXT DEFAULT 'completed',
           custom_data JSONB DEFAULT '{}'::jsonb,
+          created_at TIMESTAMPTZ DEFAULT NOW(),
+          updated_at TIMESTAMPTZ DEFAULT NOW()
+        );
+      `);
+      await this.prisma.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS public.fund_transfer_orders (
+          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          transfer_code TEXT UNIQUE NOT NULL,
+          direction TEXT NOT NULL DEFAULT 'master_to_dept',
+          source_fund_id UUID,
+          destination_fund_id UUID,
+          source_fund_name TEXT NOT NULL,
+          destination_fund_name TEXT NOT NULL,
+          amount BIGINT NOT NULL DEFAULT 0,
+          description TEXT,
+          status TEXT NOT NULL DEFAULT 'pending_acceptance',
+          created_by TEXT,
+          created_by_name TEXT,
+          accepted_by TEXT,
+          accepted_by_name TEXT,
+          accepted_at TIMESTAMPTZ,
+          transfer_date DATE DEFAULT CURRENT_DATE,
           created_at TIMESTAMPTZ DEFAULT NOW(),
           updated_at TIMESTAMPTZ DEFAULT NOW()
         );
@@ -248,7 +270,7 @@ export class FinancialReportService implements OnModuleInit {
   /**
    * Lấy danh sách hàng báo cáo tài chính
    */
-  async getRows(query?: { fromDate?: string; toDate?: string; category?: string }) {
+  async getRows(query?: { fromDate?: string; toDate?: string; category?: string; fundId?: string; department?: string }) {
     let sql = `SELECT * FROM public.financial_report_rows WHERE 1=1`;
     const params: any[] = [];
 
@@ -263,6 +285,18 @@ export class FinancialReportService implements OnModuleInit {
     if (query?.category) {
       params.push(query.category);
       sql += ` AND category = $${params.length}`;
+    }
+    if (query?.fundId || query?.department) {
+      if (query.fundId && query.department) {
+        params.push(query.fundId, query.department);
+        sql += ` AND (custom_data->>'fundId' = $${params.length - 1} OR custom_data->>'department' = $${params.length} OR custom_data->>'targetFund' = $${params.length} OR custom_data->>'sourceFund' = $${params.length})`;
+      } else if (query.fundId) {
+        params.push(query.fundId);
+        sql += ` AND custom_data->>'fundId' = $${params.length}`;
+      } else if (query.department) {
+        params.push(query.department);
+        sql += ` AND (custom_data->>'department' = $${params.length} OR custom_data->>'targetFund' = $${params.length} OR custom_data->>'sourceFund' = $${params.length})`;
+      }
     }
 
     sql += ` ORDER BY transaction_date DESC, created_at DESC`;
@@ -535,5 +569,258 @@ export class FinancialReportService implements OnModuleInit {
       outTransaction: outRow[0],
       inTransaction: inRow[0],
     };
+  }
+
+  private async canCreateMasterToDeptTransfer(actor: any): Promise<boolean> {
+    if (!actor) return false;
+    const email = String(actor.email || '').toLowerCase().trim();
+    if (['admin@ceohn10.vn', 'admin@viconnect.vn', 'admin@connect.vn', 'ceo.chutich@ceohn10.com'].includes(email)) {
+      return true;
+    }
+    const roles: string[] = [
+      actor.role,
+      ...(Array.isArray(actor.roles) ? actor.roles : []),
+      actor.executiveRole,
+      actor.department,
+    ]
+      .filter(Boolean)
+      .map((r: any) => String(r).toLowerCase().trim());
+
+    if (
+      roles.some((r) =>
+        ['platform_admin', 'admin_platform', 'superadmin', 'adm', 'admin', 'lop_truong', 'lớp trưởng', 'chu_tich', 'chủ tịch', 'ban_tai_chinh', 'tai_chinh', 'ke_toan'].includes(r) ||
+        r.includes('tài chính') ||
+        r.includes('tai chinh') ||
+        r.includes('kế toán'),
+      )
+    ) {
+      return true;
+    }
+
+    const userId = actor.id || actor.sub || actor.userId;
+    if (!userId) return false;
+    const rows = await this.prisma.$queryRaw<any[]>`
+      SELECT m.department, m.executive_role, ur.role::text as user_role
+      FROM public.members m
+      LEFT JOIN public.user_roles ur ON ur.user_id = m.user_id
+      WHERE m.user_id::text = ${String(userId)} OR LOWER(m.email) = LOWER(${email})
+      LIMIT 3
+    `.catch(() => []);
+
+    return rows.some((r) => {
+      const rStr = `${r.department || ''} ${r.executive_role || ''} ${r.user_role || ''}`.toLowerCase();
+      return (
+        rStr.includes('platform_admin') ||
+        rStr.includes('lop_truong') ||
+        rStr.includes('lớp trưởng') ||
+        rStr.includes('tài chính') ||
+        rStr.includes('tai chinh') ||
+        rStr.includes('kế toán') ||
+        rStr.includes('admin')
+      );
+    });
+  }
+
+  async getFundTransferOrders() {
+    const rows = await this.prisma.$queryRawUnsafe<any[]>(`
+      SELECT * FROM public.fund_transfer_orders ORDER BY created_at DESC LIMIT 200
+    `).catch(() => []);
+    return rows.map((r) => ({
+      ...r,
+      amount: Number(r.amount || 0),
+    }));
+  }
+
+  async createFundTransferOrder(
+    actor: any,
+    dto: {
+      direction?: 'master_to_dept' | 'dept_to_master';
+      sourceFundId?: string;
+      destinationFundId?: string;
+      sourceFundName?: string;
+      destinationFundName?: string;
+      amount: number;
+      description?: string;
+      transferDate?: string;
+    },
+  ) {
+    const direction = dto.direction === 'dept_to_master' ? 'dept_to_master' : 'master_to_dept';
+    const amount = Math.round(Number(dto.amount) || 0);
+    if (amount <= 0) {
+      throw new BadRequestException('Số tiền lệnh chuyển phải lớn hơn 0');
+    }
+
+    if (direction === 'master_to_dept') {
+      const allowed = await this.canCreateMasterToDeptTransfer(actor);
+      if (!allowed) {
+        throw new ForbiddenException(
+          'Chỉ Platform Admin, Lớp trưởng hoặc thành viên Ban Tài Chính mới được lập lệnh chuyển tiền từ Quỹ Tổng xuống Ban!',
+        );
+      }
+      if (amount > 20000000) {
+        throw new BadRequestException(
+          'Mỗi lệnh chuyển tiền từ Quỹ Tổng xuống Quỹ Ban tối đa 20.000.000 VNĐ',
+        );
+      }
+    }
+
+    let sourceFund: any = null;
+    let destFund: any = null;
+    if (dto.sourceFundId) {
+      sourceFund = await this.prisma.financial_funds.findUnique({ where: { id: dto.sourceFundId } }).catch(() => null);
+    }
+    if (dto.destinationFundId) {
+      destFund = await this.prisma.financial_funds.findUnique({ where: { id: dto.destinationFundId } }).catch(() => null);
+    }
+
+    const sourceName = sourceFund?.name || dto.sourceFundName || (direction === 'master_to_dept' ? 'Quỹ Tổng CLB CEO HN10' : 'Quỹ Ban Chuyên Trách');
+    const destName = destFund?.name || dto.destinationFundName || (direction === 'dept_to_master' ? 'Quỹ Tổng CLB CEO HN10' : 'Quỹ Ban Chuyên Trách');
+    const transferCode = `LCT-${Date.now().toString().slice(-6)}`;
+    const txDate = dto.transferDate || new Date().toISOString().slice(0, 10);
+    const actorId = String(actor?.id || actor?.sub || '');
+    const actorName = String(actor?.name || actor?.email || 'Quản trị viên');
+
+    const inserted = await this.prisma.$queryRawUnsafe<any[]>(
+      `INSERT INTO public.fund_transfer_orders (
+        transfer_code, direction, source_fund_id, destination_fund_id,
+        source_fund_name, destination_fund_name, amount, description,
+        status, created_by, created_by_name, transfer_date, created_at, updated_at
+      ) VALUES (
+        $1, $2, $3::uuid, $4::uuid,
+        $5, $6, $7, $8,
+        'pending_acceptance', $9, $10, $11::date, NOW(), NOW()
+      ) RETURNING *`,
+      transferCode,
+      direction,
+      sourceFund?.id || null,
+      destFund?.id || null,
+      sourceName,
+      destName,
+      amount,
+      dto.description || `Lệnh chuyển tiền ${sourceName} → ${destName}`,
+      actorId,
+      actorName,
+      txDate,
+    );
+
+    const order = inserted[0];
+    return {
+      ...order,
+      amount: Number(order.amount || 0),
+      message:
+        direction === 'master_to_dept'
+          ? `Đã gửi lệnh chuyển ${amount.toLocaleString('vi-VN')} đ tới Trưởng ${destName} chờ tiếp nhận.`
+          : `Đã gửi lệnh chuyển ${amount.toLocaleString('vi-VN')} đ lên Quỹ Tổng chờ tiếp nhận.`,
+    };
+  }
+
+  async acceptFundTransferOrder(actor: any, orderId: string) {
+    const rows = await this.prisma.$queryRawUnsafe<any[]>(
+      `SELECT * FROM public.fund_transfer_orders WHERE id = $1::uuid LIMIT 1`,
+      orderId,
+    ).catch(() => []);
+    if (!rows.length) {
+      throw new NotFoundException('Không tìm thấy lệnh chuyển tiền');
+    }
+    const order = rows[0];
+    if (order.status === 'accepted') {
+      throw new BadRequestException('Lệnh chuyển tiền này đã được tiếp nhận trước đó');
+    }
+
+    const amount = Number(order.amount || 0);
+    const txDate = order.transfer_date ? String(order.transfer_date).slice(0, 10) : new Date().toISOString().slice(0, 10);
+
+    await this.prisma.$transaction(async (tx) => {
+      if (order.source_fund_id) {
+        await tx.$executeRawUnsafe(
+          `UPDATE public.financial_funds SET current_balance = GREATEST(0, current_balance - $1), updated_at = NOW() WHERE id = $2::uuid`,
+          amount,
+          order.source_fund_id,
+        );
+      }
+      if (order.destination_fund_id) {
+        await tx.$executeRawUnsafe(
+          `UPDATE public.financial_funds SET current_balance = current_balance + $1, updated_at = NOW() WHERE id = $2::uuid`,
+          amount,
+          order.destination_fund_id,
+        );
+      }
+
+      await tx.$executeRawUnsafe(
+        `INSERT INTO public.financial_report_rows (
+          id, transaction_date, voucher_no, category, description,
+          income_amount, expense_amount, balance_after, party_name, status,
+          custom_data, created_at, updated_at
+        ) VALUES (
+          gen_random_uuid(), $1::date, $2, $3, $4,
+          0, $5, 0, $6, 'completed',
+          $7::jsonb, NOW(), NOW()
+        )`,
+        txDate,
+        `${order.transfer_code}-OUT`,
+        order.direction === 'master_to_dept' ? 'Chi cấp kinh phí Ban' : 'Nộp tiền về Quỹ Tổng',
+        `[ĐÃ TIẾP NHẬN] ${order.description || ''} (${order.source_fund_name} → ${order.destination_fund_name})`,
+        amount,
+        order.destination_fund_name,
+        JSON.stringify({
+          fundId: order.source_fund_id || undefined,
+          department: order.source_fund_name,
+          direction: order.direction,
+          sourceFund: order.source_fund_name,
+          targetFund: order.destination_fund_name,
+          type: 'OUT',
+          transferOrderId: order.id,
+        }),
+      );
+
+      await tx.$executeRawUnsafe(
+        `INSERT INTO public.financial_report_rows (
+          id, transaction_date, voucher_no, category, description,
+          income_amount, expense_amount, balance_after, party_name, status,
+          custom_data, created_at, updated_at
+        ) VALUES (
+          gen_random_uuid(), $1::date, $2, $3, $4,
+          $5, 0, 0, $6, 'completed',
+          $7::jsonb, NOW(), NOW()
+        )`,
+        txDate,
+        `${order.transfer_code}-IN`,
+        order.direction === 'master_to_dept' ? 'Tiếp nhận kinh phí từ Quỹ Tổng' : 'Thu tiền nộp từ Quỹ Ban về Quỹ Tổng',
+        `[ĐÃ TIẾP NHẬN] ${order.description || ''} (Từ ${order.source_fund_name})`,
+        amount,
+        order.source_fund_name,
+        JSON.stringify({
+          fundId: order.destination_fund_id || undefined,
+          department: order.destination_fund_name,
+          direction: order.direction,
+          sourceFund: order.source_fund_name,
+          targetFund: order.destination_fund_name,
+          type: 'IN',
+          transferOrderId: order.id,
+        }),
+      );
+
+      await tx.$executeRawUnsafe(
+        `UPDATE public.fund_transfer_orders
+         SET status = 'accepted', accepted_by = $1, accepted_by_name = $2, accepted_at = NOW(), updated_at = NOW()
+         WHERE id = $3::uuid`,
+        String(actor?.id || actor?.sub || ''),
+        String(actor?.name || actor?.email || 'Trưởng ban'),
+        orderId,
+      );
+    });
+
+    return {
+      success: true,
+      message: `Đã tiếp nhận lệnh ${order.transfer_code} (${amount.toLocaleString('vi-VN')} đ) và cập nhật số dư quỹ thành công!`,
+    };
+  }
+
+  async deleteFundTransferOrder(orderId: string) {
+    await this.prisma.$executeRawUnsafe(
+      `DELETE FROM public.fund_transfer_orders WHERE id = $1::uuid`,
+      orderId,
+    );
+    return { success: true };
   }
 }

@@ -26,6 +26,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/dashboard/AppShell";
+import { BulkDeleteBar, TableActionsGroup } from "@/components/common/CustomTable";
 import { PageHeader, StatCard } from "@/components/dashboard/PageKit";
 import { EmptyState, NoSearchResult } from "@/components/dashboard/StateKit";
 import { CrudModal, type CrudField, type CrudValues } from "@/components/dashboard/CrudModal";
@@ -208,6 +209,36 @@ function EventsPage() {
   const [savedFilters, setSavedFilters] = useState<EventSavedFilter[]>([]);
 
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [selectedEventIds, setSelectedEventIds] = useState<Set<string>>(new Set());
+  const [bulkDeleting, setBulkDeleting] = useState(false);
+
+  const toggleSelectEvent = (id: string) => {
+    setSelectedEventIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleBulkDeleteEvents = async () => {
+    if (selectedEventIds.size === 0) return;
+    if (typeof window !== "undefined" && !window.confirm(`Xóa vĩnh viễn ${selectedEventIds.size} sự kiện đã chọn?`)) {
+      return;
+    }
+    setBulkDeleting(true);
+    try {
+      const ids = Array.from(selectedEventIds);
+      for (const id of ids) {
+        await fetchNestApi(`/events/${id}`, { method: "DELETE" }).catch(() => {});
+      }
+      setEvents((prev) => prev.filter((ev) => !selectedEventIds.has(ev.id)));
+      setSelectedEventIds(new Set());
+      toast.success(`Đã xóa ${ids.length} sự kiện đã chọn!`);
+    } finally {
+      setBulkDeleting(false);
+    }
+  };
   const [open, setOpen] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
   const [wizardInitialType, setWizardInitialType] = useState<EventItem["type"] | undefined>(undefined);
@@ -956,14 +987,40 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
             />
           )
         ) : view === "table" ? (
-          <div className="self-stretch relative bg-white dark:bg-card rounded-[20px] outline outline-1 outline-slate-200 dark:outline-slate-800 flex flex-col justify-start items-start overflow-hidden shadow-xs">
-            <div className="overflow-x-auto relative w-full">
-              <table className="w-full min-w-[1200px] whitespace-nowrap text-sm border-collapse">
-                <thead>
-                  <tr className="h-16 bg-blue-50/70 dark:bg-blue-950/40 border-b border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-900 dark:text-slate-100">
-                    <th className="sticky left-0 z-20 w-[56px] min-w-[56px] max-w-[56px] bg-blue-50/90 dark:bg-blue-950/90 px-3 py-3 text-center border-r border-b border-slate-200 dark:border-slate-800 select-none">
-                      STT
-                    </th>
+          <div className="space-y-2">
+            {can(PERMISSIONS.EVENT_DELETE) && (
+              <BulkDeleteBar
+                selectedCount={selectedEventIds.size}
+                onBulkDelete={handleBulkDeleteEvents}
+                onClear={() => setSelectedEventIds(new Set())}
+                label="Xóa các sự kiện đã chọn"
+                busy={bulkDeleting}
+              />
+            )}
+            <div className="self-stretch relative bg-white dark:bg-card rounded-[20px] outline outline-1 outline-slate-200 dark:outline-slate-800 flex flex-col justify-start items-start overflow-hidden shadow-xs">
+              <div className="overflow-x-auto relative w-full">
+                <table className="w-full min-w-[1200px] whitespace-nowrap text-sm border-collapse">
+                  <thead>
+                    <tr className="h-16 bg-blue-50/70 dark:bg-blue-950/40 border-b border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-900 dark:text-slate-100">
+                      <th className="sticky left-0 z-20 w-[72px] min-w-[72px] max-w-[72px] bg-blue-50/90 dark:bg-blue-950/90 px-2 py-3 text-center border-r border-b border-slate-200 dark:border-slate-800 select-none">
+                        <div className="inline-flex items-center gap-1.5 justify-center">
+                          <input
+                            type="checkbox"
+                            aria-label="Chọn tất cả"
+                            checked={tc.pageRows.length > 0 && tc.pageRows.every((r: any) => selectedEventIds.has(r.id))}
+                            onChange={() => {
+                              const allSel = tc.pageRows.length > 0 && tc.pageRows.every((r: any) => selectedEventIds.has(r.id));
+                              setSelectedEventIds((prev) => {
+                                const next = new Set(prev);
+                                tc.pageRows.forEach((r: any) => (allSel ? next.delete(r.id) : next.add(r.id)));
+                                return next;
+                              });
+                            }}
+                            className="h-4 w-4 rounded border-slate-300 text-[#003B95] cursor-pointer"
+                          />
+                          <span>STT</span>
+                        </div>
+                      </th>
                     <th className="sticky left-[56px] z-20 min-w-[100px] bg-blue-50/90 dark:bg-blue-950/90 px-4 py-3 border-r border-b border-slate-200 dark:border-slate-800 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.05)] text-left">
                       Mã
                     </th>
@@ -1046,8 +1103,20 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
                           router.navigate({ to: "/events/$eventId", params: { eventId: e.id } });
                         }}
                       >
-                        <td className="sticky left-0 z-10 w-[56px] min-w-[56px] max-w-[56px] bg-card group-hover:bg-muted/70 px-3 py-3.5 text-center text-xs font-medium text-muted-foreground border-r border-b border-slate-200 dark:border-slate-800 transition-colors">
-                          {(tc.page - 1) * tc.pageSize + idx + 1}
+                        <td
+                          className="sticky left-0 z-10 w-[72px] min-w-[72px] max-w-[72px] bg-card group-hover:bg-muted/70 px-2 py-3.5 text-center text-xs font-medium text-muted-foreground border-r border-b border-slate-200 dark:border-slate-800 transition-colors"
+                          onClick={(evt) => evt.stopPropagation()}
+                        >
+                          <div className="inline-flex items-center gap-1.5 justify-center">
+                            <input
+                              type="checkbox"
+                              checked={selectedEventIds.has(e.id)}
+                              onChange={() => toggleSelectEvent(e.id)}
+                              aria-label="Chọn sự kiện"
+                              className="h-4 w-4 rounded border-slate-300 text-[#003B95] cursor-pointer"
+                            />
+                            <span>{(tc.page - 1) * tc.pageSize + idx + 1}</span>
+                          </div>
                         </td>
                         <td className="sticky left-[56px] z-10 min-w-[100px] bg-card group-hover:bg-muted/70 px-4 py-3.5 font-mono text-[12px] font-semibold text-primary border-r border-b border-slate-200 dark:border-slate-800 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.05)] transition-colors whitespace-nowrap">
                           EV-{e.id.slice(0, 6).toUpperCase()}
@@ -1125,7 +1194,7 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
                           </span>
                         </td>
                         <td className="sticky right-0 z-10 min-w-[170px] bg-card group-hover:bg-muted/70 px-4 py-3.5 text-center border-l border-b border-slate-200 dark:border-slate-800 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)] transition-colors">
-                          <div className="inline-flex items-center justify-center gap-1.5">
+                          <TableActionsGroup maxVisible={3}>
                             <Link
                               to="/events/$eventId"
                               params={{ eventId: e.id }}
@@ -1180,7 +1249,7 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
                                 <Trash2 className="h-4 w-4" />
                               </button>
                             )}
-                          </div>
+                          </TableActionsGroup>
                         </td>
                       </tr>
                     );
@@ -1199,13 +1268,37 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
               onPageSize={tc.setPageSize}
             />
           </div>
+          </div>
         ) : view === "cards" ? (
-          <div className="space-y-6">
+          <div className="space-y-4">
+            {can(PERMISSIONS.EVENT_DELETE) && (
+              <BulkDeleteBar
+                selectedCount={selectedEventIds.size}
+                onBulkDelete={handleBulkDeleteEvents}
+                onClear={() => setSelectedEventIds(new Set())}
+                label="Xóa các sự kiện đã chọn"
+                busy={bulkDeleting}
+              />
+            )}
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
               {tc.pageRows.map((e: any) => (
-                <EventCard
-                  key={e.id}
-                  event={e}
+                <div key={e.id} className="relative">
+                  {can(PERMISSIONS.EVENT_DELETE) && (
+                    <label
+                      onClick={(evt) => evt.stopPropagation()}
+                      className="absolute top-3 left-3 z-20 flex h-7 w-7 items-center justify-center rounded-lg bg-white/95 shadow-md border border-slate-200 cursor-pointer"
+                      title="Chọn sự kiện"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedEventIds.has(e.id)}
+                        onChange={() => toggleSelectEvent(e.id)}
+                        className="h-4 w-4 rounded border-slate-300 text-[#003B95] cursor-pointer"
+                      />
+                    </label>
+                  )}
+                  <EventCard
+                    event={e}
                   deleting={deletingId === e.id}
                   onEdit={() => {
                     setEditing(e);
@@ -1218,6 +1311,7 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
                   onFeedback={() => setFeedbackModalEvent(e)}
                   onMedia={() => setMediaModalEvent(e)}
                 />
+                </div>
               ))}
             </div>
             <Pagination

@@ -10,7 +10,7 @@ const tabs: Tab[] = [
   { to: "/", key: "nav.dashboard", icon: LayoutDashboard, exact: true },
   { to: "/members", key: "nav.members", icon: Users },
   { to: "/events", key: "nav.events", icon: Calendar },
-  { to: "/fees", key: "nav.fee", icon: Wallet },
+  { to: "/finance-report", key: "nav.financeReport" as TKey, icon: Wallet },
 ];
 
 function isActive(pathname: string, to?: string, exact?: boolean) {

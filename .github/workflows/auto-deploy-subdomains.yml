@@ -100,20 +100,18 @@ jobs:
 
       - name: Build Docker Images cục bộ trên runner
         run: |
-          # 1. Build Frontend Image từ bản build .output vừa hoàn thành
+          # 1. Build Frontend Image từ bản build .output vừa hoàn thành (tách biệt hoàn toàn khỏi CEO 1983)
           docker build -t ceohn10-frontend:latest -f deploy/ceohn10/Dockerfile.frontend .
           docker build -t ceohn10-crm-frontend:latest -f deploy/crm/Dockerfile.frontend .
-          docker tag ceohn10-crm-frontend:latest crm-frontend:latest
 
           # 2. Build Backend Image từ root Dockerfile.backend
           docker build -t ceohn10-backend:latest -f Dockerfile.backend .
           docker tag ceohn10-backend:latest ceohn10-crm-backend:latest
-          docker tag ceohn10-backend:latest crm-backend:latest
 
           # 3. Nén images thành tar.gz để truyền nhanh qua SSH
           mkdir -p dist-images
-          docker save ceohn10-frontend:latest ceohn10-crm-frontend:latest crm-frontend:latest | gzip -1 > dist-images/frontend-images.tar.gz
-          docker save ceohn10-backend:latest ceohn10-crm-backend:latest crm-backend:latest | gzip -1 > dist-images/backend-images.tar.gz
+          docker save ceohn10-frontend:latest ceohn10-crm-frontend:latest | gzip -1 > dist-images/frontend-images.tar.gz
+          docker save ceohn10-backend:latest ceohn10-crm-backend:latest | gzip -1 > dist-images/backend-images.tar.gz
 
       - name: Kiểm tra cấu hình SSH Secret trên GitHub
         id: check_ssh
@@ -194,21 +192,21 @@ jobs:
             docker network create vione-network 2>/dev/null || true
 
             echo ">>> [3/5] Đồng bộ và khởi động Mobile CEO HN10 (https://ceohn10.viconnect.vn)..."
-            mkdir -p /root/association
-            cp -a /root/deploy-cache/deploy/ceohn10/. /root/association/
-            cd /root/association
+            mkdir -p /root/ceohn10-app
+            cp -a /root/deploy-cache/deploy/ceohn10/. /root/ceohn10-app/
+            cd /root/ceohn10-app
             sed -i 's/\r$//' docker-compose.yml .env.association .env.production 2>/dev/null || true
             docker compose -f docker-compose.yml stop 2>/dev/null || true
             docker rm -f ceohn10-frontend-prod ceohn10-backend-prod 2>/dev/null || true
             docker compose -f docker-compose.yml up -d --force-recreate
 
-            echo ">>> [4/5] Đồng bộ và khởi động CRM Hiệp Hội (https://crm.ceohn10.viconnect.vn)..."
-            mkdir -p /root/crm
-            cp -a /root/deploy-cache/deploy/crm/. /root/crm/
-            cd /root/crm
+            echo ">>> [4/5] Đồng bộ và khởi động CRM CEO HN10 (https://crm.ceohn10.viconnect.vn)..."
+            mkdir -p /root/ceohn10-crm
+            cp -a /root/deploy-cache/deploy/crm/. /root/ceohn10-crm/
+            cd /root/ceohn10-crm
             sed -i 's/\r$//' docker-compose.yml .env.crm .env.production 2>/dev/null || true
             docker compose -f docker-compose.yml stop 2>/dev/null || true
-            docker rm -f ceohn10-crm-frontend-prod ceohn10-crm-backend-prod crm-frontend-prod crm-backend-prod 2>/dev/null || true
+            docker rm -f ceohn10-crm-frontend-prod ceohn10-crm-backend-prod 2>/dev/null || true
             docker compose -f docker-compose.yml up -d --force-recreate
 
             echo ">>> [5/5] Bỏ qua cấu hình Nginx SSL (server dev đã có sẵn Nginx SSL; chỉ chạy khi chọn target=ssl)."
@@ -224,8 +222,8 @@ jobs:
             echo " AUTO DEPLOY SUBDOMAINS HOÀN TẤT THÀNH CÔNG!"
             echo " 1. Mobile CEO HN10 Subdomain : https://ceohn10.viconnect.vn"
             echo " 2. Web CRM Subdomain         : https://crm.ceohn10.viconnect.vn"
-            echo " 3. Test Dev Link Mobile      : http://14.225.217.232:5002 | https://14.225.217.232:5444"
-            echo " 4. Test Dev Link CRM         : http://14.225.217.232:5004 | https://14.225.217.232:5443"
+            echo " 3. Test Dev Link Mobile      : http://14.225.217.232:5020 | https://14.225.217.232:5444"
+            echo " 4. Test Dev Link CRM         : http://14.225.217.232:5022 | https://14.225.217.232:5443"
             echo "=========================================================================="
 
       - name: Tổng kết trạng thái Triển khai

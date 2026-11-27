@@ -27,9 +27,26 @@ import {
   Sparkles,
   ExternalLink,
   UploadCloud,
+  Trash2,
+  Pencil,
+  BarChart3,
 } from "lucide-react";
+import * as XLSX from "xlsx";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip as RechartsTooltip,
+  PieChart as RechartsPieChart,
+  Pie,
+  Cell,
+  Legend,
+} from "recharts";
 import { AppShell } from "@/components/dashboard/AppShell";
 import { Card, PageHeader } from "@/components/dashboard/PageKit";
+import { CustomTable, TableActionsGroup, type CustomTableColumn } from "@/components/common/CustomTable";
 import { useQuery } from "@tanstack/react-query";
 import { fetchNestApi } from "@/lib/api-client";
 import { usePermissions } from "@/hooks/use-permissions";
@@ -89,22 +106,44 @@ export function FinanceReport() {
     items: InflowPayerDetail[];
   } | null>(null);
 
-  // Modal State: Lệnh Cấp Kinh Phí Ban
+  // Modal State: Lệnh Chuyển Tiền Quỹ Tổng <-> Quỹ Ban
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [showDynamicImportModal, setShowDynamicImportModal] = useState(false);
   const [transferForm, setTransferForm] = useState({
-    targetDepartment: "Ban Đào Tạo & Quản Trị Lớp",
+    direction: "master_to_dept" as "master_to_dept" | "dept_to_master",
+    targetDepartment: "",
     amount: "20000000",
-    description: "Cấp kinh phí hoạt động chuyên môn đợt 1/2026",
+    description: "",
     transferDate: new Date().toISOString().slice(0, 10),
   });
   const [isSubmittingTransfer, setIsSubmittingTransfer] = useState(false);
 
   // Modal State: Xem Lịch Sử Cấp Quỹ
   const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [selectedOrderIds, setSelectedOrderIds] = useState<Set<string | number>>(new Set());
 
-  // 1. Số dư Quỹ Tổng thực tế (mặc định 2.080.000.000 VNĐ khi chưa phát sinh giao dịch mới)
-  const OPENING_BALANCE = 2080000000;
+  // Modal State: Chỉnh sửa Thông tin Quỹ & Tài khoản Ngân hàng của từng Ban
+  const [editingFund, setEditingFund] = useState<{
+    id: string;
+    name: string;
+    description: string;
+    leaderName: string;
+    bankName: string;
+    accountNumber: string;
+    accountHolder: string;
+    sepayAccountId: string;
+  } | null>(null);
+  const [savingFund, setSavingFund] = useState(false);
+
+  // Modal State: Dashboard Chi Tiết Quỹ Từng Ban (Dòng tiền + Cột Động + Import Excel JSONB)
+  const [activeDeptFund, setActiveDeptFund] = useState<any | null>(null);
+  const [newColLabel, setNewColLabel] = useState("");
+  const [addingCol, setAddingCol] = useState(false);
+  const [importingDeptExcel, setImportingDeptExcel] = useState(false);
+  const [selectedDeptRowIds, setSelectedDeptRowIds] = useState<Set<string | number>>(new Set());
+
+  // Số dư đầu kỳ thực tế (không hardcode số ảo)
+  const OPENING_BALANCE = 0;
 
   // 2. Fetch Quỹ Tổng & 7 Quỹ Ban chuyên trách Real-time từ PostgreSQL
   const fundsQuery = useQuery({
@@ -163,13 +202,11 @@ export function FinanceReport() {
         id: f.id,
         code: f.code,
         name: f.name,
-        leader: f.code === "FUND_BAN_CONG_NGHE" ? "Trưởng Ban Công nghệ" : "Trưởng Ban Chuyên Trách",
+        leader: f.leader_name || "Trưởng Ban Chuyên Trách",
         totalAllocated: Number(f.current_balance || 0),
         transferCount: inTxs.length,
         lastTransferDate: latestTx?.date || new Date().toISOString().slice(0, 10),
-        purposeNote: f.code === "FUND_BAN_CONG_NGHE"
-          ? "Kinh phí khai giảng"
-          : (latestTx?.description || f.description || "Chưa có dòng tiền phát sinh"),
+        purposeNote: latestTx?.description || f.description || "Chưa có dòng tiền phát sinh",
         accountNumber: bankAcc,
         transactions: txList,
       } as DepartmentAllocation & { transactions?: any[] };
@@ -220,10 +257,7 @@ export function FinanceReport() {
     return items;
   }, [allFunds, realTransactions]);
 
-  const tuitionPayers: InflowPayerDetail[] = useMemo(
-    () => realFundInTxs.filter((p) => (p.purpose || "").toLowerCase().includes("hội phí") || (p.purpose || "").toLowerCase().includes("gia nhập")),
-    [realFundInTxs]
-  );
+  const tuitionPayers: InflowPayerDetail[] = [];
 
   const eventPayers: InflowPayerDetail[] = useMemo(
     () => realFundInTxs.filter((p) => (p.purpose || "").toLowerCase().includes("vé") || (p.purpose || "").toLowerCase().includes("sự kiện") || (p.companyName || "").toLowerCase().includes("sự kiện")),
@@ -254,44 +288,230 @@ export function FinanceReport() {
   // Số dư Quỹ Tổng thực tế từ PostgreSQL (mặc định 2.080.000.000 đ)
   const currentMasterBalance = generalFund ? Number(generalFund.current_balance) : OPENING_BALANCE;
 
-  // Lập Lệnh Cấp Kinh Phí Mới Cho Ban (Ghi sổ thực tế qua API)
+  // Lập Lệnh Chuyển Tiền (Quỹ Tổng <-> Quỹ Ban, tối đa 20 triệu từ Quỹ Tổng xuống Ban)
   const handleExecuteTransfer = async (e: React.FormEvent) => {
     e.preventDefault();
     const amt = Number(transferForm.amount.replace(/[^0-9]/g, "")) || 0;
     if (amt <= 0) {
-      toast.error("Vui lòng nhập số tiền cấp kinh phí hợp lệ");
+      toast.error("Vui lòng nhập số tiền hợp lệ");
       return;
     }
-    if (amt > currentMasterBalance) {
+    if (transferForm.direction === "master_to_dept" && amt > 20000000) {
+      toast.error("Mỗi lệnh chuyển tiền từ Quỹ Tổng xuống Quỹ Ban tối đa 20.000.000 VNĐ!");
+      return;
+    }
+    const targetDept = departments.find((d) => d.name === transferForm.targetDepartment) || departments[0];
+    if (!targetDept || !generalFund) {
+      toast.error("Không tìm thấy Quỹ Ban hoặc Quỹ Tổng trong CSDL.");
+      return;
+    }
+    if (transferForm.direction === "master_to_dept" && amt > currentMasterBalance) {
       toast.error("Số tiền cấp vượt quá số dư hiện có của Quỹ Tổng!");
       return;
     }
-
-    const targetDept = departments.find((d) => d.name === transferForm.targetDepartment);
-    if (!targetDept || !generalFund) {
-      toast.error("Không tìm thấy quỹ đích hoặc Quỹ Tổng trong CSDL.");
+    if (transferForm.direction === "dept_to_master" && amt > targetDept.totalAllocated) {
+      toast.error(`Số tiền chuyển vượt quá số dư hiện có của ${targetDept.name}!`);
       return;
     }
 
     setIsSubmittingTransfer(true);
     try {
-      await fetchNestApi("/financial-report/fund-transfers", {
+      const res: any = await fetchNestApi("/financial-report/fund-transfers", {
         method: "POST",
         body: JSON.stringify({
-          sourceFundId: generalFund.id,
-          destinationFundId: targetDept.id,
+          direction: transferForm.direction,
+          sourceFundId: transferForm.direction === "master_to_dept" ? generalFund.id : targetDept.id,
+          destinationFundId: transferForm.direction === "master_to_dept" ? targetDept.id : generalFund.id,
+          sourceFundName: transferForm.direction === "master_to_dept" ? generalFund.name : targetDept.name,
+          destinationFundName: transferForm.direction === "master_to_dept" ? targetDept.name : generalFund.name,
           amount: amt,
-          description: transferForm.description,
+          description: transferForm.description || `${transferForm.direction === "master_to_dept" ? "Cấp kinh phí" : "Nộp tiền về Quỹ Tổng"} (${targetDept.name})`,
           transferDate: transferForm.transferDate,
         }),
       });
       await Promise.all([fundsQuery.refetch(), transfersQuery.refetch()]);
       setShowTransferModal(false);
-      toast.success(`Đã cấp kinh phí ${amt.toLocaleString("vi-VN")} đ thành công cho ${transferForm.targetDepartment}!`);
+      toast.success(res?.message || "Đã tạo lệnh chuyển tiền chờ tiếp nhận!");
     } catch (err: any) {
-      toast.error(err?.message || "Lỗi khi thực hiện lệnh cấp kinh phí vào CSDL");
+      toast.error(err?.message || "Lỗi khi tạo lệnh chuyển tiền");
     } finally {
       setIsSubmittingTransfer(false);
+    }
+  };
+
+  const handleAcceptOrder = async (order: any) => {
+    try {
+      const res: any = await fetchNestApi(`/financial-report/fund-transfers/${order.id}/accept`, {
+        method: "POST",
+      });
+      await Promise.all([fundsQuery.refetch(), transfersQuery.refetch(), txQuery.refetch()]);
+      toast.success(res?.message || "Đã tiếp nhận lệnh chuyển tiền và cập nhật số dư quỹ!");
+    } catch (err: any) {
+      toast.error(err?.message || "Không thể tiếp nhận lệnh chuyển tiền");
+    }
+  };
+
+  const handleDeleteOrder = async (order: any) => {
+    try {
+      await fetchNestApi(`/financial-report/fund-transfers/${order.id}`, { method: "DELETE" });
+      await transfersQuery.refetch();
+      toast.success("Đã xóa lệnh chuyển tiền!");
+    } catch (err: any) {
+      toast.error(err?.message || "Không thể xóa lệnh chuyển tiền");
+    }
+  };
+
+  const handleBulkDeleteOrders = async (keys: (string | number)[]) => {
+    for (const k of keys) {
+      await fetchNestApi(`/financial-report/fund-transfers/${k}`, { method: "DELETE" }).catch(() => {});
+    }
+    setSelectedOrderIds(new Set());
+    await transfersQuery.refetch();
+    toast.success(`Đã xóa ${keys.length} lệnh chuyển tiền đã chọn!`);
+  };
+
+  // Query Cột động & Dòng tiền chi tiết cho Dashboard Quỹ từng Ban
+  const deptColumnsQuery = useQuery({
+    queryKey: ["financial-report-columns"],
+    queryFn: async () => {
+      try {
+        const res = await fetchNestApi<any[]>("/financial-report/columns");
+        return Array.isArray(res) ? res : [];
+      } catch {
+        return [];
+      }
+    },
+  });
+
+  const deptRowsQuery = useQuery({
+    queryKey: ["financial-report-dept-rows", activeDeptFund?.id],
+    enabled: Boolean(activeDeptFund?.id),
+    queryFn: async () => {
+      if (!activeDeptFund) return { rows: [], summary: { totalIncome: 0, totalExpense: 0 } };
+      const res: any = await fetchNestApi(
+        `/financial-report/rows?fundId=${encodeURIComponent(activeDeptFund.id)}&department=${encodeURIComponent(activeDeptFund.name)}`,
+      ).catch(() => ({ rows: [] }));
+      return res || { rows: [] };
+    },
+    refetchInterval: 5000,
+  });
+
+  const handleSaveFundInfo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingFund) return;
+    setSavingFund(true);
+    try {
+      await fetchNestApi(`/finance-init/funds/${editingFund.id}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          name: editingFund.name,
+          description: editingFund.description,
+          leaderName: editingFund.leaderName,
+          bankName: editingFund.bankName,
+          accountNumber: editingFund.accountNumber,
+          accountHolder: editingFund.accountHolder,
+          sepayAccountId: editingFund.sepayAccountId,
+        }),
+      });
+      await fundsQuery.refetch();
+      toast.success("Đã cập nhật thông tin Quỹ & Tài khoản ngân hàng!");
+      setEditingFund(null);
+    } catch (err: any) {
+      toast.error(err?.message || "Không thể cập nhật thông tin quỹ");
+    } finally {
+      setSavingFund(false);
+    }
+  };
+
+  const handleAddDynamicColumn = async () => {
+    const label = newColLabel.trim();
+    if (!label) return;
+    setAddingCol(true);
+    try {
+      await fetchNestApi("/financial-report/columns", {
+        method: "POST",
+        body: JSON.stringify({ column_label: label, column_type: "text" }),
+      });
+      setNewColLabel("");
+      await deptColumnsQuery.refetch();
+      toast.success(`Đã thêm cột động "${label}"!`);
+    } catch (err: any) {
+      toast.error(err?.message || "Không thể thêm cột động");
+    } finally {
+      setAddingCol(false);
+    }
+  };
+
+  const handleImportDeptExcel = async (file: File) => {
+    if (!activeDeptFund) return;
+    setImportingDeptExcel(true);
+    try {
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf, { type: "array" });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const jsonRows = XLSX.utils.sheet_to_json<Record<string, any>>(ws, { defval: "" });
+      if (jsonRows.length === 0) {
+        toast.error("File Excel không có dữ liệu.");
+        return;
+      }
+
+      const fixedHeaders = new Set(["ngày", "date", "transaction_date", "mã chứng từ", "voucher_no", "danh mục", "category", "nội dung", "description", "thu", "income", "income_amount", "chi", "expense", "expense_amount", "đối tượng", "party_name"]);
+      const existingCols = deptColumnsQuery.data || [];
+      const colKeyMap: Record<string, string> = {};
+      existingCols.forEach((c: any) => {
+        colKeyMap[String(c.column_label || "").toLowerCase().trim()] = c.column_key;
+      });
+
+      const allHeaders = Object.keys(jsonRows[0] || {});
+      for (const h of allHeaders) {
+        const norm = h.toLowerCase().trim();
+        if (!fixedHeaders.has(norm) && !colKeyMap[norm]) {
+          try {
+            const created: any = await fetchNestApi("/financial-report/columns", {
+              method: "POST",
+              body: JSON.stringify({ column_label: h, column_type: "text" }),
+            });
+            if (created?.column_key) {
+              colKeyMap[norm] = created.column_key;
+            }
+          } catch {}
+        }
+      }
+
+      for (const r of jsonRows) {
+        const customData: Record<string, any> = {
+          fundId: activeDeptFund.id,
+          department: activeDeptFund.name,
+        };
+        for (const [k, v] of Object.entries(r)) {
+          const norm = k.toLowerCase().trim();
+          if (!fixedHeaders.has(norm)) {
+            const key = colKeyMap[norm] || norm.replace(/[^a-z0-9_]/g, "_");
+            customData[key] = v;
+          }
+        }
+        await fetchNestApi("/financial-report/rows", {
+          method: "POST",
+          body: JSON.stringify({
+            transaction_date: String(r["Ngày"] || r["date"] || r["transaction_date"] || new Date().toISOString().slice(0, 10)).slice(0, 10),
+            voucher_no: String(r["Mã chứng từ"] || r["voucher_no"] || `IMP-${Date.now().toString().slice(-5)}`),
+            category: String(r["Danh mục"] || r["category"] || "Dòng tiền Quỹ Ban"),
+            description: String(r["Nội dung"] || r["description"] || `Import Excel (${activeDeptFund.name})`),
+            income_amount: Number(String(r["Thu"] || r["income"] || r["income_amount"] || 0).replace(/[^0-9.-]/g, "")) || 0,
+            expense_amount: Number(String(r["Chi"] || r["expense"] || r["expense_amount"] || 0).replace(/[^0-9.-]/g, "")) || 0,
+            party_name: String(r["Đối tượng"] || r["party_name"] || activeDeptFund.name),
+            status: "completed",
+            custom_data: customData,
+          }),
+        });
+      }
+
+      await Promise.all([deptColumnsQuery.refetch(), deptRowsQuery.refetch()]);
+      toast.success(`Đã import ${jsonRows.length} dòng & tự động lưu các cột thừa dạng JSON!`);
+    } catch (err: any) {
+      toast.error(err?.message || "Lỗi khi import file Excel");
+    } finally {
+      setImportingDeptExcel(false);
     }
   };
 
@@ -412,6 +632,59 @@ export function FinanceReport() {
                 </span>
                 <span className="text-[10px] text-slate-400 block mt-0.5">7 ban chuyên trách</span>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── 2B. THỐNG KÊ TÀI CHÍNH TRỰC QUAN (BIỂU ĐỒ DỮ LIỆU THẬT) ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-2 p-5 rounded-3xl bg-white border border-slate-200 shadow-xs">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <BarChart3 className="w-4 h-4 text-[#003B95]" />
+                <h3 className="text-sm font-black text-slate-900">Biểu Đồ Phân Bổ Số Dư Theo 7 Quỹ Ban</h3>
+              </div>
+              <span className="text-[11px] font-semibold text-slate-500">Đơn vị: VNĐ (Dữ liệu thật)</span>
+            </div>
+            <div className="h-60 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={departments.map((d) => ({ name: d.name.replace("Quỹ ", "").replace("Ban ", ""), balance: d.totalAllocated }))}>
+                  <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                  <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `${Math.round(v / 1000000)}tr`} />
+                  <RechartsTooltip formatter={(v: any) => `${Number(v || 0).toLocaleString("vi-VN")} đ`} />
+                  <Bar dataKey="balance" name="Số dư Quỹ Ban" fill="#003B95" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="p-5 rounded-3xl bg-white border border-slate-200 shadow-xs">
+            <h3 className="text-sm font-black text-slate-900 mb-3">Tỷ Trọng Nguồn Thu &amp; Quỹ</h3>
+            <div className="h-60 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <RechartsPieChart>
+                  <Pie
+                    data={[
+                      { name: "Quỹ Tổng", value: Math.max(0, currentMasterBalance) },
+                      { name: "7 Quỹ Ban", value: Math.max(0, totalAllocatedToDepts) },
+                      { name: "Thu Sự Kiện", value: Math.max(0, totalEventIn) },
+                      { name: "Tài Trợ", value: Math.max(0, totalSponsorIn) },
+                    ].filter((x) => x.value > 0)}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={72}
+                    label={false}
+                  >
+                    {["#003B95", "#F59E0B", "#10B981", "#EF4444"].map((c, idx) => (
+                      <Cell key={idx} fill={c} />
+                    ))}
+                  </Pie>
+                  <RechartsTooltip formatter={(v: any) => `${Number(v || 0).toLocaleString("vi-VN")} đ`} />
+                  <Legend wrapperStyle={{ fontSize: "11px" }} />
+                </RechartsPieChart>
+              </ResponsiveContainer>
             </div>
           </div>
         </div>
@@ -663,16 +936,63 @@ export function FinanceReport() {
                   </p>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                  <span className="text-[10px] text-slate-400">
-                    Cập nhật: {formatDisplayDate(dept.lastTransferDate)}
-                  </span>
+                <div className="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const rawFund = allFunds.find((f) => f.id === dept.id);
+                      setActiveDeptFund(rawFund || dept);
+                    }}
+                    className="text-[11px] font-bold text-[#003B95] hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>Dashboard Quỹ</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const rawFund = allFunds.find((f) => f.id === dept.id);
+                      const bank = rawFund?.bank_accounts?.[0];
+                      setEditingFund({
+                        id: dept.id,
+                        name: dept.name,
+                        description: rawFund?.description || "",
+                        leaderName: rawFund?.leader_name || dept.leader || "",
+                        bankName: bank?.bank_name || "",
+                        accountNumber: bank?.account_number || "",
+                        accountHolder: bank?.account_holder || "",
+                        sepayAccountId: bank?.sepay_account_id || "",
+                      });
+                    }}
+                    className="text-[11px] font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
+                  >
+                    <Pencil className="w-3 h-3" />
+                    <span>Sửa TK/Quỹ</span>
+                  </button>
                   <button
                     type="button"
                     onClick={() => {
                       setTransferForm({
+                        direction: "dept_to_master",
                         targetDepartment: dept.name,
-                        amount: "15000000",
+                        amount: String(Math.min(dept.totalAllocated || 0, 20000000) || 1000000),
+                        description: `Chuyển tiền thu về Quỹ Tổng từ ${dept.name}`,
+                        transferDate: new Date().toISOString().slice(0, 10),
+                      });
+                      setShowTransferModal(true);
+                    }}
+                    className="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 cursor-pointer"
+                  >
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                    <span>Nộp Tổng</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTransferForm({
+                        direction: "master_to_dept",
+                        targetDepartment: dept.name,
+                        amount: "20000000",
                         description: `Cấp kinh phí hoạt động cho ${dept.name}`,
                         transferDate: new Date().toISOString().slice(0, 10),
                       });
@@ -680,13 +1000,131 @@ export function FinanceReport() {
                     }}
                     className="text-xs font-bold text-blue-700 hover:text-blue-900 flex items-center gap-1 cursor-pointer"
                   >
-                    <span>Cấp Thêm Quỹ</span>
+                    <span>Cấp (≤20tr)</span>
                     <ChevronRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
             ))}
           </div>
+        </div>
+
+        {/* ── 4B. BẢNG LỆNH CHUYỂN TIỀN QUỸ TỔNG ↔ QUỸ BAN (TIẾP NHẬN REAL-TIME) ── */}
+        <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h3 className="text-base font-black text-slate-900 tracking-tight">
+                Lệnh Chuyển Tiền (Quỹ Tổng ↔ Quỹ Ban)
+              </h3>
+              <p className="text-xs text-slate-500">
+                Platform Admin / Lớp trưởng / Ban Tài Chính lập lệnh cấp xuống Ban (tối đa 20 triệu/lệnh). Trưởng ban bấm Tiếp nhận để cộng số dư vào Quỹ Ban.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setTransferForm({
+                  direction: "master_to_dept",
+                  targetDepartment: departments[0]?.name || "",
+                  amount: "20000000",
+                  description: "",
+                  transferDate: new Date().toISOString().slice(0, 10),
+                });
+                setShowTransferModal(true);
+              }}
+              className="px-3 py-2 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer self-start"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Lập Lệnh Chuyển Tiền</span>
+            </button>
+          </div>
+
+          <CustomTable<any>
+            data={transfersQuery.data || []}
+            keyExtractor={(r) => r.id}
+            selectable
+            selectedKeys={selectedOrderIds}
+            onSelectionChange={setSelectedOrderIds}
+            onBulkDelete={handleBulkDeleteOrders}
+            bulkDeleteLabel="Xóa các lệnh đã chọn"
+            emptyText="Chưa có lệnh chuyển tiền nào giữa Quỹ Tổng và Quỹ Ban."
+            columns={[
+              { key: "transfer_code", label: "Mã Lệnh", width: 120 },
+              {
+                key: "direction",
+                label: "Luồng Chuyển",
+                width: 170,
+                render: (r) =>
+                  r.direction === "dept_to_master" ? (
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold text-[11px]">
+                      Ban → Quỹ Tổng
+                    </span>
+                  ) : (
+                    <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-bold text-[11px]">
+                      Quỹ Tổng → Ban
+                    </span>
+                  ),
+              },
+              {
+                key: "source_fund_name",
+                label: "Quỹ Nguồn → Đích",
+                width: 240,
+                render: (r) => `${r.source_fund_name} → ${r.destination_fund_name}`,
+              },
+              {
+                key: "amount",
+                label: "Số Tiền",
+                align: "right",
+                width: 140,
+                render: (r) => (
+                  <span className="font-mono font-bold text-slate-900">
+                    {Number(r.amount || 0).toLocaleString("vi-VN")} đ
+                  </span>
+                ),
+              },
+              { key: "description", label: "Nội Dung", width: 220 },
+              {
+                key: "status",
+                label: "Trạng Thái",
+                align: "center",
+                width: 150,
+                render: (r) =>
+                  r.status === "accepted" ? (
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold text-[11px]">
+                      Đã tiếp nhận
+                    </span>
+                  ) : (
+                    <span className="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 font-bold text-[11px]">
+                      Chờ tiếp nhận
+                    </span>
+                  ),
+              },
+            ]}
+            actionColumn={{
+              title: "THAO TÁC",
+              width: 180,
+              actions: (r) => [
+                ...(r.status !== "accepted"
+                  ? [
+                      {
+                        key: "accept",
+                        label: "Tiếp nhận",
+                        icon: CheckCircle2,
+                        variant: "success" as const,
+                        onClick: () => handleAcceptOrder(r),
+                      },
+                    ]
+                  : []),
+                {
+                  key: "delete",
+                  label: "Xóa",
+                  icon: Trash2,
+                  danger: true,
+                  onClick: () => handleDeleteOrder(r),
+                },
+              ],
+            }}
+          />
         </div>
 
         {/* ── 5. NHẬT KÝ DÒNG TIỀN QUỸ TỔNG (MASTER CASHFLOW LEDGER) ── */}
@@ -719,10 +1157,9 @@ export function FinanceReport() {
                 className="px-3 py-1.5 rounded-xl border border-slate-200 text-xs text-slate-700 bg-white focus:outline-none focus:border-blue-500 cursor-pointer"
               >
                 <option value="all">Tất cả giao dịch</option>
-                <option value="tuition">Thu phí tham gia CLB</option>
                 <option value="events">Thu vé sự kiện</option>
                 <option value="sponsors">Thu tài trợ</option>
-                <option value="transfers">Lệnh cấp kinh phí các ban</option>
+                <option value="transfers">Lệnh chuyển tiền Quỹ Ban</option>
               </select>
             </div>
           </div>
@@ -739,35 +1176,11 @@ export function FinanceReport() {
                   <th className="py-3 px-4">Nội Dung Chi Tiết</th>
                   <th className="py-3 px-4 text-right">Số Tiền (VNĐ)</th>
                   <th className="py-3 px-4 text-center">Trạng Thái</th>
+                  <th className="py-3 px-4 text-center">Thao Tác</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700">
-                {/* 1. Các khoản thu phí */}
-                {tuitionPayers.map((t) => (
-                  <tr key={t.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-3 px-4 font-mono">{t.date}</td>
-                    <td className="py-3 px-4 font-mono font-bold text-blue-700">{t.transactionRef}</td>
-                    <td className="py-3 px-4">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-800">
-                        Thu Phí CLB
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <b>{t.fullName}</b> ({t.studentCode})
-                    </td>
-                    <td className="py-3 px-4 max-w-xs truncate">{t.purpose}</td>
-                    <td className="py-3 px-4 text-right font-mono font-bold text-emerald-600">
-                      +{t.amount.toLocaleString("vi-VN")} đ
-                    </td>
-                    <td className="py-3 px-4 text-center">
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800">
-                        Đã vào Quỹ
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-
-                {/* 2. Các khoản thu sự kiện */}
+                {/* 1. Các khoản thu sự kiện */}
                 {eventPayers.map((e) => (
                   <tr key={e.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="py-3 px-4 font-mono">{e.date}</td>
@@ -788,6 +1201,25 @@ export function FinanceReport() {
                       <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800">
                         Đã vào Quỹ
                       </span>
+                    </td>
+                    <td className="py-3 px-4 text-center">
+                      <TableActionsGroup
+                        maxVisible={3}
+                        actions={[
+                          {
+                            key: "view",
+                            label: "Chi tiết",
+                            icon: Eye,
+                            onClick: () =>
+                              setActiveInflowModal({
+                                title: `Chi tiết giao dịch ${e.transactionRef}`,
+                                description: e.purpose,
+                                totalAmount: e.amount,
+                                items: [e],
+                              }),
+                          },
+                        ]}
+                      />
                     </td>
                   </tr>
                 ))}
@@ -813,6 +1245,45 @@ export function FinanceReport() {
                       <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-800">
                         Đã giải ngân
                       </span>
+                    </td>
+                    <td className="py-3 px-4 text-center">
+                      <TableActionsGroup
+                        maxVisible={3}
+                        actions={[
+                          {
+                            key: "transfer_down",
+                            label: "Cấp quỹ",
+                            icon: Plus,
+                            variant: "primary",
+                            onClick: () => {
+                              setTransferForm({
+                                direction: "master_to_dept",
+                                targetDepartment: d.name,
+                                amount: "20000000",
+                                description: `Cấp kinh phí hoạt động cho ${d.name}`,
+                                transferDate: new Date().toISOString().slice(0, 10),
+                              });
+                              setShowTransferModal(true);
+                            },
+                          },
+                          {
+                            key: "transfer_up",
+                            label: "Nộp lên Tổng",
+                            icon: ArrowUpRight,
+                            variant: "success",
+                            onClick: () => {
+                              setTransferForm({
+                                direction: "dept_to_master",
+                                targetDepartment: d.name,
+                                amount: String(Math.min(d.totalAllocated || 0, 20000000) || 1000000),
+                                description: `Nộp tiền thu về Quỹ Tổng từ ${d.name}`,
+                                transferDate: new Date().toISOString().slice(0, 10),
+                              });
+                              setShowTransferModal(true);
+                            },
+                          },
+                        ]}
+                      />
                     </td>
                   </tr>
                 ))}
@@ -951,10 +1422,33 @@ export function FinanceReport() {
               </div>
 
               <form onSubmit={handleExecuteTransfer} className="space-y-4 text-xs">
-                {/* Chọn Ban nhận */}
+                {/* Chọn chiều chuyển tiền */}
                 <div>
                   <label className="block font-bold text-slate-700 mb-1">
-                    Chọn Ban Chuyên Môn Nhận Kinh Phí:
+                    Loại Lệnh Chuyển Tiền:
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setTransferForm((p) => ({ ...p, direction: "master_to_dept", amount: "20000000" }))}
+                      className={`py-2 px-3 rounded-xl border text-xs font-bold cursor-pointer ${transferForm.direction === "master_to_dept" ? "bg-blue-700 text-white border-blue-700" : "bg-white text-slate-700 border-slate-200"}`}
+                    >
+                      Quỹ Tổng → Ban (≤ 20tr)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTransferForm((p) => ({ ...p, direction: "dept_to_master" }))}
+                      className={`py-2 px-3 rounded-xl border text-xs font-bold cursor-pointer ${transferForm.direction === "dept_to_master" ? "bg-emerald-600 text-white border-emerald-600" : "bg-white text-slate-700 border-slate-200"}`}
+                    >
+                      Quỹ Ban → Quỹ Tổng
+                    </button>
+                  </div>
+                </div>
+
+                {/* Chọn Ban */}
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    {transferForm.direction === "master_to_dept" ? "Chọn Ban Nhận Kinh Phí:" : "Chọn Ban Nộp Tiền Về Quỹ Tổng:"}
                   </label>
                   <select
                     value={transferForm.targetDepartment}
@@ -963,19 +1457,20 @@ export function FinanceReport() {
                   >
                     {departments.map((d) => (
                       <option key={d.id} value={d.name}>
-                        {d.name} (Phụ trách: {d.leader})
+                        {d.name} (Số dư: {d.totalAllocated.toLocaleString("vi-VN")} đ)
                       </option>
                     ))}
                   </select>
                 </div>
 
-                {/* Số tiền cấp */}
+                {/* Số tiền */}
                 <div>
                   <label className="block font-bold text-slate-700 mb-1">
-                    Số Tiền Cấp Kinh Phí (VNĐ):
+                    Số Tiền Chuyển (VNĐ) {transferForm.direction === "master_to_dept" ? "(Tối đa 20.000.000 đ)" : ""}:
                   </label>
                   <input
                     type="number"
+                    max={transferForm.direction === "master_to_dept" ? 20000000 : undefined}
                     value={transferForm.amount}
                     onChange={(e) => setTransferForm({ ...transferForm, amount: e.target.value })}
                     placeholder="VD: 20000000"
@@ -1048,6 +1543,182 @@ export function FinanceReport() {
             toast.success("Đã đồng bộ dữ liệu tài chính từ tệp import thành công!");
           }}
         />
+
+        {/* ── MODAL 3: CHỈNH SỬA THÔNG TIN QUỸ & TÀI KHOẢN NGÂN HÀNG BAN ── */}
+        {editingFund && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+            <div className="relative w-full max-w-lg rounded-3xl bg-white border border-slate-200 p-6 text-slate-900 shadow-2xl space-y-4">
+              <div className="flex items-start justify-between pb-3 border-b border-slate-100">
+                <div>
+                  <h3 className="text-base font-black text-slate-900">Chỉnh Sửa Thông Tin Quỹ &amp; Tài Khoản Ngân Hàng</h3>
+                  <p className="text-xs text-slate-500 mt-0.5">Cập nhật thông tin tài khoản nhận tiền SePay / chuyển khoản riêng cho quỹ ban</p>
+                </div>
+                <button type="button" onClick={() => setEditingFund(null)} className="p-1 rounded-xl text-slate-400 hover:bg-slate-100 cursor-pointer">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <form onSubmit={handleSaveFundInfo} className="space-y-3 text-xs">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Tên Quỹ Ban</label>
+                  <input type="text" required value={editingFund.name} onChange={(e) => setEditingFund({ ...editingFund, name: e.target.value })} className="w-full p-2.5 rounded-xl border border-slate-200" />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Trưởng Ban / Người Phụ Trách</label>
+                  <input type="text" value={editingFund.leaderName} onChange={(e) => setEditingFund({ ...editingFund, leaderName: e.target.value })} className="w-full p-2.5 rounded-xl border border-slate-200" />
+                </div>
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Tên Ngân Hàng</label>
+                    <input type="text" placeholder="VD: VPBank, Vietcombank..." value={editingFund.bankName} onChange={(e) => setEditingFund({ ...editingFund, bankName: e.target.value })} className="w-full p-2.5 rounded-xl border border-slate-200" />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Số Tài Khoản Ngân Hàng</label>
+                    <input type="text" placeholder="Nhập STK..." value={editingFund.accountNumber} onChange={(e) => setEditingFund({ ...editingFund, accountNumber: e.target.value })} className="w-full p-2.5 rounded-xl border border-slate-200 font-mono" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Tên Chủ Tài Khoản</label>
+                    <input type="text" value={editingFund.accountHolder} onChange={(e) => setEditingFund({ ...editingFund, accountHolder: e.target.value })} className="w-full p-2.5 rounded-xl border border-slate-200" />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">SePay Account ID (Tùy chọn)</label>
+                    <input type="text" placeholder="ID TK trên my.sepay.vn" value={editingFund.sepayAccountId} onChange={(e) => setEditingFund({ ...editingFund, sepayAccountId: e.target.value })} className="w-full p-2.5 rounded-xl border border-slate-200 font-mono" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Mô Tả / Ghi Chú Quỹ</label>
+                  <textarea rows={2} value={editingFund.description} onChange={(e) => setEditingFund({ ...editingFund, description: e.target.value })} className="w-full p-2.5 rounded-xl border border-slate-200" />
+                </div>
+                <div className="pt-2 flex justify-end gap-2">
+                  <button type="button" onClick={() => setEditingFund(null)} className="px-4 py-2 rounded-xl border border-slate-200 font-bold cursor-pointer">Hủy</button>
+                  <button type="submit" disabled={savingFund} className="px-4 py-2 rounded-xl bg-[#003B95] text-white font-bold cursor-pointer disabled:opacity-50">
+                    {savingFund ? "Đang lưu..." : "Lưu Thông Tin Quỹ"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* ── MODAL 4: DASHBOARD CHI TIẾT QUỸ TỪNG BAN (DÒNG TIỀN + CỘT ĐỘNG + EXCEL JSONB) ── */}
+        {activeDeptFund && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+            <div className="relative w-full max-w-5xl rounded-3xl bg-white border border-slate-200 p-6 text-slate-900 shadow-2xl max-h-[92vh] flex flex-col space-y-4">
+              <div className="flex items-start justify-between pb-3 border-b border-slate-100">
+                <div>
+                  <h3 className="text-lg font-black text-slate-900">Dashboard Quỹ: {activeDeptFund.name}</h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Số dư: <b className="text-[#003B95] font-mono">{Number(activeDeptFund.current_balance || 0).toLocaleString("vi-VN")} đ</b>
+                    {activeDeptFund.bank_accounts?.[0] ? ` • TK: ${activeDeptFund.bank_accounts[0].bank_name} - ${activeDeptFund.bank_accounts[0].account_number}` : " • Chưa gán STK ngân hàng"}
+                  </p>
+                </div>
+                <button type="button" onClick={() => setActiveDeptFund(null)} className="p-1 rounded-xl text-slate-400 hover:bg-slate-100 cursor-pointer">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Thanh tạo cột động + Import Excel JSONB */}
+              <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-2xl bg-slate-50 border border-slate-200">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder="Tên cột động mới (VD: Dự án, Hóa đơn...)"
+                    value={newColLabel}
+                    onChange={(e) => setNewColLabel(e.target.value)}
+                    className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs w-64"
+                  />
+                  <button
+                    type="button"
+                    disabled={addingCol}
+                    onClick={handleAddDynamicColumn}
+                    className="px-3 py-1.5 rounded-xl bg-slate-900 text-white text-xs font-bold cursor-pointer disabled:opacity-50 flex items-center gap-1"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>{addingCol ? "Đang thêm..." : "Thêm Cột Động"}</span>
+                  </button>
+                </div>
+                <label className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer flex items-center gap-1.5">
+                  <UploadCloud className="w-3.5 h-3.5" />
+                  <span>{importingDeptExcel ? "Đang import..." : "Import Excel (Lưu cột thừa JSON)"}</span>
+                  <input
+                    type="file"
+                    accept=".xlsx,.xls,.csv"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) handleImportDeptExcel(f);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+              </div>
+
+              {/* Bảng dòng tiền Quỹ Ban với Cột Động + Xóa cứng hàng loạt */}
+              <div className="overflow-y-auto flex-1">
+                <CustomTable<any>
+                  data={deptRowsQuery.data?.rows || []}
+                  keyExtractor={(r) => r.id}
+                  selectable
+                  selectedKeys={selectedDeptRowIds}
+                  onSelectionChange={setSelectedDeptRowIds}
+                  onBulkDelete={async (keys) => {
+                    for (const k of keys) {
+                      await fetchNestApi(`/financial-report/rows/${k}`, { method: "DELETE" }).catch(() => {});
+                    }
+                    setSelectedDeptRowIds(new Set());
+                    await deptRowsQuery.refetch();
+                    toast.success(`Đã xóa ${keys.length} dòng đã chọn!`);
+                  }}
+                  emptyText="Chưa có dòng tiền nào trong quỹ ban này."
+                  columns={[
+                    { key: "transaction_date", label: "Ngày", width: 110, render: (r) => String(r.transaction_date || "").slice(0, 10) },
+                    { key: "voucher_no", label: "Mã CT", width: 120 },
+                    { key: "category", label: "Phân Loại", width: 150 },
+                    { key: "description", label: "Nội Dung", width: 220 },
+                    {
+                      key: "income_amount",
+                      label: "Thu (+)",
+                      align: "right",
+                      width: 130,
+                      render: (r) => <span className="font-mono font-bold text-emerald-600">+{Number(r.income_amount || 0).toLocaleString("vi-VN")} đ</span>,
+                    },
+                    {
+                      key: "expense_amount",
+                      label: "Chi (-)",
+                      align: "right",
+                      width: 130,
+                      render: (r) => <span className="font-mono font-bold text-rose-600">-{Number(r.expense_amount || 0).toLocaleString("vi-VN")} đ</span>,
+                    },
+                    ...(deptColumnsQuery.data || []).map((col: any): CustomTableColumn<any> => ({
+                      key: `dyn_${col.column_key}`,
+                      label: col.column_label,
+                      width: 140,
+                      render: (r) => String(r.custom_data?.[col.column_key] ?? "—"),
+                    })),
+                  ]}
+                  actionColumn={{
+                    title: "THAO TÁC",
+                    width: 110,
+                    actions: (r) => [
+                      {
+                        key: "del",
+                        label: "Xóa",
+                        icon: Trash2,
+                        danger: true,
+                        onClick: async () => {
+                          await fetchNestApi(`/financial-report/rows/${r.id}`, { method: "DELETE" });
+                          await deptRowsQuery.refetch();
+                          toast.success("Đã xóa dòng giao dịch!");
+                        },
+                      },
+                    ],
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </AppShell>
   );

@@ -164,8 +164,6 @@ async function bootstrap() {
       'share/(.*)',
       'api/share',
       'api/share/(.*)',
-      'webhooks/(.*)',
-      'payment/sepay-webhook',
     ],
   });
   // VULN-11 Fix: Khóa chặt chính sách CORS Whitelist theo các tên miền chính thức, ngăn ngừa CSRF & rò rỉ dữ liệu

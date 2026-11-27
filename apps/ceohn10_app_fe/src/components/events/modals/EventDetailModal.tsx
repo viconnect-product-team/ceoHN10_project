@@ -21,6 +21,9 @@ import {
   Share2,
   History,
   Trophy,
+  Pencil,
+  Trash2,
+  ScanLine,
 } from "lucide-react";
 import { toast } from "sonner";
 import { getQrUrl } from "@/lib/qr";
@@ -46,6 +49,12 @@ export interface EventDetailModalProps {
   onUnregister: (eventId: string, evt: React.MouseEvent) => void;
   onOpenRegister: (event: any, evt: React.MouseEvent) => void;
   busy: string | null;
+  canEdit?: boolean;
+  canDelete?: boolean;
+  canScanQr?: boolean;
+  onEditEvent?: (event: any) => void;
+  onDeleteEvent?: (event: any) => void;
+  onOpenQrScanner?: (event: any) => void;
 }
 
 export function isValidDriveUrl(url?: string | null): boolean {
@@ -82,6 +91,12 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
   onUnregister,
   onOpenRegister,
   busy,
+  canEdit = false,
+  canDelete = false,
+  canScanQr = false,
+  onEditEvent,
+  onDeleteEvent,
+  onOpenQrScanner,
 }) => {
   const [historyRecapOpen, setHistoryRecapOpen] = React.useState(false);
 
@@ -258,6 +273,50 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
                   <Trophy className="w-4 h-4 text-amber-300" />
                   <span>Xem Chi Tiết Lịch Sử &amp; Kỷ Niệm Sự Kiện</span>
                 </button>
+              </div>
+            )}
+
+            {/* ĐẶC BIỆT: Thanh Công Cụ Quản Trị / Ban Tổ Chức (Platform Admin, Lớp trưởng, Người tạo, Ban Sự kiện) */}
+            {(canScanQr || canEdit || canDelete) && (
+              <div className="p-3 rounded-2xl bg-slate-900 text-white border border-slate-700/80 shadow-sm space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10.5px] font-bold uppercase tracking-wider text-amber-300">
+                    Quản Trị &amp; Điều Hành Sự Kiện
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {canScanQr && onOpenQrScanner && (
+                    <button
+                      type="button"
+                      onClick={() => onOpenQrScanner(selectedEvent)}
+                      className="flex-1 min-w-[140px] py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer active:scale-95"
+                    >
+                      <ScanLine className="h-3.5 w-3.5" />
+                      <span>Quét QR Check-in/Out</span>
+                    </button>
+                  )}
+                  {canEdit && onEditEvent && (
+                    <button
+                      type="button"
+                      onClick={() => onEditEvent(selectedEvent)}
+                      className="py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer active:scale-95"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                      <span>Chỉnh sửa</span>
+                    </button>
+                  )}
+                  {canDelete && onDeleteEvent && (
+                    <button
+                      type="button"
+                      onClick={() => onDeleteEvent(selectedEvent)}
+                      disabled={busy === selectedEvent.id}
+                      className="py-2 px-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer active:scale-95 disabled:opacity-50"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                      <span>Xóa sự kiện</span>
+                    </button>
+                  )}
+                </div>
               </div>
             )}
 

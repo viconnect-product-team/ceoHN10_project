@@ -18,6 +18,10 @@ export class FinancialInitService {
    * Lấy danh sách toàn bộ các Quỹ tài chính kèm tổng dòng tiền VÀO và RA
    */
   async getFunds() {
+    await this.prisma.$executeRawUnsafe(`
+      ALTER TABLE public.financial_funds ADD COLUMN IF NOT EXISTS leader_name TEXT
+    `).catch(() => {});
+
     const funds = await this.prisma.financial_funds.findMany({
       orderBy: { current_balance: 'desc' },
       include: {
@@ -32,8 +36,12 @@ export class FinancialInitService {
     const obItems = await this.prisma.financial_opening_balance_items.findMany();
 
     const sepayEvents = await this.prisma.sepay_webhook_events.findMany({
-      where: { status: { in: ['PAID', 'RECEIVED'] } },
+      where: { status: { in: ['PAID', 'RECEIVED', 'POSTED'] } },
     });
+
+    const acceptedOrders = await this.prisma.$queryRawUnsafe<any[]>(`
+      SELECT * FROM public.fund_transfer_orders WHERE status = 'accepted' ORDER BY accepted_at DESC
+    `).catch(() => []);
 
     return funds.map((f) => {
       // 1. Số dư đầu kỳ phân bổ
@@ -41,14 +49,22 @@ export class FinancialInitService {
       const obAllocated = obItem ? Number(obItem.allocated_amount) : 0;
 
       // 2. Tiền nhận vào từ điều chuyển
-      const transferIn = transfers
-        .filter((tr) => tr.destination_fund_id === f.id)
-        .reduce((sum, tr) => sum + Number(tr.amount), 0);
+      const transferIn =
+        transfers
+          .filter((tr) => tr.destination_fund_id === f.id)
+          .reduce((sum, tr) => sum + Number(tr.amount), 0) +
+        acceptedOrders
+          .filter((o) => o.destination_fund_id === f.id)
+          .reduce((sum, o) => sum + Number(o.amount || 0), 0);
 
       // 3. Tiền chuyển đi từ điều chuyển
-      const transferOut = transfers
-        .filter((tr) => tr.source_fund_id === f.id)
-        .reduce((sum, tr) => sum + Number(tr.amount), 0);
+      const transferOut =
+        transfers
+          .filter((tr) => tr.source_fund_id === f.id)
+          .reduce((sum, tr) => sum + Number(tr.amount), 0) +
+        acceptedOrders
+          .filter((o) => o.source_fund_id === f.id)
+          .reduce((sum, o) => sum + Number(o.amount || 0), 0);
 
       // 4. Tiền nhận từ SePay Webhook
       const sepayIn = sepayEvents
@@ -75,6 +91,36 @@ export class FinancialInitService {
           voucherNo: 'SDDK-2026-001',
         });
       }
+
+      acceptedOrders
+        .filter((o) => o.destination_fund_id === f.id)
+        .forEach((o) => {
+          txList.push({
+            id: o.id,
+            type: 'IN',
+            typeName: 'Lệnh chuyển quỹ (Đã tiếp nhận)',
+            amount: Number(o.amount || 0),
+            date: o.transfer_date ? String(o.transfer_date).slice(0, 10) : new Date().toISOString().slice(0, 10),
+            counterparty: o.source_fund_name || 'Quỹ Tổng CLB CEO HN10',
+            description: o.description || 'Tiếp nhận kinh phí chuyển quỹ',
+            voucherNo: o.transfer_code,
+          });
+        });
+
+      acceptedOrders
+        .filter((o) => o.source_fund_id === f.id)
+        .forEach((o) => {
+          txList.push({
+            id: o.id,
+            type: 'OUT',
+            typeName: 'Lệnh chuyển quỹ đi',
+            amount: Number(o.amount || 0),
+            date: o.transfer_date ? String(o.transfer_date).slice(0, 10) : new Date().toISOString().slice(0, 10),
+            counterparty: o.destination_fund_name || 'Quỹ đích',
+            description: o.description || 'Chuyển quỹ',
+            voucherNo: o.transfer_code,
+          });
+        });
 
       transfers
         .filter((tr) => tr.destination_fund_id === f.id)
@@ -549,6 +595,83 @@ export class FinancialInitService {
       total_in: Number(row.total_in),
       total_out: Number(row.total_out),
       difference: Number(row.difference),
+    };
+  }
+
+  async updateFund(
+    fundId: string,
+    dto: {
+      name?: string;
+      description?: string;
+      leaderName?: string;
+      bankName?: string;
+      accountNumber?: string;
+      accountHolder?: string;
+      sepayAccountId?: string;
+    },
+  ) {
+    const existing = await this.prisma.financial_funds.findUnique({
+      where: { id: fundId },
+      include: { bank_accounts: true },
+    });
+    if (!existing) throw new NotFoundException('Không tìm thấy quỹ');
+
+    await this.prisma.$executeRawUnsafe(`
+      ALTER TABLE public.financial_funds ADD COLUMN IF NOT EXISTS leader_name TEXT
+    `).catch(() => {});
+
+    await this.prisma.$executeRawUnsafe(
+      `UPDATE public.financial_funds
+       SET name = COALESCE($1, name),
+           description = COALESCE($2, description),
+           leader_name = COALESCE($3, leader_name),
+           updated_at = NOW()
+       WHERE id = $4::uuid`,
+      dto.name ?? null,
+      dto.description ?? null,
+      dto.leaderName ?? null,
+      fundId,
+    );
+
+    if (dto.accountNumber && dto.accountNumber.trim()) {
+      const accNum = dto.accountNumber.trim();
+      const bankName = (dto.bankName || 'Ngân hàng').trim();
+      const accHolder = (dto.accountHolder || existing.name || 'CEO HN10').trim();
+      const existingAcc = existing.bank_accounts?.[0];
+
+      if (existingAcc) {
+        await this.prisma.bank_accounts.update({
+          where: { id: existingAcc.id },
+          data: {
+            bank_name: bankName,
+            account_number: accNum,
+            account_holder: accHolder,
+            sepay_account_id: dto.sepayAccountId ?? existingAcc.sepay_account_id,
+            updated_at: new Date(),
+          },
+        });
+      } else {
+        await this.prisma.bank_accounts.create({
+          data: {
+            fund_id: fundId,
+            bank_name: bankName,
+            account_number: accNum,
+            account_holder: accHolder,
+            sepay_account_id: dto.sepayAccountId || null,
+            is_default: true,
+            is_active: true,
+          },
+        });
+      }
+    }
+
+    const updated = await this.prisma.financial_funds.findUnique({
+      where: { id: fundId },
+      include: { bank_accounts: true },
+    });
+    return {
+      ...updated,
+      current_balance: Number(updated?.current_balance || 0),
     };
   }
 }
