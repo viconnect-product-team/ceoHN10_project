@@ -16,15 +16,16 @@ export function ensureSessionCookiesSync(token?: string | null): void {
     const domainAttr = getCookieDomain();
     const maxAge = 2592000; // 30 ngày cho quản trị CRM
     const cookieStr = document.cookie || "";
-    if (!cookieStr.includes(`sb-access-token=${t}`)) {
-      document.cookie = `sb-access-token=${t}; path=/; max-age=${maxAge}; SameSite=Lax${secure}${domainAttr}`;
-      document.cookie = `vibe_token=${t}; path=/; max-age=${maxAge}; SameSite=Lax${secure}${domainAttr}`;
-      document.cookie = `access_token=${t}; path=/; max-age=${maxAge}; SameSite=Lax${secure}${domainAttr}`;
+    if (!cookieStr.includes(`vibe_token=${t}`)) {
+      // Clear duplicate legacy cookies to prevent HTTP 431 Request Header Fields Too Large
+      document.cookie = `sb-access-token=; path=/; max-age=0${secure}${domainAttr}`;
+      document.cookie = `access_token=; path=/; max-age=0${secure}${domainAttr}`;
       if (domainAttr) {
-        document.cookie = `sb-access-token=${t}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
-        document.cookie = `vibe_token=${t}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
-        document.cookie = `access_token=${t}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
+        document.cookie = `sb-access-token=; path=/; max-age=0${secure}`;
+        document.cookie = `vibe_token=; path=/; max-age=0${secure}`;
+        document.cookie = `access_token=; path=/; max-age=0${secure}`;
       }
+      document.cookie = `vibe_token=${t}; path=/; max-age=${maxAge}; SameSite=Lax${secure}${domainAttr}`;
     }
   } catch {
     /* ignore */

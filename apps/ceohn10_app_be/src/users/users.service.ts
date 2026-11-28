@@ -2419,6 +2419,7 @@ export class UsersService implements OnModuleInit {
 
     const resolvedTargetSystem = data.targetSystem || 'crm_only';
     const hasCustomPermsOnCreate = Array.isArray(data.customPermissions) && data.customPermissions.length > 0;
+    const effectiveRole = hasCustomPermsOnCreate ? 'custom_account' : cleanRole;
     const isCrmGranted =
       resolvedTargetSystem === 'crm_only' ||
       resolvedTargetSystem === 'crm' ||
@@ -2452,7 +2453,7 @@ export class UsersService implements OnModuleInit {
             phone = COALESCE(NULLIF(${potentialPhone || data.phone || ''}, ''), phone),
             company_name = COALESCE(NULLIF(${data.companyName || ''}, ''), company_name),
             department = COALESCE(NULLIF(${cleanDept}, ''), department),
-            executive_role = COALESCE(NULLIF(${cleanRole}, ''), executive_role),
+            executive_role = COALESCE(NULLIF(${effectiveRole}, ''), executive_role),
             card_visibility_settings = ${metaSettingsStr}::jsonb,
             status = 'active',
             updated_at = NOW()
@@ -2472,7 +2473,7 @@ export class UsersService implements OnModuleInit {
           ${potentialPhone || data.phone || null},
           ${data.companyName ? data.companyName.trim() : 'CLB Doanh Nhân CEO HN10'},
           ${cleanDept},
-          ${cleanRole},
+          ${effectiveRole},
           'active',
           ${assocId}::uuid,
           'company',

@@ -765,7 +765,9 @@ export function Sidebar({
         className="sidebar-scroll flex-1 space-y-5 overflow-y-auto py-4"
       >
         {/* Nút Master Admin Portal (Quản trị lớn nhất nền tảng) & Tenant Switcher */}
-        {(isPrivilegedAdmin || isPlatformAdmin || isAdmin || isChuTich || user?.email === "admin@ceohn10.vn" || user?.email === "admin@viconnect.vn" || user?.email === "admin.hn10@ceohn10.vn" || user?.role === "admin" || user?.role === "quan_tri" || user?.role === "platform_admin") && (
+        {user?.role !== "custom_account" &&
+          (!Array.isArray(user?.customPermissions) || user.customPermissions.length === 0) &&
+          (isPrivilegedAdmin || isPlatformAdmin || isAdmin || isChuTich || user?.email === "admin@ceohn10.vn" || user?.email === "admin@viconnect.vn" || user?.email === "admin.hn10@ceohn10.vn" || user?.role === "admin" || user?.role === "quan_tri" || user?.role === "platform_admin") && (
           <div className={isCollapsed ? "px-2 pb-2" : "px-3 pb-2 space-y-2"}>
             <Link
               to="/master"

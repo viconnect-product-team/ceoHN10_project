@@ -107,11 +107,17 @@ function MasterAdminPortal() {
     user?.role === "platform_admin" ||
     Boolean(user?.isPlatformAdmin);
 
+  const isRestrictedCustomUser =
+    !isSuperPlatformAdmin &&
+    (user?.role === "custom_account" ||
+      (Array.isArray(user?.customPermissions) && user.customPermissions.length > 0));
+
   const isCeoHn10Admin =
-    isSuperPlatformAdmin ||
-    user?.role === "admin" ||
-    user?.targetSystem === "ceohn10" ||
-    currentUserEmail.includes("hn10");
+    !isRestrictedCustomUser &&
+    (isSuperPlatformAdmin ||
+      user?.role === "admin" ||
+      user?.targetSystem === "ceohn10" ||
+      currentUserEmail.includes("hn10"));
 
   const isMasterAdmin = isSuperPlatformAdmin || isCeoHn10Admin;
   const canManageAccounts = isSuperPlatformAdmin || isCeoHn10Admin;
@@ -761,6 +767,7 @@ function MasterAdminPortal() {
     try {
       const payload = {
         ...newAccountData,
+        role: permMode === "granular" ? "custom_account" : newAccountData.role,
         username: (newAccountData.username?.trim() || cleanEmail),
         email: cleanEmail,
         code: cleanCode,
@@ -859,6 +866,29 @@ function MasterAdminPortal() {
       setIsSavingPlatformConfig(false);
     }
   };
+
+  if (!isMasterAdmin) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-6">
+        <div className="max-w-md w-full rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-xl space-y-4">
+          <ShieldCheck className="h-12 w-12 text-rose-500 mx-auto" />
+          <h2 className="text-lg font-black text-slate-900">
+            Không có quyền truy cập Màn Quản Trị Nền Tảng
+          </h2>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Tài khoản của bạn được phân quyền riêng trong hệ thống CRM và không thể truy cập cổng Quản trị lớn nhất (Master Platform).
+          </p>
+          <button
+            type="button"
+            onClick={() => navigate({ to: "/" })}
+            className="px-5 py-2.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white text-xs font-bold shadow-sm cursor-pointer"
+          >
+            Quay về Trang chủ Hệ thống
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col lg:flex-row w-full">
