@@ -30,7 +30,9 @@ import {
   Trash2,
   Pencil,
   BarChart3,
+  Mail,
 } from "lucide-react";
+import { SendReportEmailModal } from "@/components/common/SendReportEmailModal";
 import * as XLSX from "xlsx";
 import {
   ResponsiveContainer,
@@ -610,6 +612,7 @@ export function FinanceReport() {
   };
 
   // Xuất Báo Cáo Excel Tổng Thể
+  const [mailReportOpen, setMailReportOpen] = useState(false);
   const handleExportFullReport = () => {
     exportToExcel({
       title: "BÁO CÁO DÒNG TIỀN QUỸ TỔNG VÀ PHÂN BỔ KINH PHÍ CÁC BAN - CEO HN10",
@@ -686,6 +689,14 @@ export function FinanceReport() {
             >
               <Download className="w-4 h-4 text-emerald-600" />
               <span>Xuất Báo Cáo Excel</span>
+            </button>
+            <button
+              onClick={() => setMailReportOpen(true)}
+              className="px-4 py-2 rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold text-xs shadow-xs flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
+              title="Gửi báo cáo về Email đính kèm đủ 3 định dạng: Excel, CSV, PDF"
+            >
+              <Mail className="w-4 h-4 text-blue-700" />
+              <span>Xuất Mail (3 Dạng)</span>
             </button>
           </div>
         </div>
@@ -2265,6 +2276,23 @@ export function FinanceReport() {
           </div>
         )}
       </div>
+      <SendReportEmailModal
+        open={mailReportOpen}
+        onClose={() => setMailReportOpen(false)}
+        title="BÁO CÁO DÒNG TIỀN TÀI CHÍNH CEO HN10"
+        subtitle={`Tổng thu: ${totalInflows.toLocaleString()} VNĐ | Tồn quỹ: ${currentMasterBalance.toLocaleString()} VNĐ`}
+        filePrefix={`bao-cao-tai-chinh-ceohn10-${new Date().toISOString().slice(0, 10)}`}
+        columns={[
+          { header: "Mã HV / Đơn Vị", key: "studentCode" },
+          { header: "Họ Tên / Ban", key: "fullName" },
+          { header: "Doanh Nghiệp", key: "companyName" },
+          { header: "Nội Dung", key: "purpose" },
+          { header: "Số Tiền (VNĐ)", key: "amount" },
+          { header: "Ngày GD", key: "date" },
+          { header: "Hình Thức", key: "paymentMethod" },
+        ]}
+        rows={[...tuitionPayers, ...eventPayers, ...sponsorPayers]}
+      />
     </AppShell>
   );
 }

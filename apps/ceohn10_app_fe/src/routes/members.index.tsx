@@ -36,6 +36,7 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/dashboard/AppShell";
 import { TableActionsGroup } from "@/components/common/CustomTable";
 import { CrudModal, type CrudField, type CrudValues } from "@/components/dashboard/CrudModal";
+import { SendReportEmailModal } from "@/components/common/SendReportEmailModal";
 import { MemberAccountModal } from "@/components/dashboard/MemberAccountModal";
 import { DynamicSchemaEditorModal } from "@/components/dynamic-form/DynamicSchemaEditorModal";
 import type { DynamicFieldDef } from "@/components/dynamic-form/DynamicFieldRenderer";
@@ -46,6 +47,7 @@ import { EmptyState, NoSearchResult, ListSkeleton } from "@/components/dashboard
 import { useT, type TKey } from "@/lib/i18n";
 import { useRole, PERMISSIONS } from "@/hooks/use-role";
 import { useAuth } from "@/context/AuthContext";
+import { DEPARTMENT_OPTIONS } from "@/lib/rbac-permission-helpers";
 import { usePermissions } from "@/hooks/use-permissions";
 import { PermissionGuard } from "@/components/auth/PermissionGuard";
 import { validateMemberForm } from "@/lib/validation";
@@ -388,6 +390,7 @@ function MembersPage() {
 
   // State: Gửi thư mời đăng ký Học viên mới qua Email
   const [showInviteModal, setShowInviteModal] = useState(false);
+  const [mailReportOpen, setMailReportOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteName, setInviteName] = useState("");
   const [isSendingInvite, setIsSendingInvite] = useState(false);
@@ -551,6 +554,34 @@ function MembersPage() {
     { name: "email", label: t("members.f.email"), type: "text" },
     { name: "contact", label: "Chức vụ / Chức danh", type: "text" },
     {
+      name: "department",
+      label: "Ban chuyên môn",
+      type: "select",
+      options: DEPARTMENT_OPTIONS.map((d) => ({ value: d, label: d })),
+    },
+    {
+      name: "industry",
+      label: t("members.f.industry"),
+      type: "select",
+      options: [
+        { value: "ind.trade", label: t("ind.trade") },
+        { value: "ind.it", label: t("ind.it") },
+        { value: "ind.manufacturing", label: t("ind.manufacturing") },
+        { value: "ind.realestate", label: t("ind.realestate") },
+        { value: "ind.finance", label: t("ind.finance") },
+        { value: "ind.service", label: t("ind.service") },
+      ],
+    },
+    {
+      name: "type",
+      label: t("members.f.type"),
+      type: "select",
+      options: [
+        { value: "company", label: t("type.company") },
+        { value: "individual", label: t("type.individual") },
+      ],
+    },
+    {
       name: "level",
       label: t("members.f.level"),
       type: "select",
@@ -581,7 +612,7 @@ function MembersPage() {
         { value: "expired", label: t("status.expired") },
       ],
     },
-    {
+      {
       name: "paymentStatus",
       label: "Trạng thái thanh toán phí",
       type: "select",
@@ -591,6 +622,7 @@ function MembersPage() {
         { value: "cash", label: "Đã thanh toán (Tiền mặt)" },
       ],
     },
+    { name: "feeAmount", label: "Số tiền phí tham gia CLB (VNĐ)", type: "number" },
     { name: "address", label: t("members.f.address"), type: "text" },
     { name: "joinedAt", label: "Ngày gia nhập", type: "date" },
     { name: "about", label: "Giới thiệu / Ghi chú", type: "textarea" },
@@ -717,11 +749,14 @@ function MembersPage() {
         "contact",
         "email",
         "phone",
+        "industry",
+        "type",
         "level",
         "region",
         "status",
         "paymentStatus",
         "feePaid",
+        "feeAmount",
         "address",
         "about",
         "department",
@@ -745,11 +780,14 @@ function MembersPage() {
         contact: v.contact ? String(v.contact).trim() : undefined,
         email: v.email ? String(v.email).trim() : undefined,
         phone: v.phone ? String(v.phone).trim() : undefined,
+        industry: (v.industry as any) || editing?.industry || "ind.trade",
+        type: (v.type as any) || editing?.type || "company",
         level: (v.level as any) || "memberLevel.individual",
         region: (v.region as any) || "region.north",
         status: (v.status as any) || "active",
         paymentStatus: pStatus,
         feePaid: pStatus === "paid" || pStatus === "cash",
+        feeAmount: v.feeAmount !== undefined && v.feeAmount !== "" ? Number(v.feeAmount) : undefined,
         address: v.address ? String(v.address).trim() : undefined,
         about: v.about ? String(v.about).trim() : undefined,
         joinedAt: (v as any).joinedAt ? String((v as any).joinedAt).slice(0, 10) : undefined,
@@ -957,19 +995,30 @@ function MembersPage() {
   const editInitial = (m: Member): CrudValues => {
     const custom = (m as any).customData || (m as any).custom_data || {};
     const safeCustom = typeof custom === "object" && custom !== null ? custom : {};
+    const resolvedFee =
+      (m as any).feeAmount ??
+      (m as any).fee_amount ??
+      (m.level === "vip" ? 15000000 : 10000000);
     return {
       code: m.code || "",
       name: m.name || "",
       contact: m.contact && m.contact !== m.name ? m.contact : "",
+      department: getMemberDepartment(m),
+      industry: m.industry || "ind.trade",
+      type: m.type || "company",
       email: m.email || "",
       phone: m.phone || "",
       level: m.level || "memberLevel.individual",
       region: m.region || "region.north",
       status: m.status || "active",
       paymentStatus: (m as any).payment_status || (m as any).paymentStatus || (m.feePaid ? "paid" : "unpaid"),
+      feeAmount: resolvedFee,
       address: m.address || "",
       joinedAt: m.joinedAt ? String(m.joinedAt).slice(0, 10) : "",
       about: m.about || "",
+      website: (m as any).website || safeCustom.website || "",
+      tax_code: (m as any).taxCode || (m as any).tax_code || safeCustom.tax_code || "",
+      company_size: (m as any).companySize || (m as any).company_size || safeCustom.company_size || "",
       position: safeCustom.position || safeCustom.chuc_vu || (m as any).position || (m.contact && m.contact !== m.name ? m.contact : ""),
       company: safeCustom.company || (m as any).companyName || (m as any).company_name || (m as any).company || "",
       ...safeCustom,
@@ -1294,6 +1343,15 @@ function MembersPage() {
             >
               <Download className="h-4 w-4 text-muted-foreground" />
               {t("members.export")}
+            </button>
+            <button
+              type="button"
+              onClick={() => setMailReportOpen(true)}
+              className="inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-800 shadow-xs hover:bg-blue-100 cursor-pointer"
+              title="Gửi báo cáo danh sách học viên về Email đủ 3 định dạng: Excel, CSV, PDF"
+            >
+              <Mail className="h-4 w-4" />
+              <span>Xuất Mail (3 Dạng)</span>
             </button>
           </PermissionGuard>
 
@@ -2243,6 +2301,31 @@ function MembersPage() {
           </div>
         </div>
       )}
+      <SendReportEmailModal
+        open={mailReportOpen}
+        onClose={() => setMailReportOpen(false)}
+        title="BÁO CÁO DANH BẠ HỌC VIÊN CEO HN10"
+        subtitle="Tổng hợp hồ sơ học viên CLB Doanh Nhân CEO HN10"
+        filePrefix={`bao-cao-hoc-vien-ceohn10-${new Date().toISOString().slice(0, 10)}`}
+        columns={[
+          { header: "Mã HV", key: "code" },
+          { header: "Họ Tên", key: "name" },
+          { header: "Ban Chuyên Môn", key: "department" },
+          { header: "SĐT", key: "phone" },
+          { header: "Email", key: "email" },
+          { header: "Ngày Gia Nhập", key: "joinedAt" },
+          { header: "Trạng Thái", key: "status" },
+        ]}
+        rows={filtered.map((m) => ({
+          code: m.code,
+          name: m.name,
+          department: getMemberDepartment(m),
+          phone: m.phone || "",
+          email: m.email || "",
+          joinedAt: m.joinedAt || "",
+          status: m.status,
+        }))}
+      />
     </AppShell>
   );
 

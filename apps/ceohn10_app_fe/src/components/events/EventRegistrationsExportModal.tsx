@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { exportToExcel, type ExcelColumn } from "@/lib/excel-export";
+import { buildThreeFormatAttachments } from "@/lib/report-mail-export";
 import { type EventItem, type Registration } from "@/lib/events.functions";
 import { fetchNestApi } from "@/lib/api-client";
 
@@ -679,12 +680,37 @@ export function EventRegistrationsExportModal({
         .filter((r) => r.paymentStatus === "paid")
         .reduce((sum, r) => sum + Number(r.paymentAmount || 0), 0);
 
+      const attachments = buildThreeFormatAttachments({
+        title: `BÁO CÁO ĐẠI BIỂU SỰ KIỆN: ${eventTitle}`,
+        subtitle: `Danh mục: ${activeCategoryMeta.title} | Ngày: ${eventDate}`,
+        filePrefix: `bao-cao-su-kien-${eId}`,
+        columns: [
+          { header: "Mã Vé", key: "id" },
+          { header: "Họ Tên", key: "memberName" },
+          { header: "SĐT", key: "phone" },
+          { header: "Email", key: "email" },
+          { header: "Loại Vé", key: "ticketType" },
+          { header: "Số Tiền", key: "paymentAmount" },
+          { header: "Thanh Toán", key: "paymentStatus" },
+        ],
+        rows: filteredData.map((r) => ({
+          id: r.id,
+          memberName: r.memberName,
+          phone: r.phone || "",
+          email: r.email || "",
+          ticketType: r.ticketType || "Standard",
+          paymentAmount: r.paymentAmount ?? 0,
+          paymentStatus: r.paymentStatus === "paid" ? "Đã thanh toán" : "Chưa thanh toán",
+        })),
+      });
+
       const res = await fetchNestApi<any>(`/events/${eId}/send-report`, {
         method: "POST",
         body: JSON.stringify({
           recipients: allRecipients,
           category: activeCategoryMeta.title,
           format: "Tất cả định dạng (Excel, CSV, PDF)",
+          attachments,
           reportSummary: {
             total: scopedRegistrations.length,
             checkedIn: scopedRegistrations.filter((r) => r.status === "attended" || Boolean(r.checkedInAt)).length,

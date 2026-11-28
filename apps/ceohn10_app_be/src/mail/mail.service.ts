@@ -3230,6 +3230,13 @@ export class MailService {
     html: string;
     templateCode?: string;
     fromName?: string;
+    attachments?: Array<{
+      filename: string;
+      content?: Buffer | string;
+      path?: string;
+      cid?: string;
+      contentType?: string;
+    }>;
   }) {
     this.dispatchZaloOaNotification({
       recipientEmail: options.to,
@@ -3245,6 +3252,7 @@ export class MailService {
       subject: options.subject,
       html: options.html,
       fromName: options.fromName,
+      attachments: options.attachments,
       auditContext: `[DIRECT_EMAIL] Template: ${options.templateCode || 'custom'}`,
     });
   }

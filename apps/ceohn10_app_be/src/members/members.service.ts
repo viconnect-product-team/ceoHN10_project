@@ -605,6 +605,8 @@ export class MembersService implements OnModuleInit {
       joinedAt: joinedStr,
       feeYear: r.fee_year ?? new Date().getFullYear(),
       feePaid: Boolean(r.fee_paid),
+      feeAmount: r.fee_amount !== undefined && r.fee_amount !== null ? Number(r.fee_amount) : undefined,
+      fee_amount: r.fee_amount !== undefined && r.fee_amount !== null ? Number(r.fee_amount) : undefined,
       termEnd: r.new_term_end
         ? new Date(r.new_term_end).toISOString().slice(0, 10)
         : r.term_end
@@ -1751,9 +1753,18 @@ export class MembersService implements OnModuleInit {
     const standardKeys = new Set([
       'name', 'contact', 'email', 'phone', 'type', 'level', 'industry', 'region', 'status',
       'address', 'website', 'taxCode', 'tax_code', 'employees', 'about', 'associationId',
-      'executiveRole', 'department', 'code', 'avatar', 'coverUrl', 'feePaid', 'feeYear',
+      'executiveRole', 'department', 'code', 'avatar', 'coverUrl', 'feePaid', 'feeYear', 'feeAmount', 'fee_amount',
       'paymentStatus', 'companyName', 'company', 'customData', 'custom_data', 'joinedAt', 'joined_at'
     ]);
+    const departmentVal = data.department || 'Ban Công nghệ';
+    const feeAmountVal =
+      (data as any).feeAmount !== undefined && (data as any).feeAmount !== ''
+        ? Number((data as any).feeAmount)
+        : null;
+    await this.prisma.$executeRawUnsafe(
+      `ALTER TABLE public.members ADD COLUMN IF NOT EXISTS fee_amount BIGINT`,
+    ).catch(() => {});
+
     const customFieldsObj: Record<string, any> = {
       ...(data.customData || (data as any).custom_data || {}),
     };
@@ -2146,9 +2157,19 @@ export class MembersService implements OnModuleInit {
     const standardKeys = new Set([
       'name', 'contact', 'email', 'phone', 'type', 'level', 'industry', 'region', 'status',
       'address', 'website', 'taxCode', 'tax_code', 'employees', 'about', 'associationId',
-      'executiveRole', 'department', 'code', 'avatar', 'coverUrl', 'feePaid', 'feeYear',
+      'executiveRole', 'department', 'code', 'avatar', 'coverUrl', 'feePaid', 'feeYear', 'feeAmount', 'fee_amount',
       'paymentStatus', 'companyName', 'company', 'customData', 'custom_data', 'joinedAt', 'joined_at'
     ]);
+    const departmentVal =
+      data.department !== undefined ? data.department : current.department;
+    const feeAmountVal =
+      (data as any).feeAmount !== undefined && (data as any).feeAmount !== ''
+        ? Number((data as any).feeAmount)
+        : (current.fee_amount ?? null);
+    await this.prisma.$executeRawUnsafe(
+      `ALTER TABLE public.members ADD COLUMN IF NOT EXISTS fee_amount BIGINT`,
+    ).catch(() => {});
+
     const customFieldsObj: Record<string, any> = {
       ...(data.customData || (data as any).custom_data || {}),
     };
@@ -2176,8 +2197,10 @@ export class MembersService implements OnModuleInit {
         tax_code = ${taxCode},
         employees = ${employees},
         about = ${about},
+        department = ${departmentVal},
         fee_paid = ${finalFeePaid},
         fee_year = ${feeYear},
+        fee_amount = ${feeAmountVal},
         joined_at = ${joinedAtVal}::date,
         payment_status = ${paymentStatus},
         custom_data = COALESCE(custom_data, '{}'::jsonb) || ${customJsonStr}::jsonb,

@@ -31,6 +31,7 @@ import { BulkDeleteBar, TableActionsGroup } from "@/components/common/CustomTabl
 import { PageHeader, StatCard } from "@/components/dashboard/PageKit";
 import { EmptyState, NoSearchResult } from "@/components/dashboard/StateKit";
 import { CrudModal, type CrudField, type CrudValues } from "@/components/dashboard/CrudModal";
+import { SendReportEmailModal } from "@/components/common/SendReportEmailModal";
 import { EventWizard } from "@/components/dashboard/EventWizard";
 import { EventCheckinGatekeeperModal } from "@/components/events/EventCheckinGatekeeperModal";
 import { SupplyDeclarationModal } from "@/components/dashboard/SupplyDeclarationModal";
@@ -645,6 +646,8 @@ function EventsPage() {
     toast.success("Đã xuất danh sách sự kiện chuẩn doanh nghiệp CEO HN10 (.xlsx)!");
   };
 
+  const [mailReportOpen, setMailReportOpen] = useState(false);
+
   const handleBroadcastEventToFeed = async (e: EventItem) => {
     try {
       const poster =
@@ -707,13 +710,24 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
             actions={
               <>
                 {can("EVTO_EXPORT") && (
-                  <button
-                    onClick={handleExport}
-                    className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-foreground shadow-[var(--shadow-card)] hover:bg-muted cursor-pointer"
-                  >
-                    <Download className="h-4 w-4 text-muted-foreground" />
-                    {t("common.export")}
-                  </button>
+                  <>
+                    <button
+                      onClick={handleExport}
+                      className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-foreground shadow-[var(--shadow-card)] hover:bg-muted cursor-pointer"
+                    >
+                      <Download className="h-4 w-4 text-muted-foreground" />
+                      {t("common.export")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMailReportOpen(true)}
+                      className="inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-800 shadow-xs hover:bg-blue-100 cursor-pointer"
+                      title="Gửi báo cáo danh sách sự kiện về Email đủ 3 định dạng: Excel, CSV, PDF"
+                    >
+                      <Mail className="h-4 w-4" />
+                      <span>Xuất Mail (3 Dạng)</span>
+                    </button>
+                  </>
                 )}
                 {isCharityRole && (
                   <button
@@ -1415,6 +1429,31 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
           onSuccess={() => router.invalidate()}
         />
       </div>
+      <SendReportEmailModal
+        open={mailReportOpen}
+        onClose={() => setMailReportOpen(false)}
+        title="BÁO CÁO TỔNG HỢP SỰ KIỆN CEO HN10"
+        subtitle="Danh sách sự kiện CLB Doanh Nhân CEO HN10"
+        filePrefix={`bao-cao-su-kien-ceohn10-${new Date().toISOString().slice(0, 10)}`}
+        columns={[
+          { header: "Mã SK", key: "id" },
+          { header: "Tên Sự Kiện", key: "name" },
+          { header: "Ngày Tổ Chức", key: "date" },
+          { header: "Địa Điểm", key: "location" },
+          { header: "Số Lượng ĐK", key: "registered" },
+          { header: "Giá Vé", key: "ticketPrice" },
+          { header: "Trạng Thái", key: "status" },
+        ]}
+        rows={filtered.map((e) => ({
+          id: e.id,
+          name: e.name,
+          date: e.date ? String(e.date).slice(0, 10) : "",
+          location: e.location || "",
+          registered: e.registered ?? 0,
+          ticketPrice: (e as any).ticketPrice ?? (e as any).fee ?? 0,
+          status: e.status || "",
+        }))}
+      />
     </AppShell>
   );
 }

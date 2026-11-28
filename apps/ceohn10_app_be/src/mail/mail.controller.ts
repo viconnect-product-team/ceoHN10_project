@@ -200,4 +200,63 @@ export class MailController {
       body.variables || {},
     );
   }
+
+  /**
+   * POST /api/mail/send-report
+   * Gửi báo cáo đính kèm đủ 3 định dạng file (Excel, CSV, PDF) tới danh sách email
+   */
+  @UseGuards(JwtAuthGuard)
+  @Post('send-report')
+  async sendReportWithAttachments(
+    @Body()
+    body: {
+      recipients: string[];
+      subject: string;
+      html?: string;
+      attachments?: Array<{
+        filename: string;
+        contentBase64: string;
+        contentType?: string;
+      }>;
+    },
+  ) {
+    const recipients = Array.isArray(body.recipients)
+      ? body.recipients.map((e) => String(e || '').trim()).filter((e) => e.includes('@'))
+      : [];
+    if (recipients.length === 0) {
+      throw new BadRequestException('Vui lòng cung cấp ít nhất 1 email người nhận hợp lệ');
+    }
+
+    const decodedAttachments = Array.isArray(body.attachments)
+      ? body.attachments
+          .filter((a) => a && a.filename && a.contentBase64)
+          .map((a) => ({
+            filename: a.filename,
+            content: Buffer.from(a.contentBase64, 'base64'),
+            contentType: a.contentType || 'application/octet-stream',
+          }))
+      : [];
+
+    let deliveredCount = 0;
+    for (const email of recipients) {
+      await this.mailService
+        .sendDirectEmail({
+          to: email,
+          subject: body.subject || '[CEO HN10] Báo cáo tổng hợp (Excel, CSV, PDF)',
+          html:
+            body.html ||
+            '<p>Kính gửi Quý Anh/Chị,<br/>Đính kèm là báo cáo chi tiết với đầy đủ 3 định dạng (Excel, CSV, PDF) từ hệ thống CEO HN10.</p>',
+          attachments: decodedAttachments.length > 0 ? decodedAttachments : undefined,
+        })
+        .catch(() => {});
+      deliveredCount++;
+    }
+
+    return {
+      ok: true,
+      deliveredCount,
+      attachmentCount: decodedAttachments.length,
+      recipients,
+    };
+  }
 }

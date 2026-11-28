@@ -538,7 +538,7 @@ function RegPage() {
     if (
       !window.confirm(
         `Xác nhận thu tiền mặt tại chỗ cho khách: ${r.memberName}?\nSố tiền: ${fmt.money(
-          r.paymentAmount || 500000,
+          r.paymentAmount ?? r.eventTicketPrice ?? 0,
         )}\nHệ thống sẽ tự động hạch toán vào Quản lý thu - Tiền mặt.`,
       )
     ) {
@@ -549,7 +549,7 @@ function RegPage() {
       await recordCash({
         data: {
           registrationId: r.id,
-          amount: r.paymentAmount || 500000,
+          amount: r.paymentAmount ?? r.eventTicketPrice ?? 0,
         },
       });
       toast.success(`Đã thu tiền mặt thành công! Đã cập nhật Quản lý thu.`);
@@ -1185,7 +1185,7 @@ function RegPage() {
                             <span className="text-[9px] opacity-70 underline ml-0.5">(Đổi)</span>
                           </button>
                           <span className="text-xs font-semibold text-foreground">
-                            {fmt.money(r.paymentAmount || 500000)}
+                            {fmt.money(r.paymentAmount ?? r.eventTicketPrice ?? 0)}
                           </span>
                         </div>
                         {!isPaid && !isCancelled && (
@@ -1654,7 +1654,7 @@ function RegPage() {
         type="event"
         targetId={selectedVnpayReg?.id || ""}
         eventId={selectedVnpayReg?.eventId}
-        amount={selectedVnpayReg?.paymentAmount || selectedVnpayReg?.eventTicketPrice || 500000}
+        amount={selectedVnpayReg?.paymentAmount ?? selectedVnpayReg?.eventTicketPrice ?? 0}
         title={selectedVnpayReg?.eventName || "Vé Tham Dự Sự Kiện CEO HN10"}
         attendeeName={selectedVnpayReg?.memberName}
         memberCode={selectedVnpayReg?.memberCode}

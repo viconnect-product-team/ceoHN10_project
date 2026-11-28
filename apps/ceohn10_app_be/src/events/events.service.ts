@@ -6338,136 +6338,8 @@ export class EventsService extends BaseService implements OnModuleInit {
     `.catch(() => []);
     let nextIdBig = lastReg.length > 0 ? BigInt(lastReg[0].id) + 1n : BigInt(`5${Math.floor(1000 + Math.random() * 9000)}`);
 
-    // 4.1. VALIDATION NGHIỆP VỤ BẮT BUỘC:
+    // 4.1. Lấy danh sách loại vé của sự kiện (chỉ dùng làm fallback khi file không có cột giá vé / loại vé)
     const declaredTickets: any[] = (await this.getEventTickets(eventId).catch(() => [])) || [];
-
-    // (A) Nếu sự kiện ĐÃ KHAI BÁO CÁC LOẠI VÉ KHÁC NHAU (event_ticket_types):
-    if (Array.isArray(declaredTickets) && declaredTickets.length > 0) {
-      const validNamesSummary = declaredTickets
-        .map((t) => `"${t.name}" (${Number(t.price).toLocaleString('vi-VN')} đ)`)
-        .join(', ');
-
-      for (let i = 0; i < records.length; i++) {
-        const item = records[i];
-        const fullName = (
-          item.fullName ||
-          item.name ||
-          item.memberName ||
-          item['Họ tên'] ||
-          item['Họ và tên'] ||
-          item['Tên'] ||
-          ''
-        ).trim();
-        if (!fullName) continue;
-
-        const rawStatus = String(
-          item.paymentStatus ||
-          item.status ||
-          item['Trạng thái thanh toán'] ||
-          item['Thanh toán'] ||
-          item['Tình trạng'] ||
-          '',
-        ).toLowerCase();
-        const isInvited =
-          rawStatus.includes('mời') ||
-          rawStatus.includes('moi') ||
-          rawStatus.includes('invited') ||
-          item.paymentStatus === 'invited_free';
-
-        if (isInvited) continue;
-
-        const rawTicketName = String(
-          item.ticketType ||
-          item['Loại vé'] ||
-          item['Tên vé'] ||
-          item['Hạng vé'] ||
-          item['Vé'] ||
-          item['Loại'] ||
-          item['Ticket Type'] ||
-          item['Ticket'] ||
-          '',
-        ).trim();
-
-        const rawTicketLower = rawTicketName.toLowerCase();
-
-        // Khớp loại vé với danh sách vé đã khai báo
-        const matchedTicket = declaredTickets.find((dt) => {
-          const dtNameLower = dt.name.trim().toLowerCase();
-          return (
-            dtNameLower === rawTicketLower ||
-            (rawTicketLower &&
-              (dtNameLower.includes(rawTicketLower) ||
-                rawTicketLower.includes(dtNameLower)))
-          );
-        });
-
-        if (!matchedTicket) {
-          throw new BadRequestException(
-            `Dòng ${i + 1}: Đại biểu "${fullName}" có loại vé "${rawTicketName || 'Trống'}" không khớp với các loại vé đã khai báo của sự kiện (${validNamesSummary}). Không được phép import!`,
-          );
-        }
-
-        // Kiểm tra giá tiền trong file bắt buộc phải khớp chính xác với giá vé hệ thống
-        const rawPrice =
-          item.ticketPrice ||
-          item.ticketFee ||
-          item.fee ||
-          item.price ||
-          item.amount ||
-          item['Giá vé'] ||
-          item['Phí'] ||
-          item['Số tiền'] ||
-          item['Phí tham dự'];
-
-        if (rawPrice !== undefined && rawPrice !== null && String(rawPrice).trim() !== '') {
-          const cleanPrice = String(rawPrice).replace(/[^0-9]/g, '');
-          if (cleanPrice) {
-            const parsedPrice = parseInt(cleanPrice, 10);
-            if (parsedPrice > 0 && parsedPrice !== Number(matchedTicket.price)) {
-              throw new BadRequestException(
-                `Dòng ${i + 1}: Đại biểu "${fullName}" đăng ký vé "${matchedTicket.name}" nhưng bị lệch giá! Giá trong file là ${parsedPrice.toLocaleString('vi-VN')} đ, giá khai báo trong hệ thống là ${Number(matchedTicket.price).toLocaleString('vi-VN')} đ. Không được phép import!`,
-              );
-            }
-          }
-        }
-      }
-    } else {
-      // (B) Trường hợp sự kiện áp dụng một mức phí duy nhất:
-      // (B1) Nếu sự kiện là MIỄN PHÍ: tệp import không được phép có trường tiền hoặc giá vé > 0
-      const isEventFree = eventDefaultFee === 0 && !event.is_paid;
-      if (isEventFree) {
-        for (const item of records) {
-          const rawPrice = item.ticketPrice || item.ticketFee || item.fee || item.price || item.amount || item['Giá vé'] || item['Phí'] || item['Số tiền'] || item['Phí tham dự'];
-          if (rawPrice !== undefined && rawPrice !== null && String(rawPrice).trim() !== '') {
-            const cleanPrice = String(rawPrice).replace(/[^0-9]/g, '');
-            if (cleanPrice && parseInt(cleanPrice, 10) > 0) {
-              throw new BadRequestException('Sự kiện được đánh dấu là MIỄN PHÍ. Tệp import không được phép chứa thông tin thu tiền hoặc giá vé có phí!');
-            }
-          }
-        }
-      }
-
-      // (B2) Nếu sự kiện CÓ THU PHÍ: giá vé trong tệp bắt buộc phải khớp với giá vé mặc định đã thiết lập trên hệ thống (trừ khách mời không thu phí)
-      if (!isEventFree && eventDefaultFee > 0) {
-        for (const item of records) {
-          const rawStatus = String(item.paymentStatus || item.status || item['Trạng thái thanh toán'] || item['Thanh toán'] || item['Tình trạng'] || '').toLowerCase();
-          const isInvited = rawStatus.includes('mời') || rawStatus.includes('moi') || rawStatus.includes('invited') || item.paymentStatus === 'invited_free';
-          if (isInvited) continue;
-
-          const rawPrice = item.ticketPrice || item.ticketFee || item.fee || item.price || item.amount || item['Giá vé'] || item['Phí'] || item['Số tiền'] || item['Phí tham dự'];
-          if (rawPrice !== undefined && rawPrice !== null && String(rawPrice).trim() !== '') {
-            const cleanPrice = String(rawPrice).replace(/[^0-9]/g, '');
-            if (cleanPrice) {
-              const parsedPrice = parseInt(cleanPrice, 10);
-              if (parsedPrice > 0 && parsedPrice !== eventDefaultFee) {
-                const name = item.fullName || item.name || 'đại biểu';
-                throw new BadRequestException(`Giá vé của đại biểu "${name}" (${parsedPrice.toLocaleString('vi-VN')} đ) không khớp với giá vé mặc định của sự kiện (${eventDefaultFee.toLocaleString('vi-VN')} đ). Vui lòng điều chỉnh lại tệp trước khi nhập!`);
-              }
-            }
-          }
-        }
-      }
-    }
 
     let importedCount = 0;
     let paidCount = 0;
@@ -6475,7 +6347,7 @@ export class EventsService extends BaseService implements OnModuleInit {
     let totalFundAdded = 0;
     const createdTickets: any[] = [];
 
-    // 5. Duyệt qua từng bản ghi
+    // 5. Duyệt qua từng bản ghi — GIỮ NGUYÊN 100% dữ liệu giá vé & trạng thái thanh toán từ file import
     for (const item of records) {
       const fullName = (item.fullName || item.name || item.memberName || item['Họ tên'] || item['Họ và tên'] || item['Tên'] || '').trim();
       if (!fullName) continue;
@@ -6486,41 +6358,65 @@ export class EventsService extends BaseService implements OnModuleInit {
       const position = (item.position || item.title || item['Chức danh'] || item['Chức vụ'] || '').trim();
       const note = (item.note || item.notes || item['Ghi chú'] || '').trim();
 
-      // Nhận diện trạng thái khách mời không thu phí
-      const rawStatus = String(item.paymentStatus || item.status || item['Trạng thái thanh toán'] || item['Thanh toán'] || item['Tình trạng'] || '').toLowerCase();
+      // Nhận diện trạng thái thanh toán từ file
+      const rawStatus = String(
+        item.paymentStatus ??
+        item.status ??
+        item['Trạng thái thanh toán'] ??
+        item['Thanh toán'] ??
+        item['Tình trạng'] ??
+        item['Trạng thái'] ??
+        '',
+      ).toLowerCase();
       const isInvited = rawStatus.includes('mời') || rawStatus.includes('moi') || rawStatus.includes('invited') || item.paymentStatus === 'invited_free';
 
-      // Xử lý loại vé & phí vé theo cấu hình sự kiện
-      let ticketType = (item.ticketType || item['Loại vé'] || item['Tên vé'] || item['Hạng vé'] || item['Vé'] || '').trim();
-      let ticketFee = isInvited ? 0 : eventDefaultFee;
+      // Đọc giá vé trực tiếp từ file (nếu có thì lấy nguyên bản từ file, tuyệt đối không ghi đè!)
+      const rawPrice =
+        item.ticketPrice ??
+        item.ticketFee ??
+        item.fee ??
+        item.price ??
+        item.amount ??
+        item.paymentAmount ??
+        item['Giá vé'] ??
+        item['Phí'] ??
+        item['Số tiền'] ??
+        item['Phí tham dự'] ??
+        item['Giá'];
+      const hasExplicitFilePrice =
+        rawPrice !== undefined &&
+        rawPrice !== null &&
+        String(rawPrice).trim() !== '' &&
+        /[0-9]/.test(String(rawPrice));
+      const parsedFilePrice = hasExplicitFilePrice
+        ? Math.max(0, parseInt(String(rawPrice).replace(/[^0-9]/g, ''), 10) || 0)
+        : null;
 
-      if (Array.isArray(declaredTickets) && declaredTickets.length > 0) {
-        if (isInvited) {
-          ticketFee = 0;
-          ticketType = 'Vé Mời Miễn Phí';
-        } else {
-          const rawTicketLower = ticketType.toLowerCase();
-          const matchedTicket = declaredTickets.find((dt) => {
-            const dtNameLower = dt.name.trim().toLowerCase();
-            return (
-              dtNameLower === rawTicketLower ||
-              (rawTicketLower && (dtNameLower.includes(rawTicketLower) || rawTicketLower.includes(dtNameLower)))
-            );
-          }) || declaredTickets[0];
+      let ticketType = (item.ticketType || item['Loại vé'] || item['Tên vé'] || item['Hạng vé'] || item['Vé'] || '').trim();
+      let ticketFee = isInvited ? 0 : (parsedFilePrice !== null ? parsedFilePrice : eventDefaultFee);
+
+      if (Array.isArray(declaredTickets) && declaredTickets.length > 0 && !isInvited) {
+        const rawTicketLower = ticketType.toLowerCase();
+        const matchedTicket = declaredTickets.find((dt) => {
+          const dtNameLower = dt.name.trim().toLowerCase();
+          return (
+            dtNameLower === rawTicketLower ||
+            (rawTicketLower && (dtNameLower.includes(rawTicketLower) || rawTicketLower.includes(dtNameLower)))
+          );
+        });
+        if (!ticketType && matchedTicket) {
           ticketType = matchedTicket.name;
-          ticketFee = Number(matchedTicket.price || 0);
+        } else if (!ticketType) {
+          ticketType = declaredTickets[0].name;
         }
-      } else if (!isInvited) {
-        const rawPrice = item.ticketPrice || item.ticketFee || item.fee || item.price || item.amount || item['Giá vé'] || item['Phí'] || item['Số tiền'] || item['Phí tham dự'];
-        if (rawPrice !== undefined && rawPrice !== null && String(rawPrice).trim() !== '') {
-          const cleanPrice = String(rawPrice).replace(/[^0-9]/g, '');
-          if (cleanPrice) {
-            ticketFee = Math.max(0, parseInt(cleanPrice, 10));
-          }
+        if (parsedFilePrice === null) {
+          ticketFee = Number((matchedTicket || declaredTickets[0]).price || 0);
         }
-        if (!ticketType) {
-          ticketType = ticketFee === 0 ? 'Vé Mời Miễn Phí' : 'Vé Tiêu Chuẩn';
-        }
+      } else if (isInvited) {
+        ticketFee = 0;
+        if (!ticketType) ticketType = 'Vé Mời Miễn Phí';
+      } else if (!ticketType) {
+        ticketType = ticketFee === 0 ? 'Vé Mời Miễn Phí' : 'Vé Tiêu Chuẩn';
       }
       let isPaid = false;
       let paymentStatus = 'unpaid';
@@ -6713,6 +6609,27 @@ export class EventsService extends BaseService implements OnModuleInit {
           eventId,
           `Ghi nhận tự động từ import danh sách sự kiện (${eventTitle})`,
         ).catch(() => {});
+        await this.prisma.$executeRawUnsafe(`
+          INSERT INTO public.financial_report_rows (
+            id, row_code, title, type, amount,
+            transaction_date, voucher_no, category, description,
+            income_amount, expense_amount, balance_after, party_name, status,
+            custom_data, created_at, updated_at
+          ) VALUES (
+            gen_random_uuid(), $1, $2, 'income', $3,
+            now()::date, $4, 'Phí tham gia sự kiện', $5,
+            $3, 0, 0, $6, 'completed',
+            $7::jsonb, now(), now()
+          )
+        `,
+          txCode,
+          `Thu phí tham gia sự kiện ${eventTitle} - ${fullName}`,
+          ticketFee,
+          `EV${regId}`,
+          `Ghi nhận tự động từ import danh sách sự kiện (${eventTitle})`,
+          fullName,
+          JSON.stringify({ eventId, regId, ticketType, source: 'event_import' }),
+        ).catch(() => {});
       }
 
       // 7. GỬI MÃ VÉ HOẶC THÔNG BÁO THANH TOÁN QUA EMAIL / ZALO OA
@@ -6856,6 +6773,11 @@ export class EventsService extends BaseService implements OnModuleInit {
     recipients: string[];
     category?: string;
     format?: string;
+    attachments?: Array<{
+      filename: string;
+      contentBase64: string;
+      contentType?: string;
+    }>;
     reportSummary?: {
       total: number;
       checkedIn: number;
@@ -6875,6 +6797,16 @@ export class EventsService extends BaseService implements OnModuleInit {
       throw new BadRequestException('Vui lòng chọn ít nhất một người nhận báo cáo');
     }
 
+    const decodedAttachments = Array.isArray(body.attachments)
+      ? body.attachments
+          .filter((a) => a && a.filename && a.contentBase64)
+          .map((a) => ({
+            filename: a.filename,
+            content: Buffer.from(a.contentBase64, 'base64'),
+            contentType: a.contentType || 'application/octet-stream',
+          }))
+      : [];
+
     const summary = body.reportSummary || {
       total: 0,
       checkedIn: 0,
@@ -6890,6 +6822,7 @@ export class EventsService extends BaseService implements OnModuleInit {
         this.mailService.sendDirectEmail({
           to: email.trim(),
           subject: `[BÁO CÁO SỰ KIỆN] ${eventTitle} — Danh mục: ${body.category || 'Tổng hợp'}`,
+          attachments: decodedAttachments.length > 0 ? decodedAttachments : undefined,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 650px; margin: 0 auto; padding: 24px; border: 1px solid #cbd5e1; border-radius: 12px;">
               <h2 style="color: #003B95; margin-bottom: 8px;">BÁO CÁO TỔNG KẾT ĐẠI BIỂU SỰ KIỆN</h2>
