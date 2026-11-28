@@ -660,8 +660,19 @@ export class EventsService extends BaseService implements OnModuleInit {
 
     const event = this.mapEventRow(rows[0]);
     const tickets = await this.getEventTickets(id);
+    const maxTicketPrice =
+      tickets.length > 0
+        ? Math.max(0, ...tickets.map((tk: any) => Number(tk.price) || 0))
+        : 0;
+    const effectivePrice = Math.max(Number(event.ticketPrice || 0), Number(event.fee || 0), maxTicketPrice);
 
-    return { ...event, tickets };
+    return {
+      ...event,
+      ticketPrice: effectivePrice,
+      fee: effectivePrice,
+      isPaid: effectivePrice > 0,
+      tickets,
+    };
   }
 
   async getEventTickets(eventId: string) {
@@ -739,7 +750,7 @@ export class EventsService extends BaseService implements OnModuleInit {
     const maxPrice = ticketRows.length > 0 ? Math.max(0, ...ticketRows.map((tk) => tk.price)) : 0;
     await this.prisma.$executeRaw`
       UPDATE public.events
-      SET ticket_price = ${maxPrice}, fee = ${maxPrice}, updated_at = now()
+      SET ticket_price = ${maxPrice}, fee = ${maxPrice}, is_paid = ${maxPrice > 0}, updated_at = now()
       WHERE id = ${eventId}
     `.catch(() => {});
 
@@ -5516,6 +5527,7 @@ export class EventsService extends BaseService implements OnModuleInit {
         r.ticket_type,
         r.seat_assignment,
         r.checked_in_at,
+        r.checked_out_at,
         r.status,
         r.attended_parts,
         r.event_id
@@ -5542,6 +5554,8 @@ export class EventsService extends BaseService implements OnModuleInit {
         seatAssignment: t.seat_assignment || 'Khu A',
         isCheckedIn: !!t.checked_in_at,
         checkedInAt: t.checked_in_at ? new Date(t.checked_in_at).toLocaleString('vi-VN') : null,
+        isCheckedOut: !!t.checked_out_at,
+        checkedOutAt: t.checked_out_at ? new Date(t.checked_out_at).toLocaleString('vi-VN') : null,
         status: t.status || 'pending',
         attendedParts: parseJsonArraySafe(t.attended_parts),
       })),

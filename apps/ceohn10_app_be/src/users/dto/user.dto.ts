@@ -58,28 +58,34 @@ export class ListUsersQueryDto {
 }
 
 export class AdminCreateUserDto {
-  static schema = z.object({
-    username: z
-      .string()
-      .trim()
-      .min(3, 'Tên đăng nhập / Email quản trị phải có tối thiểu 3 ký tự'),
-    email: z.string().trim().email('Địa chỉ email không đúng định dạng').optional().or(z.literal('')),
-    password: z
-      .string()
-      .min(6, 'Mật khẩu khởi tạo phải có tối thiểu 6 ký tự')
-      .optional()
-      .or(z.literal('')),
-    name: z.string().optional(),
-    code: z.string().optional(),
-    phone: z.string().optional(),
-    companyName: z.string().optional(),
-    role: z.string().optional(),
-    executiveRole: z.string().optional(),
-    department: z.string().optional(),
-    account_status: z.string().optional(),
-    targetSystem: z.string().optional(),
-    customPermissions: z.array(z.string()).optional(),
-  });
+  static schema = z
+    .object({
+      username: z.string().trim().optional().or(z.literal('')),
+      email: z.string().trim().email('Địa chỉ email không đúng định dạng').optional().or(z.literal('')),
+      password: z
+        .string()
+        .min(6, 'Mật khẩu khởi tạo phải có tối thiểu 6 ký tự')
+        .optional()
+        .or(z.literal('')),
+      name: z.string().optional(),
+      code: z.string().optional(),
+      phone: z.string().optional(),
+      companyName: z.string().optional(),
+      role: z.string().optional(),
+      executiveRole: z.string().optional(),
+      department: z.string().optional(),
+      account_status: z.string().optional(),
+      targetSystem: z.string().optional(),
+      customPermissions: z.array(z.string()).optional(),
+    })
+    .passthrough()
+    .refine(
+      (d) => (d.username && d.username.trim().length >= 3) || (d.email && d.email.trim().length >= 3),
+      {
+        message: 'Tên đăng nhập / Email quản trị phải có tối thiểu 3 ký tự',
+        path: ['username'],
+      },
+    );
 
   username!: string;
   email?: string;

@@ -630,7 +630,13 @@ function PublicEventCheckinGatePage() {
           setSelectedEventObj(matched);
           setSelectedEventId(matched.id);
           setSelectedEventName(matched.name || matched.title || "Sự kiện CLB CEO HN10");
-          const fee = Number(matched.fee || matched.ticket_price || matched.ticketPrice || 0);
+          const maxTkPrice = Array.isArray(matched.tickets)
+            ? Math.max(0, ...matched.tickets.map((tk: any) => Number(tk.price || 0)))
+            : 0;
+          const fee = Math.max(
+            Number(matched.fee || matched.ticket_price || matched.ticketPrice || 0),
+            maxTkPrice,
+          );
           setSelectedEventFee(fee);
           setSelectedEventIsFree(fee === 0);
         }
@@ -647,7 +653,13 @@ function PublicEventCheckinGatePage() {
     if (found) {
       setSelectedEventObj(found);
       setSelectedEventName(found.name || found.title || "Sự kiện CLB CEO HN10");
-      const fee = Number(found.fee || found.ticket_price || found.ticketPrice || 0);
+      const maxTkPrice = Array.isArray(found.tickets)
+        ? Math.max(0, ...found.tickets.map((tk: any) => Number(tk.price || 0)))
+        : 0;
+      const fee = Math.max(
+        Number(found.fee || found.ticket_price || found.ticketPrice || 0),
+        maxTkPrice,
+      );
       setSelectedEventFee(fee);
       setSelectedEventIsFree(fee === 0);
     }

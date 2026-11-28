@@ -35,7 +35,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
-import { getNestApiUrl, resolveMediaUrl } from "@/lib/api-client";
+import { fetchNestApi, getNestApiUrl, resolveMediaUrl } from "@/lib/api-client";
 
 import { AppShell } from "@/components/dashboard/AppShell";
 import { PageHeader, StatCard, TableShell } from "@/components/dashboard/PageKit";
@@ -288,17 +288,23 @@ function DocsPage() {
     setSubmitting(true);
     try {
       if (editing) {
-        await updateFn({ data: { id: editing.id, ...payload } as never });
+        await fetchNestApi(`/documents/${encodeURIComponent(editing.id)}`, {
+          method: "PUT",
+          body: JSON.stringify(payload),
+        });
         toast.success(t("common.updated"));
       } else {
-        await createFn({ data: payload as never });
+        await fetchNestApi("/documents", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
         toast.success(t("common.created"));
       }
       setOpen(false);
       setEditing(null);
       await router.invalidate();
-    } catch {
-      toast.error(t("common.saveError"));
+    } catch (err: any) {
+      toast.error(err?.message || t("common.saveError"));
     } finally {
       setSubmitting(false);
     }

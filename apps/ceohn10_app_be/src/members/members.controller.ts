@@ -435,7 +435,7 @@ export class MembersController {
   @RequireActions('MEM_ADD')
   @Post()
   async createMember(@Request() req: any, @Body() body: CreateMemberDto) {
-    return this.membersService.createMember(req.user.id, body);
+    return this.membersService.createMember(req.user.id, body, req.user?.email, req.user?.role);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -446,7 +446,7 @@ export class MembersController {
     @Param('id') id: string,
     @Body() body: UpdateMemberDto,
   ) {
-    return this.membersService.updateMember(req.user.id, id, body);
+    return this.membersService.updateMember(req.user.id, id, body, req.user?.email, req.user?.role);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

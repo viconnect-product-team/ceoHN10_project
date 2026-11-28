@@ -766,13 +766,13 @@ function MasterAdminPortal() {
         code: cleanCode,
         name: newAccountData.name.trim() || cleanEmail.split("@")[0],
         password: cleanPass,
-        targetSystem: newAccountData.targetSystem || "all",
+        targetSystem: newAccountData.targetSystem || "crm_only",
         customPermissions: permMode === "granular" && selectedPerms.length > 0 ? selectedPerms : undefined,
       };
 
       await fetchNestApi("/users", {
         method: "POST",
-        body: payload,
+        body: JSON.stringify(payload),
       });
       toast.success("Đã tạo tài khoản quản trị mới thành công");
       setShowCreateAccountModal(false);
