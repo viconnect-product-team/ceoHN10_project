@@ -5140,8 +5140,8 @@ export class AdminService implements OnModuleInit {
           COALESCE(u.last_sign_in_at, u.updated_at, NOW()) as last_login_at
         FROM public.vione_users u
         LEFT JOIN public.members m ON (u.id::text = m.user_id::text OR u.email = m.email)
-        WHERE u.role IN ('admin', 'platform_admin', 'adm', 'bqt', 'chu_tich', 'pho_chu_tich', 'tong_thu_ky', 'ban_thu_ky', 'truong_ban_truyen_thong', 'truong_ban_thanh_vien', 'truong_ban_xuc_tien', 'truong_ban_tai_chinh', 'truong_ban_thien_nguyen')
-           OR u.email IN ('admin@viconnect.vn', 'admin@connect.vn', 'infor@viconnect.vn')
+        WHERE u.role IN ('platform_admin', 'admin', 'lop_truong', 'lop_pho', 'truong_team', 'pho_team', 'truong_ban_chuyen_trach', 'giang_vien')
+           OR LOWER(COALESCE(u.email, '')) = 'admin@ceohn10.vn'
         ORDER BY u.role ASC, last_login_at DESC
         LIMIT 50;
       `).catch(() => []);
@@ -5189,19 +5189,15 @@ export class AdminService implements OnModuleInit {
 
   private resolveRoleLabel(role: string): string {
     const map: Record<string, string> = {
-      chu_tich: 'Chủ Tịch CLB',
-      pho_chu_tich: 'Phó Chủ Tịch CLB',
-      tong_thu_ky: 'Tổng Thư Ký',
-      ban_thu_ky: 'Ban Thư Ký',
-      admin: 'Quản Trị Viên Hệ Thống',
-      platform_admin: 'Master Platform Admin',
-      adm: 'Quản Trị Kỹ Thuật (ADM)',
-      bqt: 'Ban Quản Trị CLB',
-      truong_ban_tai_chinh: 'Trưởng Ban Tài Chính (BTC)',
-      truong_ban_truyen_thong: 'Trưởng Ban Truyền Thông (BTT)',
-      truong_ban_thanh_vien: 'Trưởng Ban Thành Viên (BTV)',
-      truong_ban_xuc_tien: 'Trưởng Ban Xúc Tiến (BXT)',
-      truong_ban_thien_nguyen: 'Trưởng Ban Thiện Nguyện (BTN)',
+      platform_admin: 'Platform Admin',
+      admin: 'Admin',
+      lop_truong: 'Lớp trưởng',
+      lop_pho: 'Lớp phó',
+      truong_team: 'Trưởng team',
+      pho_team: 'Phó team',
+      truong_ban_chuyen_trach: 'Trưởng ban chuyên trách',
+      giang_vien: 'Giảng viên',
+      member: 'Học viên',
     };
     return map[role] || 'Quản Trị Viên';
   }

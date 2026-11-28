@@ -3095,15 +3095,15 @@ function MasterAdminPortal() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-white border-slate-200 text-slate-800">
-                    <SelectItem value="admin">Quản trị viên (Admin)</SelectItem>
-                    <SelectItem value="lop_truong">Lớp Trưởng / Cán Sự Lớp</SelectItem>
-                    <SelectItem value="lop_pho">Lớp Phó / Hỗ Trợ Đào Tạo</SelectItem>
-                    <SelectItem value="giang_vien">Giảng Viên &amp; Chuyên Gia</SelectItem>
-                    <SelectItem value="truong_ban">Trưởng Ban Chuyên Môn</SelectItem>
-                    <SelectItem value="ban_dieu_hanh">Ban Điều Hành</SelectItem>
-                    <SelectItem value="ban_thu_ky">Ban Thư Ký</SelectItem>
-                    <SelectItem value="ban_cong_nghe">Ban Công Nghệ</SelectItem>
-                    <SelectItem value="ke_toan">Kế toán &amp; Tài chính</SelectItem>
+                    <SelectItem value="platform_admin">Platform Admin (Toàn quyền)</SelectItem>
+                    <SelectItem value="admin">Admin (Quản trị viên)</SelectItem>
+                    <SelectItem value="lop_truong">Lớp trưởng</SelectItem>
+                    <SelectItem value="lop_pho">Lớp phó</SelectItem>
+                    <SelectItem value="truong_team">Trưởng team</SelectItem>
+                    <SelectItem value="pho_team">Phó team</SelectItem>
+                    <SelectItem value="truong_ban_chuyen_trach">Trưởng các ban chuyên trách (7 Ban)</SelectItem>
+                    <SelectItem value="giang_vien">Giảng viên / Chuyên gia</SelectItem>
+                    <SelectItem value="member">Học viên / Hội viên</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

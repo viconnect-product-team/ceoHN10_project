@@ -768,212 +768,45 @@ export class UsersService implements OnModuleInit {
         this.logger.warn(`Could not seed CEOHN10-ADMIN into members: ${err.message}`);
       });
 
-      // 1. Kiểm tra tài khoản admin@connect.vn
+      // Chỉ đảm bảo duy nhất tài khoản quản trị hệ thống mặc định admin@ceohn10.vn tồn tại trong vione_users (KHÔNG seed dữ liệu học viên hay tài khoản giả lập)
       const adminRows = await this.prisma.$queryRaw<any[]>`
-        SELECT id, username, email FROM public.vione_users 
-        WHERE email = 'admin@connect.vn' OR username = 'admin@connect.vn' OR email = 'admin@viconnect.vn'
+        SELECT id, username, email FROM public.vione_users
+        WHERE LOWER(email) = 'admin@ceohn10.vn' OR LOWER(username) = 'admin@ceohn10.vn'
         LIMIT 1
       `.catch(() => []);
 
-      let adminUserId = '00000000-0000-4000-8000-000000000002';
+      let adminUserId = 'c1000000-0000-4000-8000-000000000001';
       if (adminRows.length === 0) {
-        this.logger.log('Seeding root admin account (admin@connect.vn) into database...');
+        this.logger.log('Ensuring root platform admin account (admin@ceohn10.vn) in vione_users...');
         await this.prisma.$executeRaw`
           INSERT INTO public.vione_users (id, username, email, name, password, email_verified, created_at, updated_at)
           VALUES (
-            ${adminUserId}::uuid, 
-            'admin@connect.vn', 
-            'admin@connect.vn', 
-            'Lê Thị Dung (Admin Viconnect)', 
-            ${defaultPasswordHash}, 
-            true, 
-            NOW(), 
+            ${adminUserId}::uuid,
+            'admin@ceohn10.vn',
+            'admin@ceohn10.vn',
+            'Hệ thống platform CEOHN10',
+            ${defaultPasswordHash},
+            true,
+            NOW(),
             NOW()
           )
-          ON CONFLICT (id) DO UPDATE SET
-            username = EXCLUDED.username,
-            email = EXCLUDED.email,
-            name = EXCLUDED.name,
-            updated_at = NOW()
+          ON CONFLICT (id) DO NOTHING
         `.catch((err) => {
-          this.logger.warn(`Could not seed root admin into vione_users: ${err.message}`);
+          this.logger.warn(`Could not ensure admin@ceohn10.vn in vione_users: ${err.message}`);
         });
       } else {
         adminUserId = String(adminRows[0].id);
       }
 
-      // Đảm bảo roles cho admin
-      await this.prisma.$executeRaw`
-        INSERT INTO public.user_roles (user_id, role)
-        VALUES (${adminUserId}::uuid, 'admin'::public.app_role)
-        ON CONFLICT DO NOTHING
-      `.catch(() => { });
       await this.prisma.$executeRaw`
         INSERT INTO public.user_roles (user_id, role)
         VALUES (${adminUserId}::uuid, 'platform_admin'::public.app_role)
         ON CONFLICT DO NOTHING
       `.catch(() => { });
-
-      // Đảm bảo profile cho admin
-      await this.prisma.$executeRaw`
-        INSERT INTO public.user_profiles (user_id, display_name, company_name, professional_title)
-        VALUES (${adminUserId}::uuid, 'Lê Thị Dung (Admin Viconnect)', 'Công ty CP Giải Pháp Viconnect', 'Quản trị viên hệ thống')
-        ON CONFLICT (user_id) DO UPDATE SET
-          display_name = EXCLUDED.display_name
-      `.catch(() => { });
-
-      // Đảm bảo record trong public.members cho admin
-      await this.prisma.$executeRaw`
-        INSERT INTO public.members (
-          id, user_id, code, name, email, phone, company_name, department, executive_role, status,
-          association_id, type, level, industry, region, payment_status, fee_paid, created_at, updated_at
-        ) VALUES (
-          'HN10-001',
-          ${adminUserId}::uuid,
-          'HN10-001',
-          'Lê Thị Dung (Admin Viconnect)',
-          'admin@connect.vn',
-          '0988870888',
-          'Công ty CP Giải Pháp Viconnect',
-          'Ban Công nghệ',
-          'admin',
-          'active',
-          'c1983000-0000-4000-8000-000000001983'::uuid,
-          'company',
-          'memberLevel.large',
-          'ind.trade',
-          'region.north',
-          'paid',
-          true,
-          NOW(),
-          NOW()
-        )
-        ON CONFLICT (id) DO UPDATE SET
-          name = EXCLUDED.name,
-          email = EXCLUDED.email,
-          phone = EXCLUDED.phone,
-          company_name = EXCLUDED.company_name,
-          department = EXCLUDED.department,
-          executive_role = EXCLUDED.executive_role,
-          status = 'active',
-          payment_status = 'paid',
-          fee_paid = true,
-          association_id = EXCLUDED.association_id,
-          updated_at = NOW()
-      `.catch((err) => {
-        this.logger.warn(`Could not seed HN10-001 into members: ${err.message}`);
-      });
-
-      // 2. Kiểm tra tài khoản infor@viconnect.vn (hoặc alias info@viconnect.vn)
-      const mediaRows = await this.prisma.$queryRaw<any[]>`
-        SELECT id, username, email FROM public.vione_users 
-        WHERE email = 'infor@viconnect.vn' OR username = 'infor@viconnect.vn' 
-           OR email = 'info@viconnect.vn' OR username = 'info@viconnect.vn'
-        LIMIT 1
-      `.catch(() => []);
-
-      let mediaUserId = '00000000-0000-4000-8000-000000000003';
-      if (mediaRows.length === 0) {
-        this.logger.log('Seeding media account (infor@viconnect.vn) into database...');
-        await this.prisma.$executeRaw`
-          INSERT INTO public.vione_users (id, username, email, name, password, email_verified, created_at, updated_at)
-          VALUES (
-            ${mediaUserId}::uuid, 
-            'infor@viconnect.vn', 
-            'infor@viconnect.vn', 
-            'Phạm Hồng Nguyên', 
-            ${mediaPasswordHash}, 
-            true, 
-            NOW(), 
-            NOW()
-          )
-          ON CONFLICT (id) DO UPDATE SET
-            username = 'infor@viconnect.vn',
-            email = 'infor@viconnect.vn',
-            password = ${mediaPasswordHash},
-            name = EXCLUDED.name,
-            updated_at = NOW()
-        `.catch((err) => {
-          this.logger.warn(`Could not seed media account into vione_users: ${err.message}`);
-        });
-      } else {
-        mediaUserId = String(mediaRows[0].id);
-        await this.prisma.$executeRaw`
-          UPDATE public.vione_users 
-          SET username = 'infor@viconnect.vn', email = 'infor@viconnect.vn', password = ${mediaPasswordHash}, name = 'Phạm Hồng Nguyên', updated_at = NOW() 
-          WHERE id = ${mediaUserId}::uuid
-        `.catch(() => { });
-      }
-
-      // Đảm bảo roles cho media
       await this.prisma.$executeRaw`
         INSERT INTO public.user_roles (user_id, role)
-        VALUES (${mediaUserId}::uuid, 'admin'::public.app_role)
+        VALUES (${adminUserId}::uuid, 'admin'::public.app_role)
         ON CONFLICT DO NOTHING
-      `.catch(() => { });
-
-      // Đảm bảo profile cho media
-      await this.prisma.$executeRaw`
-        INSERT INTO public.user_profiles (user_id, display_name, company_name, professional_title)
-        VALUES (${mediaUserId}::uuid, 'Phạm Hồng Nguyên', 'CLB Doanh Nhân CEO HN10', 'Trưởng Ban Truyền thông')
-        ON CONFLICT (user_id) DO UPDATE SET
-          display_name = EXCLUDED.display_name,
-          company_name = EXCLUDED.company_name,
-          professional_title = EXCLUDED.professional_title
-      `.catch(() => { });
-
-      // Đảm bảo record trong public.members cho media (Phạm Hồng Nguyên)
-      await this.prisma.$executeRaw`
-        INSERT INTO public.members (
-          id, user_id, code, name, email, phone, company_name, department, executive_role, status,
-          association_id, type, level, industry, region, payment_status, fee_paid, created_at, updated_at
-        ) VALUES (
-          'HN10-002',
-          ${mediaUserId}::uuid,
-          'HN10-002',
-          'Phạm Hồng Nguyên',
-          'infor@viconnect.vn',
-          '0983988999',
-          'CLB Doanh Nhân CEO HN10',
-          'Ban Truyền thông',
-          'truong_ban_chuyen_trach',
-          'active',
-          'c1983000-0000-4000-8000-000000001983'::uuid,
-          'company',
-          'memberLevel.large',
-          'ind.trade',
-          'region.north',
-          'paid',
-          true,
-          NOW(),
-          NOW()
-        )
-        ON CONFLICT (id) DO UPDATE SET
-          name = EXCLUDED.name,
-          email = 'infor@viconnect.vn',
-          phone = EXCLUDED.phone,
-          company_name = EXCLUDED.company_name,
-          department = EXCLUDED.department,
-          executive_role = EXCLUDED.executive_role,
-          status = 'active',
-          payment_status = 'paid',
-          fee_paid = true,
-          association_id = EXCLUDED.association_id,
-          updated_at = NOW()
-      `.catch((err) => {
-        this.logger.warn(`Could not seed HN10-002 into members: ${err.message}`);
-      });
-
-      // Đồng bộ tên Phạm Hồng Nguyên, email infor@viconnect.vn và mật khẩu 123456 cho toàn bộ record
-      await this.prisma.$executeRaw`
-        UPDATE public.members 
-        SET email = 'infor@viconnect.vn', name = 'Phạm Hồng Nguyên', updated_at = NOW() 
-        WHERE email IN ('info@viconnect.vn', 'infor@viconnect.vn') OR id = 'HN10-002' OR code = 'HN10-002'
-      `.catch(() => { });
-      await this.prisma.$executeRaw`
-        UPDATE public.vione_users 
-        SET email = 'infor@viconnect.vn', username = 'infor@viconnect.vn', password = ${mediaPasswordHash}, name = 'Phạm Hồng Nguyên', updated_at = NOW() 
-        WHERE email IN ('info@viconnect.vn', 'infor@viconnect.vn') OR username IN ('info@viconnect.vn', 'infor@viconnect.vn')
       `.catch(() => { });
 
     } catch (e: any) {
@@ -1015,42 +848,6 @@ export class UsersService implements OnModuleInit {
 
     if (user) {
       return user;
-    }
-
-    if (username === 'admin@viconnect.vn' || username === 'admin@connect.vn' || username === 'admini@connect.vn') {
-      return {
-        id: '00000000-0000-4000-8000-000000000002',
-        username: 'admin@viconnect.vn',
-        password:
-          '$2b$10$FLMpymq2ujbhVinusol9XuMc5pjTY97IZNrT0b9UAmzRtMoKrXHbu',
-        email: 'admin@viconnect.vn',
-        name: 'Administrator',
-        avatar_url: null,
-        google_id: null,
-        apple_id: null,
-        email_verified: true,
-        apple_refresh_token: null,
-        created_at: new Date(),
-        updated_at: new Date(),
-      } as vione_users;
-    }
-
-    if (username === 'infor@viconnect.vn' || username === 'info@viconnect.vn') {
-      return {
-        id: '00000000-0000-4000-8000-000000000003',
-        username: 'infor@viconnect.vn',
-        password:
-          '$2b$10$tAFcUYZ3KvebD7UHowJ5RODjJofc6UWAkd/n2pKqvJBw4ySP//s5u',
-        email: 'infor@viconnect.vn',
-        name: 'Phạm Hồng Nguyên',
-        avatar_url: null,
-        google_id: null,
-        apple_id: null,
-        email_verified: true,
-        apple_refresh_token: null,
-        created_at: new Date('2026-10-20'),
-        updated_at: new Date(),
-      } as vione_users;
     }
 
     if (this.prisma) {
@@ -1106,65 +903,6 @@ export class UsersService implements OnModuleInit {
         email_verified: true,
         apple_refresh_token: null,
         created_at: new Date(),
-        updated_at: new Date(),
-      } as vione_users;
-    }
-
-    if (
-      id === '00000000-0000-0000-0000-000000000000' ||
-      id === '00000000-0000-4000-8000-000000000002'
-    ) {
-      const adminUser =
-        (await this.usersRepo.findByUsername('admin@viconnect.vn')) ||
-        (await this.usersRepo.findByUsername('admin@connect.vn'));
-
-      if (adminUser) {
-        return adminUser;
-      }
-
-      return {
-        id: '00000000-0000-4000-8000-000000000002',
-        username: 'admin@viconnect.vn',
-        password:
-          '$2b$10$FLMpymq2ujbhVinusol9XuMc5pjTY97IZNrT0b9UAmzRtMoKrXHbu',
-        email: 'admin@viconnect.vn',
-        name: 'Administrator',
-        avatar_url: null,
-        google_id: null,
-        apple_id: null,
-        email_verified: true,
-        apple_refresh_token: null,
-        created_at: new Date(),
-        updated_at: new Date(),
-      } as vione_users;
-    }
-
-    if (
-      id === '00000000-0000-4000-8000-000000000003' ||
-      id === 'usr-mem-2' ||
-      id === 'HN10-002'
-    ) {
-      const mediaUser =
-        (await this.usersRepo.findByUsername('infor@viconnect.vn')) ||
-        (await this.usersRepo.findByUsername('info@viconnect.vn'));
-
-      if (mediaUser) {
-        return mediaUser;
-      }
-
-      return {
-        id: '00000000-0000-4000-8000-000000000003',
-        username: 'infor@viconnect.vn',
-        password:
-          '$2b$10$tAFcUYZ3KvebD7UHowJ5RODjJofc6UWAkd/n2pKqvJBw4ySP//s5u',
-        email: 'infor@viconnect.vn',
-        name: 'Phạm Hồng Nguyên',
-        avatar_url: null,
-        google_id: null,
-        apple_id: null,
-        email_verified: true,
-        apple_refresh_token: null,
-        created_at: new Date('2026-10-20'),
         updated_at: new Date(),
       } as vione_users;
     }
@@ -2174,65 +1912,7 @@ export class UsersService implements OnModuleInit {
       };
     });
 
-    // Đảm bảo luôn trả về ít nhất 2 tài khoản Học viên thực tế nếu bảng vione_users trống hoặc chưa sync
-    if (items.length === 0) {
-      const dbMembers = await this.prisma.$queryRaw<any[]>`
-        SELECT * FROM public.members ORDER BY updated_at DESC, created_at DESC LIMIT 50
-      `.catch(() => []);
-
-      const fallbackList = dbMembers.length > 0 ? dbMembers : [
-        {
-          id: '00000000-0000-4000-8000-000000000001',
-          name: 'Lê Thị Dung (Admin Viconnect)',
-          email: 'admin@viconnect.vn',
-          code: 'HN10-001',
-          department: 'Ban Công nghệ',
-          executive_role: 'admin',
-          status: 'active',
-          created_at: new Date('2026-08-18'),
-        },
-        {
-          id: '00000000-0000-4000-8000-000000000003',
-          name: 'Phạm Hồng Nguyên',
-          email: 'infor@viconnect.vn',
-          code: 'HN10-002',
-          department: 'Ban Truyền thông',
-          executive_role: 'truong_ban_chuyen_trach',
-          status: 'active',
-          created_at: new Date('2026-10-20'),
-        },
-      ];
-
-      items = fallbackList.map((m: any, idx: number) => {
-        const isLTD = m.email === 'admin@viconnect.vn' || m.code === 'HN10-001' || String(m.name || '').includes('Dung');
-        const email = m.email || (isLTD ? 'admin@viconnect.vn' : 'infor@viconnect.vn');
-        const execRole = isLTD ? 'admin' : (m.executive_role || 'member');
-        const hasCrm = isLTD || ['platform_admin', 'admin', 'lop_truong', 'lop_pho', 'truong_team', 'pho_team', 'truong_ban_chuyen_trach'].includes(execRole);
-        return {
-          id: m.user_id || m.id || `usr-mem-${idx + 1}`,
-          username: email,
-          email: email,
-          name: m.name || m.contact || (isLTD ? 'Lê Thị Dung (Admin Viconnect)' : 'Phạm Hồng Nguyên'),
-          avatar_url: m.avatar_url || m.avatar || null,
-          email_verified: true,
-          account_status: m.status === 'expired' ? 'suspended' : 'active',
-          company_name: m.company || m.company_name || 'CLB Doanh Nhân CEO HN10',
-          professional_title: isLTD ? 'Quản Trị Viên Hệ Thống' : 'Trưởng Ban Truyền Thông',
-          roles: isLTD ? ['admin', 'platform_admin'] : [execRole],
-          role: execRole,
-          primaryRole: execRole,
-          department: isLTD ? 'Ban Công nghệ' : (m.department || 'Ban Gắn kết & Đời sống'),
-          executiveRole: execRole,
-          targetSystem: hasCrm ? 'all' : 'app_only',
-          canAccessCrm: hasCrm,
-          can_access_crm: hasCrm,
-          customPermissions: [],
-          memberCode: m?.code || `HN10-00${idx + 1}`,
-          created_at: m.created_at || m.joined_at || new Date(),
-          updated_at: m.updated_at || new Date(),
-        };
-      });
-    }
+    // Không trả về dữ liệu tài khoản/học viên hardcode khi DB trống (STRICT NO-MOCK LAW)
 
     // Optional in-memory role & status filters if applied
     if (params.role && params.role !== 'all') {
