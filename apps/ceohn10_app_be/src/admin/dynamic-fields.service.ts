@@ -104,9 +104,9 @@ export class DynamicFieldsService {
     try {
       fields = await this.prisma.$queryRawUnsafe<any[]>(
         `SELECT * FROM public.dynamic_form_fields 
-         WHERE schema_id = $1::uuid 
-         ORDER BY order_index ASC, created_at ASC`,
-        schema.id,
+         WHERE entity_type = $1 
+         ORDER BY COALESCE(display_order, 0) ASC, created_at ASC`,
+        entityType,
       );
     } catch {
       fields = [];
@@ -116,6 +116,8 @@ export class DynamicFieldsService {
       schema,
       fields: fields.map((f) => ({
         ...f,
+        field_name: f.field_key || f.field_name,
+        order_index: f.display_order ?? f.order_index ?? 0,
         options: Array.isArray(f.options) ? f.options : typeof f.options === 'string' ? JSON.parse(f.options || '[]') : [],
         metadata: typeof f.metadata === 'string' ? JSON.parse(f.metadata || '{}') : (f.metadata || {}),
       })),
@@ -149,31 +151,35 @@ export class DynamicFieldsService {
       throw new NotFoundException('Không tìm thấy schema tương ứng');
     }
 
+    const entityType = data.entity_type || 'member';
+    const fieldKey = (data.field_name || (data as any).field_key || '').trim();
     const optionsJson = JSON.stringify(data.options || []);
-    const metadataJson = JSON.stringify(data.metadata || {});
 
     const rows = await this.prisma.$queryRawUnsafe<any[]>(
       `INSERT INTO public.dynamic_form_fields (
-        id, schema_id, field_name, field_label, field_type, options, 
-        placeholder, default_value, is_required, is_enabled, order_index, metadata, created_at, updated_at
+        id, entity_type, field_key, field_label, field_type, options,
+        placeholder, is_required, is_enabled, display_order, is_system_field, created_at, updated_at
       ) VALUES (
-        gen_random_uuid(), $1::uuid, $2, $3, $4, $5::jsonb,
-        $6, $7, $8, $9, $10, $11::jsonb, NOW(), NOW()
+        gen_random_uuid()::text, $1, $2, $3, $4, $5::jsonb,
+        $6, $7, $8, $9, false, NOW(), NOW()
       ) RETURNING *`,
-      schemaId,
-      data.field_name,
+      entityType,
+      fieldKey,
       data.field_label,
       data.field_type || 'text',
       optionsJson,
       data.placeholder || '',
-      data.default_value !== undefined ? String(data.default_value) : null,
       Boolean(data.is_required),
       data.is_enabled !== undefined ? Boolean(data.is_enabled) : true,
       Number(data.order_index || 0),
-      metadataJson,
     );
 
-    return rows[0];
+    const created = rows[0];
+    return {
+      ...created,
+      field_name: created?.field_key || fieldKey,
+      order_index: created?.display_order ?? Number(data.order_index || 0),
+    };
   }
 
   /**
@@ -181,7 +187,7 @@ export class DynamicFieldsService {
    */
   async updateField(id: string, data: Partial<DynamicFormField>) {
     const fields = await this.prisma.$queryRawUnsafe<any[]>(
-      `SELECT * FROM public.dynamic_form_fields WHERE id = $1::uuid LIMIT 1`,
+      `SELECT * FROM public.dynamic_form_fields WHERE id::text = $1 LIMIT 1`,
       id,
     );
     if (!fields[0]) {
@@ -195,8 +201,7 @@ export class DynamicFieldsService {
     const placeholder = data.placeholder ?? current.placeholder;
     const isRequired = data.is_required !== undefined ? Boolean(data.is_required) : current.is_required;
     const isEnabled = data.is_enabled !== undefined ? Boolean(data.is_enabled) : current.is_enabled;
-    const orderIndex = data.order_index !== undefined ? Number(data.order_index) : current.order_index;
-    const metadataJson = JSON.stringify(data.metadata ?? current.metadata ?? {});
+    const displayOrder = data.order_index !== undefined ? Number(data.order_index) : (current.display_order ?? 0);
 
     const updated = await this.prisma.$queryRawUnsafe<any[]>(
       `UPDATE public.dynamic_form_fields SET
@@ -206,10 +211,9 @@ export class DynamicFieldsService {
         placeholder = $5,
         is_required = $6,
         is_enabled = $7,
-        order_index = $8,
-        metadata = $9::jsonb,
+        display_order = $8,
         updated_at = NOW()
-       WHERE id = $1::uuid
+       WHERE id::text = $1
        RETURNING *`,
       id,
       fieldLabel,
@@ -218,11 +222,14 @@ export class DynamicFieldsService {
       placeholder,
       isRequired,
       isEnabled,
-      orderIndex,
-      metadataJson,
+      displayOrder,
     );
 
-    return updated[0];
+    return {
+      ...updated[0],
+      field_name: updated[0]?.field_key || updated[0]?.field_name,
+      order_index: updated[0]?.display_order ?? displayOrder,
+    };
   }
 
   /**
@@ -230,7 +237,7 @@ export class DynamicFieldsService {
    */
   async deleteField(id: string) {
     await this.prisma.$executeRawUnsafe(
-      `DELETE FROM public.dynamic_form_fields WHERE id = $1::uuid`,
+      `DELETE FROM public.dynamic_form_fields WHERE id::text = $1`,
       id,
     );
     return { success: true, message: 'Đã xóa trường cấu hình thành công' };
