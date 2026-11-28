@@ -1,4 +1,5 @@
 import React, { useRef, useState, useCallback, useMemo, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   ChevronLeft,
   ChevronRight,
@@ -128,18 +129,46 @@ export function TableActionsGroup({
   children?: React.ReactNode;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number; openUp: boolean }>({ top: 0, left: 0, openUp: false });
   const menuRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const portalMenuRef = useRef<HTMLDivElement>(null);
+
+  const updateMenuPosition = useCallback(() => {
+    if (!triggerRef.current) return;
+    const rect = triggerRef.current.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const openUp = spaceBelow < 180 && rect.top > 180;
+    setMenuPos({
+      top: openUp ? rect.top - 4 : rect.bottom + 4,
+      left: Math.max(8, rect.right - 180),
+      openUp,
+    });
+  }, []);
 
   useEffect(() => {
     if (!menuOpen) return;
+    updateMenuPosition();
     const handleClickOutside = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(target) &&
+        (!portalMenuRef.current || !portalMenuRef.current.contains(target))
+      ) {
         setMenuOpen(false);
       }
     };
+    const handleScrollOrResize = () => updateMenuPosition();
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [menuOpen]);
+    window.addEventListener("scroll", handleScrollOrResize, true);
+    window.addEventListener("resize", handleScrollOrResize);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener("scroll", handleScrollOrResize, true);
+      window.removeEventListener("resize", handleScrollOrResize);
+    };
+  }, [menuOpen, updateMenuPosition]);
 
   if (actions && Array.isArray(actions)) {
     const visibleActions = actions.filter((a) => !a.hidden);
@@ -205,9 +234,11 @@ export function TableActionsGroup({
         })}
 
         <button
+          ref={triggerRef}
           type="button"
           onClick={(e) => {
             e.stopPropagation();
+            if (!menuOpen) updateMenuPosition();
             setMenuOpen((prev) => !prev);
           }}
           className="inline-flex items-center justify-center w-7 h-7 rounded-md border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 cursor-pointer transition shadow-2xs"
@@ -217,31 +248,43 @@ export function TableActionsGroup({
           <MoreHorizontal className="w-4 h-4" />
         </button>
 
-        {menuOpen && (
-          <div className="absolute right-0 top-full mt-1 w-44 z-50 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 shadow-lg py-1 text-left text-xs">
-            {extraActions.map((act, i) => {
-              const Icon = act.icon;
-              return (
-                <button
-                  key={act.key || i}
-                  type="button"
-                  disabled={act.disabled}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setMenuOpen(false);
-                    act.onClick(e);
-                  }}
-                  className={`w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
-                    act.danger ? "text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30" : "text-slate-700 dark:text-slate-200"
-                  }`}
-                >
-                  {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
-                  <span className="truncate">{act.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        )}
+        {menuOpen &&
+          typeof document !== "undefined" &&
+          createPortal(
+            <div
+              ref={portalMenuRef}
+              style={{
+                position: "fixed",
+                top: menuPos.top,
+                left: menuPos.left,
+                transform: menuPos.openUp ? "translateY(-100%)" : undefined,
+              }}
+              className="w-48 z-[9999] rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 shadow-xl py-1 text-left text-xs"
+            >
+              {extraActions.map((act, i) => {
+                const Icon = act.icon;
+                return (
+                  <button
+                    key={act.key || i}
+                    type="button"
+                    disabled={act.disabled}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMenuOpen(false);
+                      act.onClick(e);
+                    }}
+                    className={`w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                      act.danger ? "text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30" : "text-slate-700 dark:text-slate-200"
+                    }`}
+                  >
+                    {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
+                    <span className="truncate">{act.label}</span>
+                  </button>
+                );
+              })}
+            </div>,
+            document.body,
+          )}
       </div>
     );
   }
@@ -258,9 +301,11 @@ export function TableActionsGroup({
     <div className="relative inline-flex items-center justify-center gap-1.5" ref={menuRef}>
       {directChildren}
       <button
+        ref={triggerRef}
         type="button"
         onClick={(e) => {
           e.stopPropagation();
+          if (!menuOpen) updateMenuPosition();
           setMenuOpen((prev) => !prev);
         }}
         className="inline-flex items-center justify-center w-7 h-7 rounded-md border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 cursor-pointer transition shadow-2xs"
@@ -269,15 +314,27 @@ export function TableActionsGroup({
       >
         <MoreHorizontal className="w-4 h-4" />
       </button>
-      {menuOpen && (
-        <div className="absolute right-0 top-full mt-1 min-w-[160px] z-50 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 shadow-lg p-1.5 text-left text-xs space-y-1">
-          {extraChildren.map((child, i) => (
-            <div key={i} onClick={() => setMenuOpen(false)} className="w-full [&>button]:w-full [&>button]:justify-start [&>button]:py-1.5 [&>button]:px-2.5">
-              {child}
-            </div>
-          ))}
-        </div>
-      )}
+      {menuOpen &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div
+            ref={portalMenuRef}
+            style={{
+              position: "fixed",
+              top: menuPos.top,
+              left: menuPos.left,
+              transform: menuPos.openUp ? "translateY(-100%)" : undefined,
+            }}
+            className="min-w-[180px] z-[9999] rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 shadow-xl p-1.5 text-left text-xs space-y-1"
+          >
+            {extraChildren.map((child, i) => (
+              <div key={i} onClick={() => setMenuOpen(false)} className="w-full [&>button]:w-full [&>button]:justify-start [&>button]:py-1.5 [&>button]:px-2.5">
+                {child}
+              </div>
+            ))}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

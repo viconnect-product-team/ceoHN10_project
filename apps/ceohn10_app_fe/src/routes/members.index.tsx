@@ -47,7 +47,7 @@ import { EmptyState, NoSearchResult, ListSkeleton } from "@/components/dashboard
 import { useT, type TKey } from "@/lib/i18n";
 import { useRole, PERMISSIONS } from "@/hooks/use-role";
 import { useAuth } from "@/context/AuthContext";
-import { DEPARTMENT_OPTIONS } from "@/lib/rbac-permission-helpers";
+import { DEPARTMENT_OPTIONS, canModifyRecord } from "@/lib/rbac-permission-helpers";
 import { usePermissions } from "@/hooks/use-permissions";
 import { PermissionGuard } from "@/components/auth/PermissionGuard";
 import { validateMemberForm } from "@/lib/validation";
@@ -1971,7 +1971,7 @@ function MembersPage() {
                         >
                           <Eye className="h-4 w-4" />
                         </button>
-                        {canEdit && (user?.role !== "custom_account" || ((m as any).createdBy === user?.id || (m as any).created_by === user?.id)) && (
+                        {canEdit && canModifyRecord(user, (m as any).createdBy || (m as any).created_by, (m as any).createdByName) && (
                           <button
                             onClick={() => setEditing(m)}
                             aria-label={t("common.edit")}
@@ -1991,7 +1991,7 @@ function MembersPage() {
                             <UserCog className="h-4 w-4" />
                           </button>
                         )}
-                        {canDelete && (user?.role !== "custom_account" || ((m as any).createdBy === user?.id || (m as any).created_by === user?.id)) && (
+                        {canDelete && canModifyRecord(user, (m as any).createdBy || (m as any).created_by, (m as any).createdByName) && (
                           <button
                             onClick={() => setDeleting(m)}
                             aria-label={t("common.delete")}

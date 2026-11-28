@@ -76,69 +76,46 @@ export class MembersService implements OnModuleInit {
     if (!userId) return false;
     const cleanId = String(userId).trim().toLowerCase();
     if (
+      cleanId === 'c1000000-0000-4000-8000-000000000001' ||
       cleanId === '00000000-0000-0000-0000-000000000000' ||
       cleanId === '00000000-0000-4000-8000-000000000002' ||
-      cleanId === 'admin@connect.vn' ||
-      cleanId === 'clbceohn10@gmail.com' ||
-      cleanId === 'vumikasa6@gmail.com'
+      cleanId === 'admin@ceohn10.vn'
     ) {
       return true;
     }
-    const adminRoles = [
-      'platform_admin',
-      'tenant_admin',
-      'admin',
-      'superadmin',
-      'quan_tri',
-      'chu_tich',
-      'truong_ban_dieu_hanh',
-      'thanh_vien_ban_dieu_hanh',
-      'ban_dieu_hanh',
-      'bqt',
-      'adm',
-    ];
 
-    // Check vione_users by id or email or username
-    const vUsers = await this.prisma.$queryRaw<any[]>`
-      SELECT id, email, username FROM public.vione_users 
+    // Kiểm tra trên cả vione_users, ceohn10_users, user_roles và public.members (CHỈ platform_admin)
+    const uRows = await this.prisma.$queryRaw<any[]>`
+      SELECT id, email, username FROM public.vione_users
+      WHERE id::text = ${userId}::text OR LOWER(email) = ${cleanId} OR LOWER(username) = ${cleanId}
+      UNION ALL
+      SELECT id, email, username FROM public.ceohn10_users
       WHERE id::text = ${userId}::text OR LOWER(email) = ${cleanId} OR LOWER(username) = ${cleanId}
       LIMIT 1
     `.catch(() => []);
-    if (vUsers.length > 0) {
-      const uEmail = (vUsers[0].email || '').toLowerCase();
-      const uName = (vUsers[0].username || '').toLowerCase();
-      if (
-        uEmail === 'admin@connect.vn' ||
-        uEmail === 'clbceohn10@gmail.com' ||
-        uEmail === 'vumikasa6@gmail.com' ||
-        uEmail.startsWith('admin') ||
-        uName === 'admin@connect.vn' ||
-        uName.startsWith('admin') ||
-        uEmail.endsWith('@ceohn10.com')
-      ) {
-        return true;
-      }
 
-      const roles = await this.prisma.$queryRaw<any[]>`
-        SELECT role::text FROM public.user_roles WHERE user_id::text = ${vUsers[0].id}::text
-      `.catch(() => [] as any[]);
-      if (
-        roles.some((r: any) =>
-          adminRoles.includes((r.role || '').toLowerCase()),
-        )
-      ) {
-        return true;
-      }
+    const targetUid = uRows?.[0]?.id ? String(uRows[0].id) : userId;
+    const uEmail = String(uRows?.[0]?.email || '').toLowerCase().trim();
+    if (uEmail === 'admin@ceohn10.vn') {
+      return true;
     }
 
     const roles = await this.prisma.$queryRaw<any[]>`
-      SELECT role::text FROM public.user_roles WHERE user_id::text = ${userId}::text
+      SELECT role::text FROM public.user_roles WHERE user_id::text = ${targetUid}::text
     `.catch(() => [] as any[]);
-    if (
-      roles.some((r: any) => adminRoles.includes((r.role || '').toLowerCase()))
-    ) {
+    if (roles.some((r: any) => String(r.role || '').toLowerCase() === 'platform_admin')) {
       return true;
     }
+
+    const memRows = await this.prisma.$queryRaw<any[]>`
+      SELECT executive_role FROM public.members
+      WHERE user_id::text = ${targetUid}::text
+      LIMIT 1
+    `.catch(() => [] as any[]);
+    if (String(memRows?.[0]?.executive_role || '').toLowerCase() === 'platform_admin') {
+      return true;
+    }
+
     return false;
   }
 
@@ -2509,24 +2486,24 @@ export class MembersService implements OnModuleInit {
     }
 
     const current = existing[0];
-    const isAdmin = await this.checkIsAdmin(userId, current.association_id);
-    const hasCustomMemPerm = await this.hasCustomMemberPermission(userId);
-    const canDelete = await this.checkActionPermission(
-      userId,
-      'MEM_DELETE',
-      current.association_id,
-    );
-    if (!isAdmin && !hasCustomMemPerm && !canDelete) {
-      throw new ForbiddenException(
-        'Chỉ quản trị viên hoặc tài khoản được cấp quyền xóa (MEM_DELETE) mới có quyền xóa',
-      );
-    }
     const isFullAdmin = await this.checkIsPlatformAdmin(userId);
     if (!isFullAdmin) {
+      const isAdmin = await this.checkIsAdmin(userId, current.association_id);
+      const hasCustomMemPerm = await this.hasCustomMemberPermission(userId);
+      const canDelete = await this.checkActionPermission(
+        userId,
+        'MEM_DELETE',
+        current.association_id,
+      );
+      if (!isAdmin && !hasCustomMemPerm && !canDelete) {
+        throw new ForbiddenException(
+          'Chỉ quản trị viên hoặc tài khoản được cấp quyền xóa (MEM_DELETE) mới có quyền xóa',
+        );
+      }
       const isOwner = Boolean(current.created_by && String(current.created_by) === String(userId));
       if (!isOwner) {
         throw new ForbiddenException(
-          'Bạn không có quyền xóa học viên do tài khoản khác tạo ra. Chỉ người tạo, Super Admin hoặc Lớp trưởng mới được phép xóa.',
+          'Bạn không có quyền xóa học viên do tài khoản khác tạo ra. Chỉ người tạo hoặc Platform Admin mới được phép xóa.',
         );
       }
     }

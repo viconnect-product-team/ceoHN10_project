@@ -1447,7 +1447,7 @@ export function canModifyRecord(
   const ownerId = String(createdByUserId || "").trim();
   const ownerName = String(createdByName || "").toLowerCase().trim();
 
-  if (!ownerId && !ownerName) return true;
+  if (!ownerId && !ownerName) return false;
   if (ownerId && actorId && ownerId === actorId) return true;
   if (ownerId && email && ownerId.toLowerCase() === email) return true;
   if (ownerName && actorName && ownerName === actorName) return true;

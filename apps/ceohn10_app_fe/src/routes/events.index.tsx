@@ -46,6 +46,7 @@ import { EventInvitationBuilderModal } from "@/components/events/EventInvitation
 import { OmnichannelBroadcastModal } from "@/components/templates/OmnichannelBroadcastModal";
 import { useRole, PERMISSIONS } from "@/hooks/use-role";
 import { useAuth } from "@/context/AuthContext";
+import { canModifyRecord } from "@/lib/rbac-permission-helpers";
 import { canScanEventQr } from "@/lib/checkin-gatekeeper-auth";
 import { TruncatedText } from "@/components/dashboard/TruncatedText";
 import { useTableControls } from "@/hooks/use-table-controls";
@@ -1218,7 +1219,7 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
                             >
                               <Eye className="h-4 w-4" />
                             </Link>
-                            {can(PERMISSIONS.EVENT_EDIT) && (user?.role !== "custom_account" || ((e as any).createdBy === user?.id || (e as any).created_by === user?.id)) && (
+                            {can(PERMISSIONS.EVENT_EDIT) && canModifyRecord(user, (e as any).createdBy || (e as any).created_by, (e as any).createdByName) && (
                               <button
                                 onClick={() => {
                                   setEditing(e);
@@ -1243,7 +1244,7 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
                                 <QrCode className="h-4 w-4" />
                               </button>
                             )}
-                            {can(PERMISSIONS.EVENT_DELETE) && (user?.role !== "custom_account" || ((e as any).createdBy === user?.id || (e as any).created_by === user?.id)) && (
+                            {can(PERMISSIONS.EVENT_DELETE) && canModifyRecord(user, (e as any).createdBy || (e as any).created_by, (e as any).createdByName) && (
                               <button
                                 onClick={() => onDelete(e)}
                                 disabled={deletingId === e.id}
@@ -1659,7 +1660,7 @@ function EventCard({
                 <Camera className="h-4 w-4" aria-hidden="true" />
               </button>
             )}
-            {can(PERMISSIONS.EVENT_EDIT) && (
+            {can(PERMISSIONS.EVENT_EDIT) && canModifyRecord(user, (e as any).createdBy || (e as any).created_by, (e as any).createdByName) && (
               <button
                 type="button"
                 onClick={onEdit}
@@ -1670,7 +1671,7 @@ function EventCard({
                 <Pencil className="h-4 w-4" aria-hidden="true" />
               </button>
             )}
-            {can(PERMISSIONS.EVENT_DELETE) && e.status !== "cancelled" && (
+            {can(PERMISSIONS.EVENT_DELETE) && e.status !== "cancelled" && canModifyRecord(user, (e as any).createdBy || (e as any).created_by, (e as any).createdByName) && (
               <button
                 type="button"
                 onClick={onDelete}
