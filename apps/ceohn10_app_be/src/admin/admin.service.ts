@@ -1271,18 +1271,24 @@ export class AdminService implements OnModuleInit {
       if (filterScope) {
         if (validAssocId) {
           rows = await this.prisma.$queryRaw<any[]>`
-            SELECT id, code, title, body, audience, channel, status, sent_at, reach, association_id, app_scope, target_app, target_channel, pushed_to_messages, created_at
+            SELECT id, code, title, COALESCE(body, description, message, '') as body,
+                   COALESCE(audience, 'all') as audience, COALESCE(channel, 'inapp') as channel,
+                   COALESCE(status, 'sent') as status, sent_at, reach, association_id,
+                   app_scope, target_app, target_channel, pushed_to_messages, created_at
             FROM public.notifications
             WHERE (association_id = ${validAssocId}::uuid OR association_id IS NULL)
-              AND (app_scope = ${filterScope} OR target_app = ${filterScope} OR app_scope = 'all' OR target_app = 'all' OR app_scope IS NULL)
+              AND (app_scope = ${filterScope} OR target_app = ${filterScope} OR app_scope = 'crm_platform' OR target_app = 'crm_platform' OR app_scope = 'all' OR target_app = 'all' OR app_scope IS NULL)
             ORDER BY created_at DESC
             LIMIT 60
           `.catch(() => []);
         } else {
           rows = await this.prisma.$queryRaw<any[]>`
-            SELECT id, code, title, body, audience, channel, status, sent_at, reach, association_id, app_scope, target_app, target_channel, pushed_to_messages, created_at
+            SELECT id, code, title, COALESCE(body, description, message, '') as body,
+                   COALESCE(audience, 'all') as audience, COALESCE(channel, 'inapp') as channel,
+                   COALESCE(status, 'sent') as status, sent_at, reach, association_id,
+                   app_scope, target_app, target_channel, pushed_to_messages, created_at
             FROM public.notifications
-            WHERE (app_scope = ${filterScope} OR target_app = ${filterScope} OR app_scope = 'all' OR target_app = 'all' OR app_scope IS NULL)
+            WHERE (app_scope = ${filterScope} OR target_app = ${filterScope} OR app_scope = 'crm_platform' OR target_app = 'crm_platform' OR app_scope = 'all' OR target_app = 'all' OR app_scope IS NULL)
             ORDER BY created_at DESC
             LIMIT 60
           `.catch(() => []);
@@ -1290,7 +1296,10 @@ export class AdminService implements OnModuleInit {
       } else {
         if (validAssocId) {
           rows = await this.prisma.$queryRaw<any[]>`
-            SELECT id, code, title, body, audience, channel, status, sent_at, reach, association_id, app_scope, target_app, target_channel, pushed_to_messages, created_at
+            SELECT id, code, title, COALESCE(body, description, message, '') as body,
+                   COALESCE(audience, 'all') as audience, COALESCE(channel, 'inapp') as channel,
+                   COALESCE(status, 'sent') as status, sent_at, reach, association_id,
+                   app_scope, target_app, target_channel, pushed_to_messages, created_at
             FROM public.notifications
             WHERE (association_id = ${validAssocId}::uuid OR association_id IS NULL)
             ORDER BY created_at DESC
@@ -1298,7 +1307,10 @@ export class AdminService implements OnModuleInit {
           `.catch(() => []);
         } else {
           rows = await this.prisma.$queryRaw<any[]>`
-            SELECT id, code, title, body, audience, channel, status, sent_at, reach, association_id, app_scope, target_app, target_channel, pushed_to_messages, created_at
+            SELECT id, code, title, COALESCE(body, description, message, '') as body,
+                   COALESCE(audience, 'all') as audience, COALESCE(channel, 'inapp') as channel,
+                   COALESCE(status, 'sent') as status, sent_at, reach, association_id,
+                   app_scope, target_app, target_channel, pushed_to_messages, created_at
             FROM public.notifications
             ORDER BY created_at DESC
             LIMIT 60

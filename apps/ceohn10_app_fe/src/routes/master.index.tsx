@@ -53,6 +53,7 @@ import {
   Pencil,
 } from "lucide-react";
 import { TableActionsGroup } from "@/components/common";
+import { GranularRoleAndActionPicker } from "@/components/common/GranularRoleAndActionPicker";
 import {
   SYSTEM_TENANTS,
   isModuleEnabledForTenant,
@@ -3140,91 +3141,14 @@ function MasterAdminPortal() {
               />
             </div>
 
-            {/* CHỌN HÌNH THỨC PHÂN QUYỀN: THEO ROLE HOẶC TÍCH QUYỀN THAO TÁC CỤ THỂ */}
-            <div className="pt-2 border-t border-slate-200">
-              <div className="flex items-center justify-between mb-2">
-                <Label className="text-xs font-bold text-slate-900">
-                  Phương thức phân quyền truy cập:
-                </Label>
-                <div className="flex items-center gap-1 p-0.5 bg-slate-100 rounded-lg border border-slate-200 text-[11px]">
-                  <button
-                    type="button"
-                    onClick={() => setPermMode("role")}
-                    className={`px-2 py-0.5 rounded font-bold transition cursor-pointer ${
-                      permMode === "role"
-                        ? "bg-[#002B70] text-white shadow-2xs"
-                        : "text-slate-600 hover:text-slate-900"
-                    }`}
-                  >
-                    Theo Chức Danh (Role)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPermMode("granular")}
-                    className={`px-2 py-0.5 rounded font-bold transition cursor-pointer ${
-                      permMode === "granular"
-                        ? "bg-[#002B70] text-white shadow-2xs"
-                        : "text-slate-600 hover:text-slate-900"
-                    }`}
-                  >
-                    Tích Quyền Cụ Thể (Custom)
-                  </button>
-                </div>
-              </div>
-
-              {permMode === "granular" ? (
-                <div className="p-2.5 rounded-xl border border-slate-200 bg-slate-50 max-h-48 overflow-y-auto space-y-3">
-                  <div className="text-[10px] text-slate-500 italic">
-                    Tích chọn các chức năng cụ thể tài khoản này được phép thấy trên Sidebar &amp; thao tác:
-                  </div>
-                  {GRANULAR_PERMISSION_CATEGORIES.map((cat) => (
-                    <div key={cat.category} className="space-y-1">
-                      <div className="text-[11px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1">
-                        <span>{cat.category}</span>
-                      </div>
-                      <div className="grid grid-cols-2 gap-1.5 pl-1">
-                        {cat.items.map((p) => {
-                          const isChecked = selectedPerms.includes(p.key);
-                          return (
-                            <label
-                              key={p.key}
-                              className={`flex items-start gap-1.5 p-1.5 rounded-lg border text-left cursor-pointer transition ${
-                                isChecked
-                                  ? "bg-blue-50 border-blue-200 text-blue-900"
-                                  : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
-                              }`}
-                            >
-                              <input
-                                type="checkbox"
-                                checked={isChecked}
-                                onChange={(e) => {
-                                  if (e.target.checked) {
-                                    setSelectedPerms((prev) => [...prev, p.key]);
-                                  } else {
-                                    setSelectedPerms((prev) => prev.filter((k) => k !== p.key));
-                                  }
-                                }}
-                                className="mt-0.5 rounded text-[#002B70]"
-                              />
-                              <div className="min-w-0 flex-1 leading-tight">
-                                <div className="text-[11px] font-bold truncate">{p.name}</div>
-                                <div className="text-[9px] text-slate-400 truncate">{p.desc}</div>
-                              </div>
-                            </label>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="p-3 rounded-xl bg-blue-50/70 border border-blue-200/80 text-[11px] text-blue-900 leading-relaxed">
-                  Tài khoản sẽ được tự động kích hoạt toàn bộ menu và phân quyền theo chuẩn nghiệp vụ của vai trò{" "}
-                  <strong>{newAccountData.role}</strong> trong phạm vi hệ thống{" "}
-                  <strong>{newAccountData.targetSystem || "toàn nền tảng"}</strong>.
-                </div>
-              )}
-            </div>
+            {/* CHỌN HÌNH THỨC PHÂN QUYỀN: THEO ROLE HOẶC TÍCH QUYỀN & THAO TÁC CỤ THỂ */}
+            <GranularRoleAndActionPicker
+              mode={permMode}
+              onModeChange={setPermMode}
+              role={newAccountData.role}
+              selectedPerms={selectedPerms}
+              onChangeSelectedPerms={setSelectedPerms}
+            />
           </div>
 
           <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
@@ -3337,94 +3261,13 @@ function MasterAdminPortal() {
             </div>
 
             {/* CHỌN QUYỀN TRUY CẬP CỤ THỂ CHO TÀI KHOẢN (ẨN MENU & CHẶN API NGOÀI QUYỀN) */}
-            <div className="pt-2 border-t border-slate-200">
-              <div className="flex items-center justify-between mb-2">
-                <Label className="text-xs font-bold text-slate-900">
-                  Phương thức phân quyền chức năng:
-                </Label>
-                <div className="flex items-center gap-1 p-0.5 bg-slate-100 rounded-lg border border-slate-200 text-[11px]">
-                  <button
-                    type="button"
-                    onClick={() => setEditPermMode("role")}
-                    className={`px-2 py-0.5 rounded font-bold transition cursor-pointer ${
-                      editPermMode === "role"
-                        ? "bg-[#002B70] text-white shadow-2xs"
-                        : "text-slate-600 hover:text-slate-900"
-                    }`}
-                  >
-                    Theo Chức Danh (Role)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setEditPermMode("granular")}
-                    className={`px-2 py-0.5 rounded font-bold transition cursor-pointer ${
-                      editPermMode === "granular"
-                        ? "bg-[#002B70] text-white shadow-2xs"
-                        : "text-slate-600 hover:text-slate-900"
-                    }`}
-                  >
-                    Tích Quyền Cụ Thể (Custom)
-                  </button>
-                </div>
-              </div>
-
-              {editPermMode === "granular" ? (
-                <div className="p-2.5 rounded-xl border border-slate-200 bg-slate-50 max-h-52 overflow-y-auto space-y-3">
-                  <div className="text-[10px] text-slate-500 italic">
-                    Tích chọn các chức năng tài khoản này được phép thấy trên Sidebar &amp; thao tác API (các mục không tích sẽ tự động ẩn hoàn toàn):
-                  </div>
-                  {GRANULAR_PERMISSION_CATEGORIES.map((cat) => (
-                    <div key={cat.category} className="space-y-1">
-                      <div className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">
-                        {cat.category}
-                      </div>
-                      <div className="grid grid-cols-2 gap-1.5 pl-1">
-                        {cat.items.map((p) => {
-                          const isChecked = editSelectedPerms.includes(p.key);
-                          return (
-                            <label
-                              key={p.key}
-                              className={`flex items-start gap-1.5 p-1.5 rounded-lg border text-left cursor-pointer transition ${
-                                isChecked
-                                  ? "bg-blue-50 border-blue-200 text-blue-900"
-                                  : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
-                              }`}
-                            >
-                              <input
-                                type="checkbox"
-                                checked={isChecked}
-                                onChange={(e) => {
-                                  if (e.target.checked) {
-                                    setEditSelectedPerms((prev) => [...prev, p.key]);
-                                  } else {
-                                    setEditSelectedPerms((prev) => prev.filter((k) => k !== p.key));
-                                  }
-                                }}
-                                className="mt-0.5 rounded text-[#002B70]"
-                              />
-                              <div className="min-w-0 flex-1 leading-tight">
-                                <div className="text-[11px] font-bold truncate">{p.name}</div>
-                                <div className="text-[9px] text-slate-400 truncate">{p.desc}</div>
-                              </div>
-                            </label>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600 space-y-1">
-                  <div className="font-bold text-slate-700 flex items-center gap-1.5">
-                    <Shield className="w-3.5 h-3.5 text-[#002B70]" />
-                    <span>Phân quyền tự động theo Vai trò &amp; Ban chuyên trách:</span>
-                  </div>
-                  <p>
-                    Tài khoản sẽ chỉ hiển thị các menu và thao tác API thuộc quyền của vai trò <strong>{editRbacData.role}</strong> trong <strong>{editRbacData.department}</strong>.
-                  </p>
-                </div>
-              )}
-            </div>
+            <GranularRoleAndActionPicker
+              mode={editPermMode}
+              onModeChange={setEditPermMode}
+              role={editRbacData.role}
+              selectedPerms={editSelectedPerms}
+              onChangeSelectedPerms={setEditSelectedPerms}
+            />
           </div>
 
           <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">

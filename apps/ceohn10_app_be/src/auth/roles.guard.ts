@@ -212,7 +212,7 @@ export class RolesGuard implements CanActivate {
     if (requiredDataScope) {
       if (requiredDataScope === 'ALL' && scopeLevel !== 'ALL') {
         throw new ForbiddenException(
-          'Thao tác này yêu cầu quyền dữ liệu phạm vi Toàn Hệ Thống (Master Admin / Chủ Tịch)',
+          'Thao tác này yêu cầu quyền dữ liệu phạm vi Toàn Hệ Thống (Master Admin / Lớp Trưởng)',
         );
       }
       if (requiredDataScope === 'DEPARTMENT' && scopeLevel === 'SELF') {
@@ -239,8 +239,10 @@ export class RolesGuard implements CanActivate {
         { apiPrefix: '/api/finance-init', permMatch: ['/finance-report', 'FIN_'] },
         { apiPrefix: '/api/financial-report', permMatch: ['/finance-report', 'FIN_'] },
         { apiPrefix: '/api/documents', permMatch: ['/documents', 'DOC_'] },
-        { apiPrefix: '/api/voting', permMatch: ['/voting', '/events', 'VOTE_'] },
-        { apiPrefix: '/api/polls', permMatch: ['/voting', '/polls', '/events', 'VOTE_'] },
+        { apiPrefix: '/api/voting', permMatch: ['/voting', '/events', 'VOTE_', 'VOT_'] },
+        { apiPrefix: '/api/polls', permMatch: ['/voting', '/polls', '/events', 'VOTE_', 'VOT_'] },
+        { apiPrefix: '/api/notifications', permMatch: ['/notifications', '/email-marketing', 'NTF_', 'EML_'] },
+        { apiPrefix: '/api/email-marketing', permMatch: ['/email-marketing', '/notifications', 'EML_', 'NTF_'] },
         { apiPrefix: '/api/admin/landing-webs', permMatch: ['/admin/landing-webs', '/landing-builder', 'LND_', 'LANDING_'] },
         { apiPrefix: '/api/admin', permMatch: ['/master'] },
         { apiPrefix: '/api/rbac', permMatch: ['/permissions', '/accounts'] },
@@ -291,18 +293,36 @@ export class RolesGuard implements CanActivate {
     const actionsToCheck = requiredPermissions || [];
 
     if (actionsToCheck.length > 0) {
-      const userPerms: string[] = Array.isArray(user.permissions)
-        ? user.permissions.map((p: any) => String(p).toLowerCase().trim())
-        : [];
-
-      if (userPerms.includes('*')) {
-        actionGranted = true;
-      } else {
-        actionGranted = actionsToCheck.some((act) =>
-          userPerms.includes(act.toLowerCase().trim()),
+      if (hasCustomPerms) {
+        const dbCustomLower = dbCustomPerms.map((p: any) =>
+          String(p).toLowerCase().trim(),
         );
+        const hasAnyActionCode = dbCustomPerms.some((p: any) =>
+          /^[A-Z]+_[A-Z_]+$/.test(String(p).trim()),
+        );
+        if (hasAnyActionCode) {
+          actionGranted = actionsToCheck.some((act) =>
+            dbCustomLower.includes(act.toLowerCase().trim()),
+          );
+        } else {
+          // Legacy customPermissions chỉ chứa route: chỉ cho phép thao tác *_VIEW nếu đã cấp route
+          actionGranted =
+            matchedAllowedModule &&
+            actionsToCheck.some((act) => act.toUpperCase().endsWith('_VIEW'));
+        }
+      } else {
+        const userPerms: string[] = Array.isArray(user.permissions)
+          ? user.permissions.map((p: any) => String(p).toLowerCase().trim())
+          : [];
 
-        if (!actionGranted) {
+        if (userPerms.includes('*')) {
+          actionGranted = true;
+        } else {
+          actionGranted = actionsToCheck.some((act) =>
+            userPerms.includes(act.toLowerCase().trim()),
+          );
+
+          if (!actionGranted) {
           try {
             const matrixRows = await this.prisma.$queryRaw<{ value: any }[]>`
               SELECT value FROM public.app_settings WHERE key = 'crm_permission_matrix' LIMIT 1
@@ -342,6 +362,7 @@ export class RolesGuard implements CanActivate {
               }
             }
           } catch { }
+          }
         }
       }
     }

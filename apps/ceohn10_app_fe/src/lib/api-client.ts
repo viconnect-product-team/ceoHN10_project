@@ -16,14 +16,20 @@ export function ensureSessionCookiesSync(token?: string | null): void {
     const domainAttr = getCookieDomain();
     const maxAge = 2592000; // 30 ngày cho quản trị CRM
     const cookieStr = document.cookie || "";
-    if (!cookieStr.includes(`vibe_token=${t}`)) {
+    const hasLegacyBloat =
+      cookieStr.includes("sb-access-token=") ||
+      cookieStr.includes("access_token=") ||
+      cookieStr.includes("sb-refresh-token=");
+    if (hasLegacyBloat || !cookieStr.includes(`vibe_token=${t}`)) {
       // Clear duplicate legacy cookies to prevent HTTP 431 Request Header Fields Too Large
       document.cookie = `sb-access-token=; path=/; max-age=0${secure}${domainAttr}`;
       document.cookie = `access_token=; path=/; max-age=0${secure}${domainAttr}`;
+      document.cookie = `sb-refresh-token=; path=/; max-age=0${secure}${domainAttr}`;
       if (domainAttr) {
         document.cookie = `sb-access-token=; path=/; max-age=0${secure}`;
         document.cookie = `vibe_token=; path=/; max-age=0${secure}`;
         document.cookie = `access_token=; path=/; max-age=0${secure}`;
+        document.cookie = `sb-refresh-token=; path=/; max-age=0${secure}`;
       }
       document.cookie = `vibe_token=${t}; path=/; max-age=${maxAge}; SameSite=Lax${secure}${domainAttr}`;
     }
@@ -479,18 +485,16 @@ async function trySilentRefresh(): Promise<string | null> {
       const isHttps = window.location.protocol === "https:";
       const secure = isHttps ? "; secure" : "";
       const domainAttr = getCookieDomain();
-      document.cookie = `sb-access-token=${data.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}${domainAttr}`;
-      document.cookie = `vibe_token=${data.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}${domainAttr}`;
-      document.cookie = `access_token=${data.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}${domainAttr}`;
-      if (data.refresh_token) {
-        document.cookie = `sb-refresh-token=${data.refresh_token}; path=/; max-age=604800; SameSite=Lax${secure}${domainAttr}`;
-      }
+      document.cookie = `sb-access-token=; path=/; max-age=0${secure}${domainAttr}`;
+      document.cookie = `access_token=; path=/; max-age=0${secure}${domainAttr}`;
+      document.cookie = `sb-refresh-token=; path=/; max-age=0${secure}${domainAttr}`;
       if (domainAttr) {
-        // Đồng thời lưu host-only dự phòng
-        document.cookie = `sb-access-token=${data.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
-        document.cookie = `vibe_token=${data.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
-        document.cookie = `access_token=${data.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
+        document.cookie = `sb-access-token=; path=/; max-age=0${secure}`;
+        document.cookie = `vibe_token=; path=/; max-age=0${secure}`;
+        document.cookie = `access_token=; path=/; max-age=0${secure}`;
+        document.cookie = `sb-refresh-token=; path=/; max-age=0${secure}`;
       }
+      document.cookie = `vibe_token=${data.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}${domainAttr}`;
       return data.access_token;
     } catch {
       return null;

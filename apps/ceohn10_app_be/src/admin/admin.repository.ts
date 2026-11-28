@@ -28,41 +28,31 @@ export class AdminRepository {
     `,
       )
       .catch(() => {});
-    await this.prisma
-      .$executeRawUnsafe(
-        `
-      ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS app_scope text DEFAULT 'crm';
-    `,
-      )
-      .catch(() => {});
-    await this.prisma
-      .$executeRawUnsafe(
-        `
-      ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS target_app text DEFAULT 'crm';
-    `,
-      )
-      .catch(() => {});
-    await this.prisma
-      .$executeRawUnsafe(
-        `
-      ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS target_channel text;
-    `,
-      )
-      .catch(() => {});
-    await this.prisma
-      .$executeRawUnsafe(
-        `
-      ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS description text;
-    `,
-      )
-      .catch(() => {});
-    await this.prisma
-      .$executeRawUnsafe(
-        `
-      ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS pushed_to_messages boolean DEFAULT false;
-    `,
-      )
-      .catch(() => {});
+    const ensureCols = [
+      `ALTER TABLE public.notifications ALTER COLUMN tenant_id DROP NOT NULL`,
+      `ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS code text`,
+      `ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS body text`,
+      `ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS message text`,
+      `ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS type text DEFAULT 'info'`,
+      `ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS audience text DEFAULT 'all'`,
+      `ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS channel text DEFAULT 'inapp'`,
+      `ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS status text DEFAULT 'sent'`,
+      `ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS sent_at timestamptz DEFAULT now()`,
+      `ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS reach integer DEFAULT 0`,
+      `ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS association_id uuid`,
+      `ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS target_role text DEFAULT 'all'`,
+      `ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS read boolean DEFAULT false`,
+      `ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS app_scope text DEFAULT 'crm'`,
+      `ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS target_app text DEFAULT 'crm'`,
+      `ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS target_channel text`,
+      `ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS description text`,
+      `ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS pushed_to_messages boolean DEFAULT false`,
+      `ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS poster_url text`,
+      `ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS event_id text`,
+    ];
+    for (const sql of ensureCols) {
+      await this.prisma.$executeRawUnsafe(sql).catch(() => {});
+    }
     await this.prisma
       .$executeRawUnsafe(
         `

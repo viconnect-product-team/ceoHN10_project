@@ -245,10 +245,12 @@ async function consumeAuthCallback(): Promise<boolean> {
     const refreshToken = hash.get("refresh_token") || search.get("refresh_token");
     if (token) {
       localStorage.setItem("vibe_token", token);
-      document.cookie = `sb-access-token=${token}; path=/; max-age=604800; SameSite=Lax`;
+      document.cookie = `vibe_token=${token}; path=/; max-age=604800; SameSite=Lax`;
+      document.cookie = "sb-access-token=; path=/; max-age=0";
+      document.cookie = "access_token=; path=/; max-age=0";
+      document.cookie = "sb-refresh-token=; path=/; max-age=0";
       if (refreshToken) {
         localStorage.setItem("vibe_refresh_token", refreshToken);
-        document.cookie = `sb-refresh-token=${refreshToken}; path=/; max-age=2592000; SameSite=Lax`;
       }
       established = true;
     }

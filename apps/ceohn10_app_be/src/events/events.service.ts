@@ -5410,6 +5410,13 @@ export class EventsService extends BaseService implements OnModuleInit {
       WHERE member_code = $1 AND event_title = $2
     `, reg.member_code || '', reg.event_name || reg.event_title || '').catch(() => {});
 
+    await this.dispatchTicketLifecycleNotification(
+      reg,
+      'event_checkout',
+      'Check-out sự kiện thành công',
+      `${reg.name || reg.member_name || 'Đại biểu'} đã check-out rời sự kiện "${reg.event_name || reg.event_title || 'CEO HN10'}" lúc ${now.toLocaleString('vi-VN')}.`,
+    );
+
     // Gửi email cảm ơn Quý đại biểu đã tham gia sự kiện
     if (reg.email && reg.email.includes('@') && this.mailService) {
       const attendeeName = reg.member_name || 'Quý Hội viên / Quý Đại biểu';
@@ -7650,8 +7657,9 @@ export class EventsService extends BaseService implements OnModuleInit {
   ) {
     try {
       await this.prisma.$executeRawUnsafe(
-        `INSERT INTO public.notifications (id, type, title, message, target_role, read, app_scope, target_app, created_at)
-         VALUES (gen_random_uuid(), $1, $2, $3, 'all', false, 'crm_platform', 'crm_platform', NOW())`,
+        `INSERT INTO public.notifications (id, code, type, title, body, description, message, audience, channel, status, target_role, read, app_scope, target_app, sent_at, created_at)
+         VALUES (gen_random_uuid(), $1, $2, $3, $4, $4, $4, 'all', 'inapp', 'sent', 'all', false, 'all', 'all', NOW(), NOW())`,
+        `NTF-${Date.now().toString(36).toUpperCase()}`,
         eventKind,
         title,
         body,

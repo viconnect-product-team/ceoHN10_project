@@ -255,15 +255,17 @@ function setSessionCookies(session: AppSession) {
   const secure = isHttps ? '; secure' : '';
   const maxAge = session.expires_in && session.expires_in > 86400 ? session.expires_in : 2592000; // 30 ngày cho quản trị CRM
   const domainAttr = getCookieDomain();
-  document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}${domainAttr}`;
-  document.cookie = `vibe_token=${session.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}${domainAttr}`;
-  document.cookie = `access_token=${session.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}${domainAttr}`;
-  document.cookie = `sb-refresh-token=${session.refresh_token}; path=/; max-age=2592000; SameSite=Lax${secure}${domainAttr}`;
+  // Xóa các cookie trùng lặp cũ để tránh lỗi HTTP 431 Request Header Fields Too Large
+  document.cookie = `sb-access-token=; path=/; max-age=0${secure}${domainAttr}`;
+  document.cookie = `access_token=; path=/; max-age=0${secure}${domainAttr}`;
+  document.cookie = `sb-refresh-token=; path=/; max-age=0${secure}${domainAttr}`;
   if (domainAttr) {
-    document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
-    document.cookie = `vibe_token=${session.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
-    document.cookie = `access_token=${session.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
+    document.cookie = `sb-access-token=; path=/; max-age=0${secure}`;
+    document.cookie = `vibe_token=; path=/; max-age=0${secure}`;
+    document.cookie = `access_token=; path=/; max-age=0${secure}`;
+    document.cookie = `sb-refresh-token=; path=/; max-age=0${secure}`;
   }
+  document.cookie = `vibe_token=${session.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}${domainAttr}`;
 }
 
 function clearSessionCookies() {

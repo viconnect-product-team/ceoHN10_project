@@ -105,25 +105,33 @@ export function usePermissions() {
     return (actionCode: string): boolean => {
       const code = actionCode.toUpperCase().trim();
 
-      // Ưu tiên 1: Nếu tài khoản có customPermissions (Tích quyền cụ thể), chỉ mở thao tác thuộc module đã tích!
+      // Ưu tiên 1: Nếu tài khoản có customPermissions (Tích quyền cụ thể), chỉ mở đúng thao tác đã tích!
       if (hasCustomPerms) {
         if (userCustomPerms.includes(code) || userCustomPerms.includes(actionCode)) return true;
-        if (user?.permissionsHash && user.permissionsHash[code] !== undefined) {
-          return Boolean(user.permissionsHash[code]);
+
+        // Nếu customPermissions đã chứa mã thao tác chi tiết (VD: MEM_VIEW, EVT_ADD...), kiểm tra nghiêm ngặt theo từng thao tác
+        const hasAnyActionCode = userCustomPerms.some((p) => /^[A-Z]+_[A-Z_]+$/.test(String(p).trim()));
+        if (hasAnyActionCode) {
+          return false;
         }
-        if (code.startsWith("MEM_")) return userCustomPerms.includes("/members");
-        if (code.startsWith("EVT_") || code.startsWith("EREG_") || code.startsWith("CHK_") || code.startsWith("LKD_")) {
-          return userCustomPerms.some((p) => ["/events", "/event-registrations", "/event-checkin", "/checkin-qr", "/lucky-draw"].includes(p));
+
+        // Fallback cho dữ liệu cũ chỉ lưu route: chỉ cho phép thao tác XEM (*_VIEW) của route đã tích
+        const isViewAction = code.endsWith("_VIEW");
+        if (!isViewAction) return false;
+        if (code === "MEM_VIEW") return userCustomPerms.includes("/members");
+        if (code === "EVT_VIEW" || code === "EREG_VIEW" || code === "CHK_VIEW" || code === "LKD_VIEW" || code === "VOT_VIEW" || code === "FBK_VIEW") {
+          return userCustomPerms.some((p) => ["/events", "/event-registrations", "/event-checkin", "/checkin-qr", "/lucky-draw", "/voting", "/feedback"].includes(p));
         }
-        if (code.startsWith("CLS_") || code.startsWith("TRN_")) return userCustomPerms.includes("/classes");
-        if (code.startsWith("FIN_") || code.startsWith("FEE_") || code.startsWith("INC_") || code.startsWith("EXP_") || code.startsWith("FRP_")) {
+        if (code === "CLS_VIEW" || code === "TCH_VIEW" || code === "STD_VIEW" || code === "CLF_VIEW") {
+          return userCustomPerms.some((p) => p.startsWith("/classes"));
+        }
+        if (code === "FIN_VIEW") {
           return userCustomPerms.some((p) => ["/finance-report", "/income", "/expenses", "/fees"].includes(p));
         }
-        if (code.startsWith("SPN_")) return userCustomPerms.includes("/sponsors") || userCustomPerms.includes("/finance-report");
-        if (code.startsWith("NTF_") || code.startsWith("EML_")) return userCustomPerms.includes("/notifications") || userCustomPerms.includes("/email-marketing");
-        if (code.startsWith("DOC_")) return userCustomPerms.includes("/documents");
-        if (code.startsWith("SYS_") || code.startsWith("PRM_") || code.startsWith("ACC_")) {
-          return userCustomPerms.some((p) => ["/permissions", "/account-settings", "/settings", "/master"].includes(p));
+        if (code === "NTF_VIEW" || code === "EML_VIEW") return userCustomPerms.includes("/notifications") || userCustomPerms.includes("/email-marketing");
+        if (code === "DOC_VIEW") return userCustomPerms.includes("/documents");
+        if (code === "ACC_VIEW" || code === "PRM_VIEW") {
+          return userCustomPerms.some((p) => ["/permissions", "/accounts", "/settings", "/master"].includes(p));
         }
         return false;
       }

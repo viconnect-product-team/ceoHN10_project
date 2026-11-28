@@ -973,8 +973,9 @@ export class PaymentService {
 
       // 1. Thông báo tới CRM Notification Center
       await this.prisma.$executeRawUnsafe(
-        `INSERT INTO public.notifications (id, type, title, message, target_role, read, app_scope, target_app, created_at)
-         VALUES (gen_random_uuid(), 'payment_success', $1, $2, 'all', false, 'crm_platform', 'crm_platform', NOW())`,
+        `INSERT INTO public.notifications (id, code, type, title, body, description, message, audience, channel, status, target_role, read, app_scope, target_app, sent_at, created_at)
+         VALUES (gen_random_uuid(), $1, 'payment_success', $2, $3, $3, $3, 'all', 'inapp', 'sent', 'all', false, 'all', 'all', NOW(), NOW())`,
+        `NTF-PAY-${Date.now().toString(36).toUpperCase()}`,
         `[SePay] ${title}`,
         body,
       ).catch(() => {});

@@ -2520,6 +2520,7 @@ export class UsersService implements OnModuleInit {
       'truong_ban_an_sinh',
       'truong_ban_thien_nguyen',
       'truong_ban_doi_ngoai',
+      'truong_ban_chuyen_trach',
       'giang_vien',
       'hoc_vien',
       'custom_account',

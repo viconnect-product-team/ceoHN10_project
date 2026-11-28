@@ -539,10 +539,16 @@ export function getDynamicDepartmentOptions(): string[] {
 }
 
 // ── BẢNG PHÂN QUYỀN THAO TÁC CỤ THỂ (GRANULAR PERMISSIONS) ─────────────────────
+export interface GranularPermAction {
+  code: string;
+  label: string;
+}
+
 export interface GranularPermItem {
   key: string;
   name: string;
   desc: string;
+  actions?: GranularPermAction[];
 }
 
 export interface GranularPermCategory {
@@ -554,76 +560,293 @@ export const GRANULAR_PERMISSION_CATEGORIES: GranularPermCategory[] = [
   {
     category: "1. Tổng quan & Trợ lý AI",
     items: [
-      { key: "/", name: "Tổng quan Dashboard", desc: "Xem trang điều hành tổng quan hệ thống" },
-      { key: "/ai-assistant", name: "Trợ lý AI Điều Hành", desc: "Sử dụng AI phân tích CRM và xuất hóa đơn điện tử" },
+      {
+        key: "/",
+        name: "Tổng quan Dashboard",
+        desc: "Xem trang điều hành tổng quan hệ thống",
+        actions: [{ code: "DSH_VIEW", label: "Xem tổng quan" }],
+      },
+      {
+        key: "/ai-assistant",
+        name: "Trợ lý AI Điều Hành",
+        desc: "Sử dụng AI phân tích CRM và xuất hóa đơn điện tử",
+        actions: [
+          { code: "AI_VIEW", label: "Xem & Hỏi AI" },
+          { code: "AI_EXPORT", label: "Xuất báo cáo AI" },
+        ],
+      },
     ],
   },
   {
     category: "2. Quản lý Học viên",
     items: [
-      { key: "/members", name: "Quản lý Học viên & Doanh nghiệp", desc: "Xem, thêm sửa và duyệt hồ sơ học viên" },
+      {
+        key: "/members",
+        name: "Quản lý Học viên & Doanh nghiệp",
+        desc: "Xem, thêm sửa và duyệt hồ sơ học viên",
+        actions: [
+          { code: "MEM_VIEW", label: "Xem" },
+          { code: "MEM_ADD", label: "Thêm mới" },
+          { code: "MEM_EDIT", label: "Chỉnh sửa" },
+          { code: "MEM_DELETE", label: "Xóa" },
+          { code: "MEM_APPROVE", label: "Phê duyệt" },
+          { code: "MEM_EXPORT", label: "Xuất Excel" },
+        ],
+      },
     ],
   },
   {
     category: "3. Quản lý Sự kiện & Khai giảng",
     items: [
-      { key: "/events", name: "Quản lý Sự kiện & Khai giảng", desc: "Tạo và điều hành sự kiện" },
-      { key: "/event-registrations", name: "Quản lý Người đăng ký vé", desc: "Quản lý danh sách đăng ký và vé sự kiện" },
-      { key: "/event-checkin", name: "Cổng Check-in & Soát vé (Online/Offline)", desc: "Quét mã QR và soát vé sự kiện" },
-      { key: "/checkin-qr", name: "Cấu hình Mã QR Sự kiện", desc: "Cấu hình mã QR đăng ký và check-in" },
-      { key: "/lucky-draw", name: "Quản lý Quay thưởng", desc: "Tổ chức bốc thăm trúng thưởng" },
-      { key: "/voting", name: "Biểu quyết & Đánh giá ý kiến", desc: "Tạo và thu thập ý kiến biểu quyết" },
-      { key: "/feedback", name: "Phản hồi & Góp ý", desc: "Khảo sát và phản hồi sau sự kiện" },
+      {
+        key: "/events",
+        name: "Quản lý Sự kiện & Khai giảng",
+        desc: "Tạo và điều hành sự kiện",
+        actions: [
+          { code: "EVT_VIEW", label: "Xem" },
+          { code: "EVT_ADD", label: "Tạo mới" },
+          { code: "EVT_EDIT", label: "Chỉnh sửa" },
+          { code: "EVT_DELETE", label: "Xóa" },
+          { code: "EVT_EXPORT", label: "Xuất Excel" },
+        ],
+      },
+      {
+        key: "/event-registrations",
+        name: "Quản lý Người đăng ký vé",
+        desc: "Quản lý danh sách đăng ký và vé sự kiện",
+        actions: [
+          { code: "EREG_VIEW", label: "Xem" },
+          { code: "EREG_ADD", label: "Thêm đăng ký" },
+          { code: "EREG_EDIT", label: "Chỉnh sửa" },
+          { code: "EREG_DELETE", label: "Xóa" },
+          { code: "EREG_APPROVE", label: "Duyệt vé" },
+          { code: "EREG_EXPORT", label: "Xuất Excel" },
+        ],
+      },
+      {
+        key: "/event-checkin",
+        name: "Cổng Check-in & Soát vé (Online/Offline)",
+        desc: "Quét mã QR và soát vé sự kiện",
+        actions: [
+          { code: "CHK_VIEW", label: "Xem" },
+          { code: "CHK_SCAN", label: "Quét QR / Check-in" },
+          { code: "CHK_EXPORT", label: "Xuất Excel" },
+        ],
+      },
+      {
+        key: "/checkin-qr",
+        name: "Cấu hình Mã QR Sự kiện",
+        desc: "Cấu hình mã QR đăng ký và check-in",
+        actions: [
+          { code: "QRC_VIEW", label: "Xem" },
+          { code: "QRC_EDIT", label: "Cấu hình QR" },
+        ],
+      },
+      {
+        key: "/lucky-draw",
+        name: "Quản lý Quay thưởng",
+        desc: "Tổ chức bốc thăm trúng thưởng",
+        actions: [
+          { code: "LKD_VIEW", label: "Xem" },
+          { code: "LKD_ADD", label: "Tạo giải / Quay" },
+          { code: "LKD_EDIT", label: "Chỉnh sửa" },
+          { code: "LKD_DELETE", label: "Xóa" },
+        ],
+      },
+      {
+        key: "/voting",
+        name: "Biểu quyết & Đánh giá ý kiến",
+        desc: "Tạo và thu thập ý kiến biểu quyết",
+        actions: [
+          { code: "VOT_VIEW", label: "Xem" },
+          { code: "VOT_ADD", label: "Tạo biểu quyết" },
+          { code: "VOT_EDIT", label: "Chỉnh sửa" },
+          { code: "VOT_DELETE", label: "Xóa" },
+        ],
+      },
+      {
+        key: "/feedback",
+        name: "Phản hồi & Góp ý",
+        desc: "Khảo sát và phản hồi sau sự kiện",
+        actions: [
+          { code: "FBK_VIEW", label: "Xem" },
+          { code: "FBK_EDIT", label: "Phản hồi / Xử lý" },
+          { code: "FBK_DELETE", label: "Xóa" },
+        ],
+      },
     ],
   },
   {
     category: "4. Phân hệ Lớp học CEO HN10",
     items: [
-      { key: "/classes?tab=courses", name: "Quản lý Lớp & Lịch học 30 buổi", desc: "Xem và quản lý các chuyên đề học thứ 7" },
-      { key: "/classes?tab=teachers", name: "Quản lý Giảng viên & Chuyên gia", desc: "Quản lý danh sách giảng viên" },
-      { key: "/classes?tab=students", name: "Dashboard Học viên (Đa chỉ số)", desc: "Quản lý điểm danh, quỹ phạt, tín nhiệm" },
-      { key: "/classes?tab=finance", name: "Quỹ Tài Chính Lớp (20tr & Thu/Chi)", desc: "Quản lý quỹ lớp khởi tạo 20tr và các nguồn thu chi" },
-      { key: "/classes?tab=attendance-qr", name: "Mã QR Điểm danh theo buổi", desc: "Chiếu và quản lý mã QR điểm danh" },
+      {
+        key: "/classes?tab=courses",
+        name: "Quản lý Lớp & Lịch học 30 buổi",
+        desc: "Xem và quản lý các chuyên đề học thứ 7",
+        actions: [
+          { code: "CLS_VIEW", label: "Xem" },
+          { code: "CLS_ADD", label: "Thêm buổi/lớp" },
+          { code: "CLS_EDIT", label: "Chỉnh sửa" },
+          { code: "CLS_DELETE", label: "Xóa" },
+        ],
+      },
+      {
+        key: "/classes?tab=teachers",
+        name: "Quản lý Giảng viên & Chuyên gia",
+        desc: "Quản lý danh sách giảng viên",
+        actions: [
+          { code: "TCH_VIEW", label: "Xem" },
+          { code: "TCH_ADD", label: "Thêm" },
+          { code: "TCH_EDIT", label: "Sửa" },
+          { code: "TCH_DELETE", label: "Xóa" },
+        ],
+      },
+      {
+        key: "/classes?tab=students",
+        name: "Dashboard Học viên (Đa chỉ số)",
+        desc: "Quản lý điểm danh, quỹ phạt, tín nhiệm",
+        actions: [
+          { code: "STD_VIEW", label: "Xem" },
+          { code: "STD_EDIT", label: "Cập nhật chỉ số" },
+          { code: "STD_EXPORT", label: "Xuất Excel" },
+        ],
+      },
+      {
+        key: "/classes?tab=finance",
+        name: "Quỹ Tài Chính Lớp (20tr & Thu/Chi)",
+        desc: "Quản lý quỹ lớp khởi tạo 20tr và các nguồn thu chi",
+        actions: [
+          { code: "CLF_VIEW", label: "Xem" },
+          { code: "CLF_ADD", label: "Thêm thu/chi" },
+          { code: "CLF_EDIT", label: "Sửa" },
+          { code: "CLF_DELETE", label: "Xóa" },
+        ],
+      },
+      {
+        key: "/classes?tab=attendance-qr",
+        name: "Mã QR Điểm danh theo buổi",
+        desc: "Chiếu và quản lý mã QR điểm danh",
+        actions: [{ code: "CLS_ATTEND", label: "Điểm danh / Chiếu QR" }],
+      },
     ],
   },
   {
     category: "5. Tài chính & Ngân sách",
     items: [
-      { key: "/finance-report", name: "Báo cáo Tài chính Tổng CLB", desc: "Xem báo cáo thu chi ngân sách toàn CLB" },
+      {
+        key: "/finance-report",
+        name: "Báo cáo Tài chính Tổng CLB",
+        desc: "Xem báo cáo thu chi ngân sách toàn CLB",
+        actions: [
+          { code: "FIN_VIEW", label: "Xem" },
+          { code: "FIN_ROW_ADD", label: "Thêm dòng" },
+          { code: "FIN_ROW_EDIT", label: "Sửa dòng" },
+          { code: "FIN_ROW_DELETE", label: "Xóa dòng" },
+          { code: "FIN_COL_ADD", label: "Thêm cột" },
+          { code: "FIN_COL_DELETE", label: "Xóa cột" },
+          { code: "FRP_EXPORT", label: "Xuất Excel/PDF" },
+        ],
+      },
     ],
   },
   {
     category: "6. Thông báo & Truyền thông",
     items: [
-      { key: "/notifications", name: "Thông báo Zalo OA / ZBS", desc: "Tạo và gửi thông báo qua Zalo OA" },
-      { key: "/email-marketing", name: "Thông báo đến Email", desc: "Gửi email marketing cho học viên" },
+      {
+        key: "/notifications",
+        name: "Thông báo Zalo OA / ZBS",
+        desc: "Tạo và gửi thông báo qua Zalo OA",
+        actions: [
+          { code: "NTF_VIEW", label: "Xem" },
+          { code: "NTF_ADD", label: "Tạo & Gửi" },
+          { code: "NTF_DELETE", label: "Xóa" },
+        ],
+      },
+      {
+        key: "/email-marketing",
+        name: "Thông báo đến Email",
+        desc: "Gửi email marketing cho học viên",
+        actions: [
+          { code: "EML_VIEW", label: "Xem" },
+          { code: "EML_ADD", label: "Tạo & Gửi" },
+          { code: "EML_DELETE", label: "Xóa" },
+        ],
+      },
     ],
   },
   {
     category: "7. Quản trị & Cài đặt hệ thống",
     items: [
-      { key: "/documents", name: "Quản lý Tài liệu & Học liệu", desc: "Quản lý tài liệu lớp học và CEOHN10" },
-      { key: "/accounts", name: "Quản trị Người dùng & Phân quyền", desc: "Thêm mới và gán quyền tài khoản" },
-      { key: "/permissions", name: "Ma Trận Phân Quyền RBAC", desc: "Cấu hình phân quyền hệ thống" },
-      { key: "/settings", name: "Cài đặt Cấu hình SePay / Zalo OA", desc: "Cấu hình tích hợp thanh toán và Zalo" },
+      {
+        key: "/documents",
+        name: "Quản lý Tài liệu & Học liệu",
+        desc: "Quản lý tài liệu lớp học và CEOHN10",
+        actions: [
+          { code: "DOC_VIEW", label: "Xem" },
+          { code: "DOC_ADD", label: "Tải lên" },
+          { code: "DOC_EDIT", label: "Sửa" },
+          { code: "DOC_DELETE", label: "Xóa" },
+        ],
+      },
+      {
+        key: "/accounts",
+        name: "Quản trị Người dùng & Phân quyền",
+        desc: "Thêm mới và gán quyền tài khoản",
+        actions: [
+          { code: "ACC_VIEW", label: "Xem" },
+          { code: "SYS_USER_CREATE", label: "Tạo tài khoản" },
+          { code: "SYS_USER_PERM", label: "Phân quyền" },
+        ],
+      },
+      {
+        key: "/permissions",
+        name: "Ma Trận Phân Quyền RBAC",
+        desc: "Cấu hình phân quyền hệ thống",
+        actions: [
+          { code: "PRM_VIEW", label: "Xem" },
+          { code: "PRM_EDIT", label: "Sửa ma trận" },
+        ],
+      },
+      {
+        key: "/settings",
+        name: "Cài đặt Cấu hình SePay / Zalo OA",
+        desc: "Cấu hình tích hợp thanh toán và Zalo",
+        actions: [{ code: "SYS_SEPAY_CONFIG", label: "Cấu hình hệ thống" }],
+      },
     ],
   },
 ];
 
+export function getAllActionCodesForRoutes(routes: string[]): string[] {
+  const codes: string[] = [];
+  for (const cat of GRANULAR_PERMISSION_CATEGORIES) {
+    for (const item of cat.items) {
+      if (routes.includes(item.key) && item.actions) {
+        for (const act of item.actions) {
+          codes.push(act.code);
+        }
+      }
+    }
+  }
+  return codes;
+}
+
 export function getDefaultPermissionsForRole(role: string): string[] {
   const allRoutes = GRANULAR_PERMISSION_CATEGORIES.flatMap((c) => c.items.map((i) => i.key));
 
-  if (role === "admin" || role === "quan_tri" || role === "ADM") {
+  if (role === "platform_admin" || role === "admin" || role === "quan_tri" || role === "ADM") {
     return allRoutes;
   }
-  if (role === "chu_tich" || role === "president") {
-    // Lớp Trưởng Lâm Thời: Quyền điều hành tối cao toàn lớp và sự kiện
+  if (role === "lop_truong" || role === "president") {
+    // Lớp Trưởng: Quyền điều hành toàn lớp và sự kiện
     return allRoutes.filter((r) => r !== "/settings" && r !== "/permissions");
   }
-  if (role === "pho_chu_tich" || role === "lop_pho_hoc_tap") {
+  if (role === "lop_pho" || role === "ban_dieu_hanh" || role === "lop_pho_hoc_tap") {
     return [
       "/",
       "/ai-assistant",
+      "/members",
+      "/events",
       "/classes?tab=courses",
       "/classes?tab=teachers",
       "/classes?tab=students",

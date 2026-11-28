@@ -269,14 +269,36 @@ export class UsersRepository {
   async updateUser(
     id: string,
     data: Partial<vione_users>,
-  ): Promise<vione_users> {
-    return this.prisma.vione_users.update({
-      where: { id },
-      data: {
-        ...data,
-        updated_at: new Date(),
-      },
-    });
+  ): Promise<vione_users | null> {
+    const cleanData: any = { updated_at: new Date() };
+    if (data.name !== undefined) cleanData.name = data.name;
+    if (data.email !== undefined) cleanData.email = data.email;
+    if (data.avatar_url !== undefined) cleanData.avatar_url = data.avatar_url;
+    if (data.password !== undefined) cleanData.password = data.password;
+    if (data.email_verified !== undefined) cleanData.email_verified = data.email_verified;
+
+    let updated: any = null;
+    try {
+      const ceohn10Res = await (this.prisma as any).ceohn10_users
+        ?.update({
+          where: { id },
+          data: cleanData,
+        })
+        .catch(() => null);
+      if (ceohn10Res) updated = ceohn10Res;
+    } catch {}
+
+    try {
+      const vioneRes = await this.prisma.vione_users
+        .update({
+          where: { id },
+          data: cleanData,
+        })
+        .catch(() => null);
+      if (vioneRes && !updated) updated = vioneRes;
+    } catch {}
+
+    return updated;
   }
 
   async getUserRoles(userId: string): Promise<any[]> {

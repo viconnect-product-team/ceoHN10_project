@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import type { Notification } from "@/lib/extra-data";
 import { listNotificationsFn, deleteNotificationFn } from "@/lib/notifications.functions";
 import { getLastSeen, markNotificationsSeen } from "@/hooks/use-unread-notifications";
+import { fetchNestApi } from "@/lib/api-client";
 import { ListSkeleton, NoNotifications } from "@/components/dashboard/StateKit";
 import { getConnectAppSocket } from "@/hooks/use-connect-app-socket";
 import { useRole } from "@/hooks/use-role";
@@ -62,10 +63,11 @@ export function NotificationCenter() {
 
   const refresh = useCallback(async () => {
     try {
-      const rows = await listRef.current({ data: { appScope: "crm" } as never });
+      const apiRows = await fetchNestApi<Notification[]>("/admin/notifications?appScope=crm").catch(() => null);
+      const rows = Array.isArray(apiRows) ? apiRows : await listRef.current({ data: { appScope: "crm" } as never });
       const uniqueMap = new Map<string, Notification>();
       for (const r of rows) {
-        if (r.status !== "sent") continue;
+        if (r.status && r.status !== "sent" && (r.status as string) !== "delivered") continue;
         // Hide staff-only and member approval notifications from non-admin accounts
         if (!canViewStaffNotifs) {
           if (r.audience === "staff") continue;

@@ -424,6 +424,22 @@ export class FinancialReportService implements OnModuleInit {
       rowAmount,
     );
 
+    const amtFormatted = Number(rowAmount || 0).toLocaleString('vi-VN');
+    const isIncome = Number(income || 0) > 0;
+    const ntfTitle = isIncome
+      ? `Thu / Chuyển tiền về quỹ: +${amtFormatted} đ`
+      : `Chi quỹ CLB: -${amtFormatted} đ`;
+    const ntfBody = `${description || rowTitle || 'Giao dịch tài chính'} (${partyName || 'CLB CEO HN10'} · Mã CT: ${voucherNo}).`;
+    await this.prisma
+      .$executeRawUnsafe(
+        `INSERT INTO public.notifications (id, code, type, title, body, description, message, audience, channel, status, target_role, read, app_scope, target_app, sent_at, created_at)
+         VALUES (gen_random_uuid(), $1, 'finance_transfer', $2, $3, $3, $3, 'all', 'inapp', 'sent', 'all', false, 'all', 'all', NOW(), NOW())`,
+        `NTF-FIN-${Date.now().toString(36).toUpperCase()}`,
+        ntfTitle,
+        ntfBody,
+      )
+      .catch(() => {});
+
     return inserted[0];
   }
 

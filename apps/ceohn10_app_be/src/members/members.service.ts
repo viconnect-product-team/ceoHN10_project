@@ -1843,6 +1843,15 @@ export class MembersService implements OnModuleInit {
       )
     `.catch(() => null);
 
+    // Thông báo Học viên mới gia nhập vào Notification Center
+    await this.prisma.$executeRawUnsafe(
+      `INSERT INTO public.notifications (id, code, type, title, body, description, message, audience, channel, status, target_role, read, app_scope, target_app, sent_at, created_at)
+       VALUES (gen_random_uuid(), $1, 'new_member', $2, $3, $3, $3, 'all', 'inapp', 'sent', 'all', false, 'all', 'all', NOW(), NOW())`,
+      `NTF-MEM-${Date.now().toString(36).toUpperCase()}`,
+      `Học viên mới gia nhập: ${data.name}`,
+      `Học viên ${data.name} (${id}) vừa gia nhập CLB Doanh Nhân CEO HN10.`,
+    ).catch(() => null);
+
     // Tự động khởi tạo tài khoản App-Only (chỉ vào App CEOHN10, không vào CRM) và đồng bộ lên Quản lý tài khoản
     if (cleanEmail && cleanEmail.includes('@')) {
       try {
@@ -2039,11 +2048,11 @@ export class MembersService implements OnModuleInit {
       );
     }
     const isFullAdmin = isJwtAdmin || (await this.checkIsPlatformAdmin(userId));
-    if (!isAdmin && !isFullAdmin && hasCustomMemPerm) {
+    if (!isFullAdmin) {
       const isOwner = Boolean(current.created_by && String(current.created_by) === String(userId));
       if (!isOwner) {
         throw new ForbiddenException(
-          'Bạn chỉ có quyền chỉnh sửa học viên do chính tài khoản của bạn tạo ra!',
+          'Bạn không có quyền chỉnh sửa học viên do tài khoản khác tạo ra. Chỉ người tạo, Super Admin hoặc Lớp trưởng mới được phép chỉnh sửa.',
         );
       }
     }
@@ -2497,11 +2506,11 @@ export class MembersService implements OnModuleInit {
       );
     }
     const isFullAdmin = await this.checkIsPlatformAdmin(userId);
-    if (!isAdmin && !isFullAdmin && hasCustomMemPerm) {
+    if (!isFullAdmin) {
       const isOwner = Boolean(current.created_by && String(current.created_by) === String(userId));
       if (!isOwner) {
         throw new ForbiddenException(
-          'Bạn chỉ có quyền chỉnh sửa học viên do chính tài khoản của bạn tạo ra!',
+          'Bạn không có quyền chỉnh sửa thông tin liên hệ học viên do tài khoản khác tạo ra.',
         );
       }
     }
@@ -2558,11 +2567,11 @@ export class MembersService implements OnModuleInit {
       );
     }
     const isFullAdmin = await this.checkIsPlatformAdmin(userId);
-    if (!isAdmin && !isFullAdmin && hasCustomMemPerm) {
+    if (!isFullAdmin) {
       const isOwner = Boolean(current.created_by && String(current.created_by) === String(userId));
       if (!isOwner) {
         throw new ForbiddenException(
-          'Bạn chỉ có quyền xóa học viên do chính tài khoản của bạn tạo ra!',
+          'Bạn không có quyền xóa học viên do tài khoản khác tạo ra. Chỉ người tạo, Super Admin hoặc Lớp trưởng mới được phép xóa.',
         );
       }
     }

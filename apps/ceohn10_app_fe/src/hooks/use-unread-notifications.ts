@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useRouterState } from "@tanstack/react-router";
 import { listNotificationsFn } from "@/lib/notifications.functions";
+import { fetchNestApi } from "@/lib/api-client";
 import { getConnectAppSocket } from "./use-connect-app-socket";
 
 
@@ -77,7 +78,11 @@ export function useUnreadNotifications() {
       if (force) {
         lastFetchTime = 0;
       }
-      const items = await getSharedNotifications(listRef.current);
+      const apiRows =
+        typeof window !== "undefined"
+          ? await fetchNestApi<any[]>("/admin/notifications?appScope=crm").catch(() => null)
+          : null;
+      const items = Array.isArray(apiRows) ? apiRows : await getSharedNotifications(listRef.current);
       const seen = lastSeen();
       // Lấy danh sách ID đã đọc cá nhân từ localStorage nếu có
       let readIds = new Set<string>();
