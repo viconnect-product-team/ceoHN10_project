@@ -12,11 +12,12 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
 import { DocumentsService } from './documents.service';
 import { CreateDocumentDto, UpdateDocumentDto } from './dto';
 
 @Controller('documents')
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, RolesGuard)
 export class DocumentsController {
   constructor(private readonly documentsService: DocumentsService) {}
 

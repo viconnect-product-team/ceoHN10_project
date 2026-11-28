@@ -2362,43 +2362,10 @@ export class UsersService implements OnModuleInit {
       UPDATE public.vione_users SET must_change_password = true WHERE id = ${newUser.id}::uuid
     `.catch(() => { });
 
-    const rawRole = (data.executiveRole || (typeof data.role === 'string' ? data.role : '') || 'member').toLowerCase().trim();
-    let cleanRole = 'member';
-    if (rawRole === 'platform_admin' || rawRole === 'quan_tri') cleanRole = 'platform_admin';
-    else if (rawRole === 'admin') cleanRole = 'admin';
-    else if (rawRole === 'lop_truong' || rawRole === 'chu_tich') cleanRole = 'lop_truong';
-    else if (rawRole === 'lop_pho' || rawRole === 'ban_dieu_hanh' || rawRole === 'pho_chu_tich') cleanRole = 'lop_pho';
-    else if (rawRole === 'truong_team') cleanRole = 'truong_team';
-    else if (rawRole === 'pho_team') cleanRole = 'pho_team';
-    else if (rawRole === 'truong_ban_chuyen_trach' || rawRole.startsWith('truong_ban_') || rawRole === 'tong_thu_ky' || rawRole === 'ban_thu_ky') cleanRole = 'truong_ban_chuyen_trach';
-    else if (rawRole === 'giang_vien') cleanRole = 'giang_vien';
-    else cleanRole = 'member';
-
-    let cleanDept = 'Ban Gắn kết & Đời sống';
-    const rawDeptLower = (data.department || '').toLowerCase();
-    if (rawDeptLower.includes('công nghệ') || rawDeptLower.includes('cong_nghe')) cleanDept = 'Ban Công nghệ';
-    else if (rawDeptLower.includes('truyền thông') || rawDeptLower.includes('truyen_thong')) cleanDept = 'Ban Truyền thông';
-    else if (rawDeptLower.includes('tài chính') || rawDeptLower.includes('tai_chinh')) cleanDept = 'Ban Tài chính';
-    else if (rawDeptLower.includes('sự kiện') || rawDeptLower.includes('hậu cần') || rawDeptLower.includes('su_kien')) cleanDept = 'Ban Sự kiện & Hậu cần';
-    else if (rawDeptLower.includes('đối ngoại') || rawDeptLower.includes('giao thương') || rawDeptLower.includes('xúc tiến') || rawDeptLower.includes('b2b')) cleanDept = 'Ban Đối ngoại & Giao thương';
-    else if (rawDeptLower.includes('thiện nguyện') || rawDeptLower.includes('thien_nguyen')) cleanDept = 'Ban Thiện nguyện';
-    else cleanDept = 'Ban Gắn kết & Đời sống';
-
-    let appRoleValue: app_role = 'member';
-    if (cleanRole === 'platform_admin') {
-      appRoleValue = 'platform_admin' as app_role;
-    } else if (
-      cleanRole === 'admin' ||
-      cleanRole === 'lop_truong' ||
-      cleanRole === 'lop_pho' ||
-      cleanRole === 'truong_team' ||
-      cleanRole === 'pho_team' ||
-      cleanRole === 'truong_ban_chuyen_trach'
-    ) {
-      appRoleValue = 'admin' as app_role;
-    } else {
-      appRoleValue = 'member' as app_role;
-    }
+    const { cleanRole, cleanDept, appRoleValue } = this.normalizeRoleAndDept(
+      data.executiveRole || (typeof data.role === 'string' ? data.role : ''),
+      data.department || '',
+    );
 
     await this.usersRepo.createUserRole(newUser.id, appRoleValue);
 
@@ -2439,6 +2406,7 @@ export class UsersService implements OnModuleInit {
       (data.code && data.code.trim()) ||
       `HN10-${Math.floor(100 + Math.random() * 900)}`;
 
+    const hasCustomPermsOnCreate = Array.isArray(data.customPermissions) && data.customPermissions.length > 0;
     const isCrmGranted =
       cleanRole === 'platform_admin' ||
       cleanRole === 'admin' ||
@@ -2446,7 +2414,9 @@ export class UsersService implements OnModuleInit {
       cleanRole === 'lop_pho' ||
       cleanRole === 'truong_team' ||
       cleanRole === 'pho_team' ||
-      cleanRole === 'truong_ban_chuyen_trach' ||
+      cleanRole.startsWith('truong_ban_') ||
+      cleanRole === 'custom_account' ||
+      hasCustomPermsOnCreate ||
       Boolean(data.targetSystem === 'all');
 
     const metaSettingsStr = JSON.stringify({
@@ -2507,6 +2477,73 @@ export class UsersService implements OnModuleInit {
     }
 
     return this.getAccountDetails(newUser.id);
+  }
+
+  private normalizeRoleAndDept(rawRoleInput?: string, rawDeptInput?: string): {
+    cleanRole: string;
+    cleanDept: string;
+    appRoleValue: app_role;
+  } {
+    const rawRole = String(rawRoleInput || 'hoc_vien').toLowerCase().trim();
+    const canonicalRoles = new Set([
+      'platform_admin',
+      'admin',
+      'lop_truong',
+      'lop_pho',
+      'truong_team',
+      'pho_team',
+      'truong_ban_cong_nghe',
+      'truong_ban_hoc_tap',
+      'truong_ban_tai_chinh',
+      'truong_ban_truyen_thong',
+      'truong_ban_su_kien',
+      'truong_ban_an_sinh',
+      'truong_ban_thien_nguyen',
+      'truong_ban_doi_ngoai',
+      'giang_vien',
+      'hoc_vien',
+      'custom_account',
+    ]);
+    let cleanRole = 'hoc_vien';
+    if (canonicalRoles.has(rawRole)) {
+      cleanRole = rawRole;
+    } else if (rawRole === 'admin_platform') {
+      cleanRole = 'platform_admin';
+    } else if (rawRole === 'truong_ban_su_kien_hau_can') {
+      cleanRole = 'truong_ban_su_kien';
+    } else if (rawRole === 'truong_ban_an_sinh_xa_hoi') {
+      cleanRole = 'truong_ban_an_sinh';
+    } else if (rawRole === 'truong_ban_doi_noi_doi_ngoai') {
+      cleanRole = 'truong_ban_doi_ngoai';
+    } else if (rawRole === 'member') {
+      cleanRole = 'hoc_vien';
+    }
+
+    const rawDeptLower = String(rawDeptInput || '').toLowerCase();
+    let cleanDept = 'Ban Công nghệ';
+    if (rawDeptLower.includes('công nghệ') || rawDeptLower.includes('cong_nghe')) cleanDept = 'Ban Công nghệ';
+    else if (rawDeptLower.includes('học tập') || rawDeptLower.includes('hoc_tap')) cleanDept = 'Ban Học tập';
+    else if (rawDeptLower.includes('tài chính') || rawDeptLower.includes('tai_chinh')) cleanDept = 'Ban Tài chính';
+    else if (rawDeptLower.includes('truyền thông') || rawDeptLower.includes('truyen_thong')) cleanDept = 'Ban Truyền thông';
+    else if (rawDeptLower.includes('sự kiện') || rawDeptLower.includes('hậu cần') || rawDeptLower.includes('su_kien')) cleanDept = 'Ban Sự kiện & Hậu cần';
+    else if (rawDeptLower.includes('an sinh') || rawDeptLower.includes('an_sinh')) cleanDept = 'Ban An sinh xã hội';
+    else if (rawDeptLower.includes('thiện nguyện') || rawDeptLower.includes('thien_nguyen')) cleanDept = 'Ban Thiện nguyện';
+    else if (rawDeptLower.includes('đối nội') || rawDeptLower.includes('đối ngoại') || rawDeptLower.includes('doi_ngoai')) cleanDept = 'Ban Đối nội Đối ngoại';
+
+    let appRoleValue: app_role = 'member';
+    if (cleanRole === 'platform_admin') {
+      appRoleValue = 'platform_admin' as app_role;
+    } else if (
+      cleanRole === 'admin' ||
+      cleanRole === 'lop_truong' ||
+      cleanRole === 'lop_pho' ||
+      cleanRole === 'truong_team' ||
+      cleanRole === 'pho_team' ||
+      cleanRole.startsWith('truong_ban_')
+    ) {
+      appRoleValue = 'admin' as app_role;
+    }
+    return { cleanRole, cleanDept, appRoleValue };
   }
 
   async adminUpdateUser(
@@ -2605,42 +2642,10 @@ export class UsersService implements OnModuleInit {
     const rawDept = (data.department || '').trim();
 
     if (rawRole || rawDept || data.customPermissions !== undefined || data.dataScope !== undefined) {
-      let cleanRole = rawRole || 'member';
-      if (rawRole === 'platform_admin' || rawRole === 'quan_tri') cleanRole = 'platform_admin';
-      else if (rawRole === 'admin') cleanRole = 'admin';
-      else if (rawRole === 'lop_truong' || rawRole === 'chu_tich') cleanRole = 'lop_truong';
-      else if (rawRole === 'lop_pho' || rawRole === 'ban_dieu_hanh' || rawRole === 'pho_chu_tich') cleanRole = 'lop_pho';
-      else if (rawRole === 'truong_team') cleanRole = 'truong_team';
-      else if (rawRole === 'pho_team') cleanRole = 'pho_team';
-      else if (rawRole === 'truong_ban_chuyen_trach' || rawRole.startsWith('truong_ban_') || rawRole === 'tong_thu_ky' || rawRole === 'ban_thu_ky') cleanRole = 'truong_ban_chuyen_trach';
-      else if (rawRole === 'giang_vien') cleanRole = 'giang_vien';
-      else if (rawRole === 'member' || rawRole === 'hoi_vien') cleanRole = 'member';
-
-      let cleanDept = rawDept || 'Ban Gắn kết & Đời sống';
-      const rawDeptLower = cleanDept.toLowerCase();
-      if (rawDeptLower.includes('công nghệ') || rawDeptLower.includes('cong_nghe')) cleanDept = 'Ban Công nghệ';
-      else if (rawDeptLower.includes('truyền thông') || rawDeptLower.includes('truyen_thong')) cleanDept = 'Ban Truyền thông';
-      else if (rawDeptLower.includes('tài chính') || rawDeptLower.includes('tai_chinh')) cleanDept = 'Ban Tài chính';
-      else if (rawDeptLower.includes('sự kiện') || rawDeptLower.includes('hậu cần') || rawDeptLower.includes('su_kien')) cleanDept = 'Ban Sự kiện & Hậu cần';
-      else if (rawDeptLower.includes('đối ngoại') || rawDeptLower.includes('giao thương') || rawDeptLower.includes('xúc tiến') || rawDeptLower.includes('b2b')) cleanDept = 'Ban Đối ngoại & Giao thương';
-      else if (rawDeptLower.includes('thiện nguyện') || rawDeptLower.includes('thien_nguyen')) cleanDept = 'Ban Thiện nguyện';
-      else if (rawDept) cleanDept = 'Ban Gắn kết & Đời sống';
-
-      let appRoleValue: app_role = 'member';
-      if (cleanRole === 'platform_admin') {
-        appRoleValue = 'platform_admin' as app_role;
-      } else if (
-        cleanRole === 'admin' ||
-        cleanRole === 'lop_truong' ||
-        cleanRole === 'lop_pho' ||
-        cleanRole === 'truong_team' ||
-        cleanRole === 'pho_team' ||
-        cleanRole === 'truong_ban_chuyen_trach'
-      ) {
-        appRoleValue = 'admin' as app_role;
-      } else {
-        appRoleValue = 'member' as app_role;
-      }
+      const { cleanRole, cleanDept, appRoleValue } = this.normalizeRoleAndDept(
+        rawRole || 'hoc_vien',
+        rawDept,
+      );
 
       await this.usersRepo.deleteUserRoles(resolvedUserId);
       await this.usersRepo.createUserRole(resolvedUserId, appRoleValue);
@@ -2653,7 +2658,8 @@ export class UsersService implements OnModuleInit {
         cleanRole === 'lop_pho' ||
         cleanRole === 'truong_team' ||
         cleanRole === 'pho_team' ||
-        cleanRole === 'truong_ban_chuyen_trach' ||
+        cleanRole.startsWith('truong_ban_') ||
+        cleanRole === 'custom_account' ||
         hasCustomPerms ||
         data.targetSystem === 'all' ||
         data.targetSystem === 'crm';

@@ -24,6 +24,7 @@ export class AuthorizationController {
   /**
    * Lấy danh sách toàn bộ Vai trò (Roles)
    */
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Get('roles')
   async getRoles() {
     return this.prisma.roles.findMany({
@@ -34,6 +35,7 @@ export class AuthorizationController {
   /**
    * Lấy danh mục Quyền hạn (Permissions)
    */
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Get('permissions')
   async getPermissions() {
     return this.prisma.permissions.findMany({
@@ -44,6 +46,7 @@ export class AuthorizationController {
   /**
    * Lấy toàn bộ Ma trận Vai trò - Quyền hạn (Role Permissions Mapping)
    */
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Get('matrix')
   async getRolePermissionsMatrix() {
     const roles = await this.prisma.roles.findMany({

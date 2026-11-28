@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { TrainingsService } from './trainings.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
 
 @Controller()
 export class TrainingsController {
@@ -63,25 +64,25 @@ export class TrainingsController {
   }
 
   @Post('trainings')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   async createTraining(@Body() body: any, @Request() req: any) {
     return this.trainingsService.createTraining(body, req.user?.id);
   }
 
   @Post('association/trainings')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   async createAssociationTraining(@Body() body: any, @Request() req: any) {
     return this.trainingsService.createTraining(body, req.user?.id);
   }
 
   @Put('trainings/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   async updateTraining(@Param('id') id: string, @Body() body: any) {
     return this.trainingsService.updateTraining(id, body);
   }
 
   @Delete('trainings/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   async deleteTraining(@Param('id') id: string) {
     return this.trainingsService.deleteTraining(id);
   }
