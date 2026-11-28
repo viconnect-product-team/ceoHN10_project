@@ -25,6 +25,8 @@ import {
   Sparkles,
   Plus,
   Trash2,
+  SlidersHorizontal,
+  X,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { isPrivilegedAdminOrPresident, isMediaDepartmentMember } from "@/lib/checkin-gatekeeper-auth";
@@ -164,6 +166,46 @@ function CheckinQrSetupPage() {
   const [registrationCustomFields, setRegistrationCustomFields] = useState<CustomFormFieldItem[]>([]);
   const [checkinCustomFields, setCheckinCustomFields] = useState<CustomFormFieldItem[]>([]);
 
+  // Cấu hình đầy đủ Form Check-in Sự Kiện (Popup Chỉnh sửa Form Check-in)
+  const defaultCheckinFormConfig = {
+    logoUrl: "/ceohn10-official-logo.png",
+    logoHeightPx: 56,
+    accentColor: "#007AFF",
+    enabledTabs: {
+      member: true,
+      ticket: true,
+      walkin: true,
+      checkout: true,
+      checkedin_list: true,
+      checkedout_list: true,
+    },
+    tabLabels: {
+      member: "Học viên",
+      ticket: "Có mã vé",
+      walkin: "Khách mới",
+      checkout: "Check-out",
+      checkedin_list: "Đã Check-in",
+      checkedout_list: "Đã Check-out",
+    },
+    sectionTitles: {
+      member: "Check-in Học Viên",
+      ticket: "Check-in Bằng Mã Vé",
+      walkin: "Đăng Ký Khách Mới",
+      checkout: "Check-out Sự Kiện",
+    },
+    memberPlaceholder: "Nhập mã học viên...",
+    ticketPlaceholder: "Nhập mã vé...",
+    submitButtonText: "Check-in",
+    showProxyCheckin: true,
+    bankName: "",
+    bankAccount: "",
+    bankOwner: "",
+    customFields: [] as CustomFormFieldItem[],
+  };
+  const [showCheckinFormModal, setShowCheckinFormModal] = useState(false);
+  const [savingCheckinForm, setSavingCheckinForm] = useState(false);
+  const [checkinFormDraft, setCheckinFormDraft] = useState(defaultCheckinFormConfig);
+
   // Đồng bộ cấu hình khi đổi sự kiện
   useEffect(() => {
     if (activeEvent) {
@@ -186,11 +228,55 @@ function CheckinQrSetupPage() {
             ? (activeEvent as any).customFields
             : [],
       );
-      setCheckinCustomFields(
-        Array.isArray(savedCfg.checkinCustomFields) ? savedCfg.checkinCustomFields : [],
-      );
+      const fallbackCheckinFields = Array.isArray(savedCfg.checkinCustomFields) ? savedCfg.checkinCustomFields : [];
+      setCheckinCustomFields(fallbackCheckinFields);
+
+      fetchNestApi<any>(`/events/${encodeURIComponent(activeEvent.id)}/checkin-form-config`)
+        .then((res) => {
+          const cfg = res?.config;
+          if (cfg && typeof cfg === "object") {
+            setCheckinFormDraft({
+              ...defaultCheckinFormConfig,
+              ...cfg,
+              enabledTabs: { ...defaultCheckinFormConfig.enabledTabs, ...(cfg.enabledTabs || {}) },
+              tabLabels: { ...defaultCheckinFormConfig.tabLabels, ...(cfg.tabLabels || {}) },
+              sectionTitles: { ...defaultCheckinFormConfig.sectionTitles, ...(cfg.sectionTitles || {}) },
+              customFields: Array.isArray(cfg.customFields) ? cfg.customFields : fallbackCheckinFields,
+            });
+          } else {
+            setCheckinFormDraft({
+              ...defaultCheckinFormConfig,
+              customFields: fallbackCheckinFields,
+            });
+          }
+        })
+        .catch(() => {
+          setCheckinFormDraft({
+            ...defaultCheckinFormConfig,
+            customFields: fallbackCheckinFields,
+          });
+        });
     }
   }, [activeEvent]);
+
+  const handleApplyCheckinForm = async () => {
+    if (!activeEvent) return;
+    setSavingCheckinForm(true);
+    try {
+      await fetchNestApi(`/events/${encodeURIComponent(activeEvent.id)}/checkin-form-config`, {
+        method: "PUT",
+        body: JSON.stringify({ config: checkinFormDraft }),
+      });
+      setCheckinCustomFields(checkinFormDraft.customFields || []);
+      setShowCheckinFormModal(false);
+      toast.success(`Đã áp dụng & Public Form Check-in cho sự kiện "${activeEvent.name}"!`);
+      await router.invalidate();
+    } catch (err: any) {
+      toast.error("Lỗi khi áp dụng Form Check-in: " + (err?.message || ""));
+    } finally {
+      setSavingCheckinForm(false);
+    }
+  };
 
   // Xử lý lưu cấu hình (Bao gồm đồng bộ Loại vé về Chi tiết sự kiện)
   const handleSaveSetup = async () => {
@@ -694,31 +780,43 @@ function CheckinQrSetupPage() {
                       activeFormConfigTab === "register" ? setRegistrationCustomFields : setCheckinCustomFields;
                     return (
                       <div className="space-y-2">
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between gap-2 flex-wrap">
                           <span className="text-[11px] font-bold text-slate-700">
                             {activeFormConfigTab === "register"
                               ? "Trường tùy chỉnh Form Đăng Ký Sự Kiện"
                               : "Trường tùy chỉnh Form Check-In Sự Kiện"}
                           </span>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setList((prev) => [
-                                ...prev,
-                                {
-                                  id: `cf_${Date.now().toString(36)}`,
-                                  label: "Trường thông tin mới",
-                                  type: "text",
-                                  required: false,
-                                  optionsText: "",
-                                },
-                              ])
-                            }
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#003B95] text-[11px] font-bold cursor-pointer"
-                          >
-                            <Plus className="h-3.5 w-3.5" />
-                            <span>Thêm trường</span>
-                          </button>
+                          <div className="flex items-center gap-1.5">
+                            {activeFormConfigTab === "checkin" && activeEvent && (
+                              <button
+                                type="button"
+                                onClick={() => setShowCheckinFormModal(true)}
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[11px] font-bold cursor-pointer"
+                              >
+                                <SlidersHorizontal className="h-3.5 w-3.5" />
+                                <span>Chỉnh sửa Form Check-in Sự Kiện</span>
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setList((prev) => [
+                                  ...prev,
+                                  {
+                                    id: `cf_${Date.now().toString(36)}`,
+                                    label: "Trường thông tin mới",
+                                    type: "text",
+                                    required: false,
+                                    optionsText: "",
+                                  },
+                                ])
+                              }
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#003B95] text-[11px] font-bold cursor-pointer"
+                            >
+                              <Plus className="h-3.5 w-3.5" />
+                              <span>Thêm trường</span>
+                            </button>
+                          </div>
                         </div>
 
                         {currentList.length === 0 ? (
@@ -876,7 +974,15 @@ function CheckinQrSetupPage() {
                   </div>
                 </div>
 
-                <div className="mt-5 pt-3 border-t border-slate-100 flex gap-2">
+                <div className="mt-5 pt-3 border-t border-slate-100 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowCheckinFormModal(true)}
+                    className="w-full min-h-10 inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#003B95]/30 bg-blue-50/80 hover:bg-blue-100 text-[#003B95] text-xs font-bold transition cursor-pointer"
+                  >
+                    <SlidersHorizontal className="h-4 w-4" />
+                    <span>Chỉnh sửa Form Check-in Sự Kiện</span>
+                  </button>
                   <a
                     href={checkinUrl}
                     target="_blank"
@@ -906,6 +1012,418 @@ function CheckinQrSetupPage() {
           </div>
         )}
       </div>
+
+      {/* Popup Chỉnh sửa Form Check-in Sự Kiện (Hiển thị toàn bộ các trường đang có trên Form Check-in) */}
+      {showCheckinFormModal && activeEvent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="w-full max-w-3xl max-h-[90vh] rounded-3xl bg-white border border-slate-200 shadow-2xl flex flex-col overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between gap-3 bg-slate-50/70">
+              <div className="flex items-center gap-2.5">
+                <span className="p-2 rounded-xl bg-[#003B95] text-white">
+                  <SlidersHorizontal className="h-4 w-4" />
+                </span>
+                <div>
+                  <h3 className="text-sm sm:text-base font-black text-slate-900">
+                    Chỉnh sửa Form Check-in Sự Kiện
+                  </h3>
+                  <p className="text-[11px] text-slate-500 font-medium">
+                    {activeEvent.name} — Chỉnh sửa xong bấm &quot;Áp dụng &amp; Public&quot; để cập nhật trang Check-in công khai.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCheckinFormModal(false)}
+                className="p-1.5 rounded-full hover:bg-slate-200 text-slate-500 cursor-pointer"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto space-y-5 text-xs">
+              {/* 1. Header Logo & Màu sắc iOS Liquid Glass */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl border border-slate-200 bg-slate-50/60">
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-700 block">
+                    Chiều cao Logo Header CEO HN10 ({checkinFormDraft.logoHeightPx}px)
+                  </label>
+                  <input
+                    type="range"
+                    min={36}
+                    max={96}
+                    value={checkinFormDraft.logoHeightPx}
+                    onChange={(e) =>
+                      setCheckinFormDraft((prev) => ({
+                        ...prev,
+                        logoHeightPx: Number(e.target.value) || 56,
+                      }))
+                    }
+                    className="w-full accent-[#003B95]"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-700 block">Màu nút chính (iOS Liquid Glass Accent)</label>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {[
+                      { label: "iOS Blue", color: "#007AFF" },
+                      { label: "Obsidian", color: "#0B0D12" },
+                      { label: "CEO HN10", color: "#003B95" },
+                      { label: "Emerald", color: "#059669" },
+                    ].map((preset) => (
+                      <button
+                        key={preset.color}
+                        type="button"
+                        onClick={() =>
+                          setCheckinFormDraft((prev) => ({ ...prev, accentColor: preset.color }))
+                        }
+                        className={`px-2.5 py-1.5 rounded-full text-[11px] font-bold border transition cursor-pointer inline-flex items-center gap-1.5 ${
+                          checkinFormDraft.accentColor === preset.color
+                            ? "border-[#003B95] bg-white text-slate-900 shadow-xs"
+                            : "border-slate-200 bg-white/70 text-slate-600"
+                        }`}
+                      >
+                        <span className="w-2.5 h-2.5 rounded-full" style={{ background: preset.color }} />
+                        {preset.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. Các danh mục hiện có trên Form Check-in */}
+              <div className="space-y-2">
+                <label className="font-bold text-slate-800 block">
+                  1. Các danh mục hiện có trên Form Check-in (Bật/Tắt &amp; Đổi nhãn)
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  {(
+                    [
+                      { key: "member" },
+                      { key: "ticket" },
+                      { key: "walkin" },
+                      { key: "checkout" },
+                      { key: "checkedin_list" },
+                      { key: "checkedout_list" },
+                    ] as const
+                  ).map(({ key }) => (
+                    <div
+                      key={key}
+                      className="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 bg-slate-50/70"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checkinFormDraft.enabledTabs[key]}
+                        onChange={(e) =>
+                          setCheckinFormDraft((prev) => ({
+                            ...prev,
+                            enabledTabs: { ...prev.enabledTabs, [key]: e.target.checked },
+                          }))
+                        }
+                        className="rounded accent-[#003B95] cursor-pointer"
+                      />
+                      <input
+                        type="text"
+                        value={checkinFormDraft.tabLabels[key]}
+                        onChange={(e) =>
+                          setCheckinFormDraft((prev) => ({
+                            ...prev,
+                            tabLabels: { ...prev.tabLabels, [key]: e.target.value },
+                          }))
+                        }
+                        className="flex-1 min-w-0 bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-semibold text-slate-900"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 3. Các trường nhập liệu & Tiêu đề hiện có */}
+              <div className="space-y-2.5">
+                <label className="font-bold text-slate-800 block">
+                  2. Các trường &amp; Tiêu đề đang có trên Form Check-in
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-600 block mb-1">Tiêu đề tab Học viên</label>
+                    <input
+                      type="text"
+                      value={checkinFormDraft.sectionTitles.member}
+                      onChange={(e) =>
+                        setCheckinFormDraft((prev) => ({
+                          ...prev,
+                          sectionTitles: { ...prev.sectionTitles, member: e.target.value },
+                        }))
+                      }
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-600 block mb-1">Placeholder nhập mã Học viên</label>
+                    <input
+                      type="text"
+                      value={checkinFormDraft.memberPlaceholder}
+                      onChange={(e) =>
+                        setCheckinFormDraft((prev) => ({ ...prev, memberPlaceholder: e.target.value }))
+                      }
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-600 block mb-1">Tiêu đề tab Có mã vé</label>
+                    <input
+                      type="text"
+                      value={checkinFormDraft.sectionTitles.ticket}
+                      onChange={(e) =>
+                        setCheckinFormDraft((prev) => ({
+                          ...prev,
+                          sectionTitles: { ...prev.sectionTitles, ticket: e.target.value },
+                        }))
+                      }
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-600 block mb-1">Placeholder nhập mã vé</label>
+                    <input
+                      type="text"
+                      value={checkinFormDraft.ticketPlaceholder}
+                      onChange={(e) =>
+                        setCheckinFormDraft((prev) => ({ ...prev, ticketPlaceholder: e.target.value }))
+                      }
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-600 block mb-1">Tiêu đề tab Khách mới</label>
+                    <input
+                      type="text"
+                      value={checkinFormDraft.sectionTitles.walkin}
+                      onChange={(e) =>
+                        setCheckinFormDraft((prev) => ({
+                          ...prev,
+                          sectionTitles: { ...prev.sectionTitles, walkin: e.target.value },
+                        }))
+                      }
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-600 block mb-1">Chữ trên nút xác nhận</label>
+                    <input
+                      type="text"
+                      value={checkinFormDraft.submitButtonText}
+                      onChange={(e) =>
+                        setCheckinFormDraft((prev) => ({ ...prev, submitButtonText: e.target.value }))
+                      }
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold"
+                    />
+                  </div>
+                </div>
+
+                <label className="inline-flex items-center gap-2 font-semibold text-slate-700 cursor-pointer pt-1">
+                  <input
+                    type="checkbox"
+                    checked={checkinFormDraft.showProxyCheckin}
+                    onChange={(e) =>
+                      setCheckinFormDraft((prev) => ({ ...prev, showProxyCheckin: e.target.checked }))
+                    }
+                    className="rounded accent-[#003B95]"
+                  />
+                  <span>Cho phép nút &quot;+ Check-in hộ&quot; nhiều người cùng lúc</span>
+                </label>
+              </div>
+
+              {/* 4. Tài khoản nhận phí CEO HN10 cho Khách mới */}
+              <div className="space-y-2 pt-3 border-t border-slate-200">
+                <label className="font-bold text-slate-800 block">
+                  3. Tài khoản nhận phí CEO HN10 (Hiển thị + Xem QR khi Khách mới đăng ký sự kiện có phí)
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  <input
+                    type="text"
+                    placeholder="Ngân hàng (VD: MB Bank)"
+                    value={checkinFormDraft.bankName}
+                    onChange={(e) =>
+                      setCheckinFormDraft((prev) => ({ ...prev, bankName: e.target.value }))
+                    }
+                    className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Số tài khoản CEO HN10"
+                    value={checkinFormDraft.bankAccount}
+                    onChange={(e) =>
+                      setCheckinFormDraft((prev) => ({ ...prev, bankAccount: e.target.value }))
+                    }
+                    className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold font-mono"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Chủ tài khoản"
+                    value={checkinFormDraft.bankOwner}
+                    onChange={(e) =>
+                      setCheckinFormDraft((prev) => ({ ...prev, bankOwner: e.target.value }))
+                    }
+                    className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold"
+                  />
+                </div>
+              </div>
+
+              {/* 5. Trường thông tin bổ sung */}
+              <div className="space-y-2.5 pt-3 border-t border-slate-200">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-slate-800">
+                    4. Trường thông tin bổ sung ({checkinFormDraft.customFields.length})
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setCheckinFormDraft((prev) => ({
+                        ...prev,
+                        customFields: [
+                          ...prev.customFields,
+                          {
+                            id: `cf_${Date.now().toString(36)}`,
+                            label: "Trường thông tin mới",
+                            type: "text",
+                            required: false,
+                            optionsText: "",
+                          },
+                        ],
+                      }))
+                    }
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#003B95] font-bold text-[11px] cursor-pointer"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    <span>Thêm trường</span>
+                  </button>
+                </div>
+
+                {checkinFormDraft.customFields.length === 0 ? (
+                  <div className="p-3 rounded-xl border border-dashed border-slate-200 text-center text-[11px] text-slate-500">
+                    Chưa có trường bổ sung nào. Bấm <b>+ Thêm trường</b> nếu muốn thu thập thêm thông tin khi Khách mới check-in.
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {checkinFormDraft.customFields.map((cf, idx) => (
+                      <div key={cf.id} className="p-2.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={cf.label}
+                            onChange={(e) =>
+                              setCheckinFormDraft((prev) => ({
+                                ...prev,
+                                customFields: prev.customFields.map((item, i) =>
+                                  i === idx ? { ...item, label: e.target.value } : item,
+                                ),
+                              }))
+                            }
+                            placeholder="Tên trường..."
+                            className="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold"
+                          />
+                          <select
+                            value={cf.type}
+                            onChange={(e) =>
+                              setCheckinFormDraft((prev) => ({
+                                ...prev,
+                                customFields: prev.customFields.map((item, i) =>
+                                  i === idx ? { ...item, type: e.target.value as any } : item,
+                                ),
+                              }))
+                            }
+                            className="px-2 py-1.5 rounded-lg border border-slate-200 bg-white text-[11px]"
+                          >
+                            <option value="text">Văn bản ngắn</option>
+                            <option value="textarea">Đoạn văn</option>
+                            <option value="number">Số</option>
+                            <option value="date">Ngày tháng</option>
+                            <option value="select">Danh sách chọn</option>
+                            <option value="checkbox">Checkbox</option>
+                            <option value="email">Email</option>
+                            <option value="phone">Số điện thoại</option>
+                          </select>
+                          <label className="inline-flex items-center gap-1 text-[11px] font-medium cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={cf.required}
+                              onChange={(e) =>
+                                setCheckinFormDraft((prev) => ({
+                                  ...prev,
+                                  customFields: prev.customFields.map((item, i) =>
+                                    i === idx ? { ...item, required: e.target.checked } : item,
+                                  ),
+                                }))
+                              }
+                            />
+                            <span>Bắt buộc</span>
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setCheckinFormDraft((prev) => ({
+                                ...prev,
+                                customFields: prev.customFields.filter((_, i) => i !== idx),
+                              }))
+                            }
+                            className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg cursor-pointer"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                        {cf.type === "select" && (
+                          <input
+                            type="text"
+                            value={cf.optionsText || ""}
+                            onChange={(e) =>
+                              setCheckinFormDraft((prev) => ({
+                                ...prev,
+                                customFields: prev.customFields.map((item, i) =>
+                                  i === idx ? { ...item, optionsText: e.target.value } : item,
+                                ),
+                              }))
+                            }
+                            placeholder="Các lựa chọn cách nhau dấu phẩy (VD: S, M, L, XL)"
+                            className="w-full px-2.5 py-1 rounded-lg border border-slate-200 bg-white text-[11px]"
+                          />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="px-6 py-4 border-t border-slate-200 flex items-center justify-between gap-2 bg-slate-50/70">
+              <button
+                type="button"
+                onClick={() => setCheckinFormDraft(defaultCheckinFormConfig)}
+                className="px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer"
+              >
+                Khôi phục mặc định
+              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowCheckinFormModal(false)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-100 cursor-pointer"
+                >
+                  Đóng
+                </button>
+                <button
+                  type="button"
+                  onClick={handleApplyCheckinForm}
+                  disabled={savingCheckinForm}
+                  className="px-5 py-2 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-sm cursor-pointer disabled:opacity-60"
+                >
+                  <Save className="h-3.5 w-3.5" />
+                  <span>{savingCheckinForm ? "Đang áp dụng..." : "Áp dụng & Public"}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </AppShell>
   );
 }

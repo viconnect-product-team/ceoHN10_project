@@ -1487,6 +1487,8 @@ export class UsersService implements OnModuleInit {
         (memberRow?.card_visibility_settings as any)?.dataScope ||
         (primaryRole === 'platform_admin' || primaryRole === 'admin' ? 'all' : 'department');
 
+      const storedSettings = (memberRow?.card_visibility_settings as any) || {};
+      const storedTarget = storedSettings.targetSystem;
       const isCrmAuthorized =
         primaryRole === 'platform_admin' ||
         primaryRole === 'admin' ||
@@ -1494,9 +1496,16 @@ export class UsersService implements OnModuleInit {
         primaryRole === 'lop_pho' ||
         primaryRole === 'truong_team' ||
         primaryRole === 'pho_team' ||
-        primaryRole === 'truong_ban_chuyen_trach' ||
+        primaryRole.startsWith('truong_ban_') ||
+        primaryRole === 'custom_account' ||
         customPermsList.length > 0 ||
-        Boolean((memberRow?.card_visibility_settings as any)?.canAccessCrm);
+        storedTarget === 'crm_only' ||
+        storedTarget === 'crm' ||
+        Boolean(storedSettings.canAccessCrm);
+      const isAppAuthorized =
+        storedSettings.canAccessApp !== undefined
+          ? Boolean(storedSettings.canAccessApp)
+          : storedTarget !== 'crm_only' && storedTarget !== 'crm';
 
       const isUnrestrictedAdmin =
         (primaryRole === 'platform_admin' || primaryRole === 'admin') &&
@@ -1532,7 +1541,9 @@ export class UsersService implements OnModuleInit {
         memberId: memberRow?.id || null,
         canAccessCrm: isCrmAuthorized,
         can_access_crm: isCrmAuthorized,
-        targetSystem: isCrmAuthorized ? 'all' : 'ceohn10',
+        canAccessApp: isAppAuthorized,
+        can_access_app: isAppAuthorized,
+        targetSystem: storedTarget || (isCrmAuthorized ? (isAppAuthorized ? 'all' : 'crm_only') : 'ceohn10'),
         dataScope: userDataScope,
         customPermissions: customPermsList,
         companyName: memberRow?.company_name || profile?.company_name || '',
@@ -2406,8 +2417,12 @@ export class UsersService implements OnModuleInit {
       (data.code && data.code.trim()) ||
       `HN10-${Math.floor(100 + Math.random() * 900)}`;
 
+    const resolvedTargetSystem = data.targetSystem || 'crm_only';
     const hasCustomPermsOnCreate = Array.isArray(data.customPermissions) && data.customPermissions.length > 0;
     const isCrmGranted =
+      resolvedTargetSystem === 'crm_only' ||
+      resolvedTargetSystem === 'crm' ||
+      resolvedTargetSystem === 'all' ||
       cleanRole === 'platform_admin' ||
       cleanRole === 'admin' ||
       cleanRole === 'lop_truong' ||
@@ -2416,12 +2431,16 @@ export class UsersService implements OnModuleInit {
       cleanRole === 'pho_team' ||
       cleanRole.startsWith('truong_ban_') ||
       cleanRole === 'custom_account' ||
-      hasCustomPermsOnCreate ||
-      Boolean(data.targetSystem === 'all');
+      hasCustomPermsOnCreate;
+    const isAppGranted =
+      resolvedTargetSystem === 'all' ||
+      resolvedTargetSystem === 'ceohn10' ||
+      resolvedTargetSystem === 'app_only';
 
     const metaSettingsStr = JSON.stringify({
-      targetSystem: isCrmGranted ? 'all' : 'ceohn10',
+      targetSystem: resolvedTargetSystem,
       canAccessCrm: isCrmGranted,
+      canAccessApp: isAppGranted,
       customPermissions: Array.isArray(data.customPermissions) ? data.customPermissions : [],
     });
 

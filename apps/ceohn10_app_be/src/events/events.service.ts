@@ -647,9 +647,12 @@ export class EventsService extends BaseService implements OnModuleInit {
   }
 
   async getEventById(userId: string, id: string) {
-    const rows = await this.prisma.$queryRaw<any[]>`
-      SELECT * FROM public.events WHERE id = ${id} LIMIT 1
-    `.catch(() => []);
+    const rows = await this.prisma
+      .$queryRawUnsafe<any[]>(`SELECT * FROM public.events WHERE id = $1 LIMIT 1`, id)
+      .catch((err) => {
+        this.logger.warn(`getEventById query failed for ${id}: ${err?.message}`);
+        return [];
+      });
 
     if (rows.length === 0) {
       throw new NotFoundException('Không tìm thấy sự kiện');
@@ -7009,6 +7012,91 @@ export class EventsService extends BaseService implements OnModuleInit {
       WHERE id = ${eventId}
     `;
     return { ok: true, config: configPayload };
+  }
+
+  async getCheckinFormConfig(eventId: string) {
+    await this.prisma.$executeRawUnsafe(
+      `ALTER TABLE public.events ADD COLUMN IF NOT EXISTS checkin_form_config jsonb`,
+    ).catch(() => {});
+    const targetId =
+      !eventId || eventId === 'latest' || eventId === 'default'
+        ? (
+            await this.prisma.$queryRaw<any[]>`
+              SELECT id FROM public.events ORDER BY date DESC NULLS LAST, created_at DESC LIMIT 1
+            `.catch(() => [])
+          )[0]?.id
+        : eventId;
+    if (!targetId) return { config: null };
+    const rows = await this.prisma.$queryRaw<any[]>`
+      SELECT checkin_form_config, form_fields_config FROM public.events WHERE id = ${targetId} LIMIT 1
+    `.catch(() => []);
+    const raw = rows[0]?.checkin_form_config || null;
+    const config = raw ? (typeof raw === 'string' ? JSON.parse(raw) : raw) : null;
+    const formFieldsRaw = rows[0]?.form_fields_config || null;
+    const formFields = formFieldsRaw
+      ? typeof formFieldsRaw === 'string'
+        ? JSON.parse(formFieldsRaw)
+        : formFieldsRaw
+      : null;
+    if (!config && Array.isArray(formFields?.checkinCustomFields)) {
+      return {
+        config: {
+          customFields: formFields.checkinCustomFields,
+        },
+      };
+    }
+    return { config };
+  }
+
+  async saveCheckinFormConfig(eventId: string, body: any) {
+    await this.prisma.$executeRawUnsafe(
+      `ALTER TABLE public.events ADD COLUMN IF NOT EXISTS checkin_form_config jsonb`,
+    ).catch(() => {});
+    await this.prisma.$executeRawUnsafe(
+      `ALTER TABLE public.events ADD COLUMN IF NOT EXISTS form_fields_config jsonb`,
+    ).catch(() => {});
+    const targetId =
+      !eventId || eventId === 'latest' || eventId === 'default'
+        ? (
+            await this.prisma.$queryRaw<any[]>`
+              SELECT id FROM public.events ORDER BY date DESC NULLS LAST, created_at DESC LIMIT 1
+            `.catch(() => [])
+          )[0]?.id
+        : eventId;
+    if (!targetId) {
+      throw new NotFoundException('Không tìm thấy sự kiện để lưu cấu hình Form Check-in');
+    }
+    const configPayload = body?.config && typeof body.config === 'object' ? body.config : body;
+    const jsonStr = JSON.stringify(configPayload || {});
+    await this.prisma.$executeRaw`
+      UPDATE public.events
+      SET checkin_form_config = ${jsonStr}::jsonb, updated_at = now()
+      WHERE id = ${targetId}
+    `;
+
+    if (Array.isArray(configPayload?.customFields)) {
+      const existingRows = await this.prisma.$queryRaw<any[]>`
+        SELECT form_fields_config FROM public.events WHERE id = ${targetId} LIMIT 1
+      `.catch(() => []);
+      let existingFf: any = {};
+      if (existingRows[0]?.form_fields_config) {
+        existingFf =
+          typeof existingRows[0].form_fields_config === 'string'
+            ? JSON.parse(existingRows[0].form_fields_config)
+            : existingRows[0].form_fields_config;
+      }
+      const nextFf = {
+        ...(existingFf && typeof existingFf === 'object' ? existingFf : {}),
+        checkinCustomFields: configPayload.customFields,
+      };
+      await this.prisma.$executeRaw`
+        UPDATE public.events
+        SET form_fields_config = ${JSON.stringify(nextFf)}::jsonb
+        WHERE id = ${targetId}
+      `.catch(() => {});
+    }
+
+    return { ok: true, eventId: targetId, config: configPayload };
   }
 
   /**

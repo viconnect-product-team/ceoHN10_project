@@ -593,6 +593,7 @@ function AccountsPage() {
         executiveRole: formRole,
         role: formRole,
         account_status: formStatus,
+        targetSystem: "crm_only",
       };
 
       const res = await fetchNestApi<any>("/users", {

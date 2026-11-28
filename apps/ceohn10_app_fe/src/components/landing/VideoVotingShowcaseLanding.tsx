@@ -215,9 +215,16 @@ export function VideoVotingShowcaseLanding({
 
   const activeVideoRef = useRef<HTMLVideoElement | null>(null);
   const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
 
   const currentSlide = slides[currentIndex] || slides[0];
   const primaryColor = config.theme?.primaryColor || "#E5B84B";
+  const appliedEventTitle =
+    (config as any).eventName ||
+    (config as any).eventTitle ||
+    config.name ||
+    config.brand?.logoText ||
+    "SỰ KIỆN CEO HN10";
   const slugOrId = config.slug || config.id || "video-voting";
 
   const publicUrl = useMemo(() => {
@@ -324,16 +331,19 @@ export function VideoVotingShowcaseLanding({
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX.current === null) return;
+    if (touchStartX.current === null || touchStartY.current === null) return;
     const deltaX = e.changedTouches[0].clientX - touchStartX.current;
-    if (Math.abs(deltaX) > 45) {
+    const deltaY = e.changedTouches[0].clientY - touchStartY.current;
+    if (Math.abs(deltaX) > 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
       if (deltaX < 0) handleNextSlide();
       else handlePrevSlide();
     }
     touchStartX.current = null;
+    touchStartY.current = null;
   };
 
   const handleChooseOption = (slide: LandingSlide, option: LandingVoteOption) => {
@@ -399,14 +409,103 @@ export function VideoVotingShowcaseLanding({
     return diff;
   };
 
+  const renderSlideVoteCard = (slide: LandingSlide, sIdx: number) => {
+    const st =
+      (voteStats?.slideStats || []).find((x: any) => x.slideId === slide.id) || {
+        slideId: slide.id,
+        slideNumber: sIdx + 1,
+        title: `${slide.title1 || ""} ${slide.title2 || ""}`.trim() || `Video 0${sIdx + 1}`,
+        totalVotes: 0,
+        options: (slide.votingOptions || []).map((o) => ({
+          id: o.id,
+          label: o.label,
+          count: 0,
+          percentage: 0,
+        })),
+      };
+
+    return (
+      <div key={slide.id} className="pin-glass-card rounded-3xl p-4 sm:p-5 space-y-3.5">
+        <div className="flex items-center justify-between gap-2 pb-1">
+          <div className="min-w-0">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-blue-700">
+              VIDEO 0{sIdx + 1} · {[slide.title1, slide.title2].filter(Boolean).join(" ")}
+            </span>
+            <h3 className="text-sm font-extrabold text-[#0B0D12] truncate mt-0.5">
+              {slide.votingQuestion || st.title}
+            </h3>
+          </div>
+          <span className="px-3 py-1 rounded-full bg-[#0B0D12] text-white text-xs font-mono font-bold shrink-0">
+            {st.totalVotes ?? 0} phiếu
+          </span>
+        </div>
+
+        <div className="space-y-2.5">
+          {(slide.votingOptions || []).map((opt) => {
+            const optStat = (st.options || []).find((o: any) => o.id === opt.id);
+            const count = optStat?.count ?? 0;
+            const pct = optStat?.percentage ?? 0;
+            const isSelected = selectedOptionBySlide[slide.id] === opt.id;
+            const optionVoters = (voteStats?.recentVoters || []).filter(
+              (v: any) => v.slideId === slide.id && v.optionId === opt.id,
+            );
+
+            return (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() => handleChooseOption(slide, opt)}
+                className={`pin-vote-card w-full rounded-2xl p-3 text-left space-y-2 cursor-pointer ${
+                  isSelected ? "ring-2 ring-[#0B0D12]" : ""
+                }`}
+              >
+                <div className="flex items-center justify-between text-xs gap-2">
+                  <span className="font-bold text-[#0B0D12]">{opt.label}</span>
+                  <span className="font-mono font-extrabold text-blue-700 shrink-0 tabular-nums transition-all duration-500">
+                    {pct}% ({count})
+                  </span>
+                </div>
+
+                <div className="relative w-full min-h-[30px] rounded-xl bg-slate-100/90 border border-slate-200/80 overflow-hidden p-1.5 flex flex-wrap items-center gap-1.5">
+                  <div
+                    className="absolute inset-y-0 left-0 rounded-xl transition-all duration-700 ease-out pointer-events-none"
+                    style={{
+                      width: `${Math.min(100, pct)}%`,
+                      background: "linear-gradient(90deg, rgba(59,130,246,0.22) 0%, rgba(14,165,233,0.14) 100%)",
+                    }}
+                  />
+                  {optionVoters.length > 0 ? (
+                    optionVoters.slice(0, 10).map((voter: any, vIdx: number) => (
+                      <span
+                        key={voter.id || vIdx}
+                        style={{ animationDelay: `${vIdx * 60}ms` }}
+                        className="voter-chip-enter relative z-10 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#0B0D12] text-white text-[10px] font-semibold shadow-xs"
+                      >
+                        <span className="size-1.5 rounded-full bg-emerald-400 shrink-0" />
+                        <span className="max-w-[120px] truncate">{voter.voterName}</span>
+                      </span>
+                    ))
+                  ) : (
+                    <span className="relative z-10 text-[10px] text-[#8A919E] px-1">
+                      Chạm để bình chọn phương án này
+                    </span>
+                  )}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div
-      className="relative w-full min-h-screen bg-[#FFFFFF] text-[#0B0D12] overflow-x-hidden flex flex-col justify-between select-none"
+      className="relative w-full min-h-screen bg-[#FFFFFF] text-[#0B0D12] overflow-y-auto overflow-x-hidden flex flex-col justify-between"
       style={{
         fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        touchAction: "pan-y",
       }}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
     >
       <style>{`
         @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Syne:wght@700;800&family=JetBrains+Mono:wght@500;700&display=swap");
@@ -529,6 +628,9 @@ export function VideoVotingShowcaseLanding({
             </span>
           </div>
           <div className="min-w-0">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-blue-700 truncate">
+              {appliedEventTitle}
+            </div>
             <div className="text-xs sm:text-sm font-extrabold tracking-tight text-[#0B0D12] truncate">
               {activeScreen === "video"
                 ? [currentSlide.title1, currentSlide.title2].filter(Boolean).join(" ") || `Video 0${currentIndex + 1}`
@@ -626,9 +728,13 @@ export function VideoVotingShowcaseLanding({
       {/* MÀN 1: VIDEO SHOWCASE (KHÔNG LẪN MÀN VOTING) | MÀN 2: VOTING & BIỂU ĐỒ RIÊNG BIỆT (THEME SÁNG) */}
       {activeScreen === "video" ? (
         <>
-          <main className="relative z-20 flex-1 w-full max-w-[1440px] mx-auto flex flex-col justify-center py-2 sm:py-5">
-            {/* 1. CAROUSEL VIEWPORT WITH PEEKING ADJACENT VIDEO CARDS */}
-            <div className="relative w-full h-[250px] sm:h-[450px] lg:h-[540px] flex items-center justify-center overflow-hidden px-3 sm:px-4">
+          <main className="relative z-20 flex-1 w-full flex flex-col justify-start py-2 sm:py-4 space-y-5">
+            {/* 1. CAROUSEL VIEWPORT FULL WIDTH (SWIPEABLE HORIZONTALLY, SCROLLABLE VERTICALLY) */}
+            <div
+              className="relative w-full h-[260px] sm:h-[460px] lg:h-[560px] flex items-center justify-center overflow-hidden"
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+            >
           {slides.map((slide, idx) => {
             const offset = getRelativeOffset(idx);
             const isCenter = offset === 0;
@@ -668,10 +774,10 @@ export function VideoVotingShowcaseLanding({
                 onClick={() => {
                   if (!isCenter) setCurrentIndex(idx);
                 }}
-                className={`absolute w-[92%] sm:w-[82%] lg:w-[72%] max-w-[1020px] h-full rounded-[24px] sm:rounded-[38px] overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                className={`absolute w-full h-full overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                   isCenter
-                    ? "shadow-[0_35px_100px_rgba(0,0,0,0.85)]"
-                    : "cursor-pointer hover:opacity-70"
+                    ? "shadow-[0_24px_60px_rgba(0,0,0,0.28)]"
+                    : "cursor-pointer hover:opacity-70 rounded-2xl"
                 }`}
                 style={{
                   transform: transformStyle,
@@ -783,8 +889,13 @@ export function VideoVotingShowcaseLanding({
           </button>
         </div>
 
-        {/* 2. NÚT CHUYỂN NHANH SANG MÀN VOTING & BIỂU ĐỒ RIÊNG */}
-        <div className="flex justify-center mt-4">
+        {/* 2. VOTING NGAY BÊN DƯỚI VIDEO ĐANG CHẠY */}
+        <div className="w-full max-w-[880px] mx-auto px-3 sm:px-4">
+          {renderSlideVoteCard(currentSlide, currentIndex)}
+        </div>
+
+        {/* 3. NÚT CHUYỂN NHANH SANG MÀN BIỂU ĐỒ TỔNG HỢP 7 VIDEO */}
+        <div className="flex justify-center pb-2">
           <button
             type="button"
             onClick={() => {
@@ -792,50 +903,88 @@ export function VideoVotingShowcaseLanding({
               setLoadingStats(true);
               fetchRealtimeStats().finally(() => setLoadingStats(false));
             }}
-            className="px-6 py-3 rounded-full bg-[#0B0D12] text-white hover:bg-slate-800 text-xs sm:text-sm font-bold flex items-center gap-2 shadow-lg cursor-pointer transition active:scale-95"
+            className="px-6 py-2.5 rounded-full bg-[#0B0D12] text-white hover:bg-slate-800 text-xs sm:text-sm font-bold flex items-center gap-2 shadow-lg cursor-pointer transition active:scale-95"
           >
             <BarChart3 className="size-4" />
-            <span>Mở Màn Voting &amp; Biểu Đồ Bình Chọn</span>
+            <span>Xem Biểu Đồ Tổng Hợp 7 Video</span>
             <ArrowUpRight className="size-4" />
           </button>
         </div>
       </main>
 
-      {/* BOTTOM 7-SLIDE FILMSTRIP DOCK (LIGHT THEME) */}
-      <footer className="relative z-20 w-full max-w-[1440px] mx-auto px-4 sm:px-10 pb-5 pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="flex items-center gap-2 overflow-x-auto max-w-full pb-1 scrollbar-none">
-          {slides.map((s, idx) => {
-            const active = idx === currentIndex;
-            return (
-              <button
-                key={s.id}
-                type="button"
-                onClick={() => setCurrentIndex(idx)}
-                className={`group relative flex items-center gap-2 p-1.5 pr-3 rounded-full transition-all duration-300 cursor-pointer shrink-0 ${
-                  active
-                    ? "bg-[#0B0D12] text-white shadow-md scale-105"
-                    : "pin-glass-pill text-[#525866] hover:text-[#0B0D12]"
-                }`}
-              >
-                <div className="relative w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden shrink-0">
+      {/* BOTTOM LEFT (VIDEO ĐÃ XUẤT HIỆN) & BOTTOM RIGHT (VIDEO CHƯA XUẤT HIỆN) — VUỐT NGANG ĐỂ CHỌN */}
+      <footer
+        className="relative z-20 w-full max-w-[1440px] mx-auto px-3 sm:px-8 pb-5 pt-2 flex flex-col sm:flex-row items-stretch sm:items-end justify-between gap-3"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        {/* Góc dưới bên trái: Các video đã xuất hiện */}
+        <div className="flex flex-col gap-1 min-w-0 sm:max-w-[46%]">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-[#525866] px-1">
+            Đã xuất hiện ({currentIndex})
+          </span>
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+            {slides.slice(0, currentIndex).length === 0 ? (
+              <span className="text-[11px] text-[#8A919E] px-2 py-1 rounded-xl pin-glass-pill">
+                Đang ở video đầu tiên
+              </span>
+            ) : (
+              slides.slice(0, currentIndex).map((s, idx) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => setCurrentIndex(idx)}
+                  className="group relative w-20 h-12 sm:w-24 sm:h-14 rounded-xl overflow-hidden border border-slate-200 shadow-sm hover:scale-105 transition cursor-pointer shrink-0 bg-slate-900"
+                  title={[s.title1, s.title2].filter(Boolean).join(" ")}
+                >
                   <img
                     src={resolveMediaUrl(s.image) || s.image}
                     alt={`0${idx + 1}`}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover opacity-85 group-hover:opacity-100"
                   />
-                </div>
-                <div className="text-left">
-                  <div
-                    className={`text-[10px] font-mono font-bold ${
-                      active ? "text-white" : "text-[#0B0D12]"
-                    }`}
-                  >
+                  <span className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/70 text-white text-[9px] font-mono font-bold">
                     0{idx + 1}
-                  </div>
-                </div>
-              </button>
-            );
-          })}
+                  </span>
+                </button>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Góc dưới bên phải: Các video chưa xuất hiện */}
+        <div className="flex flex-col sm:items-end gap-1 min-w-0 sm:max-w-[46%]">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-[#525866] px-1">
+            Tiếp theo ({slides.length - 1 - currentIndex})
+          </span>
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+            {slides.slice(currentIndex + 1).length === 0 ? (
+              <span className="text-[11px] text-[#8A919E] px-2 py-1 rounded-xl pin-glass-pill">
+                Đã hết danh sách video
+              </span>
+            ) : (
+              slides.slice(currentIndex + 1).map((s, offsetIdx) => {
+                const realIdx = currentIndex + 1 + offsetIdx;
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => setCurrentIndex(realIdx)}
+                    className="group relative w-20 h-12 sm:w-24 sm:h-14 rounded-xl overflow-hidden border border-slate-200 shadow-sm hover:scale-105 transition cursor-pointer shrink-0 bg-slate-900"
+                    title={[s.title1, s.title2].filter(Boolean).join(" ")}
+                  >
+                    <img
+                      src={resolveMediaUrl(s.image) || s.image}
+                      alt={`0${realIdx + 1}`}
+                      className="w-full h-full object-cover opacity-85 group-hover:opacity-100"
+                    />
+                    <span className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-black/70 text-white text-[9px] font-mono font-bold">
+                      0{realIdx + 1}
+                    </span>
+                  </button>
+                );
+              })
+            )}
+          </div>
         </div>
       </footer>
         </>
@@ -896,99 +1045,7 @@ export function VideoVotingShowcaseLanding({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {slides.slice(0, 7).map((slide, sIdx) => {
-              const st =
-                (voteStats?.slideStats || []).find((x: any) => x.slideId === slide.id) || {
-                  slideId: slide.id,
-                  slideNumber: sIdx + 1,
-                  title: `${slide.title1 || ""} ${slide.title2 || ""}`.trim() || `Video 0${sIdx + 1}`,
-                  totalVotes: 0,
-                  options: (slide.votingOptions || []).map((o) => ({
-                    id: o.id,
-                    label: o.label,
-                    count: 0,
-                    percentage: 0,
-                  })),
-                };
-
-              return (
-                <div
-                  key={slide.id}
-                  className="pin-glass-card rounded-3xl p-4 sm:p-5 space-y-3.5"
-                >
-                  <div className="flex items-center justify-between gap-2 pb-1">
-                    <div className="min-w-0">
-                      <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-blue-700">
-                        VIDEO 0{sIdx + 1} · {[slide.title1, slide.title2].filter(Boolean).join(" ")}
-                      </span>
-                      <h3 className="text-sm font-extrabold text-[#0B0D12] truncate mt-0.5">
-                        {slide.votingQuestion || st.title}
-                      </h3>
-                    </div>
-                    <span className="px-3 py-1 rounded-full bg-[#0B0D12] text-white text-xs font-mono font-bold shrink-0">
-                      {st.totalVotes ?? 0} phiếu
-                    </span>
-                  </div>
-
-                  <div className="space-y-2.5">
-                    {(slide.votingOptions || []).map((opt) => {
-                      const optStat = (st.options || []).find((o: any) => o.id === opt.id);
-                      const count = optStat?.count ?? 0;
-                      const pct = optStat?.percentage ?? 0;
-                      const isSelected = selectedOptionBySlide[slide.id] === opt.id;
-                      const optionVoters = (voteStats?.recentVoters || []).filter(
-                        (v: any) => v.slideId === slide.id && v.optionId === opt.id,
-                      );
-
-                      return (
-                        <button
-                          key={opt.id}
-                          type="button"
-                          onClick={() => handleChooseOption(slide, opt)}
-                          className={`pin-vote-card w-full rounded-2xl p-3 text-left space-y-2 cursor-pointer ${
-                            isSelected ? "ring-2 ring-[#0B0D12]" : ""
-                          }`}
-                        >
-                          <div className="flex items-center justify-between text-xs gap-2">
-                            <span className="font-bold text-[#0B0D12]">{opt.label}</span>
-                            <span className="font-mono font-extrabold text-blue-700 shrink-0 tabular-nums transition-all duration-500">
-                              {pct}% ({count})
-                            </span>
-                          </div>
-
-                          {/* Thanh biểu đồ biến động realtime + Tên người vote bay vào lựa chọn */}
-                          <div className="relative w-full min-h-[30px] rounded-xl bg-slate-100/90 border border-slate-200/80 overflow-hidden p-1.5 flex flex-wrap items-center gap-1.5">
-                            <div
-                              className="absolute inset-y-0 left-0 rounded-xl transition-all duration-700 ease-out pointer-events-none"
-                              style={{
-                                width: `${Math.min(100, pct)}%`,
-                                background: "linear-gradient(90deg, rgba(59,130,246,0.22) 0%, rgba(14,165,233,0.14) 100%)",
-                              }}
-                            />
-                            {optionVoters.length > 0 ? (
-                              optionVoters.slice(0, 10).map((voter: any, vIdx: number) => (
-                                <span
-                                  key={voter.id || vIdx}
-                                  style={{ animationDelay: `${vIdx * 60}ms` }}
-                                  className="voter-chip-enter relative z-10 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#0B0D12] text-white text-[10px] font-semibold shadow-xs"
-                                >
-                                  <span className="size-1.5 rounded-full bg-emerald-400 shrink-0" />
-                                  <span className="max-w-[120px] truncate">{voter.voterName}</span>
-                                </span>
-                              ))
-                            ) : (
-                              <span className="relative z-10 text-[10px] text-[#8A919E] px-1">
-                                Chạm để bình chọn phương án này
-                              </span>
-                            )}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
+            {slides.slice(0, 7).map((slide, sIdx) => renderSlideVoteCard(slide, sIdx))}
           </div>
         </main>
       )}

@@ -11,7 +11,7 @@ export const SAFE_COLUMN_KEY_REGEX = /^[a-z][a-z0-9_]{1,63}$/;
  */
 export function isValidVietnamesePhone(phone: string): boolean {
   if (!phone) return false;
-  return VIETNAMESE_PHONE_REGEX.test(phone.trim().replace(/\s+/g, ""));
+  return VIETNAMESE_PHONE_REGEX.test(phone.trim().replace(/[\s.-]+/g, ""));
 }
 
 /**

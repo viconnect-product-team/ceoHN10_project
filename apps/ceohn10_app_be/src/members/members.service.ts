@@ -2030,7 +2030,7 @@ export class MembersService implements OnModuleInit {
       );
     }
     const isFullAdmin = await this.checkIsPlatformAdmin(userId);
-    if (!isFullAdmin && hasCustomMemPerm) {
+    if (!isAdmin && !isFullAdmin && hasCustomMemPerm) {
       const isOwner = Boolean(current.created_by && String(current.created_by) === String(userId));
       if (!isOwner) {
         throw new ForbiddenException(
@@ -2121,21 +2121,31 @@ export class MembersService implements OnModuleInit {
     const website = data.website !== undefined ? data.website : current.website;
     const taxCode =
       data.taxCode !== undefined ? data.taxCode : current.tax_code;
+    const rawEmployees = data.employees !== undefined ? data.employees : current.employees;
     const employees =
-      data.employees !== undefined ? data.employees : current.employees;
+      rawEmployees !== null && rawEmployees !== undefined && rawEmployees !== '' && Number.isFinite(Number(rawEmployees))
+        ? Math.round(Number(rawEmployees))
+        : current.employees ?? null;
     const about = data.about !== undefined ? data.about : current.about;
-    const feeYear =
+    const rawFeeYear =
       data.feeYear !== undefined
         ? data.feeYear
         : (current.fee_year ?? new Date().getFullYear());
+    const feeYear = Number.isFinite(Number(rawFeeYear)) ? Number(rawFeeYear) : new Date().getFullYear();
+    const parseIsoDateSafe = (raw: any): string | null => {
+      if (!raw) return null;
+      const s = String(raw).trim();
+      if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+      const dm = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+      if (dm) return `${dm[3]}-${dm[2].padStart(2, '0')}-${dm[1].padStart(2, '0')}`;
+      const d = new Date(s);
+      return Number.isNaN(d.getTime()) ? null : d.toISOString().slice(0, 10);
+    };
     const joinedAtVal =
-      (data as any).joinedAt !== undefined && String((data as any).joinedAt).trim() !== ''
-        ? String((data as any).joinedAt).slice(0, 10)
-        : (data as any).joined_at !== undefined && String((data as any).joined_at).trim() !== ''
-          ? String((data as any).joined_at).slice(0, 10)
-          : current.joined_at
-            ? new Date(current.joined_at).toISOString().slice(0, 10)
-            : new Date().toISOString().slice(0, 10);
+      parseIsoDateSafe((data as any).joinedAt) ||
+      parseIsoDateSafe((data as any).joined_at) ||
+      parseIsoDateSafe(current.joined_at) ||
+      new Date().toISOString().slice(0, 10);
     let paymentStatus =
       data.paymentStatus !== undefined
         ? data.paymentStatus
@@ -2162,9 +2172,14 @@ export class MembersService implements OnModuleInit {
     ]);
     const departmentVal =
       data.department !== undefined ? data.department : current.department;
+    const rawFeeAmount = (data as any).feeAmount;
+    const parsedFeeAmount =
+      rawFeeAmount !== undefined && rawFeeAmount !== null && String(rawFeeAmount).trim() !== ''
+        ? Number(String(rawFeeAmount).replace(/[^\d.-]/g, ''))
+        : NaN;
     const feeAmountVal =
-      (data as any).feeAmount !== undefined && (data as any).feeAmount !== ''
-        ? Number((data as any).feeAmount)
+      Number.isFinite(parsedFeeAmount)
+        ? Math.round(parsedFeeAmount)
         : (current.fee_amount ?? null);
     await this.prisma.$executeRawUnsafe(
       `ALTER TABLE public.members ADD COLUMN IF NOT EXISTS fee_amount BIGINT`,
@@ -2471,7 +2486,7 @@ export class MembersService implements OnModuleInit {
       );
     }
     const isFullAdmin = await this.checkIsPlatformAdmin(userId);
-    if (!isFullAdmin && hasCustomMemPerm) {
+    if (!isAdmin && !isFullAdmin && hasCustomMemPerm) {
       const isOwner = Boolean(current.created_by && String(current.created_by) === String(userId));
       if (!isOwner) {
         throw new ForbiddenException(
@@ -2532,7 +2547,7 @@ export class MembersService implements OnModuleInit {
       );
     }
     const isFullAdmin = await this.checkIsPlatformAdmin(userId);
-    if (!isFullAdmin && hasCustomMemPerm) {
+    if (!isAdmin && !isFullAdmin && hasCustomMemPerm) {
       const isOwner = Boolean(current.created_by && String(current.created_by) === String(userId));
       if (!isOwner) {
         throw new ForbiddenException(

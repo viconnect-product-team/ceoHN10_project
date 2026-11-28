@@ -678,6 +678,18 @@ export class EventsController {
     return this.eventsService.saveInvitationConfig(id, body);
   }
 
+  @UseGuards(OptionalJwtAuthGuard)
+  @Get(':id/checkin-form-config')
+  async getCheckinFormConfig(@Param('id') id: string) {
+    return this.eventsService.getCheckinFormConfig(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put(':id/checkin-form-config')
+  async saveCheckinFormConfig(@Param('id') id: string, @Body() body: any) {
+    return this.eventsService.saveCheckinFormConfig(id, body);
+  }
+
   // UC-INV-03..06: Xem thư mời cá nhân hóa công khai & RSVP không cần đăng nhập
   @UseGuards(OptionalJwtAuthGuard)
   @Get(':id/public-invitation')

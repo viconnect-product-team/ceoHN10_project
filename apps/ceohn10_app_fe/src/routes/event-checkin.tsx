@@ -34,8 +34,10 @@ import {
   Ticket,
   Dices,
   MapPin,
+  SlidersHorizontal,
+  Save,
 } from "lucide-react";
-import { fetchNestApi } from "@/lib/api-client";
+import { fetchNestApi, getAuthToken } from "@/lib/api-client";
 import { toast } from "sonner";
 import { decodeQrFromImage } from "@/lib/qr-image-decoder";
 import { EventLivePhotoGalleryModal } from "@/components/events/EventLivePhotoGalleryModal";
@@ -45,9 +47,145 @@ export const Route = createFileRoute("/event-checkin")({
   component: PublicEventCheckinGatePage,
 });
 
+type CheckinCustomField = {
+  id: string;
+  label: string;
+  type: "text" | "textarea" | "number" | "date" | "select" | "checkbox" | "email" | "phone";
+  required: boolean;
+  optionsText?: string;
+};
+
+type CheckinFormConfig = {
+  logoUrl: string;
+  logoHeightPx: number;
+  accentColor: string;
+  enabledTabs: {
+    member: boolean;
+    ticket: boolean;
+    walkin: boolean;
+    checkout: boolean;
+    checkedin_list: boolean;
+    checkedout_list: boolean;
+  };
+  tabLabels: {
+    member: string;
+    ticket: string;
+    walkin: string;
+    checkout: string;
+    checkedin_list: string;
+    checkedout_list: string;
+  };
+  sectionTitles: {
+    member: string;
+    ticket: string;
+    walkin: string;
+    checkout: string;
+  };
+  memberPlaceholder: string;
+  ticketPlaceholder: string;
+  submitButtonText: string;
+  showProxyCheckin: boolean;
+  bankName?: string;
+  bankAccount?: string;
+  bankOwner?: string;
+  customFields: CheckinCustomField[];
+};
+
+const DEFAULT_CHECKIN_FORM_CONFIG: CheckinFormConfig = {
+  logoUrl: "/ceohn10-official-logo.png",
+  logoHeightPx: 56,
+  accentColor: "#007AFF",
+  enabledTabs: {
+    member: true,
+    ticket: true,
+    walkin: true,
+    checkout: true,
+    checkedin_list: true,
+    checkedout_list: true,
+  },
+  tabLabels: {
+    member: "Học viên",
+    ticket: "Có mã vé",
+    walkin: "Khách mới",
+    checkout: "Check-out",
+    checkedin_list: "Đã Check-in",
+    checkedout_list: "Đã Check-out",
+  },
+  sectionTitles: {
+    member: "Check-in Học Viên",
+    ticket: "Check-in Bằng Mã Vé",
+    walkin: "Đăng Ký Khách Mới",
+    checkout: "Check-out Sự Kiện",
+  },
+  memberPlaceholder: "Nhập mã học viên...",
+  ticketPlaceholder: "Nhập mã vé...",
+  submitButtonText: "Check-in",
+  showProxyCheckin: true,
+  bankName: "",
+  bankAccount: "",
+  bankOwner: "",
+  customFields: [],
+};
+
+function mergeCheckinFormConfig(raw?: any): CheckinFormConfig {
+  if (!raw || typeof raw !== "object") return DEFAULT_CHECKIN_FORM_CONFIG;
+  return {
+    logoUrl: raw.logoUrl || DEFAULT_CHECKIN_FORM_CONFIG.logoUrl,
+    logoHeightPx: Number(raw.logoHeightPx) > 24 ? Number(raw.logoHeightPx) : DEFAULT_CHECKIN_FORM_CONFIG.logoHeightPx,
+    accentColor: raw.accentColor || DEFAULT_CHECKIN_FORM_CONFIG.accentColor,
+    enabledTabs: {
+      ...DEFAULT_CHECKIN_FORM_CONFIG.enabledTabs,
+      ...(raw.enabledTabs || {}),
+    },
+    tabLabels: {
+      ...DEFAULT_CHECKIN_FORM_CONFIG.tabLabels,
+      ...(raw.tabLabels || {}),
+    },
+    sectionTitles: {
+      ...DEFAULT_CHECKIN_FORM_CONFIG.sectionTitles,
+      ...(raw.sectionTitles || {}),
+    },
+    memberPlaceholder: raw.memberPlaceholder || DEFAULT_CHECKIN_FORM_CONFIG.memberPlaceholder,
+    ticketPlaceholder: raw.ticketPlaceholder || DEFAULT_CHECKIN_FORM_CONFIG.ticketPlaceholder,
+    submitButtonText: raw.submitButtonText || DEFAULT_CHECKIN_FORM_CONFIG.submitButtonText,
+    showProxyCheckin:
+      raw.showProxyCheckin !== undefined
+        ? Boolean(raw.showProxyCheckin)
+        : DEFAULT_CHECKIN_FORM_CONFIG.showProxyCheckin,
+    bankName: raw.bankName || "",
+    bankAccount: raw.bankAccount || "",
+    bankOwner: raw.bankOwner || "",
+    customFields: Array.isArray(raw.customFields) ? raw.customFields : [],
+  };
+}
+
 function PublicEventCheckinGatePage() {
-  const [activeCategory, setActiveCategory] = useState<"member" | "ticket" | "walkin">("member");
+  const [activeCategory, setActiveCategory] = useState<
+    "member" | "ticket" | "walkin" | "checkout" | "checkedin_list" | "checkedout_list"
+  >("member");
+  const [formConfig, setFormConfig] = useState<CheckinFormConfig>(DEFAULT_CHECKIN_FORM_CONFIG);
+  const [draftFormConfig, setDraftFormConfig] = useState<CheckinFormConfig>(DEFAULT_CHECKIN_FORM_CONFIG);
+  const [isFormEditorOpen, setIsFormEditorOpen] = useState(false);
+  const [savingFormConfig, setSavingFormConfig] = useState(false);
+  const [hasAdminSession, setHasAdminSession] = useState(false);
+  const [showWalkinBankQr, setShowWalkinBankQr] = useState(false);
+  const [sepayBankInfo, setSepayBankInfo] = useState<{
+    bankName: string;
+    bankAccount: string;
+    bankOwner: string;
+  } | null>(null);
   const [memberCodeInput, setMemberCodeInput] = useState("");
+  const [checkoutCodeInput, setCheckoutCodeInput] = useState("");
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [listFilterQuery, setListFilterQuery] = useState("");
+  const [loadingLists, setLoadingLists] = useState(false);
+  const [checkoutResult, setCheckoutResult] = useState<{
+    ok: boolean;
+    message: string;
+    memberName?: string;
+    eventTitle?: string;
+    checkedOutAt?: string;
+  } | null>(null);
   const [unregisteredMember, setUnregisteredMember] = useState<any>(null);
   const [thankYouSuccess, setThankYouSuccess] = useState<{
     name: string;
@@ -517,6 +655,86 @@ function PublicEventCheckinGatePage() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    const token = getAuthToken();
+    setHasAdminSession(Boolean(token));
+    const search = new URLSearchParams(window.location.search);
+    if (search.get("editForm") === "1" && token) {
+      setIsFormEditorOpen(true);
+    }
+    fetchNestApi<any>("/admin/master-settings/sepay")
+      .then((res) => {
+        if (res && (res.account_number || res.bank_brand_name)) {
+          setSepayBankInfo({
+            bankName: res.bank_brand_name || "MB Bank",
+            bankAccount: res.account_number || "",
+            bankOwner: res.account_name || "CLB DOANH NHAN CEO HN10",
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const targetId = selectedEventId || "latest";
+    const loadConfig = async () => {
+      try {
+        const res = await fetchNestApi<any>(`/events/${encodeURIComponent(targetId)}/checkin-form-config`);
+        const merged = mergeCheckinFormConfig(res?.config);
+        setFormConfig(merged);
+        setDraftFormConfig(merged);
+        const tabKeys: Array<keyof CheckinFormConfig["enabledTabs"]> = [
+          "member",
+          "ticket",
+          "walkin",
+          "checkout",
+          "checkedin_list",
+          "checkedout_list",
+        ];
+        if (!merged.enabledTabs[activeCategory]) {
+          const firstEnabled = tabKeys.find((k) => merged.enabledTabs[k]);
+          if (firstEnabled) setActiveCategory(firstEnabled);
+        }
+      } catch {
+        // Keep defaults
+      }
+    };
+    void loadConfig();
+  }, [selectedEventId]);
+
+  const handleApplyFormConfig = async () => {
+    setSavingFormConfig(true);
+    try {
+      const targetId = selectedEventId || "latest";
+      const res = await fetchNestApi<any>(`/events/${encodeURIComponent(targetId)}/checkin-form-config`, {
+        method: "PUT",
+        body: JSON.stringify({ config: draftFormConfig }),
+      });
+      const merged = mergeCheckinFormConfig(res?.config || draftFormConfig);
+      setFormConfig(merged);
+      setDraftFormConfig(merged);
+      const tabKeys: Array<keyof CheckinFormConfig["enabledTabs"]> = [
+        "member",
+        "ticket",
+        "walkin",
+        "checkout",
+        "checkedin_list",
+        "checkedout_list",
+      ];
+      if (!merged.enabledTabs[activeCategory]) {
+        const firstEnabled = tabKeys.find((k) => merged.enabledTabs[k]);
+        if (firstEnabled) setActiveCategory(firstEnabled);
+      }
+      setIsFormEditorOpen(false);
+      toast.success("Đã áp dụng & Public cấu hình Form Check-in mới!");
+    } catch (err: any) {
+      toast.error(err?.message || "Không thể lưu cấu hình Form Check-in (cần đăng nhập quyền Quản trị).");
+    } finally {
+      setSavingFormConfig(false);
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
     const search = new URLSearchParams(window.location.search);
     const paramTicket =
       search.get("ticket") ||
@@ -721,6 +939,147 @@ function PublicEventCheckinGatePage() {
       }
     } catch {
       setFeeItems([]);
+    }
+  };
+
+  const refreshEventTicketLists = async (targetEventId?: string) => {
+    const eId = targetEventId || selectedEventId || currentTicket?.eventId || "latest";
+    setLoadingLists(true);
+    try {
+      const res = await fetchNestApi<any>(`/events/${eId}/offline-dataset`);
+      if (res && res.ok && Array.isArray(res.tickets)) {
+        setCachedTickets(res.tickets);
+        localStorage.setItem("ceohn10_offline_tickets", JSON.stringify(res.tickets));
+      }
+    } catch {
+    } finally {
+      setLoadingLists(false);
+    }
+  };
+
+  const renderAttendanceList = (mode: "checkin" | "checkout") => {
+    const ql = listFilterQuery.trim().toLowerCase();
+    const baseList = cachedTickets.filter((t) =>
+      mode === "checkin"
+        ? Boolean(t.isCheckedIn || t.status === "attended" || t.checkedInAt)
+        : Boolean(t.checkedOutAt),
+    );
+    const filteredList = baseList.filter((t) => {
+      if (!ql) return true;
+      return (
+        String(t.memberName || "").toLowerCase().includes(ql) ||
+        String(t.memberCode || "").toLowerCase().includes(ql) ||
+        String(t.id || "").toLowerCase().includes(ql) ||
+        String(t.company || "").toLowerCase().includes(ql) ||
+        String(t.luckyNumber || "").toLowerCase().includes(ql)
+      );
+    });
+
+    return (
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-2">
+          <div className="text-[14px] font-bold text-[#0B0D12]">
+            {mode === "checkin" ? `Danh sách đã Check-in (${baseList.length})` : `Danh sách đã Check-out (${baseList.length})`}
+          </div>
+          <button
+            type="button"
+            onClick={() => void refreshEventTicketLists()}
+            disabled={loadingLists}
+            className="px-3 py-1 rounded-full bg-white/80 hover:bg-white border border-[#cdddf0] text-[11px] font-bold text-[#0B0D12] cursor-pointer disabled:opacity-50"
+          >
+            {loadingLists ? "Đang tải..." : "Làm mới"}
+          </button>
+        </div>
+
+        <input
+          type="text"
+          placeholder="Tìm theo tên, mã HV, mã vé, số may mắn..."
+          value={listFilterQuery}
+          onChange={(e) => setListFilterQuery(e.target.value)}
+          className="ios-liquid-input !py-2 !px-3.5 !text-xs"
+        />
+
+        <div className="max-h-72 overflow-y-auto space-y-2 pr-1">
+          {filteredList.length === 0 ? (
+            <div className="p-5 text-center text-xs text-[#525866] bg-white/60 rounded-2xl border border-[#cdddf0]">
+              {loadingLists
+                ? "Đang tải danh sách từ hệ thống..."
+                : mode === "checkin"
+                  ? "Chưa có đại biểu nào Check-in."
+                  : "Chưa có đại biểu nào Check-out."}
+            </div>
+          ) : (
+            filteredList.map((item) => (
+              <div
+                key={item.id}
+                className="p-3 rounded-2xl bg-white/85 border border-[#cdddf0] flex items-center justify-between gap-2 text-xs"
+              >
+                <div className="min-w-0">
+                  <div className="font-bold text-[#0B0D12] truncate">{item.memberName || "Đại biểu"}</div>
+                  <div className="text-[11px] text-[#525866] truncate">
+                    {item.memberCode || item.id} {item.company ? `· ${item.company}` : ""}
+                  </div>
+                  <div className="text-[10px] text-emerald-700 font-semibold mt-0.5">
+                    {mode === "checkin"
+                      ? `Check-in: ${item.checkedInAt || "Đã điểm danh"}`
+                      : `Check-out: ${item.checkedOutAt}`}
+                  </div>
+                </div>
+                {item.luckyNumber && (
+                  <span className="px-2.5 py-1 rounded-full bg-amber-100 border border-amber-400 text-amber-900 font-mono font-black text-[11px] shrink-0">
+                    #{item.luckyNumber}
+                  </span>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const handleDirectCheckout = async (rawCode?: string) => {
+    const clean = String(rawCode ?? checkoutCodeInput).trim();
+    if (!clean) {
+      toast.info("Vui lòng nhập mã học viên hoặc mã vé để Check-out");
+      return;
+    }
+    setCheckoutLoading(true);
+    setCheckoutResult(null);
+    try {
+      const res = await fetchNestApi<any>("/events/ticket-checkout", {
+        method: "POST",
+        body: JSON.stringify({ ticketCode: clean }),
+      });
+      if (res && res.ok) {
+        const msg = res.message || "Check-out thành công!";
+        toast.success(msg);
+        setCheckoutResult({
+          ok: true,
+          message: msg,
+          memberName: res.ticket?.memberName,
+          eventTitle: res.ticket?.eventTitle,
+          checkedOutAt: res.checkedOutAt || new Date().toLocaleString("vi-VN"),
+        });
+      } else {
+        const errMsg =
+          res?.notCheckedIn
+            ? "Đại biểu chưa Check-in sự kiện này! Chỉ những người đã Check-in mới được phép Check-out."
+            : res?.message || "Không thể Check-out vé này.";
+        toast.error(errMsg);
+        setCheckoutResult({
+          ok: false,
+          message: errMsg,
+          memberName: res?.ticket?.memberName,
+          eventTitle: res?.ticket?.eventTitle,
+        });
+      }
+    } catch (err: any) {
+      const errMsg = err?.message || "Không tìm thấy vé hoặc đại biểu chưa Check-in.";
+      toast.error(errMsg);
+      setCheckoutResult({ ok: false, message: errMsg });
+    } finally {
+      setCheckoutLoading(false);
     }
   };
 
@@ -936,14 +1295,29 @@ function PublicEventCheckinGatePage() {
         } else {
           // Sự kiện có phí: Hiện luôn mã QR thanh toán VietQR & chờ thanh toán thành công -> Tự Check-in
           const activeEv = eventsList.find((ev) => ev.id === targetEventId);
-          const bankAccount = activeEv?.bank_account || activeEv?.bankAccount || "0983101010";
-          const bankName = activeEv?.bank_name || activeEv?.bankName || "MB Bank";
-          const bankOwner = activeEv?.bank_owner || activeEv?.bankOwner || "CLB DOANH NHAN CEO HN10";
+          const bankAccount =
+            formConfig.bankAccount ||
+            activeEv?.bank_account ||
+            activeEv?.bankAccount ||
+            sepayBankInfo?.bankAccount ||
+            "0983101010";
+          const bankName =
+            formConfig.bankName ||
+            activeEv?.bank_name ||
+            activeEv?.bankName ||
+            sepayBankInfo?.bankName ||
+            "MB Bank";
+          const bankOwner =
+            formConfig.bankOwner ||
+            activeEv?.bank_owner ||
+            activeEv?.bankOwner ||
+            sepayBankInfo?.bankOwner ||
+            "CLB DOANH NHAN CEO HN10";
           const totalPay = selectedEventFee * allWalkins.length;
           const transferContent = `EV_${regId}`;
           const vietQrUrl =
             res.vietQrUrl ||
-            `https://img.vietqr.io/image/970422-${encodeURIComponent(bankAccount)}-compact2.png?amount=${totalPay}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(bankOwner)}`;
+            `https://img.vietqr.io/image/${encodeURIComponent(bankName.replace(/\s+/g, ""))}-${encodeURIComponent(bankAccount)}-compact2.png?amount=${totalPay}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(bankOwner)}`;
           setWalkinQrResult({
             regId,
             amount: totalPay,
@@ -1170,23 +1544,25 @@ function PublicEventCheckinGatePage() {
     "/skyline_perspective_dark.jpg";
 
   return (
-    <div className="min-h-screen w-full relative overflow-x-hidden flex items-center justify-center p-5 text-[#0B0D12] font-sans selection:bg-[#0B0D12] selection:text-white bg-white">
+    <div className="min-h-screen w-full relative overflow-x-hidden flex items-center justify-center p-4 sm:p-6 text-[#0B0D12] font-sans selection:bg-[#007AFF] selection:text-white bg-[#FFFFFF]">
       <style>{`
         :root {
           --bg-canvas: #FFFFFF;
-          --caustic-cyan: rgba(110, 215, 255, 0.22);
-          --caustic-violet: rgba(190, 175, 255, 0.20);
-          --caustic-mint: rgba(130, 245, 210, 0.18);
-          --glass-bg: rgba(255, 255, 255, 0.58);
-          --glass-bg-elevated: rgba(255, 255, 255, 0.85);
-          --glass-input-bg: rgba(242, 244, 248, 0.55);
-          --glass-border-top: rgba(255, 255, 255, 0.98);
-          --glass-border-edge: rgba(205, 222, 240, 0.65);
-          --prism-glow: rgba(120, 210, 255, 0.35);
-          --glass-shadow: 0 20px 48px -12px rgba(15, 23, 42, 0.08),
-                          0 4px 16px -4px rgba(15, 23, 42, 0.04);
-          --pill-active-shadow: 0 8px 20px -4px rgba(15, 23, 42, 0.10),
-                                0 0 18px rgba(120, 215, 255, 0.32);
+          --accent-color: ${formConfig.accentColor || "#007AFF"};
+          --caustic-cyan: rgba(56, 189, 248, 0.13);
+          --caustic-violet: rgba(167, 139, 250, 0.11);
+          --caustic-mint: rgba(52, 211, 153, 0.10);
+          --glass-bg: rgba(255, 255, 255, 0.72);
+          --glass-bg-elevated: rgba(255, 255, 255, 0.92);
+          --glass-input-bg: rgba(241, 245, 249, 0.68);
+          --glass-border-top: rgba(255, 255, 255, 1);
+          --glass-border-edge: rgba(203, 213, 225, 0.55);
+          --prism-glow: rgba(56, 189, 248, 0.25);
+          --glass-shadow: 0 0 0 1px rgba(15, 23, 42, 0.045),
+                          0 24px 56px -14px rgba(15, 23, 42, 0.08),
+                          0 6px 18px -4px rgba(15, 23, 42, 0.035);
+          --pill-active-shadow: 0 6px 18px -4px rgba(15, 23, 42, 0.10),
+                                0 0 16px rgba(56, 189, 248, 0.24);
         }
         @keyframes iosWaterWave {
           0% {
@@ -1225,90 +1601,112 @@ function PublicEventCheckinGatePage() {
         .ios-liquid-glass {
           position: relative;
           overflow: hidden;
-          background: rgba(255, 255, 255, 0.58);
-          backdrop-filter: blur(28px) saturate(180%);
-          -webkit-backdrop-filter: blur(28px) saturate(180%);
-          border-radius: 28px;
-          border: 1px solid rgba(205, 222, 240, 0.65);
+          background: var(--glass-bg);
+          backdrop-filter: blur(36px) saturate(200%);
+          -webkit-backdrop-filter: blur(36px) saturate(200%);
+          border-radius: 30px;
+          border: 1px solid rgba(255, 255, 255, 0.92);
           box-shadow:
-            inset 0 1.5px 1px rgba(255, 255, 255, 0.98),
-            inset 0 -1px 2px rgba(120, 210, 255, 0.35),
-            0 20px 48px -12px rgba(15, 23, 42, 0.08),
-            0 4px 16px -4px rgba(15, 23, 42, 0.04);
+            inset 0 1.5px 1px rgba(255, 255, 255, 1),
+            inset 0 -1px 2px rgba(56, 189, 248, 0.16),
+            var(--glass-shadow);
+        }
+        .ios-liquid-glass::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          border-radius: inherit;
+          background: linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.55) 0%,
+            rgba(255, 255, 255, 0.08) 42%,
+            rgba(255, 255, 255, 0) 68%
+          );
+          z-index: 0;
+        }
+        .ios-liquid-glass > * {
+          position: relative;
+          z-index: 1;
         }
         .ios-liquid-glass-active {
           position: relative;
           overflow: hidden;
-          background: rgba(255, 255, 255, 0.85);
-          backdrop-filter: blur(28px) saturate(180%);
-          -webkit-backdrop-filter: blur(28px) saturate(180%);
-          border: 1px solid rgba(205, 222, 240, 0.65);
+          background: var(--glass-bg-elevated);
+          backdrop-filter: blur(30px) saturate(190%);
+          -webkit-backdrop-filter: blur(30px) saturate(190%);
+          border: 1px solid var(--glass-border-edge);
           box-shadow:
-            inset 0 1px 1px rgba(255, 255, 255, 0.98),
-            0 8px 20px -4px rgba(15, 23, 42, 0.10),
-            0 0 18px rgba(120, 215, 255, 0.32);
+            inset 0 1px 1px rgba(255, 255, 255, 1),
+            var(--pill-active-shadow);
         }
         .ios-liquid-pill {
           position: relative;
           overflow: hidden;
-          background: rgba(255, 255, 255, 0.85);
-          border: 1px solid rgba(205, 222, 240, 0.65);
+          background: rgba(255, 255, 255, 0.88);
+          backdrop-filter: blur(20px) saturate(180%);
+          -webkit-backdrop-filter: blur(20px) saturate(180%);
+          border: 1px solid rgba(203, 213, 225, 0.58);
           box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.98),
-            0 4px 12px rgba(0, 0, 0, 0.04);
+            inset 0 1px 0 rgba(255, 255, 255, 1),
+            0 4px 12px rgba(15, 23, 42, 0.045);
         }
         .ios-seg-btn {
           border: 1px solid transparent;
           background: transparent;
           padding: 10px 8px;
           border-radius: 999px;
-          font-size: 13.5px;
+          font-size: 13px;
           font-weight: 500;
-          color: #525866;
+          color: #64748B;
           cursor: pointer;
           transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
         }
         .ios-seg-btn.active {
-          background: rgba(255, 255, 255, 0.85);
+          background: rgba(255, 255, 255, 0.96);
           color: #0B0D12;
           font-weight: 700;
-          border-color: rgba(205, 222, 240, 0.65);
+          border-color: rgba(203, 213, 225, 0.55);
           box-shadow:
-            inset 0 1px 1px rgba(255, 255, 255, 0.98),
-            0 8px 20px -4px rgba(15, 23, 42, 0.10),
-            0 0 18px rgba(120, 215, 255, 0.32);
+            inset 0 1px 1px rgba(255, 255, 255, 1),
+            0 6px 18px -4px rgba(15, 23, 42, 0.09),
+            0 0 14px rgba(56, 189, 248, 0.20);
         }
         .ios-liquid-input {
           width: 100%;
           padding: 13px 18px;
           border-radius: 999px;
-          border: 1px solid rgba(205, 222, 240, 0.65);
-          background: rgba(242, 244, 248, 0.55);
+          border: 1px solid rgba(203, 213, 225, 0.62);
+          background: var(--glass-input-bg);
           color: #0B0D12;
           font-size: 14.5px;
           outline: none;
-          transition: all 0.2s ease;
+          transition: all 0.22s ease;
         }
         .ios-liquid-input::placeholder {
-          color: #8A919E;
+          color: #94A3B8;
         }
         .ios-liquid-input:focus {
-          background: rgba(255, 255, 255, 0.85);
-          box-shadow: 0 0 0 3px rgba(120, 210, 255, 0.35);
+          background: rgba(255, 255, 255, 0.96);
+          border-color: rgba(56, 189, 248, 0.65);
+          box-shadow: 0 0 0 3.5px rgba(56, 189, 248, 0.22);
         }
         .ios-btn-submit {
           padding: 13px 20px;
           border-radius: 999px;
-          border: none;
-          background: #0B0D12;
+          border: 1px solid rgba(255, 255, 255, 0.24);
+          background: var(--accent-color, #007AFF);
           color: #FFFFFF;
           font-size: 15px;
           font-weight: 700;
           cursor: pointer;
           box-shadow:
-            inset 0 1px 1px rgba(255, 255, 255, 0.25),
-            0 8px 20px rgba(11, 13, 18, 0.18);
-          transition: transform 0.15s ease, opacity 0.15s ease;
+            inset 0 1.5px 1px rgba(255, 255, 255, 0.35),
+            0 10px 24px -6px rgba(0, 122, 255, 0.32);
+          transition: transform 0.15s ease, opacity 0.15s ease, filter 0.15s ease;
+        }
+        .ios-btn-submit:hover {
+          filter: brightness(1.06);
         }
         .ios-btn-submit:active {
           transform: scale(0.98);
@@ -1382,159 +1780,129 @@ function PublicEventCheckinGatePage() {
         className="fixed inset-0 pointer-events-none z-0"
         style={{
           background: `
-            radial-gradient(circle at 18% 22%, rgba(110, 215, 255, 0.22) 0%, transparent 42%),
-            radial-gradient(circle at 82% 35%, rgba(190, 175, 255, 0.20) 0%, transparent 45%),
-            radial-gradient(circle at 50% 82%, rgba(130, 245, 210, 0.18) 0%, transparent 45%)
+            radial-gradient(circle at 15% 18%, var(--caustic-cyan) 0%, transparent 40%),
+            radial-gradient(circle at 86% 28%, var(--caustic-violet) 0%, transparent 42%),
+            radial-gradient(circle at 50% 86%, var(--caustic-mint) 0%, transparent 42%)
           `,
         }}
       />
 
+      {hasAdminSession && (
+        <button
+          type="button"
+          onClick={() => {
+            setDraftFormConfig(formConfig);
+            setIsFormEditorOpen(true);
+          }}
+          className="fixed top-4 right-4 z-40 ios-liquid-pill px-3.5 py-2 rounded-full inline-flex items-center gap-1.5 text-xs font-bold text-[#0B0D12] hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer"
+          title="Chỉnh sửa giao diện & trường thông tin Form Check-in"
+        >
+          <SlidersHorizontal className="w-3.5 h-3.5 text-[#007AFF]" />
+          <span>Chỉnh sửa Form</span>
+        </button>
+      )}
+
       {/* Main Content */}
-      <main className="relative z-10 w-full max-w-[400px] mx-auto flex flex-col gap-[18px]">
-        {/* 1. Header Card */}
-        <section className="ios-liquid-glass px-5 py-6 text-center flex flex-col items-center gap-3">
-          <div className="ios-liquid-pill px-4 py-1.5 rounded-full inline-flex items-center justify-center gap-1.5 text-[11px] font-bold tracking-[0.08em] text-[#0B0D12]">
-            <img
-              src="/hn10-logo-2.png"
-              alt="CEOHN10"
-              className="h-4 w-auto object-contain brightness-0"
-            />
-            <span>CEOHN10</span>
-          </div>
-
-          <h1 className="text-[22px] font-extrabold tracking-[-0.02em] text-[#0B0D12] leading-tight break-words">
-            {selectedEventName}
-          </h1>
-
-          {(selectedEventObj?.date ||
-            selectedEventObj?.time ||
-            selectedEventObj?.start_time ||
-            selectedEventObj?.startTime ||
-            (Array.isArray(selectedEventObj?.parts) && selectedEventObj.parts.length > 0) ||
-            selectedEventObj?.venueName ||
-            selectedEventObj?.venue_name ||
-            selectedEventObj?.location) && (
-            <div
-              className="px-3.5 py-[7px] rounded-full text-[12.5px] font-medium text-[#525866] leading-snug"
-              style={{
-                background: "rgba(255, 255, 255, 0.65)",
-                border: "1px solid rgba(205, 222, 240, 0.65)",
-              }}
-            >
-              {[
-                selectedEventObj?.date
-                  ? (() => {
-                      const raw = String(selectedEventObj.date).trim();
-                      if (/^\d{4}-\d{2}-\d{2}/.test(raw)) {
-                        return raw.slice(0, 10).split("-").reverse().join("/");
-                      }
-                      return raw;
-                    })()
-                  : null,
-                selectedEventObj?.time ||
-                  [
-                    selectedEventObj?.start_time || selectedEventObj?.startTime,
-                    selectedEventObj?.end_time || selectedEventObj?.endTime,
-                  ]
-                    .filter(Boolean)
-                    .join(" - ") ||
-                  (Array.isArray(selectedEventObj?.parts) && selectedEventObj.parts.length > 0
-                    ? [
-                        selectedEventObj.parts[0]?.startTime || selectedEventObj.parts[0]?.start_time,
-                        selectedEventObj.parts[selectedEventObj.parts.length - 1]?.endTime ||
-                          selectedEventObj.parts[selectedEventObj.parts.length - 1]?.end_time,
-                      ]
-                        .filter(Boolean)
-                        .join(" - ")
-                    : null),
-                selectedEventObj?.venueName ||
-                  selectedEventObj?.venue_name ||
-                  selectedEventObj?.location,
-              ]
-                .filter(Boolean)
-                .join(" • ")}
-            </div>
-          )}
-
-          <div
-            className="px-3.5 py-[5px] rounded-full text-[12.5px] font-bold"
-            style={
-              selectedEventIsFree
-                ? { background: "rgba(16, 185, 129, 0.14)", color: "#047857" }
-                : { background: "rgba(245, 158, 11, 0.14)", color: "#B45309" }
-            }
-          >
-            {selectedEventIsFree
-              ? "Miễn phí"
-              : `Phí: ${new Intl.NumberFormat("vi-VN").format(selectedEventFee)} VNĐ`}
-          </div>
-
-          {eventsList.length > 1 && (
-            <select
-              value={selectedEventId}
-              onChange={(e) => handleSelectEvent(e.target.value)}
-              className="text-xs font-semibold ios-liquid-pill rounded-full px-3.5 py-1.5 text-[#0B0D12] outline-none cursor-pointer max-w-[260px] truncate transition"
-              title="Đổi sự kiện để check-in"
-            >
-              {eventsList.map((evt) => (
-                <option key={evt.id} value={evt.id} className="text-[#0B0D12] bg-white">
-                  {evt.name || evt.title}
-                </option>
-              ))}
-            </select>
-          )}
+      <main className="relative z-10 w-full max-w-[440px] mx-auto flex flex-col gap-[18px]">
+        {/* 1. Header Card — Chỉ hiển thị Logo CEO HN10 */}
+        <section className="ios-liquid-glass px-6 py-5 text-center flex items-center justify-center">
+          <img
+            src={formConfig.logoUrl || "/ceohn10-official-logo.png"}
+            alt="CEO HN10"
+            style={{ height: `${formConfig.logoHeightPx || 56}px` }}
+            className="w-auto max-w-[240px] object-contain mx-auto select-none"
+          />
         </section>
 
-        {/* 2. Segmented Pill 3 danh mục tối giản */}
-        <nav className="ios-liquid-glass grid grid-cols-3 p-[5px] !rounded-full gap-1">
-          <button
-            type="button"
-            onPointerDown={triggerWaterRipple}
-            onClick={() => {
-              setActiveCategory("member");
-              setUnregisteredMember(null);
-            }}
-            className={`ios-water-btn ios-seg-btn ${activeCategory === "member" ? "active" : ""}`}
-          >
-            Học viên
-          </button>
-
-          <button
-            type="button"
-            onPointerDown={triggerWaterRipple}
-            onClick={() => {
-              setActiveCategory("ticket");
-              setUnregisteredMember(null);
-            }}
-            className={`ios-water-btn ios-seg-btn ${activeCategory === "ticket" ? "active" : ""}`}
-          >
-            Có mã vé
-          </button>
-
-          <button
-            type="button"
-            onPointerDown={triggerWaterRipple}
-            onClick={() => {
-              setActiveCategory("walkin");
-              setUnregisteredMember(null);
-              setWalkinQrResult(null);
-            }}
-            className={`ios-water-btn ios-seg-btn ${activeCategory === "walkin" ? "active" : ""}`}
-          >
-            Khách mới
-          </button>
-        </nav>
+        {/* 2. Segmented Pill danh mục (tùy biến bật/tắt & nhãn từ Cấu hình Form) */}
+        {(() => {
+          const allTabDefs: Array<{
+            key: keyof CheckinFormConfig["enabledTabs"];
+            onSelect: () => void;
+          }> = [
+            {
+              key: "member",
+              onSelect: () => {
+                setActiveCategory("member");
+                setUnregisteredMember(null);
+              },
+            },
+            {
+              key: "ticket",
+              onSelect: () => {
+                setActiveCategory("ticket");
+                setUnregisteredMember(null);
+              },
+            },
+            {
+              key: "walkin",
+              onSelect: () => {
+                setActiveCategory("walkin");
+                setUnregisteredMember(null);
+                setWalkinQrResult(null);
+              },
+            },
+            {
+              key: "checkout",
+              onSelect: () => {
+                setActiveCategory("checkout");
+                setUnregisteredMember(null);
+                setCheckoutResult(null);
+              },
+            },
+            {
+              key: "checkedin_list",
+              onSelect: () => {
+                setActiveCategory("checkedin_list");
+                setUnregisteredMember(null);
+                void refreshEventTicketLists();
+              },
+            },
+            {
+              key: "checkedout_list",
+              onSelect: () => {
+                setActiveCategory("checkedout_list");
+                setUnregisteredMember(null);
+                void refreshEventTicketLists();
+              },
+            },
+          ];
+          const visibleTabs = allTabDefs.filter((t) => formConfig.enabledTabs[t.key]);
+          if (visibleTabs.length === 0) return null;
+          return (
+            <nav
+              className="ios-liquid-glass grid p-[5px] !rounded-3xl sm:!rounded-full gap-1"
+              style={{
+                gridTemplateColumns: `repeat(${Math.min(visibleTabs.length, 3)}, minmax(0, 1fr))`,
+              }}
+            >
+              {visibleTabs.map((t) => (
+                <button
+                  key={t.key}
+                  type="button"
+                  onPointerDown={triggerWaterRipple}
+                  onClick={t.onSelect}
+                  className={`ios-water-btn ios-seg-btn !text-[12px] !px-2 truncate ${
+                    activeCategory === t.key ? "active" : ""
+                  }`}
+                >
+                  {formConfig.tabLabels[t.key]}
+                </button>
+              ))}
+            </nav>
+          );
+        })()}
 
         {/* 3. Khối nhập liệu Check-in */}
         <section className="ios-liquid-glass px-5 py-[22px] flex flex-col gap-3.5">
           {activeCategory === "member" && (
             <div className="flex flex-col gap-3.5">
-              <div className="text-center text-[14px] font-semibold text-[#0B0D12]">
-                Check-in Học Viên
+              <div className="text-center text-[15px] font-bold text-[#0B0D12] tracking-tight">
+                {formConfig.sectionTitles.member}
               </div>
               <input
                 type="text"
-                placeholder="Nhập mã học viên..."
+                placeholder={formConfig.memberPlaceholder}
                 value={memberCodeInput}
                 onChange={(e) => setMemberCodeInput(e.target.value.toUpperCase())}
                 onKeyDown={(e) => {
@@ -1542,7 +1910,7 @@ function PublicEventCheckinGatePage() {
                 }}
                 className="ios-liquid-input font-mono uppercase"
               />
-              {renderProxyCheckinBox("member")}
+              {formConfig.showProxyCheckin && renderProxyCheckinBox("member")}
               <button
                 type="button"
                 onClick={(e) => {
@@ -1552,15 +1920,15 @@ function PublicEventCheckinGatePage() {
                 disabled={loading}
                 className="ios-water-btn ios-btn-submit w-full disabled:opacity-60"
               >
-                {loading ? "Đang tra cứu..." : "Check-in"}
+                {loading ? "Đang tra cứu..." : formConfig.submitButtonText}
               </button>
             </div>
           )}
 
           {activeCategory === "ticket" && (
             <div className="flex flex-col gap-3.5">
-              <div className="text-center text-[14px] font-semibold text-[#0B0D12]">
-                Check-in Bằng Mã Vé
+              <div className="text-center text-[15px] font-bold text-[#0B0D12] tracking-tight">
+                {formConfig.sectionTitles.ticket}
               </div>
 
               <input
@@ -1573,7 +1941,7 @@ function PublicEventCheckinGatePage() {
 
               <input
                 type="text"
-                placeholder="Nhập mã vé..."
+                placeholder={formConfig.ticketPlaceholder}
                 value={ticketInput}
                 onChange={(e) => setTicketInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -1581,7 +1949,7 @@ function PublicEventCheckinGatePage() {
                 }}
                 className="ios-liquid-input font-mono"
               />
-              {renderProxyCheckinBox("ticket")}
+              {formConfig.showProxyCheckin && renderProxyCheckinBox("ticket")}
 
               <div className="flex items-center gap-2.5">
                 <button
@@ -1593,7 +1961,7 @@ function PublicEventCheckinGatePage() {
                   disabled={loading || isDecodingImage}
                   className="ios-water-btn ios-btn-submit flex-1 disabled:opacity-60"
                 >
-                  {loading ? "Đang kiểm tra..." : "Check-in"}
+                  {loading ? "Đang kiểm tra..." : formConfig.submitButtonText}
                 </button>
                 <button
                   type="button"
@@ -1613,61 +1981,128 @@ function PublicEventCheckinGatePage() {
 
           {activeCategory === "walkin" && (
             <form onSubmit={handleWalkinSubmit} className="space-y-3.5 text-xs">
-              <div className="text-center text-[14px] font-semibold text-[#0B0D12]">
-                Đăng Ký Khách Mới
+              <div className="text-center text-[15px] font-bold text-[#0B0D12] tracking-tight">
+                {formConfig.sectionTitles.walkin}
               </div>
 
-              {!selectedEventIsFree && (
-                <div className="p-3.5 rounded-2xl border border-amber-200 bg-amber-50/70 space-y-2">
-                  <div className="text-xs font-bold text-amber-950 flex items-center justify-between">
-                    <span>Phí sự kiện: {new Intl.NumberFormat("vi-VN").format(selectedEventFee)} VNĐ / đại biểu</span>
-                    <span className="text-[10px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full font-bold">
-                      Có phí
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                    <label
-                      className={`p-2.5 rounded-xl border flex items-start gap-2 cursor-pointer transition ${
-                        walkinPaymentMethod === "cash_instant"
-                          ? "bg-white border-slate-900 ring-1 ring-slate-900 shadow-2xs"
-                          : "bg-white/60 border-slate-200"
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="walkinPayment"
-                        checked={walkinPaymentMethod === "cash_instant"}
-                        onChange={() => setWalkinPaymentMethod("cash_instant")}
-                        className="mt-0.5 text-slate-900"
-                      />
-                      <div>
-                        <div className="font-bold text-slate-900 text-xs">1. Quét mã VietQR tại chỗ</div>
-                        <div className="text-[10px] text-slate-500">Hiển thị QR thanh toán &amp; tự động Check-in</div>
-                      </div>
-                    </label>
+              {!selectedEventIsFree && (() => {
+                const activeEv = eventsList.find((ev) => ev.id === selectedEventId);
+                const bankAccount =
+                  formConfig.bankAccount ||
+                  activeEv?.bank_account ||
+                  activeEv?.bankAccount ||
+                  sepayBankInfo?.bankAccount ||
+                  "0983101010";
+                const bankName =
+                  formConfig.bankName ||
+                  activeEv?.bank_name ||
+                  activeEv?.bankName ||
+                  sepayBankInfo?.bankName ||
+                  "MB Bank";
+                const bankOwner =
+                  formConfig.bankOwner ||
+                  activeEv?.bank_owner ||
+                  activeEv?.bankOwner ||
+                  sepayBankInfo?.bankOwner ||
+                  "CLB DOANH NHAN CEO HN10";
+                const totalFee = selectedEventFee * (1 + additionalWalkins.length);
+                const noteText = `CEOHN10 ${walkinForm.phone || walkinForm.fullName || "KHACHMOI"}`.trim();
+                const previewQrUrl = `https://img.vietqr.io/image/${encodeURIComponent(bankName.replace(/\s+/g, ""))}-${encodeURIComponent(bankAccount)}-compact2.png?amount=${totalFee}&addInfo=${encodeURIComponent(noteText)}&accountName=${encodeURIComponent(bankOwner)}`;
 
-                    <label
-                      className={`p-2.5 rounded-xl border flex items-start gap-2 cursor-pointer transition ${
-                        walkinPaymentMethod === "email_invoice"
-                          ? "bg-white border-amber-600 ring-1 ring-amber-500 shadow-2xs"
-                          : "bg-white/60 border-slate-200"
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="walkinPayment"
-                        checked={walkinPaymentMethod === "email_invoice"}
-                        onChange={() => setWalkinPaymentMethod("email_invoice")}
-                        className="mt-0.5 text-amber-600"
-                      />
-                      <div>
-                        <div className="font-bold text-slate-900 text-xs">2. Gửi mail thông báo phí</div>
-                        <div className="text-[10px] text-slate-500">Gửi mail kèm VietQR, tự động check-in khi thanh toán</div>
+                return (
+                  <div className="p-3.5 rounded-2xl border border-amber-200/90 bg-amber-50/75 space-y-2.5">
+                    <div className="text-xs font-bold text-amber-950 flex items-center justify-between gap-2">
+                      <span>Phí sự kiện: {new Intl.NumberFormat("vi-VN").format(selectedEventFee)} VNĐ / đại biểu</span>
+                      <span className="text-[10px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full font-bold shrink-0">
+                        Có phí
+                      </span>
+                    </div>
+
+                    {/* Thông tin tài khoản CEO HN10 + Nút Xem mã QR chuyển khoản */}
+                    <div className="p-2.5 rounded-xl bg-white/90 border border-amber-200/70 space-y-2">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <div className="text-[11px] text-slate-700 space-y-0.5">
+                          <div className="font-bold text-slate-900">Tài khoản nhận phí CEO HN10</div>
+                          <div>
+                            Ngân hàng: <b>{bankName}</b> · STK:{" "}
+                            <b className="font-mono text-[#003B95]">{bankAccount}</b>
+                          </div>
+                          <div>
+                            Chủ TK: <b>{bankOwner}</b>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setShowWalkinBankQr((v) => !v)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#007AFF] hover:bg-[#0062CC] text-white text-[11px] font-bold shadow-xs transition cursor-pointer shrink-0"
+                        >
+                          <QrCode className="w-3.5 h-3.5" />
+                          <span>{showWalkinBankQr ? "Ẩn mã QR" : "Xem mã QR chuyển khoản"}</span>
+                        </button>
                       </div>
-                    </label>
+
+                      {showWalkinBankQr && (
+                        <div className="pt-2 border-t border-amber-100 text-center space-y-1.5">
+                          <img
+                            src={previewQrUrl}
+                            alt="VietQR CEO HN10"
+                            className="w-44 h-44 mx-auto rounded-xl bg-white p-1.5 border border-amber-200 shadow-xs object-contain"
+                          />
+                          <div className="text-[11px] text-slate-600">
+                            Số tiền:{" "}
+                            <b className="text-emerald-700">
+                              {new Intl.NumberFormat("vi-VN").format(totalFee)} VNĐ
+                            </b>{" "}
+                            · Nội dung: <b className="font-mono text-[#003B95]">{noteText}</b>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-0.5">
+                      <label
+                        className={`p-2.5 rounded-xl border flex items-start gap-2 cursor-pointer transition ${
+                          walkinPaymentMethod === "cash_instant"
+                            ? "bg-white border-slate-900 ring-1 ring-slate-900 shadow-2xs"
+                            : "bg-white/60 border-slate-200"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="walkinPayment"
+                          checked={walkinPaymentMethod === "cash_instant"}
+                          onChange={() => setWalkinPaymentMethod("cash_instant")}
+                          className="mt-0.5 text-slate-900"
+                        />
+                        <div>
+                          <div className="font-bold text-slate-900 text-xs">1. Quét mã VietQR tại chỗ</div>
+                          <div className="text-[10px] text-slate-500">Hiển thị QR thanh toán &amp; tự động Check-in</div>
+                        </div>
+                      </label>
+
+                      <label
+                        className={`p-2.5 rounded-xl border flex items-start gap-2 cursor-pointer transition ${
+                          walkinPaymentMethod === "email_invoice"
+                            ? "bg-white border-amber-600 ring-1 ring-amber-500 shadow-2xs"
+                            : "bg-white/60 border-slate-200"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="walkinPayment"
+                          checked={walkinPaymentMethod === "email_invoice"}
+                          onChange={() => setWalkinPaymentMethod("email_invoice")}
+                          className="mt-0.5 text-amber-600"
+                        />
+                        <div>
+                          <div className="font-bold text-slate-900 text-xs">2. Gửi mail thông báo phí</div>
+                          <div className="text-[10px] text-slate-500">Gửi mail kèm VietQR, tự động check-in khi thanh toán</div>
+                        </div>
+                      </label>
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
 
               {walkinQrResult && (
                 <div className="p-4 rounded-2xl border-2 border-amber-400 bg-amber-50 text-center space-y-3">
@@ -1757,11 +2192,15 @@ function PublicEventCheckinGatePage() {
 
               {(() => {
                 const activeEv = eventsList.find((e) => e.id === selectedEventId);
-                const checkinCustomFields: any[] = Array.isArray(
+                const legacyFields: any[] = Array.isArray(
                   activeEv?.formFieldsConfig?.checkinCustomFields
                 )
                   ? activeEv.formFieldsConfig.checkinCustomFields
                   : [];
+                const checkinCustomFields =
+                  formConfig.customFields && formConfig.customFields.length > 0
+                    ? formConfig.customFields
+                    : legacyFields;
                 if (checkinCustomFields.length === 0) return null;
                 return (
                   <div className="space-y-2.5 pt-2 border-t border-slate-200">
@@ -1966,6 +2405,57 @@ function PublicEventCheckinGatePage() {
               </div>
             </form>
           )}
+
+          {activeCategory === "checkout" && (
+            <div className="flex flex-col gap-3.5">
+              <div className="text-center text-[15px] font-bold text-[#0B0D12] tracking-tight">
+                {formConfig.sectionTitles.checkout} (Chỉ dành cho đại biểu đã Check-in)
+              </div>
+              <input
+                type="text"
+                placeholder="Nhập mã học viên (HN10-...) hoặc mã vé đã Check-in..."
+                value={checkoutCodeInput}
+                onChange={(e) => setCheckoutCodeInput(e.target.value.toUpperCase())}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") void handleDirectCheckout();
+                }}
+                className="ios-liquid-input font-mono uppercase"
+              />
+              <button
+                type="button"
+                onClick={(e) => {
+                  triggerWaterRipple(e);
+                  void handleDirectCheckout();
+                }}
+                disabled={checkoutLoading}
+                className="ios-water-btn ios-btn-submit w-full disabled:opacity-60"
+              >
+                {checkoutLoading ? "Đang xác nhận Check-out..." : "Xác nhận Check-out"}
+              </button>
+
+              {checkoutResult && (
+                <div
+                  className={`p-3.5 rounded-2xl border text-xs space-y-1 ${
+                    checkoutResult.ok
+                      ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-900"
+                      : "bg-rose-500/15 border-rose-500/40 text-rose-900"
+                  }`}
+                >
+                  <div className="font-bold">{checkoutResult.message}</div>
+                  {checkoutResult.memberName && (
+                    <div>Đại biểu: <strong>{checkoutResult.memberName}</strong></div>
+                  )}
+                  {checkoutResult.checkedOutAt && (
+                    <div>Thời gian Check-out: <strong>{checkoutResult.checkedOutAt}</strong></div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeCategory === "checkedin_list" && renderAttendanceList("checkin")}
+
+          {activeCategory === "checkedout_list" && renderAttendanceList("checkout")}
         </section>
 
         {/* TÍCH XANH CẢM ƠN & STICKER SỐ MAY MẮN KHI CHECK-IN THÀNH CÔNG */}
@@ -2549,7 +3039,7 @@ function PublicEventCheckinGatePage() {
         )}
 
         {/* NÚT PHỤ DƯỚI CÙNG */}
-        {activeCategory !== "walkin" && (
+        {activeCategory !== "walkin" && formConfig.enabledTabs.walkin && (
           <button
             type="button"
             onClick={(e) => {
@@ -2564,6 +3054,392 @@ function PublicEventCheckinGatePage() {
           </button>
         )}
       </main>
+
+      {/* Modal Chỉnh sửa Form Check-in & Áp dụng Public (dành cho BTC / Admin) */}
+      {isFormEditorOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/35 backdrop-blur-md">
+          <div className="ios-liquid-glass w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden !bg-white/95">
+            <div className="px-5 py-4 border-b border-slate-200/70 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <SlidersHorizontal className="w-4 h-4 text-[#007AFF]" />
+                <h2 className="text-sm sm:text-base font-extrabold text-[#0B0D12]">
+                  Chỉnh sửa Form Check-in Public
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsFormEditorOpen(false)}
+                className="p-1.5 rounded-full hover:bg-slate-100 text-slate-500 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-5 overflow-y-auto space-y-5 text-xs">
+              {/* Chọn sự kiện áp dụng */}
+              {eventsList.length > 0 && (
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-700 block">Sự kiện áp dụng</label>
+                  <select
+                    value={selectedEventId}
+                    onChange={(e) => handleSelectEvent(e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-[#0B0D12] outline-none focus:border-[#007AFF]"
+                  >
+                    {eventsList.map((evt) => (
+                      <option key={evt.id} value={evt.id}>
+                        {evt.name || evt.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* Màu chủ đạo iOS Liquid Glass & Logo */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-700 block">Màu nút chính (iOS Accent)</label>
+                  <div className="flex items-center gap-2">
+                    {[
+                      { label: "iOS Blue", color: "#007AFF" },
+                      { label: "Obsidian", color: "#0B0D12" },
+                      { label: "CEO HN10", color: "#003B95" },
+                      { label: "Emerald", color: "#059669" },
+                    ].map((preset) => (
+                      <button
+                        key={preset.color}
+                        type="button"
+                        onClick={() =>
+                          setDraftFormConfig((prev) => ({ ...prev, accentColor: preset.color }))
+                        }
+                        className={`px-2.5 py-1.5 rounded-full text-[11px] font-bold border transition cursor-pointer flex items-center gap-1.5 ${
+                          draftFormConfig.accentColor === preset.color
+                            ? "border-[#0B0D12] bg-slate-100 text-[#0B0D12]"
+                            : "border-slate-200 bg-white text-slate-600"
+                        }`}
+                      >
+                        <span
+                          className="w-2.5 h-2.5 rounded-full"
+                          style={{ background: preset.color }}
+                        />
+                        {preset.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-700 block">
+                    Chiều cao Logo Header ({draftFormConfig.logoHeightPx}px)
+                  </label>
+                  <input
+                    type="range"
+                    min={36}
+                    max={96}
+                    value={draftFormConfig.logoHeightPx}
+                    onChange={(e) =>
+                      setDraftFormConfig((prev) => ({
+                        ...prev,
+                        logoHeightPx: Number(e.target.value) || 56,
+                      }))
+                    }
+                    className="w-full accent-[#007AFF]"
+                  />
+                </div>
+              </div>
+
+              {/* Bật/Tắt & Đổi tên 6 Danh mục */}
+              <div className="space-y-2">
+                <label className="font-bold text-slate-700 block">
+                  Các danh mục hiển thị trên Form Check-in
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {(
+                    [
+                      { key: "member", defaultLabel: "Học viên" },
+                      { key: "ticket", defaultLabel: "Có mã vé" },
+                      { key: "walkin", defaultLabel: "Khách mới" },
+                      { key: "checkout", defaultLabel: "Check-out" },
+                      { key: "checkedin_list", defaultLabel: "Đã Check-in" },
+                      { key: "checkedout_list", defaultLabel: "Đã Check-out" },
+                    ] as const
+                  ).map(({ key }) => (
+                    <div
+                      key={key}
+                      className="flex items-center gap-2 p-2 rounded-xl border border-slate-200 bg-slate-50/70"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={draftFormConfig.enabledTabs[key]}
+                        onChange={(e) =>
+                          setDraftFormConfig((prev) => ({
+                            ...prev,
+                            enabledTabs: {
+                              ...prev.enabledTabs,
+                              [key]: e.target.checked,
+                            },
+                          }))
+                        }
+                        className="rounded accent-[#007AFF] cursor-pointer"
+                      />
+                      <input
+                        type="text"
+                        value={draftFormConfig.tabLabels[key]}
+                        onChange={(e) =>
+                          setDraftFormConfig((prev) => ({
+                            ...prev,
+                            tabLabels: {
+                              ...prev.tabLabels,
+                              [key]: e.target.value,
+                            },
+                          }))
+                        }
+                        className="flex-1 bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-semibold text-[#0B0D12]"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tiêu đề & Nhãn nút */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700 block">Tiêu đề tab Học viên</label>
+                  <input
+                    type="text"
+                    value={draftFormConfig.sectionTitles.member}
+                    onChange={(e) =>
+                      setDraftFormConfig((prev) => ({
+                        ...prev,
+                        sectionTitles: { ...prev.sectionTitles, member: e.target.value },
+                      }))
+                    }
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700 block">Tiêu đề tab Có mã vé</label>
+                  <input
+                    type="text"
+                    value={draftFormConfig.sectionTitles.ticket}
+                    onChange={(e) =>
+                      setDraftFormConfig((prev) => ({
+                        ...prev,
+                        sectionTitles: { ...prev.sectionTitles, ticket: e.target.value },
+                      }))
+                    }
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700 block">Placeholder mã học viên</label>
+                  <input
+                    type="text"
+                    value={draftFormConfig.memberPlaceholder}
+                    onChange={(e) =>
+                      setDraftFormConfig((prev) => ({ ...prev, memberPlaceholder: e.target.value }))
+                    }
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700 block">Chữ trên nút xác nhận</label>
+                  <input
+                    type="text"
+                    value={draftFormConfig.submitButtonText}
+                    onChange={(e) =>
+                      setDraftFormConfig((prev) => ({ ...prev, submitButtonText: e.target.value }))
+                    }
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold"
+                  />
+                </div>
+              </div>
+
+              <label className="inline-flex items-center gap-2 font-semibold text-slate-700 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={draftFormConfig.showProxyCheckin}
+                  onChange={(e) =>
+                    setDraftFormConfig((prev) => ({ ...prev, showProxyCheckin: e.target.checked }))
+                  }
+                  className="rounded accent-[#007AFF]"
+                />
+                <span>Cho phép nút &quot;+ Check-in hộ&quot; nhiều người cùng lúc</span>
+              </label>
+
+              {/* Tài khoản nhận phí CEO HN10 cho Khách mới */}
+              <div className="space-y-2 pt-2 border-t border-slate-200/70">
+                <label className="font-bold text-slate-700 block">
+                  Tài khoản nhận phí CEO HN10 (hiển thị cho Khách mới khi sự kiện có phí)
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <input
+                    type="text"
+                    placeholder="Ngân hàng (VD: MB Bank)"
+                    value={draftFormConfig.bankName || ""}
+                    onChange={(e) =>
+                      setDraftFormConfig((prev) => ({ ...prev, bankName: e.target.value }))
+                    }
+                    className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Số tài khoản CEO HN10"
+                    value={draftFormConfig.bankAccount || ""}
+                    onChange={(e) =>
+                      setDraftFormConfig((prev) => ({ ...prev, bankAccount: e.target.value }))
+                    }
+                    className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold font-mono"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Chủ tài khoản"
+                    value={draftFormConfig.bankOwner || ""}
+                    onChange={(e) =>
+                      setDraftFormConfig((prev) => ({ ...prev, bankOwner: e.target.value }))
+                    }
+                    className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold"
+                  />
+                </div>
+              </div>
+
+              {/* Trường tùy chỉnh bổ sung */}
+              <div className="space-y-2 pt-2 border-t border-slate-200/70">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-slate-700">
+                    Trường thông tin bổ sung ({draftFormConfig.customFields.length})
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setDraftFormConfig((prev) => ({
+                        ...prev,
+                        customFields: [
+                          ...prev.customFields,
+                          {
+                            id: `cf_${Date.now().toString(36)}`,
+                            label: "Thông tin thêm",
+                            type: "text",
+                            required: false,
+                            optionsText: "",
+                          },
+                        ],
+                      }))
+                    }
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-sky-50 text-[#007AFF] font-bold text-[11px] hover:bg-sky-100 cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    Thêm trường
+                  </button>
+                </div>
+
+                {draftFormConfig.customFields.map((cf, idx) => (
+                  <div
+                    key={cf.id}
+                    className="p-2.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2"
+                  >
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={cf.label}
+                        onChange={(e) =>
+                          setDraftFormConfig((prev) => ({
+                            ...prev,
+                            customFields: prev.customFields.map((item, i) =>
+                              i === idx ? { ...item, label: e.target.value } : item
+                            ),
+                          }))
+                        }
+                        placeholder="Tên trường..."
+                        className="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold"
+                      />
+                      <select
+                        value={cf.type}
+                        onChange={(e) =>
+                          setDraftFormConfig((prev) => ({
+                            ...prev,
+                            customFields: prev.customFields.map((item, i) =>
+                              i === idx ? { ...item, type: e.target.value as any } : item
+                            ),
+                          }))
+                        }
+                        className="px-2 py-1.5 rounded-lg border border-slate-200 bg-white text-[11px]"
+                      >
+                        <option value="text">Văn bản</option>
+                        <option value="number">Số</option>
+                        <option value="select">Danh sách chọn</option>
+                        <option value="phone">SĐT</option>
+                        <option value="email">Email</option>
+                      </select>
+                      <label className="inline-flex items-center gap-1 text-[11px] cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={cf.required}
+                          onChange={(e) =>
+                            setDraftFormConfig((prev) => ({
+                              ...prev,
+                              customFields: prev.customFields.map((item, i) =>
+                                i === idx ? { ...item, required: e.target.checked } : item
+                              ),
+                            }))
+                          }
+                        />
+                        <span>Bắt buộc</span>
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setDraftFormConfig((prev) => ({
+                            ...prev,
+                            customFields: prev.customFields.filter((_, i) => i !== idx),
+                          }))
+                        }
+                        className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                    {cf.type === "select" && (
+                      <input
+                        type="text"
+                        value={cf.optionsText || ""}
+                        onChange={(e) =>
+                          setDraftFormConfig((prev) => ({
+                            ...prev,
+                            customFields: prev.customFields.map((item, i) =>
+                              i === idx ? { ...item, optionsText: e.target.value } : item
+                            ),
+                          }))
+                        }
+                        placeholder="Các lựa chọn cách nhau dấu phẩy (VD: S, M, L)"
+                        className="w-full px-2.5 py-1 rounded-lg border border-slate-200 bg-white text-[11px]"
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="px-5 py-3.5 border-t border-slate-200/70 flex items-center justify-end gap-2 bg-white/80">
+              <button
+                type="button"
+                onClick={() => setDraftFormConfig(DEFAULT_CHECKIN_FORM_CONFIG)}
+                className="px-3.5 py-2 rounded-full border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer"
+              >
+                Khôi phục mặc định
+              </button>
+              <button
+                type="button"
+                onClick={handleApplyFormConfig}
+                disabled={savingFormConfig}
+                className="ios-btn-submit !py-2 !px-5 !text-xs inline-flex items-center gap-1.5 disabled:opacity-60"
+              >
+                <Save className="w-3.5 h-3.5" />
+                <span>{savingFormConfig ? "Đang áp dụng..." : "Áp dụng & Public"}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

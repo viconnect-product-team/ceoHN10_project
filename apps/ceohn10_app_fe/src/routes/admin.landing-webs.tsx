@@ -1158,7 +1158,7 @@ function AdminLandingWebsPage() {
 
       {/* ================= MODAL XEM TRỰC TIẾP (LIVE PREVIEW) ================= */}
       {previewItem && (
-        <div className="fixed inset-0 z-90 bg-white light [color-scheme:light]">
+        <div className="fixed inset-0 z-90 bg-white light [color-scheme:light] overflow-y-auto overflow-x-hidden">
           {previewItem.template === "video_voting_showcase" || previewItem.slug === "video-voting" ? (
             <VideoVotingShowcaseLanding
               config={previewItem}

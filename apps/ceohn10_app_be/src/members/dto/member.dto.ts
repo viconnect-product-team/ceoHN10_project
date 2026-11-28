@@ -75,27 +75,39 @@ export class UpdateMemberDto {
       .nullable()
       .or(z.literal('')),
     phone: z
-      .string()
-      .trim()
-      .regex(
-        /^(0|\+84)[1-9][0-9]{8,9}$/,
-        'Số điện thoại không hợp lệ (10-11 số, bắt đầu bằng 0 hoặc +84)',
-      )
-      .optional()
-      .nullable()
-      .or(z.literal('')),
-    type: z.enum(['company', 'individual']).optional(),
+      .preprocess(
+        (val) => (typeof val === 'string' ? val.replace(/[\s.-]/g, '').trim() : val),
+        z
+          .string()
+          .regex(
+            /^(0|\+84)[0-9]{8,10}$/,
+            'Số điện thoại không hợp lệ (9-11 số, bắt đầu bằng 0 hoặc +84)',
+          )
+          .optional()
+          .nullable()
+          .or(z.literal('')),
+      ),
+    type: z.string().optional().nullable(),
     level: z.string().optional().nullable(),
     industry: z.string().optional().nullable(),
     region: z.string().optional().nullable(),
-    status: z.enum(['active', 'pending', 'expired', 'suspended']).optional(),
+    status: z.string().optional().nullable(),
     address: z.string().optional().nullable(),
     website: z.string().optional().nullable(),
     taxCode: z.string().optional().nullable(),
-    employees: z.number().optional().nullable(),
+    employees: z.preprocess(
+      (val) => (val === '' || val === null || val === undefined ? null : Number(val)),
+      z.number().finite().optional().nullable(),
+    ),
     about: z.string().optional().nullable(),
     feePaid: z.boolean().optional(),
-    feeYear: z.number().optional(),
+    feeYear: z.preprocess(
+      (val) => (val === '' || val === null || val === undefined ? undefined : Number(val)),
+      z.number().finite().optional(),
+    ),
+    feeAmount: z.union([z.number(), z.string()]).optional().nullable(),
+    joinedAt: z.string().optional().nullable(),
+    joined_at: z.string().optional().nullable(),
     paymentStatus: z.string().optional().nullable(),
     executiveRole: z.string().optional().nullable(),
     department: z.string().optional().nullable(),

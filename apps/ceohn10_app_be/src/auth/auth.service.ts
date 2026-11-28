@@ -174,6 +174,18 @@ export class AuthService implements OnModuleInit {
       }
     }
 
+    if (portal === 'app' || portal === 'ceohn10' || portal === 'mobile') {
+      const canAccessApp =
+        (details as any)?.canAccessApp !== undefined
+          ? Boolean((details as any).canAccessApp)
+          : details?.targetSystem !== 'crm_only' && details?.targetSystem !== 'crm';
+      if (!canAccessApp) {
+        throw new ForbiddenException(
+          'Tài khoản này chỉ được cấp quyền truy cập Hệ thống Quản trị CRM, không có quyền đăng nhập vào App CEOHN10.',
+        );
+      }
+    }
+
     const permissions = details?.permissions || [];
     const accessJti = crypto.randomUUID();
     const refreshJti = crypto.randomUUID();
