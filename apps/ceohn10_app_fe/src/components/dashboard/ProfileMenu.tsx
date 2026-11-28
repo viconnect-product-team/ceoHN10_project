@@ -78,6 +78,17 @@ export function ProfileMenu() {
   }, []);
 
   const displayName = fullName || email || "—";
+  const userEmailLower = (user?.email || email || "").toLowerCase().trim();
+  const isRestrictedCustom =
+    user?.role === "custom_account" ||
+    (Array.isArray(user?.customPermissions) && user.customPermissions.length > 0);
+  const canAccessMasterPlatform =
+    !isRestrictedCustom &&
+    (userEmailLower === "admin@ceohn10.vn" ||
+      userEmailLower === "admin@viconnect.vn" ||
+      userEmailLower === "admin@connect.vn" ||
+      user?.role === "platform_admin" ||
+      Boolean((user as any)?.isPlatformAdmin));
 
   async function handleLogout() {
     try {
@@ -146,20 +157,22 @@ export function ProfileMenu() {
           >
             <UserIcon className="h-4 w-4 text-muted-foreground" /> {t("profile.menu.profile")}
           </button>
-          <button
-            onClick={() => {
-              setOpen(false);
-              if (typeof window !== "undefined") {
-                window.location.href = "/master?tab=accounts";
-              } else {
-                navigate({ to: "/master", search: { tab: "accounts" } as any });
-              }
-            }}
-            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-foreground hover:bg-muted font-medium"
-          >
-            <UserCog className="h-4 w-4 text-[#003B95] dark:text-blue-400" />
-            <span>Quản trị tài khoản &amp; Phân quyền</span>
-          </button>
+          {canAccessMasterPlatform && (
+            <button
+              onClick={() => {
+                setOpen(false);
+                if (typeof window !== "undefined") {
+                  window.location.href = "/master?tab=accounts";
+                } else {
+                  navigate({ to: "/master", search: { tab: "accounts" } as any });
+                }
+              }}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-foreground hover:bg-muted font-medium"
+            >
+              <UserCog className="h-4 w-4 text-[#003B95] dark:text-blue-400" />
+              <span>Quản trị tài khoản &amp; Phân quyền</span>
+            </button>
+          )}
           <button
             onClick={() => {
               setOpen(false);

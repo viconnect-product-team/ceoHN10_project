@@ -16,5 +16,6 @@ WORKDIR /app/apps/ceohn10_app_fe
 ENV VITE_APP_SCOPE=crm_platform
 ENV VITE_APP_NAME="CEO HN10 CRM Admin"
 ENV VITE_APP_DEFAULT_ROUTE=/
+ENV NODE_OPTIONS="--max-http-header-size=65536"
 
 CMD ["sh", "-c", "if [ -f docker-entrypoint.sh ]; then ./docker-entrypoint.sh; else node .output/server/index.mjs; fi"]
