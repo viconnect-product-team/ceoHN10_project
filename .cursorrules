@@ -3076,3 +3076,8 @@
   + Nút bấm Check-in trung tâm: Bỏ chữ text "Check-in", trang bị thanh laser quét ngang từ trên xuống liên tục mô phỏng hiệu ứng MoMo scanner.
   + Quy tắc tương phản Zero-Tolerance: Cấm tuyệt đối text đen trên nền xanh navy, ép buộc chữ và icon luôn là #FFFFFF !important trên toàn bộ các nền xanh.
   + Bộ chọn màu hệ thống: Đổi màu đồng bộ 100% toàn ứng dụng thông qua CSS variables và global style override.
+
+
+# STRICT ROLE RULE (2026-11-28)
+- NEVER use or reference role `chu_tich` (Chủ tịch) anywhere in CEO HN10. There is NO `chu_tich` role in this system.
+- Only `platform_admin` and `lop_truong` (Lớp trưởng) — and NEVER `custom_account` or users with `customPermissions` — may see or access `/master` (Platform CRM) or ProfileMenu account/permission management.

@@ -88,6 +88,7 @@ export function ProfileMenu() {
       userEmailLower === "admin@viconnect.vn" ||
       userEmailLower === "admin@connect.vn" ||
       user?.role === "platform_admin" ||
+      user?.role === "lop_truong" ||
       Boolean((user as any)?.isPlatformAdmin));
 
   async function handleLogout() {

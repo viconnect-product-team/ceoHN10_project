@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { COMMITTEE_7_OPTIONS } from "@/components/rbac/ScopeRoleAssignmentSection";
@@ -112,15 +112,13 @@ function MasterAdminPortal() {
     (user?.role === "custom_account" ||
       (Array.isArray(user?.customPermissions) && user.customPermissions.length > 0));
 
-  const isCeoHn10Admin =
+  const isLopTruong =
     !isRestrictedCustomUser &&
-    (isSuperPlatformAdmin ||
-      user?.role === "admin" ||
-      user?.targetSystem === "ceohn10" ||
-      currentUserEmail.includes("hn10"));
+    (user?.role === "lop_truong" ||
+      (user as any)?.executiveRole === "lop_truong");
 
-  const isMasterAdmin = isSuperPlatformAdmin || isCeoHn10Admin;
-  const canManageAccounts = isSuperPlatformAdmin || isCeoHn10Admin;
+  const isMasterAdmin = isSuperPlatformAdmin || isLopTruong;
+  const canManageAccounts = isSuperPlatformAdmin || isLopTruong;
 
   const [activeTab, setActiveTab] = useState<"overview" | "accounts" | "settings" | "departments">(() => {
     if (typeof window !== "undefined") {
@@ -867,23 +865,55 @@ function MasterAdminPortal() {
     }
   };
 
+  const [masterKickCountdown, setMasterKickCountdown] = useState(5);
+
+  useEffect(() => {
+    if (isMasterAdmin) return;
+    if (masterKickCountdown <= 0) {
+      try {
+        localStorage.removeItem("vibe_token");
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("token");
+        localStorage.removeItem("sb-access-token");
+        document.cookie = "vibe_token=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      } catch {}
+      window.location.replace("/auth");
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      setMasterKickCountdown((c) => c - 1);
+    }, 1000);
+    return () => window.clearTimeout(timer);
+  }, [isMasterAdmin, masterKickCountdown]);
+
   if (!isMasterAdmin) {
     return (
       <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-6">
-        <div className="max-w-md w-full rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-xl space-y-4">
+        <div className="max-w-md w-full rounded-3xl border border-rose-200 bg-white p-8 text-center shadow-2xl space-y-4">
           <ShieldCheck className="h-12 w-12 text-rose-500 mx-auto" />
           <h2 className="text-lg font-black text-slate-900">
-            Không có quyền truy cập Màn Quản Trị Nền Tảng
+            Bạn không có quyền truy cập trang này
           </h2>
           <p className="text-xs text-slate-600 leading-relaxed">
             Tài khoản của bạn được phân quyền riêng trong hệ thống CRM và không thể truy cập cổng Quản trị lớn nhất (Master Platform).
           </p>
+          <p className="text-xs font-semibold text-rose-600">
+            Tự động chuyển về màn hình đăng nhập sau{" "}
+            <span className="font-black text-sm">{Math.max(0, masterKickCountdown)}</span> giây...
+          </p>
           <button
             type="button"
-            onClick={() => navigate({ to: "/" })}
-            className="px-5 py-2.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white text-xs font-bold shadow-sm cursor-pointer"
+            onClick={() => {
+              try {
+                localStorage.removeItem("vibe_token");
+                localStorage.removeItem("access_token");
+                localStorage.removeItem("token");
+              } catch {}
+              window.location.replace("/auth");
+            }}
+            className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold shadow-sm cursor-pointer"
           >
-            Quay về Trang chủ Hệ thống
+            Về màn đăng nhập ngay
           </button>
         </div>
       </div>
