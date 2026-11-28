@@ -45,6 +45,7 @@ import { DynamicTableColumnsConfig } from "@/components/dynamic-form/DynamicTabl
 import { EmptyState, NoSearchResult, ListSkeleton } from "@/components/dashboard/StateKit";
 import { useT, type TKey } from "@/lib/i18n";
 import { useRole, PERMISSIONS } from "@/hooks/use-role";
+import { useAuth } from "@/context/AuthContext";
 import { usePermissions } from "@/hooks/use-permissions";
 import { PermissionGuard } from "@/components/auth/PermissionGuard";
 import { validateMemberForm } from "@/lib/validation";
@@ -352,6 +353,7 @@ function MembersPage() {
       return !deletedIds.has(idStr) && (!codeStr || !deletedIds.has(codeStr));
     });
   }, [rawMembers, deletedIds]);
+  const { user } = useAuth();
   const { isAdmin, canApproveMembers, isBTV, isBQT, isPlatformAdmin, can, loading: roleLoading } = useRole();
   const perm = usePermissions();
   const canApprove = perm.can("MEM_APPROVE") || can(PERMISSIONS.MEMBER_APPROVE);
@@ -1539,9 +1541,9 @@ function MembersPage() {
               onToggleSel={() => toggleSel(m.id)}
               onToggleFav={() => setFavoriteAndSync(m.id)}
               onTogglePin={() => setPinnedAndSync(m.id)}
-              onEdit={canEdit ? () => setEditing(m) : undefined}
+              onEdit={canEdit && (user?.role !== "custom_account" || ((m as any).createdBy === user?.id || (m as any).created_by === user?.id)) ? () => setEditing(m) : undefined}
               onAccount={canAccount ? () => setAccountFor(m) : undefined}
-              onDelete={canDelete ? () => setDeleting(m) : undefined}
+              onDelete={canDelete && (user?.role !== "custom_account" || ((m as any).createdBy === user?.id || (m as any).created_by === user?.id)) ? () => setDeleting(m) : undefined}
               onApprove={canApprove ? () => handleApproveAndSendCredentials(m) : undefined}
               onPaymentChange={(s) => handleUpdatePaymentStatus(m, s)}
             />
@@ -1811,7 +1813,7 @@ function MembersPage() {
                         >
                           <Eye className="h-4 w-4" />
                         </button>
-                        {canEdit && (
+                        {canEdit && (user?.role !== "custom_account" || ((m as any).createdBy === user?.id || (m as any).created_by === user?.id)) && (
                           <button
                             onClick={() => setEditing(m)}
                             aria-label={t("common.edit")}
@@ -1831,7 +1833,7 @@ function MembersPage() {
                             <UserCog className="h-4 w-4" />
                           </button>
                         )}
-                        {canDelete && (
+                        {canDelete && (user?.role !== "custom_account" || ((m as any).createdBy === user?.id || (m as any).created_by === user?.id)) && (
                           <button
                             onClick={() => setDeleting(m)}
                             aria-label={t("common.delete")}

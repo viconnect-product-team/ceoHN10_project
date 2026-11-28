@@ -308,20 +308,22 @@ export class AuthorizationService {
     const mappedExecAndDept = (() => {
       const rc = cleanRoleCode;
       if (rc === 'ADMIN_PLATFORM' || rc === 'PLATFORM_ADMIN') return { role: 'platform_admin', dept: 'Ban Công nghệ', appRole: 'platform_admin' };
-      if (rc.includes('ADMIN')) return { role: 'admin', dept: 'Ban Công nghệ', appRole: 'admin' };
-      if (rc === 'LOP_TRUONG' || rc === 'CHU_TICH') return { role: 'lop_truong', dept: 'Ban Gắn kết & Đời sống', appRole: 'admin' };
-      if (rc === 'LOP_PHO' || rc === 'BAN_DIEU_HANH') return { role: 'lop_pho', dept: 'Ban Gắn kết & Đời sống', appRole: 'admin' };
-      if (rc === 'TRUONG_TEAM') return { role: 'truong_team', dept: 'Ban Gắn kết & Đời sống', appRole: 'admin' };
-      if (rc === 'PHO_TEAM') return { role: 'pho_team', dept: 'Ban Gắn kết & Đời sống', appRole: 'admin' };
-      if (rc === 'GIANG_VIEN') return { role: 'giang_vien', dept: 'Ban Gắn kết & Đời sống', appRole: 'member' };
-      if (rc.includes('CONG_NGHE')) return { role: 'truong_ban_chuyen_trach', dept: 'Ban Công nghệ', appRole: 'admin' };
-      if (rc.includes('TRUYEN_THONG')) return { role: 'truong_ban_chuyen_trach', dept: 'Ban Truyền thông', appRole: 'admin' };
-      if (rc.includes('TAI_CHINH')) return { role: 'truong_ban_chuyen_trach', dept: 'Ban Tài chính', appRole: 'admin' };
-      if (rc.includes('SU_KIEN')) return { role: 'truong_ban_chuyen_trach', dept: 'Ban Sự kiện & Hậu cần', appRole: 'admin' };
-      if (rc.includes('DOI_NGOAI') || rc.includes('GIAO_THUONG') || rc.includes('XUC_TIEN')) return { role: 'truong_ban_chuyen_trach', dept: 'Ban Đối ngoại & Giao thương', appRole: 'admin' };
-      if (rc.includes('GAN_KET') || rc.includes('DOI_SONG') || rc.includes('THANH_VIEN')) return { role: 'truong_ban_chuyen_trach', dept: 'Ban Gắn kết & Đời sống', appRole: 'admin' };
-      if (rc.includes('THIEN_NGUYEN')) return { role: 'truong_ban_chuyen_trach', dept: 'Ban Thiện nguyện', appRole: 'admin' };
-      return { role: 'member', dept: 'Ban Gắn kết & Đời sống', appRole: 'member' };
+      if (rc === 'ADMIN') return { role: 'admin', dept: 'Ban Công nghệ', appRole: 'admin' };
+      if (rc === 'LOP_TRUONG') return { role: 'lop_truong', dept: 'Ban Công nghệ', appRole: 'admin' };
+      if (rc === 'LOP_PHO') return { role: 'lop_pho', dept: 'Ban Công nghệ', appRole: 'admin' };
+      if (rc === 'TRUONG_TEAM') return { role: 'truong_team', dept: 'Ban Công nghệ', appRole: 'admin' };
+      if (rc === 'PHO_TEAM') return { role: 'pho_team', dept: 'Ban Công nghệ', appRole: 'admin' };
+      if (rc === 'GIANG_VIEN') return { role: 'giang_vien', dept: 'Ban Học tập', appRole: 'member' };
+      if (rc === 'CUSTOM_ACCOUNT') return { role: 'custom_account', dept: 'Ban Công nghệ', appRole: 'member' };
+      if (rc.includes('CONG_NGHE')) return { role: 'truong_ban_cong_nghe', dept: 'Ban Công nghệ', appRole: 'admin' };
+      if (rc.includes('HOC_TAP')) return { role: 'truong_ban_hoc_tap', dept: 'Ban Học tập', appRole: 'admin' };
+      if (rc.includes('TAI_CHINH')) return { role: 'truong_ban_tai_chinh', dept: 'Ban Tài chính', appRole: 'admin' };
+      if (rc.includes('TRUYEN_THONG')) return { role: 'truong_ban_truyen_thong', dept: 'Ban Truyền thông', appRole: 'admin' };
+      if (rc.includes('SU_KIEN')) return { role: 'truong_ban_su_kien', dept: 'Ban Sự kiện & Hậu cần', appRole: 'admin' };
+      if (rc.includes('AN_SINH')) return { role: 'truong_ban_an_sinh', dept: 'Ban An sinh xã hội', appRole: 'admin' };
+      if (rc.includes('THIEN_NGUYEN')) return { role: 'truong_ban_thien_nguyen', dept: 'Ban Thiện nguyện', appRole: 'admin' };
+      if (rc.includes('DOI_NOI') || rc.includes('DOI_NGOAI')) return { role: 'truong_ban_doi_ngoai', dept: 'Ban Đối nội Đối ngoại', appRole: 'admin' };
+      return { role: 'hoc_vien', dept: 'Ban Học tập', appRole: 'member' };
     })();
 
     await this.prisma.$executeRawUnsafe(

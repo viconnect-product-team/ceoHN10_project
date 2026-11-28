@@ -22,7 +22,7 @@ export class FinancialInitController {
    */
   @Get('funds')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin', 'platform_admin', 'superadmin', 'president', 'vice_president', 'accountant', 'secretary', 'lop_truong', 'lop_pho', 'truong_ban_chuyen_trach', 'quan_tri')
+  @Roles('platform_admin', 'admin', 'lop_truong', 'lop_pho', 'truong_team', 'pho_team', 'truong_ban_cong_nghe', 'truong_ban_hoc_tap', 'truong_ban_tai_chinh', 'truong_ban_truyen_thong', 'truong_ban_su_kien', 'truong_ban_an_sinh', 'truong_ban_thien_nguyen', 'truong_ban_doi_ngoai')
   getFunds() {
     return this.finService.getFunds();
   }
@@ -32,7 +32,7 @@ export class FinancialInitController {
    */
   @Get('detailed-ledger')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin', 'platform_admin', 'superadmin', 'president', 'vice_president', 'accountant', 'secretary', 'lop_truong', 'lop_pho', 'truong_ban_chuyen_trach', 'quan_tri')
+  @Roles('platform_admin', 'admin', 'lop_truong', 'lop_pho', 'truong_team', 'pho_team', 'truong_ban_cong_nghe', 'truong_ban_hoc_tap', 'truong_ban_tai_chinh', 'truong_ban_truyen_thong', 'truong_ban_su_kien', 'truong_ban_an_sinh', 'truong_ban_thien_nguyen', 'truong_ban_doi_ngoai')
   getDetailedLedger() {
     return this.finService.getDetailedLedger();
   }
@@ -42,7 +42,7 @@ export class FinancialInitController {
    */
   @Post('manual-cashflow')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin', 'platform_admin', 'superadmin', 'president', 'vice_president', 'accountant', 'secretary', 'lop_truong', 'lop_pho', 'truong_ban_chuyen_trach', 'quan_tri')
+  @Roles('platform_admin', 'admin', 'lop_truong', 'lop_pho', 'truong_team', 'pho_team', 'truong_ban_cong_nghe', 'truong_ban_hoc_tap', 'truong_ban_tai_chinh', 'truong_ban_truyen_thong', 'truong_ban_su_kien', 'truong_ban_an_sinh', 'truong_ban_thien_nguyen', 'truong_ban_doi_ngoai')
   createManualCashflow(
     @Req() req: any,
     @Body()

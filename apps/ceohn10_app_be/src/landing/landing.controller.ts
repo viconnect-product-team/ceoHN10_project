@@ -24,7 +24,7 @@ import {
 
 @Controller('admin/landing-webs')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('admin', 'president', 'vice_president', 'superadmin', 'platform_admin', 'quan_tri', 'lop_truong', 'lop_pho', 'truong_ban_chuyen_trach')
+@Roles('platform_admin', 'admin', 'lop_truong', 'lop_pho', 'truong_team', 'pho_team', 'truong_ban_cong_nghe', 'truong_ban_hoc_tap', 'truong_ban_tai_chinh', 'truong_ban_truyen_thong', 'truong_ban_su_kien', 'truong_ban_an_sinh', 'truong_ban_thien_nguyen', 'truong_ban_doi_ngoai', 'custom_account')
 export class LandingAdminController {
   constructor(private readonly landingService: LandingService) {}
 

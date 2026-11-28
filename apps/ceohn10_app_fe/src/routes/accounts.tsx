@@ -783,13 +783,9 @@ function AccountsPage() {
 
   const isRootAdmin = (acc: UserAccountItem) => {
     return (
-      acc.role === "quan_tri" ||
+      acc.role === "platform_admin" ||
       acc.code === "ADMIN-001" ||
-      acc.email === "admin@viconnect.vn" ||
-      acc.email === "admin@connect.vn" ||
-      acc.email === "admin@ceohn10.vn" ||
-      acc.email === "infor@viconnect.vn" ||
-      acc.email === "info@viconnect.vn"
+      acc.email === "admin@ceohn10.vn"
     );
   };
 
@@ -1135,7 +1131,7 @@ function AccountsPage() {
               <div className="text-[#003B95] dark:text-blue-400 text-xs font-semibold font-['Inter']">LÃNH ĐẠO &amp; QUẢN TRỊ</div>
             </div>
             <div className="text-slate-900 dark:text-white text-2xl font-bold font-['Inter'] leading-7">
-              {accounts.filter((a) => a.role === "quan_tri" || a.role === "admin" || a.role === "chu_tich").length}
+              {accounts.filter((a) => a.role === "platform_admin" || a.role === "admin" || a.role === "lop_truong" || a.role === "lop_pho").length}
             </div>
             <div className="text-slate-500 text-xs font-normal font-['Inter']">Admin &amp; Ban điều hành cấp cao</div>
           </div>

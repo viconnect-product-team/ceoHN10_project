@@ -423,33 +423,26 @@ export function Sidebar({
     setRoleOverride,
   } = roleState;
 
-  // Xác định vai trò hệ thống CRM cốt lõi theo thứ tự ưu tiên chính xác
+  // Xác định vai trò hệ thống CRM cốt lõi theo thứ tự ưu tiên chính xác (17 vai trò chuẩn)
   const currentRoleKey: SystemRoleKey = useMemo(() => {
     const rawRole = (srsRole as string) || "";
-
-    // 1. Vai trò Lãnh đạo cấp cao & Quản trị hệ thống
-    if (rawRole === "admin_platform" || rawRole === "quan_tri" || rawRole === "ADM" || isPlatformAdmin) return "admin_platform";
-    if (rawRole === "lop_truong" || rawRole === "chu_tich" || rawRole === "president" || isChuTich) return "lop_truong";
-    if (rawRole === "lop_pho" || rawRole === "pho_chu_tich" || rawRole.startsWith("lop_pho_")) return "lop_pho";
-    if (rawRole.startsWith("truong_team_") || rawRole === "truong_team") return "truong_team";
-    if (rawRole.startsWith("pho_team_") || rawRole === "pho_team") return "pho_team";
-    if (rawRole === "admin" || (isAdmin && !rawRole.startsWith("thanh_vien_ban_") && rawRole !== "member" && rawRole !== "HVT") || isBQT) return "admin";
-
-    // 2. Trưởng ban chuyên trách
-    if (
-      rawRole === "truong_ban_chuyen_trach" ||
-      rawRole === "truong_ban_truyen_thong" || rawRole === "BTT" || isTruongBanTruyenThong ||
-      rawRole === "truong_ban_thanh_vien" || rawRole === "BTV" || isTruongBanThanhVien ||
-      rawRole === "truong_ban_xuc_tien" || rawRole === "BXT" || isTruongBanXucTien ||
-      rawRole === "truong_ban_tai_chinh" || rawRole === "BTC" || isTruongBanTaiChinh ||
-      rawRole === "truong_ban_thien_nguyen" || rawRole === "BTN" || isTruongBanThienNguyen ||
-      rawRole === "tong_thu_ky" || isTongThuKy ||
-      rawRole === "ban_thu_ky" || isBanThuKy ||
-      rawRole === "ban_dieu_hanh" || rawRole === "truong_ban_dieu_hanh" ||
-      rawRole.startsWith("tb_")
-    ) return "truong_ban_chuyen_trach";
-
-    return "member";
+    if (rawRole === "platform_admin" || isPlatformAdmin) return "platform_admin";
+    if (rawRole === "lop_truong" || isChuTich) return "lop_truong";
+    if (rawRole === "lop_pho") return "lop_pho";
+    if (rawRole === "truong_team") return "truong_team";
+    if (rawRole === "pho_team") return "pho_team";
+    if (rawRole === "admin" || isAdmin || isBQT) return "admin";
+    if (rawRole === "giang_vien") return "giang_vien";
+    if (rawRole === "custom_account") return "custom_account";
+    if (rawRole === "truong_ban_cong_nghe") return "truong_ban_cong_nghe";
+    if (rawRole === "truong_ban_hoc_tap") return "truong_ban_hoc_tap";
+    if (rawRole === "truong_ban_tai_chinh" || isTruongBanTaiChinh) return "truong_ban_tai_chinh";
+    if (rawRole === "truong_ban_truyen_thong" || isTruongBanTruyenThong) return "truong_ban_truyen_thong";
+    if (rawRole === "truong_ban_su_kien") return "truong_ban_su_kien";
+    if (rawRole === "truong_ban_an_sinh") return "truong_ban_an_sinh";
+    if (rawRole === "truong_ban_thien_nguyen" || isTruongBanThienNguyen) return "truong_ban_thien_nguyen";
+    if (rawRole === "truong_ban_doi_ngoai") return "truong_ban_doi_ngoai";
+    return "hoc_vien";
   }, [
     srsRole,
     isPlatformAdmin,

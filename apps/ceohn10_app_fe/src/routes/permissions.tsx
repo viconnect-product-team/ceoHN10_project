@@ -108,13 +108,11 @@ function PermissionsPage() {
     isChuTich ||
     isBQT ||
     isAdmin ||
-    srsRole === "BQT" ||
-    srsRole === "ADM" ||
+    srsRole === "platform_admin" ||
     srsRole === "admin" ||
-    srsRole === "quan_tri" ||
-    srsRole === "ban_dieu_hanh" ||
-    srsRole === "chu_tich" ||
-    isRouteAllowedByMatrix("/permissions", (srsRole as any) || "member");
+    srsRole === "lop_truong" ||
+    srsRole === "lop_pho" ||
+    isRouteAllowedByMatrix("/permissions", (srsRole as any) || "hoc_vien");
 
   const [matrixDirty, setMatrixDirty] = useState(false);
   const matrixSaveRef = useRef<(() => Promise<boolean>) | null>(null);

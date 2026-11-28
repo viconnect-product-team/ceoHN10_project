@@ -148,21 +148,19 @@ export class MembersService implements OnModuleInit {
     try {
       const executiveRoles = [
         'admin',
-        'association_admin',
-        'owner',
         'platform_admin',
-        'tenant_admin',
-        'superadmin',
-        'quan_tri',
-        'chu_tich',
-        'truong_ban_dieu_hanh',
-        'thanh_vien_ban_dieu_hanh',
-        'ban_dieu_hanh',
-        'bqt',
-        'adm',
-        'truong_ban',
-        'ban_thu_ky',
-        'tong_thu_ky',
+        'lop_truong',
+        'lop_pho',
+        'truong_team',
+        'pho_team',
+        'truong_ban_cong_nghe',
+        'truong_ban_hoc_tap',
+        'truong_ban_tai_chinh',
+        'truong_ban_truyen_thong',
+        'truong_ban_su_kien',
+        'truong_ban_an_sinh',
+        'truong_ban_thien_nguyen',
+        'truong_ban_doi_ngoai',
       ];
 
       // 1. Check user_roles
@@ -222,6 +220,24 @@ export class MembersService implements OnModuleInit {
     }
   }
 
+  private async hasCustomMemberPermission(userId: string): Promise<boolean> {
+    if (!userId) return false;
+    try {
+      const rows = await this.prisma.$queryRaw<any[]>`
+        SELECT card_visibility_settings FROM public.members
+        WHERE user_id::text = ${userId}::text OR id::text = ${userId}::text
+        LIMIT 1
+      `.catch(() => [] as any[]);
+      const perms = rows[0]?.card_visibility_settings?.customPermissions;
+      if (Array.isArray(perms) && perms.length > 0) {
+        return perms.some((p: string) => p === '/members' || String(p).startsWith('/members/') || String(p).startsWith('MEM_'));
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  }
+
   /**
    * Kiểm tra quyền thực thi action code (MEM_ADD, MEM_EDIT, MEM_DELETE, MEM_APPROVE, ...)
    * theo app_settings.crm_member_permissions (override cá nhân) và app_settings.crm_permission_matrix.
@@ -235,6 +251,11 @@ export class MembersService implements OnModuleInit {
     try {
       // 1. Platform Admin / Superadmin luôn có quyền tối thượng
       if (await this.checkIsPlatformAdmin(userId)) {
+        return true;
+      }
+
+      // 1.5. Tài khoản custom_account được tick /members (hoặc MEM_*) trong customPermissions
+      if (actionCode.startsWith('MEM_') && (await this.hasCustomMemberPermission(userId))) {
         return true;
       }
 
@@ -293,55 +314,40 @@ export class MembersService implements OnModuleInit {
           const rawRole = (userRoleRows[0]?.role || '').toLowerCase();
           const dept = (user?.department || '').toLowerCase();
 
-          let roleKey = 'member';
+          let roleKey = 'hoc_vien';
           if (
+            rawRole.includes('platform_admin') ||
             rawRole.includes('admin') ||
-            rawRole.includes('bqt') ||
-            rawRole.includes('chủ tịch') ||
+            email === 'admin@ceohn10.vn' ||
             email === 'admin@connect.vn'
           ) {
             roleKey = 'admin';
-          } else if (
-            rawRole.includes('quan_tri') ||
-            rawRole.includes('superadmin')
-          ) {
-            roleKey = 'quan_tri';
-          } else if (
-            rawRole.includes('tong_thu_ky') ||
-            dept.includes('thư ký')
-          ) {
-            roleKey = 'tong_thu_ky';
-          } else if (
-            rawRole.includes('truyền thông') ||
-            dept.includes('truyền thông')
-          ) {
+          } else if (rawRole.includes('lop_truong') || rawRole.includes('lớp trưởng')) {
+            roleKey = 'lop_truong';
+          } else if (rawRole.includes('lop_pho') || rawRole.includes('lớp phó')) {
+            roleKey = 'lop_pho';
+          } else if (rawRole.includes('truong_team')) {
+            roleKey = 'truong_team';
+          } else if (rawRole.includes('pho_team')) {
+            roleKey = 'pho_team';
+          } else if (rawRole.includes('truyền thông') || dept.includes('truyền thông') || rawRole.includes('truyen_thong')) {
             roleKey = 'truong_ban_truyen_thong';
-          } else if (
-            rawRole.includes('thành viên') ||
-            dept.includes('thành viên')
-          ) {
-            roleKey = 'truong_ban_thanh_vien';
-          } else if (
-            rawRole.includes('xúc tiến') ||
-            dept.includes('xúc tiến') ||
-            dept.includes('thương mại')
-          ) {
-            roleKey = 'truong_ban_xuc_tien';
-          } else if (
-            rawRole.includes('tài chính') ||
-            dept.includes('tài chính')
-          ) {
+          } else if (rawRole.includes('công nghệ') || dept.includes('công nghệ') || rawRole.includes('cong_nghe')) {
+            roleKey = 'truong_ban_cong_nghe';
+          } else if (rawRole.includes('học tập') || dept.includes('học tập') || rawRole.includes('hoc_tap')) {
+            roleKey = 'truong_ban_hoc_tap';
+          } else if (rawRole.includes('tài chính') || dept.includes('tài chính') || rawRole.includes('tai_chinh')) {
             roleKey = 'truong_ban_tai_chinh';
-          } else if (
-            rawRole.includes('thiện nguyện') ||
-            dept.includes('thiện nguyện')
-          ) {
+          } else if (rawRole.includes('sự kiện') || dept.includes('sự kiện') || rawRole.includes('su_kien')) {
+            roleKey = 'truong_ban_su_kien';
+          } else if (rawRole.includes('an sinh') || dept.includes('an sinh') || rawRole.includes('an_sinh')) {
+            roleKey = 'truong_ban_an_sinh';
+          } else if (rawRole.includes('thiện nguyện') || dept.includes('thiện nguyện') || rawRole.includes('thien_nguyen')) {
             roleKey = 'truong_ban_thien_nguyen';
-          } else if (
-            dept.includes('điều hành') ||
-            rawRole.includes('dieu_hanh')
-          ) {
-            roleKey = 'truong_ban_dieu_hanh';
+          } else if (rawRole.includes('đối nội') || rawRole.includes('đối ngoại') || dept.includes('đối nội') || rawRole.includes('doi_ngoai')) {
+            roleKey = 'truong_ban_doi_ngoai';
+          } else if (rawRole.includes('custom_account')) {
+            roleKey = 'custom_account';
           }
 
           for (const cat of cats) {
@@ -637,7 +643,9 @@ export class MembersService implements OnModuleInit {
       about: r.about ?? '',
       associationId: r.association_id,
       userId: r.user_id,
-      executiveRole: r.executive_role || 'member',
+      createdBy: r.created_by ?? null,
+      created_by: r.created_by ?? null,
+      executiveRole: r.executive_role || 'hoc_vien',
       executive_role: r.executive_role || 'member',
       department: r.department || 'Học viên CEO HN10',
       role: r.executive_role || 'member',
@@ -1690,9 +1698,10 @@ export class MembersService implements OnModuleInit {
       data.associationId,
     );
     const isAdmin = await this.checkIsAdmin(userId, assocId ?? undefined);
-    if (!isAdmin) {
+    const hasCustomMemPerm = await this.hasCustomMemberPermission(userId);
+    if (!isAdmin && !hasCustomMemPerm) {
       throw new ForbiddenException(
-        'Chỉ quản trị viên mới có quyền thêm Học viên',
+        'Chỉ quản trị viên hoặc tài khoản được phân quyền Học viên mới có quyền thêm Học viên',
       );
     }
     const canAdd = await this.checkActionPermission(
@@ -1759,11 +1768,14 @@ export class MembersService implements OnModuleInit {
     await this.prisma.$executeRawUnsafe(
       `ALTER TABLE public.members ADD COLUMN IF NOT EXISTS custom_data JSONB DEFAULT '{}'::jsonb`,
     ).catch(() => {});
+    await this.prisma.$executeRawUnsafe(
+      `ALTER TABLE public.members ADD COLUMN IF NOT EXISTS created_by TEXT`,
+    ).catch(() => {});
     await this.prisma.$executeRaw`
       INSERT INTO public.members (
         id, code, name, contact, email, phone, type, level, industry, region, status,
         joined_at, fee_year, fee_paid, address, website, tax_code, employees, about,
-        executive_role, department, custom_data,
+        executive_role, department, custom_data, created_by,
         association_id, created_at, updated_at
       ) VALUES (
         ${id},
@@ -1785,9 +1797,10 @@ export class MembersService implements OnModuleInit {
         ${data.taxCode ?? null},
         ${data.employees ?? null},
         ${data.about ?? ''},
-        'member',
-        'Học viên ceohn10',
+        'hoc_vien',
+        'Học viên CEOHN10',
         ${customJsonStr}::jsonb,
+        ${String(userId)},
         ${assocId}::uuid,
         now(),
         now()
@@ -1998,10 +2011,20 @@ export class MembersService implements OnModuleInit {
 
     const current = existing[0];
     const isAdmin = await this.checkIsAdmin(userId, current.association_id);
-    if (!isAdmin) {
+    const hasCustomMemPerm = await this.hasCustomMemberPermission(userId);
+    if (!isAdmin && !hasCustomMemPerm) {
       throw new ForbiddenException(
-        'Chỉ quản trị viên mới có quyền cập nhật Học viên',
+        'Chỉ quản trị viên hoặc tài khoản được phân quyền Học viên mới có quyền cập nhật Học viên',
       );
+    }
+    const isFullAdmin = await this.checkIsPlatformAdmin(userId);
+    if (!isFullAdmin && hasCustomMemPerm) {
+      const isOwner = Boolean(current.created_by && String(current.created_by) === String(userId));
+      if (!isOwner) {
+        throw new ForbiddenException(
+          'Bạn chỉ có quyền chỉnh sửa học viên do chính tài khoản của bạn tạo ra!',
+        );
+      }
     }
     const canEdit = await this.checkActionPermission(
       userId,
@@ -2408,10 +2431,20 @@ export class MembersService implements OnModuleInit {
 
     const current = existing[0];
     const isAdmin = await this.checkIsAdmin(userId, current.association_id);
-    if (!isAdmin) {
+    const hasCustomMemPerm = await this.hasCustomMemberPermission(userId);
+    if (!isAdmin && !hasCustomMemPerm) {
       throw new ForbiddenException(
-        'Chỉ quản trị viên mới có quyền cập nhật Học viên',
+        'Chỉ quản trị viên hoặc tài khoản được phân quyền Học viên mới có quyền cập nhật Học viên',
       );
+    }
+    const isFullAdmin = await this.checkIsPlatformAdmin(userId);
+    if (!isFullAdmin && hasCustomMemPerm) {
+      const isOwner = Boolean(current.created_by && String(current.created_by) === String(userId));
+      if (!isOwner) {
+        throw new ForbiddenException(
+          'Bạn chỉ có quyền chỉnh sửa học viên do chính tài khoản của bạn tạo ra!',
+        );
+      }
     }
 
     const email = data.email !== undefined ? data.email : current.email;
@@ -2454,15 +2487,25 @@ export class MembersService implements OnModuleInit {
 
     const current = existing[0];
     const isAdmin = await this.checkIsAdmin(userId, current.association_id);
+    const hasCustomMemPerm = await this.hasCustomMemberPermission(userId);
     const canDelete = await this.checkActionPermission(
       userId,
       'MEM_DELETE',
       current.association_id,
     );
-    if (!isAdmin && !canDelete) {
+    if (!isAdmin && !hasCustomMemPerm && !canDelete) {
       throw new ForbiddenException(
         'Chỉ quản trị viên hoặc tài khoản được cấp quyền xóa (MEM_DELETE) mới có quyền xóa',
       );
+    }
+    const isFullAdmin = await this.checkIsPlatformAdmin(userId);
+    if (!isFullAdmin && hasCustomMemPerm) {
+      const isOwner = Boolean(current.created_by && String(current.created_by) === String(userId));
+      if (!isOwner) {
+        throw new ForbiddenException(
+          'Bạn chỉ có quyền xóa học viên do chính tài khoản của bạn tạo ra!',
+        );
+      }
     }
 
     const memberEmail = (current.email || '').trim().toLowerCase();

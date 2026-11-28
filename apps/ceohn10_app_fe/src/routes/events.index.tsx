@@ -1204,7 +1204,7 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
                             >
                               <Eye className="h-4 w-4" />
                             </Link>
-                            {can(PERMISSIONS.EVENT_EDIT) && (
+                            {can(PERMISSIONS.EVENT_EDIT) && (user?.role !== "custom_account" || ((e as any).createdBy === user?.id || (e as any).created_by === user?.id)) && (
                               <button
                                 onClick={() => {
                                   setEditing(e);
@@ -1229,7 +1229,7 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
                                 <QrCode className="h-4 w-4" />
                               </button>
                             )}
-                            {can(PERMISSIONS.EVENT_DELETE) && (
+                            {can(PERMISSIONS.EVENT_DELETE) && (user?.role !== "custom_account" || ((e as any).createdBy === user?.id || (e as any).created_by === user?.id)) && (
                               <button
                                 onClick={() => onDelete(e)}
                                 disabled={deletingId === e.id}

@@ -177,31 +177,25 @@ export class RolesGuard implements CanActivate {
     const isSuperAdmin =
       !hasCustomPerms &&
       (userEmail === 'admin@ceohn10.vn' ||
-        userEmail === 'admin@viconnect.vn' ||
-        userEmail === 'admin@connect.vn' ||
-        normalizedUserRoles.includes('admin_platform') ||
-        normalizedUserRoles.includes('platform_admin') ||
-        normalizedUserRoles.includes('superadmin') ||
-        normalizedUserRoles.includes('quan_tri'));
+        normalizedUserRoles.includes('platform_admin'));
 
     // 3. Phân quyền Dữ Liệu (Data Scope Resolution)
     let scopeLevel: 'ALL' | 'DEPARTMENT' | 'CLASS' | 'SELF' = 'SELF';
     if (
       isSuperAdmin ||
       normalizedUserRoles.includes('admin') ||
-      normalizedUserRoles.includes('lop_pho') ||
-      normalizedUserRoles.includes('bqt')
+      normalizedUserRoles.includes('lop_truong') ||
+      normalizedUserRoles.includes('lop_pho')
     ) {
       scopeLevel = 'ALL';
     } else if (
       normalizedUserRoles.includes('truong_team') ||
       normalizedUserRoles.includes('pho_team') ||
-      normalizedUserRoles.includes('truong_ban_chuyen_trach') ||
-      normalizedUserRoles.some((r) => r.startsWith('truong_ban_') || r.startsWith('thanh_vien_ban_') || r.startsWith('tb_')) ||
+      normalizedUserRoles.some((r) => r.startsWith('truong_ban_')) ||
       userDepartment
     ) {
       scopeLevel = 'DEPARTMENT';
-    } else if (normalizedUserRoles.includes('giao_vien') || normalizedUserRoles.includes('teacher')) {
+    } else if (normalizedUserRoles.includes('giang_vien')) {
       scopeLevel = 'CLASS';
     }
 
@@ -234,6 +228,7 @@ export class RolesGuard implements CanActivate {
     }
 
     // 3.5. Nếu tài khoản có gán customPermissions (Tích quyền cụ thể), chặn ngay lập tức nếu request nằm ngoài quyền đã tích
+    let matchedAllowedModule = false;
     if (hasCustomPerms) {
       const reqPath = String(request.path || request.url || '').split('?')[0].toLowerCase();
       const allowedModuleChecks: Array<{ apiPrefix: string; permMatch: string[] }> = [
@@ -241,8 +236,14 @@ export class RolesGuard implements CanActivate {
         { apiPrefix: '/api/events', permMatch: ['/events', '/event-registrations', '/event-checkin', '/checkin-qr', '/lucky-draw', 'EVT_', 'EREG_', 'CHK_', 'LKD_'] },
         { apiPrefix: '/api/trainings', permMatch: ['/classes', 'CLS_', 'TRN_'] },
         { apiPrefix: '/api/sponsors', permMatch: ['/sponsors', '/finance-report', 'SPN_', 'FIN_'] },
+        { apiPrefix: '/api/finance-init', permMatch: ['/finance-report', 'FIN_'] },
+        { apiPrefix: '/api/financial-report', permMatch: ['/finance-report', 'FIN_'] },
         { apiPrefix: '/api/documents', permMatch: ['/documents', 'DOC_'] },
         { apiPrefix: '/api/voting', permMatch: ['/voting', '/events', 'VOTE_'] },
+        { apiPrefix: '/api/admin/landing-webs', permMatch: ['/admin/landing-webs', '/landing-builder', 'LND_', 'LANDING_'] },
+        { apiPrefix: '/api/rbac', permMatch: ['/permissions', '/accounts'] },
+        { apiPrefix: '/api/users', permMatch: ['/accounts', '/permissions'] },
+        { apiPrefix: '/api/settings', permMatch: ['/settings'] },
       ];
       const isSelfEndpoint =
         reqPath.includes('/me') ||
@@ -261,6 +262,7 @@ export class RolesGuard implements CanActivate {
                 'Tài khoản của bạn không được phân quyền thao tác trên phân hệ này.',
               );
             }
+            matchedAllowedModule = true;
           }
         }
       }
@@ -272,6 +274,14 @@ export class RolesGuard implements CanActivate {
       roleGranted = requiredRoles.some((role) =>
         normalizedUserRoles.includes(role.toLowerCase().trim()),
       );
+      if (
+        !roleGranted &&
+        hasCustomPerms &&
+        normalizedUserRoles.includes('custom_account') &&
+        matchedAllowedModule
+      ) {
+        roleGranted = true;
+      }
     }
 
     // 5. Kiểm tra Phân Quyền Thao Tác (Action Permissions)

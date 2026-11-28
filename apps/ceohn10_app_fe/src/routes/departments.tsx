@@ -340,11 +340,11 @@ function DepartmentsPage() {
   };
 
   const handleResetDefaults = () => {
-    if (!window.confirm("Khôi phục danh sách ban về mặc định (7 ban chuyên trách)?")) return;
+    if (!window.confirm("Khôi phục danh sách ban về mặc định (8 ban chuyên môn)?")) return;
     setDepartments(INITIAL_DEPARTMENTS);
     saveCustomDepartments(INITIAL_DEPARTMENTS);
     dispatchPermissionSyncEvent();
-    toast.info("Đã khôi phục danh sách ban về mặc định 7 ban chuyên trách.");
+    toast.info("Đã khôi phục danh sách ban về mặc định 8 ban chuyên môn.");
   };
 
   const filteredDepartments = useMemo(() => {

@@ -271,7 +271,7 @@ function SettingsPage() {
                       <span>Cơ cấu Ban chuyên môn & Nhân sự phụ trách</span>
                     </h4>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      Chuẩn hóa 6 Ban: Ban Công nghệ, Ban Truyền thông, Ban Tài chính, Ban Sự kiện & Hậu cần, Ban Đối ngoại & Giao thương, Ban Gắn kết & Đời sống
+                      Chuẩn hóa 8 Ban: Ban Công nghệ, Ban Học tập, Ban Tài chính, Ban Truyền thông, Ban Sự kiện &amp; Hậu cần, Ban An sinh xã hội, Ban Thiện nguyện, Ban Đối nội Đối ngoại
                     </p>
                   </div>
                   <Link

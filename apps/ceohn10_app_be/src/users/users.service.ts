@@ -253,6 +253,7 @@ export function computeUserRbacEvaluation(
       '/email-marketing': ['EML_VIEW', 'EML_SEND', 'EML_CREATE', 'NTF_VIEW', 'media:manage'],
       '/templates': ['TPL_VIEW', 'TPL_CREATE', 'TPL_EDIT', 'TPL_DELETE', 'media:manage'],
       '/admin/landing-webs': ['LND_VIEW', 'LND_CREATE', 'LND_EDIT', 'LND_DELETE', 'LND_PUBLISH', 'media:manage'],
+      '/landing-builder': ['LND_VIEW', 'LND_CREATE', 'LND_EDIT', 'LND_DELETE', 'LND_PUBLISH', 'media:manage'],
       '/documents': [
         'DOC_VIEW', 'DOC_ADD', 'DOC_CREATE', 'DOC_UPLOAD', 'DOC_EDIT', 'DOC_DELETE', 'DOC_DOWNLOAD',
         'document:view', 'document:create', 'document:update', 'document:delete', 'document:manage',
