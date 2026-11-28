@@ -611,36 +611,28 @@ export function VideoVotingShowcaseLanding({
         </div>
       )}
 
-      {/* MINIMALIST LIGHT HEADER: CHỈ HIỆN TIÊU ĐỀ & MÔ TẢ VIDEO ĐANG CHẠY + CHUYỂN MÀN VIDEO / VOTING */}
+      {/* MINIMALIST LIGHT HEADER: CÂN ĐỐI CHỈ HIỆN LOGO HN10 + TIÊU ĐỀ NGẮN + CHUYỂN MÀN VIDEO / VOTING */}
       <header
         className={`relative z-30 w-full max-w-[1440px] mx-auto px-4 sm:px-10 ${
           previewMode ? "pt-14" : "pt-4 sm:pt-6"
-        } pb-2 flex flex-wrap items-center justify-between gap-3`}
+        } pb-3 flex flex-wrap items-center justify-between gap-3`}
       >
-        {/* Left: Active Video Title & Description */}
-        <div className="flex items-center gap-2.5 min-w-0 max-w-full sm:max-w-[42%]">
-          <div className="size-9 rounded-full pin-glass-pill grid place-items-center shrink-0">
+        {/* Left: Logo HN10 + Active Video Title */}
+        <div className="flex items-center gap-3 min-w-0 max-w-full sm:max-w-[36%]">
+          <div className="h-9 px-3 rounded-full pin-glass-pill inline-flex items-center justify-center shrink-0">
             <span
-              className="text-xs font-black tracking-tighter text-[#0B0D12]"
+              className="text-xs font-black tracking-tight text-[#0B0D12] leading-none"
               style={{ fontFamily: "'Syne', sans-serif" }}
             >
               HN10
             </span>
           </div>
           <div className="min-w-0">
-            <div className="text-[10px] font-bold uppercase tracking-wider text-blue-700 truncate">
-              {appliedEventTitle}
-            </div>
-            <div className="text-xs sm:text-sm font-extrabold tracking-tight text-[#0B0D12] truncate">
+            <div className="text-xs sm:text-sm font-extrabold tracking-tight text-[#0B0D12] truncate leading-snug">
               {activeScreen === "video"
                 ? [currentSlide.title1, currentSlide.title2].filter(Boolean).join(" ") || `Video 0${currentIndex + 1}`
                 : "Voting & Biểu Đồ Bình Chọn"}
             </div>
-            {activeScreen === "video" && currentSlide.description && (
-              <div className="text-[11px] text-[#525866] truncate">
-                {currentSlide.description}
-              </div>
-            )}
           </div>
         </div>
 

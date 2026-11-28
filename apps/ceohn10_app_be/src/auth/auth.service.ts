@@ -210,10 +210,6 @@ export class AuthService implements OnModuleInit {
       isExecutive: Boolean(details?.isExecutive || isPlatformAdminUser),
       isGeneralSecretary: Boolean(details?.isGeneralSecretary),
       isDepartmentLeader: Boolean(details?.isDepartmentLeader),
-      permissions,
-      permissionsHash: details?.permissionsHash || {},
-      allowedRoutes: details?.allowedRoutes || [],
-      customPermissions: details?.customPermissions || [],
     };
     const isSystemAdmin =
       user.email === 'admin@ceohn10.vn' ||
@@ -314,7 +310,6 @@ export class AuthService implements OnModuleInit {
         isExecutive: Boolean(details?.isExecutive),
         isGeneralSecretary: Boolean(details?.isGeneralSecretary),
         isDepartmentLeader: Boolean(details?.isDepartmentLeader),
-        permissions,
       };
       const newRefreshPayload = { jti: newRefreshJti, sub: user.id, type: 'refresh' };
       return {

@@ -50,6 +50,9 @@ export function getAuthToken(): string | null {
   if (token) {
     ensureSessionCookiesSync(token);
   }
+  if (token) {
+    ensureSessionCookiesSync(token);
+  }
   return token;
 }
 
