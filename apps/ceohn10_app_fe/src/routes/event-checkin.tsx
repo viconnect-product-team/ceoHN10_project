@@ -176,6 +176,7 @@ function PublicEventCheckinGatePage() {
   } | null>(null);
   const [memberCodeInput, setMemberCodeInput] = useState("");
   const [checkoutCodeInput, setCheckoutCodeInput] = useState("");
+  const [proxyCheckoutCodes, setProxyCheckoutCodes] = useState<string[]>([]);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [listFilterQuery, setListFilterQuery] = useState("");
   const [loadingLists, setLoadingLists] = useState(false);
@@ -1051,45 +1052,75 @@ function PublicEventCheckinGatePage() {
   };
 
   const handleDirectCheckout = async (rawCode?: string) => {
-    const clean = String(rawCode ?? checkoutCodeInput).trim();
-    if (!clean) {
+    const primary = String(rawCode ?? checkoutCodeInput).trim();
+    const companions = proxyCheckoutCodes.map((c) => c.trim()).filter(Boolean);
+    const allCodes = Array.from(new Set([primary, ...companions].filter(Boolean)));
+    if (allCodes.length === 0) {
       toast.info("Vui lòng nhập mã học viên hoặc mã vé để Check-out");
       return;
     }
     setCheckoutLoading(true);
     setCheckoutResult(null);
     try {
-      const res = await fetchNestApi<any>("/events/ticket-checkout", {
-        method: "POST",
-        body: JSON.stringify({ ticketCode: clean }),
-      });
-      if (res && res.ok) {
-        const msg = res.message || "Check-out thành công!";
+      const successes: Array<{ code: string; name?: string; checkedOutAt?: string }> = [];
+      const failures: Array<{ code: string; reason: string }> = [];
+
+      for (const code of allCodes) {
+        try {
+          const res = await fetchNestApi<any>("/events/ticket-checkout", {
+            method: "POST",
+            body: JSON.stringify({ ticketCode: code }),
+          });
+          if (res && res.ok) {
+            successes.push({
+              code,
+              name: res.ticket?.memberName,
+              checkedOutAt: res.checkedOutAt || new Date().toLocaleString("vi-VN"),
+            });
+          } else {
+            const errMsg = res?.notCheckedIn
+              ? "Chưa Check-in sự kiện này"
+              : res?.message || "Không thể Check-out";
+            failures.push({ code, reason: errMsg });
+          }
+        } catch (err: any) {
+          failures.push({ code, reason: err?.message || "Không tìm thấy vé hoặc chưa Check-in" });
+        }
+      }
+
+      if (successes.length > 0 && failures.length === 0) {
+        const msg =
+          successes.length === 1
+            ? `Check-out thành công cho ${successes[0].name || successes[0].code}!`
+            : `Đã Check-out thành công ${successes.length} đại biểu (${successes.map((s) => s.name || s.code).join(", ")})!`;
         toast.success(msg);
         setCheckoutResult({
           ok: true,
           message: msg,
-          memberName: res.ticket?.memberName,
-          eventTitle: res.ticket?.eventTitle,
-          checkedOutAt: res.checkedOutAt || new Date().toLocaleString("vi-VN"),
+          memberName: successes.map((s) => s.name || s.code).join(", "),
+          checkedOutAt: successes[0].checkedOutAt,
         });
+        setCheckoutCodeInput("");
+        setProxyCheckoutCodes([]);
+        void refreshEventTicketLists();
+      } else if (successes.length > 0 && failures.length > 0) {
+        const msg = `Check-out thành công ${successes.length} người; ${failures.length} mã không hợp lệ: ${failures.map((f) => `${f.code} (${f.reason})`).join("; ")}`;
+        toast.warning(msg);
+        setCheckoutResult({
+          ok: true,
+          message: msg,
+          memberName: successes.map((s) => s.name || s.code).join(", "),
+          checkedOutAt: successes[0].checkedOutAt,
+        });
+        void refreshEventTicketLists();
       } else {
         const errMsg =
-          res?.notCheckedIn
-            ? "Đại biểu chưa Check-in sự kiện này! Chỉ những người đã Check-in mới được phép Check-out."
-            : res?.message || "Không thể Check-out vé này.";
+          failures.length === 1
+            ? failures[0].reason
+            : failures.map((f) => `${f.code}: ${f.reason}`).join(" | ");
         toast.error(errMsg);
-        setCheckoutResult({
-          ok: false,
-          message: errMsg,
-          memberName: res?.ticket?.memberName,
-          eventTitle: res?.ticket?.eventTitle,
-        });
+        setCheckoutResult({ ok: false, message: errMsg });
       }
-    } catch (err: any) {
-      const errMsg = err?.message || "Không tìm thấy vé hoặc đại biểu chưa Check-in.";
-      toast.error(errMsg);
-      setCheckoutResult({ ok: false, message: errMsg });
     } finally {
       setCheckoutLoading(false);
     }
@@ -2433,6 +2464,47 @@ function PublicEventCheckinGatePage() {
                 }}
                 className="ios-liquid-input font-mono uppercase"
               />
+
+              {proxyCheckoutCodes.length > 0 && (
+                <div className="space-y-2">
+                  {proxyCheckoutCodes.map((code, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        placeholder={`Mã học viên / mã vé Check-out hộ #${idx + 1}...`}
+                        value={code}
+                        onChange={(e) =>
+                          setProxyCheckoutCodes((prev) =>
+                            prev.map((it, i) => (i === idx ? e.target.value.toUpperCase() : it)),
+                          )
+                        }
+                        className="ios-liquid-input !py-2 !px-3.5 !text-xs font-mono uppercase flex-1"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setProxyCheckoutCodes((prev) => prev.filter((_, i) => i !== idx))
+                        }
+                        className="px-2.5 py-2 rounded-full text-xs font-bold text-rose-600 hover:bg-rose-50 cursor-pointer"
+                      >
+                        Xóa
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex items-center justify-between gap-2">
+                <button
+                  type="button"
+                  onClick={() => setProxyCheckoutCodes((prev) => [...prev, ""])}
+                  className="ios-liquid-pill px-3.5 py-2 rounded-full text-xs font-bold text-[#0B0D12] hover:bg-slate-50 cursor-pointer inline-flex items-center gap-1.5"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>+ Check-out hộ</span>
+                </button>
+              </div>
+
               <button
                 type="button"
                 onClick={(e) => {

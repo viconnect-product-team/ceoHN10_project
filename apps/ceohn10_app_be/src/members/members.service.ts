@@ -1932,6 +1932,7 @@ export class MembersService implements OnModuleInit {
           const appOnlySettings = JSON.stringify({
             targetSystem: 'app_only',
             canAccessCrm: false,
+            canAccessApp: true,
           });
           await this.prisma.$executeRaw`
             UPDATE public.members
