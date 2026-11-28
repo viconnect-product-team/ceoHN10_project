@@ -444,11 +444,12 @@ export class MembersService implements OnModuleInit {
 
   private mapMemberRow(r: any) {
     let joinedStr = '';
-    if (r.joined_at) {
-      if (r.joined_at instanceof Date) {
-        joinedStr = r.joined_at.toISOString().slice(0, 10);
+    const rawJoined = r.joined_at || r.created_at;
+    if (rawJoined) {
+      if (rawJoined instanceof Date) {
+        joinedStr = rawJoined.toISOString().slice(0, 10);
       } else {
-        joinedStr = String(r.joined_at).slice(0, 10);
+        joinedStr = String(rawJoined).slice(0, 10);
       }
     }
 
@@ -1751,7 +1752,7 @@ export class MembersService implements OnModuleInit {
       'name', 'contact', 'email', 'phone', 'type', 'level', 'industry', 'region', 'status',
       'address', 'website', 'taxCode', 'tax_code', 'employees', 'about', 'associationId',
       'executiveRole', 'department', 'code', 'avatar', 'coverUrl', 'feePaid', 'feeYear',
-      'paymentStatus', 'companyName', 'company', 'customData', 'custom_data'
+      'paymentStatus', 'companyName', 'company', 'customData', 'custom_data', 'joinedAt', 'joined_at'
     ]);
     const customFieldsObj: Record<string, any> = {
       ...(data.customData || (data as any).custom_data || {}),
@@ -2116,6 +2117,14 @@ export class MembersService implements OnModuleInit {
       data.feeYear !== undefined
         ? data.feeYear
         : (current.fee_year ?? new Date().getFullYear());
+    const joinedAtVal =
+      (data as any).joinedAt !== undefined && String((data as any).joinedAt).trim() !== ''
+        ? String((data as any).joinedAt).slice(0, 10)
+        : (data as any).joined_at !== undefined && String((data as any).joined_at).trim() !== ''
+          ? String((data as any).joined_at).slice(0, 10)
+          : current.joined_at
+            ? new Date(current.joined_at).toISOString().slice(0, 10)
+            : new Date().toISOString().slice(0, 10);
     let paymentStatus =
       data.paymentStatus !== undefined
         ? data.paymentStatus
@@ -2138,7 +2147,7 @@ export class MembersService implements OnModuleInit {
       'name', 'contact', 'email', 'phone', 'type', 'level', 'industry', 'region', 'status',
       'address', 'website', 'taxCode', 'tax_code', 'employees', 'about', 'associationId',
       'executiveRole', 'department', 'code', 'avatar', 'coverUrl', 'feePaid', 'feeYear',
-      'paymentStatus', 'companyName', 'company', 'customData', 'custom_data'
+      'paymentStatus', 'companyName', 'company', 'customData', 'custom_data', 'joinedAt', 'joined_at'
     ]);
     const customFieldsObj: Record<string, any> = {
       ...(data.customData || (data as any).custom_data || {}),
@@ -2169,6 +2178,7 @@ export class MembersService implements OnModuleInit {
         about = ${about},
         fee_paid = ${finalFeePaid},
         fee_year = ${feeYear},
+        joined_at = ${joinedAtVal}::date,
         payment_status = ${paymentStatus},
         custom_data = COALESCE(custom_data, '{}'::jsonb) || ${customJsonStr}::jsonb,
         updated_at = now()

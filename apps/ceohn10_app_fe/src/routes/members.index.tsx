@@ -592,57 +592,119 @@ function MembersPage() {
       ],
     },
     { name: "address", label: t("members.f.address"), type: "text" },
+    { name: "joinedAt", label: "Ngày gia nhập", type: "date" },
     { name: "about", label: "Giới thiệu / Ghi chú", type: "textarea" },
   ];
 
-  // Dynamic fields mapping: merges dynamic schema configured by Ban Công Nghệ
+  // Dynamic fields mapping: merges dynamic schema + all visible dynamic columns (Larksuite + imported customData)
   const activeFields: CrudField[] = useMemo(() => {
-    if (!dynamicFields || dynamicFields.length === 0) {
-      return fields;
-    }
-    return dynamicFields
-      .filter((df) => df.is_enabled !== false)
-      .map((df) => {
-        const key = df.field_name || (df as any).field_key;
-        const standard = fields.find((f) => f.name === key);
-        const fType = df.field_type === "textarea" ? "textarea" : df.field_type === "select" ? "select" : "text";
+    const mapDynamicFieldDef = (df: DynamicFieldDef): CrudField => {
+      const key = df.field_name || (df as any).field_key;
+      const standard = fields.find((f) => f.name === key);
+      const rawType = String(df.field_type || "text").toLowerCase();
 
-        if (fType === "select") {
-          const rawOpts =
-            df.options && df.options.length > 0
-              ? df.options
-              : standard && "options" in standard && Array.isArray((standard as any).options)
-              ? (standard as any).options
-              : [];
-          const normalizedOpts = rawOpts.map((opt: any) =>
-            typeof opt === "string" ? { value: opt, label: opt } : { value: String(opt.value), label: String(opt.label) }
-          );
-          return {
-            name: key,
-            label: df.field_label || standard?.label || key,
-            type: "select" as const,
-            required: Boolean(df.is_required),
-            options: normalizedOpts,
-          };
-        }
-
-        if (fType === "textarea") {
-          return {
-            name: key,
-            label: df.field_label || standard?.label || key,
-            type: "textarea" as const,
-            required: Boolean(df.is_required),
-          };
-        }
-
+      if (rawType === "select") {
+        const rawOpts =
+          df.options && df.options.length > 0
+            ? df.options
+            : standard && "options" in standard && Array.isArray((standard as any).options)
+            ? (standard as any).options
+            : [];
+        const normalizedOpts = rawOpts.map((opt: any) =>
+          typeof opt === "string" ? { value: opt, label: opt } : { value: String(opt.value), label: String(opt.label) }
+        );
         return {
           name: key,
           label: df.field_label || standard?.label || key,
-          type: "text" as const,
+          type: "select",
+          required: Boolean(df.is_required),
+          options: normalizedOpts,
+        };
+      }
+
+      if (rawType === "switch" || rawType === "boolean" || rawType === "checkbox") {
+        return {
+          name: key,
+          label: df.field_label || standard?.label || key,
+          type: "select",
+          required: Boolean(df.is_required),
+          options: [
+            { value: "true", label: "Có / Bật" },
+            { value: "false", label: "Không / Tắt" },
+          ],
+        };
+      }
+
+      if (rawType === "textarea") {
+        return {
+          name: key,
+          label: df.field_label || standard?.label || key,
+          type: "textarea",
           required: Boolean(df.is_required),
         };
+      }
+
+      const inputType: "text" | "number" | "date" | "email" | "tel" | "url" =
+        rawType === "number"
+          ? "number"
+          : rawType === "date"
+            ? "date"
+            : rawType === "email"
+              ? "email"
+              : rawType === "phone" || rawType === "tel"
+                ? "tel"
+                : rawType === "url"
+                  ? "url"
+                  : "text";
+
+      return {
+        name: key,
+        label: df.field_label || standard?.label || key,
+        type: inputType,
+        required: Boolean(df.is_required),
+        placeholder: df.placeholder || undefined,
+      };
+    };
+
+    const result: CrudField[] = [];
+    const seen = new Set<string>();
+
+    // 1. Base / dynamic schema fields
+    const baseSource = dynamicFields && dynamicFields.length > 0 ? dynamicFields.filter((df) => df.is_enabled !== false) : [];
+    if (baseSource.length > 0) {
+      baseSource.forEach((df) => {
+        const key = df.field_name || (df as any).field_key;
+        if (key && !seen.has(key)) {
+          seen.add(key);
+          result.push(mapDynamicFieldDef(df));
+        }
       });
-  }, [dynamicFields, fields]);
+    } else {
+      fields.forEach((f) => {
+        seen.add(f.name);
+        result.push(f);
+      });
+    }
+
+    // 2. Ensure core fields (like joinedAt) are always present
+    fields.forEach((f) => {
+      if (!seen.has(f.name)) {
+        seen.add(f.name);
+        result.push(f);
+      }
+    });
+
+    // 3. Append all dynamic table columns (Larksuite + auto-imported customData columns) so they can be edited
+    customDynamicFieldDefs.forEach((df) => {
+      const key = df.field_name || (df as any).field_key;
+      if (key && !seen.has(key)) {
+        seen.add(key);
+        result.push(mapDynamicFieldDef(df));
+      }
+    });
+
+    return result;
+  }, [dynamicFields, customDynamicFieldDefs, fields]);
 
   const onSubmit = async (v: CrudValues) => {
     setSubmitting(true);
@@ -663,10 +725,16 @@ function MembersPage() {
         "address",
         "about",
         "department",
+        "joinedAt",
+        "joined_at",
       ]);
-      const customDataPayload: Record<string, any> = {};
+      const existingCustom =
+        editing && typeof ((editing as any).customData || (editing as any).custom_data) === "object"
+          ? { ...((editing as any).customData || (editing as any).custom_data) }
+          : {};
+      const customDataPayload: Record<string, any> = { ...existingCustom };
       Object.keys(v).forEach((key) => {
-        if (!standardKeys.has(key)) {
+        if (!standardKeys.has(key) && v[key] !== undefined) {
           customDataPayload[key] = v[key];
         }
       });
@@ -684,6 +752,7 @@ function MembersPage() {
         feePaid: pStatus === "paid" || pStatus === "cash",
         address: v.address ? String(v.address).trim() : undefined,
         about: v.about ? String(v.about).trim() : undefined,
+        joinedAt: (v as any).joinedAt ? String((v as any).joinedAt).slice(0, 10) : undefined,
         department: (v as any).department ? String((v as any).department).trim() : (editing?.department || undefined),
         customData: customDataPayload,
       };
@@ -887,18 +956,23 @@ function MembersPage() {
 
   const editInitial = (m: Member): CrudValues => {
     const custom = (m as any).customData || (m as any).custom_data || {};
+    const safeCustom = typeof custom === "object" && custom !== null ? custom : {};
     return {
-      name: m.name,
-      contact: m.contact,
-      email: m.email,
-      phone: m.phone,
-      level: m.level,
-      region: m.region,
-      status: m.status,
+      code: m.code || "",
+      name: m.name || "",
+      contact: m.contact && m.contact !== m.name ? m.contact : "",
+      email: m.email || "",
+      phone: m.phone || "",
+      level: m.level || "memberLevel.individual",
+      region: m.region || "region.north",
+      status: m.status || "active",
       paymentStatus: (m as any).payment_status || (m as any).paymentStatus || (m.feePaid ? "paid" : "unpaid"),
-      address: m.address,
-      about: m.about,
-      ...(typeof custom === "object" ? custom : {}),
+      address: m.address || "",
+      joinedAt: m.joinedAt ? String(m.joinedAt).slice(0, 10) : "",
+      about: m.about || "",
+      position: safeCustom.position || safeCustom.chuc_vu || (m as any).position || (m.contact && m.contact !== m.name ? m.contact : ""),
+      company: safeCustom.company || (m as any).companyName || (m as any).company_name || (m as any).company || "",
+      ...safeCustom,
     };
   };
 
@@ -1775,14 +1849,40 @@ function MembersPage() {
                       const custom = (m as any).customData || (m as any).custom_data || {};
                       let rawVal = custom[colKey];
                       if (rawVal === undefined || rawVal === null || rawVal === "") {
-                        if (colKey === "position") rawVal = (m as any).position || m.contact;
-                        else if (colKey === "company") rawVal = (m as any).company_name || (m as any).company || m.contact;
-                        else if (colKey === "phone") rawVal = m.phone;
+                        if (colKey === "position") {
+                          rawVal = custom.position || custom.chuc_vu || (m as any).position || (m.contact && m.contact !== m.name ? m.contact : "");
+                        } else if (colKey === "company") {
+                          rawVal = (m as any).companyName || (m as any).company_name || (m as any).company;
+                        } else if (colKey === "phone") rawVal = m.phone;
                         else if (colKey === "email") rawVal = m.email;
                         else if (colKey === "address") rawVal = m.address;
                         else if (colKey === "about") rawVal = m.about;
-                        else if (colKey === "club_role") rawVal = (m as any).executive_role || (m as any).clubRole;
-                        else rawVal = (m as any)[colKey];
+                        else if (colKey === "tax_code") rawVal = (m as any).taxCode || (m as any).tax_code;
+                        else if (colKey === "website") rawVal = (m as any).website;
+                        else if (colKey === "company_size") rawVal = (m as any).companySize || (m as any).company_size;
+                        else if (colKey === "club_role") {
+                          const rawRole = String((m as any).executive_role || (m as any).executiveRole || (m as any).clubRole || "");
+                          const roleMap: Record<string, string> = {
+                            platform_admin: "Platform Admin",
+                            admin: "Admin",
+                            lop_truong: "Lớp trưởng",
+                            lop_pho: "Lớp phó",
+                            truong_team: "Trưởng team",
+                            pho_team: "Phó team",
+                            truong_ban_cong_nghe: "Trưởng ban Công nghệ",
+                            truong_ban_hoc_tap: "Trưởng ban Học tập",
+                            truong_ban_tai_chinh: "Trưởng ban Tài chính",
+                            truong_ban_truyen_thong: "Trưởng ban Truyền thông",
+                            truong_ban_su_kien: "Trưởng ban Sự kiện & Hậu cần",
+                            truong_ban_an_sinh: "Trưởng ban An sinh xã hội",
+                            truong_ban_thien_nguyen: "Trưởng ban Thiện nguyện",
+                            truong_ban_doi_ngoai: "Trưởng ban Đối nội Đối ngoại",
+                            giang_vien: "Giảng viên",
+                            hoc_vien: "Học viên",
+                            custom_account: "Tài khoản phân quyền riêng",
+                          };
+                          rawVal = roleMap[rawRole.toLowerCase()] || rawRole || "Học viên";
+                        } else rawVal = (m as any)[colKey];
                       }
                       const valStr = rawVal != null && String(rawVal).trim() !== "" ? String(rawVal) : "—";
                       return (
@@ -2013,7 +2113,7 @@ function MembersPage() {
 
       <CrudModal
         open={!!editing}
-        title={t("members.edit")}
+        title={editing && (editing as any).id ? t("members.edit") : "Thêm Học viên mới"}
         fields={activeFields}
         initial={editing ? editInitial(editing) : undefined}
         submitting={submitting}
@@ -2021,6 +2121,17 @@ function MembersPage() {
         cancelLabel={t("common.cancel")}
         onSubmit={onSubmit}
         onClose={() => setEditing(null)}
+        extraFooterLeft={
+          <button
+            type="button"
+            onClick={() => setShowDynamicSchemaModal(true)}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-blue-300 bg-blue-50 px-3 py-2 text-xs font-bold text-blue-800 hover:bg-blue-100 cursor-pointer transition"
+            title="Thêm trường dữ liệu mới với đầy đủ định dạng (text, number, date, select, email, phone, switch...)"
+          >
+            <SlidersHorizontal className="h-3.5 w-3.5" />
+            <span>+ Thêm trường (đủ định dạng)</span>
+          </button>
+        }
       />
 
       <DynamicSchemaEditorModal

@@ -200,6 +200,147 @@ function PublicEventCheckinGatePage() {
       toast.error("Lỗi tra cứu thông tin người nhờ check-in hộ");
     }
   };
+
+  const checkinProxyEntries = async (): Promise<number> => {
+    const ready = additionalWalkins.filter((a) => a.ticketCode && !a.isCheckedIn);
+    if (ready.length === 0) return 0;
+    let count = 0;
+    for (const comp of ready) {
+      try {
+        const res = await fetchNestApi<any>("/events/ticket-checkin", {
+          method: "POST",
+          body: JSON.stringify({
+            ticketCode: comp.ticketCode,
+            method: "companion_checkin",
+            attendedParts: selectedCheckinParts,
+          }),
+        });
+        if (res?.ok || res?.alreadyCheckedIn) {
+          count += 1;
+          setAdditionalWalkins((prev) =>
+            prev.map((it) =>
+              it.id === comp.id
+                ? { ...it, isCheckedIn: true, lookupStatus: `Đã check-in hộ thành công: ${comp.fullName}` }
+                : it,
+            ),
+          );
+        }
+      } catch { }
+    }
+    if (count > 0) {
+      toast.success(`Đã check-in hộ thành công ${count} người đi cùng!`);
+    }
+    return count;
+  };
+
+  const renderProxyCheckinBox = (mode: "member" | "ticket") => (
+    <div className="space-y-2.5 pt-1">
+      {additionalWalkins.length > 0 && (
+        <div className="space-y-2">
+          {additionalWalkins.map((w, idx) => (
+            <div
+              key={w.id}
+              className="p-3 rounded-2xl border border-[#cdddf0] bg-white/80 space-y-2"
+            >
+              <div className="flex items-center justify-between text-[11px] font-bold text-[#0B0D12]">
+                <span>Check-in hộ #{idx + 1}</span>
+                <button
+                  type="button"
+                  onClick={() => setAdditionalWalkins((prev) => prev.filter((_, i) => i !== idx))}
+                  className="text-rose-600 hover:underline font-semibold cursor-pointer"
+                >
+                  Xóa
+                </button>
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder={mode === "member" ? "Nhập mã học viên check-in hộ (HN10-...)..." : "Nhập mã vé (REG-...) hoặc mã HV check-in hộ..."}
+                  value={w.lookupCode || ""}
+                  onChange={(e) => {
+                    const val = mode === "member" ? e.target.value.toUpperCase() : e.target.value;
+                    setAdditionalWalkins((prev) =>
+                      prev.map((it, i) => (i === idx ? { ...it, lookupCode: val } : it)),
+                    );
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      void lookupCompanionByCode(idx);
+                    }
+                  }}
+                  className="ios-liquid-input !py-2 !px-3 !text-xs font-mono flex-1"
+                />
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    triggerWaterRipple(e);
+                    void lookupCompanionByCode(idx);
+                  }}
+                  disabled={w.lookupLoading}
+                  className="ios-water-btn ios-btn-submit !py-2 !px-3 !text-xs shrink-0 disabled:opacity-60"
+                >
+                  {w.lookupLoading ? "Tìm..." : "Tra cứu"}
+                </button>
+              </div>
+              {w.fullName && (
+                <div className="text-[11px] font-semibold text-[#0B0D12] px-1">
+                  {w.fullName} {w.company ? `· ${w.company}` : ""}
+                </div>
+              )}
+              {w.lookupStatus && (
+                <div
+                  className={`text-[11px] font-semibold px-2.5 py-1 rounded-xl ${
+                    w.isCheckedIn
+                      ? "bg-emerald-500/20 text-emerald-900"
+                      : w.isRegistered
+                        ? "bg-blue-500/15 text-blue-900"
+                        : "bg-amber-500/15 text-amber-900"
+                  }`}
+                >
+                  {w.lookupStatus}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={() =>
+            setAdditionalWalkins((prev) => [
+              ...prev,
+              {
+                id: `proxy_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                lookupCode: "",
+                fullName: "",
+                phone: "",
+                email: "",
+                company: "",
+                position: "",
+              },
+            ])
+          }
+          className="px-3 py-1.5 rounded-full bg-white/80 hover:bg-white text-[#0B0D12] text-[11px] font-bold border border-[#cdddf0] cursor-pointer transition inline-flex items-center gap-1"
+        >
+          <UserPlus className="w-3.5 h-3.5" />
+          <span>+ Check-in hộ</span>
+        </button>
+
+        {additionalWalkins.some((a) => a.ticketCode && !a.isCheckedIn) && (
+          <button
+            type="button"
+            onClick={() => void checkinProxyEntries()}
+            className="px-3.5 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold cursor-pointer transition"
+          >
+            Xác nhận Check-in hộ ({additionalWalkins.filter((a) => a.ticketCode && !a.isCheckedIn).length})
+          </button>
+        )}
+      </div>
+    </div>
+  );
   const [submittingWalkin, setSubmittingWalkin] = useState(false);
 
   // ── OFFLINE CHECKIN STATE (MẤT SÓNG / KHÔNG CÓ MẠNG) ───────────────────────
@@ -656,6 +797,7 @@ function PublicEventCheckinGatePage() {
           luckyNumber: assignedLucky,
           seatAssignment: res.ticket?.seatAssignment || currentTicket.seatAssignment,
         });
+        await checkinProxyEntries();
       } else if (res && res.alreadyCheckedIn) {
         toast.error(res.message);
         setCurrentTicket({
@@ -1400,6 +1542,7 @@ function PublicEventCheckinGatePage() {
                 }}
                 className="ios-liquid-input font-mono uppercase"
               />
+              {renderProxyCheckinBox("member")}
               <button
                 type="button"
                 onClick={(e) => {
@@ -1438,6 +1581,7 @@ function PublicEventCheckinGatePage() {
                 }}
                 className="ios-liquid-input font-mono"
               />
+              {renderProxyCheckinBox("ticket")}
 
               <div className="flex items-center gap-2.5">
                 <button

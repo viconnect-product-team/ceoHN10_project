@@ -17,7 +17,7 @@ export type CrudField =
   | {
       name: string;
       label: string;
-      type: "text" | "number" | "date";
+      type: "text" | "number" | "date" | "email" | "tel" | "url";
       required?: boolean;
       placeholder?: string;
     }
@@ -262,6 +262,7 @@ export function CrudModal({
   onDelete,
   deleteLabel = "Xóa bài viết",
   isDeleting,
+  extraFooterLeft,
 }: {
   open: boolean;
   title: string;
@@ -275,6 +276,7 @@ export function CrudModal({
   onDelete?: () => void;
   deleteLabel?: string;
   isDeleting?: boolean;
+  extraFooterLeft?: ReactNode;
 }) {
   const [values, setValues] = useState<CrudValues>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -780,8 +782,8 @@ export function CrudModal({
             );
           })}
         </div>
-        <div className="flex items-center justify-between border-t border-border px-5 py-4 shrink-0">
-          <div>
+        <div className="flex items-center justify-between border-t border-border px-5 py-4 shrink-0 gap-2 flex-wrap">
+          <div className="flex items-center gap-2">
             {onDelete && (
               <button
                 type="button"
@@ -793,6 +795,7 @@ export function CrudModal({
                 {isDeleting ? "Đang xóa..." : deleteLabel}
               </button>
             )}
+            {extraFooterLeft}
           </div>
           <div className="flex items-center gap-2">
             <button
