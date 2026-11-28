@@ -52,7 +52,7 @@ export interface SendTestEmailDto {
 
 @Controller('mail')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('admin', 'platform_admin', 'adm', 'bqt', 'btc', 'btk')
+@Roles('platform_admin', 'admin', 'lop_truong', 'lop_pho', 'truong_team', 'pho_team', 'truong_ban_chuyen_trach', 'custom_account')
 export class MailController {
   constructor(private readonly mailService: MailService) {}
 

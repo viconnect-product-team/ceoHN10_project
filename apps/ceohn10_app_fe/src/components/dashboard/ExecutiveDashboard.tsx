@@ -62,6 +62,7 @@ import { REVIEW_SEARCH_RESET } from "@/lib/review-search";
 import type { ActivityLog } from "@/lib/extra-data";
 import { EmptyState, ErrorState, ListSkeleton, Skeleton } from "@/components/dashboard/StateKit";
 import { useRole } from "@/hooks/use-role";
+import { usePermissions } from "@/hooks/use-permissions";
 import { useUnreadNotifications } from "@/hooks/use-unread-notifications";
 import { DEFAULT_MEMBERS } from "@/lib/members-data";
 import { fetchMasterOverview } from "@/lib/master-admin.functions";
@@ -220,7 +221,14 @@ function ViewAll({ to, label }: { to: string; label: string }) {
 export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
   const t = useT();
   const roleState = useRole();
+  const { can, isSuperAdmin } = usePermissions();
   const { canManageFinance, canManageMembers, canManageEvents, canManageMedia, isBQT, isPlatformAdmin } = roleState;
+  const canMem = can("MEM_VIEW");
+  const canEvt = can("EVT_VIEW");
+  const canFin = can("FIN_VIEW");
+  const canCls = can("CLS_VIEW");
+  const canDoc = can("DOC_VIEW");
+  const canNtf = can("NTF_VIEW") || can("EML_VIEW");
   const getStats = useServerFn(getDashboardStatsFn);
   const getActivity = useServerFn(listActivityLogFn);
   const { count: unread } = useUnreadNotifications();
@@ -254,6 +262,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
       return DEFAULT_MEMBERS;
     },
     staleTime: 30000,
+    enabled: authReady && canMem,
   });
 
   const invoicesQ = useQuery({
@@ -267,7 +276,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
         return [];
       }
     },
-    enabled: authReady,
+    enabled: authReady && canFin,
   });
 
   const eventsQ = useQuery({
@@ -281,7 +290,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
         return [];
       }
     },
-    enabled: authReady,
+    enabled: authReady && canEvt,
   });
   const activityQ = useQuery({
     queryKey: ["dashboard-activity"],
@@ -317,7 +326,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
         return [];
       }
     },
-    enabled: authReady,
+    enabled: authReady && canCls,
   });
 
   const recentTrainings = useMemo(() => {
@@ -335,7 +344,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
         return [];
       }
     },
-    enabled: authReady,
+    enabled: authReady && canDoc,
   });
 
   const recentDocs = useMemo(() => {
@@ -367,7 +376,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
         return null;
       }
     },
-    enabled: authReady,
+    enabled: authReady && canFin,
   });
 
   // Master Admin Overview: Trạng thái nền tảng & Báo cáo quỹ còn tồn
@@ -375,7 +384,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
     queryKey: ["master-admin-overview"],
     queryFn: fetchMasterOverview,
     staleTime: 30000,
-    enabled: authReady,
+    enabled: authReady && isSuperAdmin,
   });
 
   // Mục I.1 & UC-3: Khóa học Học viên tham gia
@@ -638,35 +647,39 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
 
       {/* KPI grid */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <ExecKpi
-          label={t("exec.kpi.totalMembers")}
-          value={s.totalMembers.toLocaleString("vi-VN")}
-          icon={Users}
-          tone="navy"
-          to="/members"
-          hint={`${s.companies} DN · ${s.individuals} CN`}
-        />
-        <ExecKpi
-          label={t("exec.kpi.activeMembers")}
-          value={s.activeMembers.toLocaleString("vi-VN")}
-          icon={UserCheck}
-          tone="green"
-          to="/members"
-        />
-        <ExecKpi
-          label={t("exec.kpi.newThisMonth")}
-          value={s.newMembers30d.toLocaleString("vi-VN")}
-          icon={UserPlus}
-          tone="blue"
-          to="/members"
-          hint={
-            <span className="inline-flex items-center gap-0.5 font-semibold text-success">
-              <ArrowUpRight className="h-3.5 w-3.5" />
-              30d
-            </span>
-          }
-        />
-        {(canManageMembers || canManageFinance || isBQT || isPlatformAdmin) && (
+        {canMem && (
+          <>
+            <ExecKpi
+              label={t("exec.kpi.totalMembers")}
+              value={s.totalMembers.toLocaleString("vi-VN")}
+              icon={Users}
+              tone="navy"
+              to="/members"
+              hint={`${s.companies} DN · ${s.individuals} CN`}
+            />
+            <ExecKpi
+              label={t("exec.kpi.activeMembers")}
+              value={s.activeMembers.toLocaleString("vi-VN")}
+              icon={UserCheck}
+              tone="green"
+              to="/members"
+            />
+            <ExecKpi
+              label={t("exec.kpi.newThisMonth")}
+              value={s.newMembers30d.toLocaleString("vi-VN")}
+              icon={UserPlus}
+              tone="blue"
+              to="/members"
+              hint={
+                <span className="inline-flex items-center gap-0.5 font-semibold text-success">
+                  <ArrowUpRight className="h-3.5 w-3.5" />
+                  30d
+                </span>
+              }
+            />
+          </>
+        )}
+        {canFin && (canManageMembers || canManageFinance || isBQT || isPlatformAdmin) && (
           <ExecKpi
             label={t("exec.kpi.pendingRenewals")}
             value={s.pendingRenewals.toLocaleString("vi-VN")}
@@ -675,7 +688,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
             to="/renewal"
           />
         )}
-        {(canManageFinance || isBQT || isPlatformAdmin) && (
+        {canFin && (canManageFinance || isBQT || isPlatformAdmin) && (
           <ExecKpi
             label={t("exec.kpi.overdueFees")}
             value={s.unpaidInvoices.toLocaleString("vi-VN")}
@@ -684,32 +697,39 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
             to="/fees"
           />
         )}
-        <ExecKpi
-          label={t("exec.kpi.upcomingEvents")}
-          value={s.upcomingEvents.toLocaleString("vi-VN")}
-          icon={CalendarClock}
-          tone="navy"
-          to="/events"
-          hint="4 sự kiện tiêu biểu"
-        />
-        <ExecKpi
-          label="Lớp học & Đào tạo"
-          value={(trainingsQ.data ?? []).length.toLocaleString("vi-VN")}
-          icon={GraduationCap}
-          tone="navy"
-          to="/trainings"
-          hint="30 khóa học chuẩn hóa"
-        />
-        <ExecKpi
-          label={t("exec.kpi.unreadNotifs")}
-          value={unread.toLocaleString("vi-VN")}
-          icon={Bell}
-          tone="rose"
-          to="/notifications"
-        />
+        {canEvt && (
+          <ExecKpi
+            label={t("exec.kpi.upcomingEvents")}
+            value={s.upcomingEvents.toLocaleString("vi-VN")}
+            icon={CalendarClock}
+            tone="navy"
+            to="/events"
+            hint="4 sự kiện tiêu biểu"
+          />
+        )}
+        {canCls && (
+          <ExecKpi
+            label="Lớp học & Đào tạo"
+            value={(trainingsQ.data ?? []).length.toLocaleString("vi-VN")}
+            icon={GraduationCap}
+            tone="navy"
+            to="/trainings"
+            hint="30 khóa học chuẩn hóa"
+          />
+        )}
+        {canNtf && (
+          <ExecKpi
+            label={t("exec.kpi.unreadNotifs")}
+            value={unread.toLocaleString("vi-VN")}
+            icon={Bell}
+            tone="rose"
+            to="/notifications"
+          />
+        )}
       </div>
 
       {/* ── BÁO CÁO KINH PHÍ CHƯƠNG TRÌNH KHAI GIẢNG (QUỸ CEO HN10) ── */}
+      {canFin && (
       <Panel
         title="Báo Cáo Tài Chính Chương Trình Khai Giảng"
         sub="Kinh phí được cấp từ Quỹ tổng CLB Doanh Nhân CEO HN10 chi cho chương trình Khai giảng sắp tới"
@@ -764,8 +784,10 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
           </div>
         </div>
       </Panel>
+      )}
 
       {/* ── BÁO CÁO DOANH THU & NGUỒN TIỀN VÉ SỰ KIỆN (QUỸ TÀI CHÍNH CEO HN10) ── */}
+      {canFin && (
       <Panel
         title="Quỹ Thu Vé & Doanh Thu Từng Sự Kiện"
         sub="Dòng tiền tự động nạp vào Quỹ CLB từ file import danh sách đăng ký và cổng thanh toán vé SePay VietQR"
@@ -839,6 +861,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
           )}
         </div>
       </Panel>
+      )}
 
       {/* ── KHÓA HỌC & SỰ KIỆN TÔI THAM GIA (Học viên - MỤC I.1 & UC-3) ── */}
       <Panel
@@ -1025,6 +1048,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
 
       {/* Events + Activity */}
       <div className="grid gap-5 lg:grid-cols-2">
+        {canEvt && (
         <Panel
           title={t("exec.events.title")}
           action={<ViewAll to="/events" label={t("exec.viewAll")} />}
@@ -1081,6 +1105,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
             </ul>
           )}
         </Panel>
+        )}
 
         <Panel
           title={t("exec.activity.title")}
@@ -1112,8 +1137,10 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
         </Panel>
       </div>
 
-      {/* Realtime Live Feed: Học viên mới & Sản phẩm Marketplace mới nhất */}
+      {/* Realtime Live Feed: Học viên mới & Lớp học mới nhất */}
+      {(canMem || canCls) && (
       <div className="grid gap-5 lg:grid-cols-2">
+        {canMem && (
         <Panel
           title="Học viên mới gia nhập"
           action={<ViewAll to="/members" label={t("exec.viewAll")} />}
@@ -1165,7 +1192,9 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
             </ul>
           )}
         </Panel>
+        )}
 
+        {canCls && (
         <Panel
           title="Lớp học & Khóa đào tạo CEOHN10"
           action={<ViewAll to="/trainings" label={t("exec.viewAll")} />}
@@ -1209,10 +1238,13 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
             </ul>
           )}
         </Panel>
+        )}
       </div>
+      )}
 
       {/* Documents + Action queue */}
       <div className="grid gap-5 lg:grid-cols-3">
+        {canDoc && (
         <Panel
           title="Tài liệu & Học liệu số CEOHN10"
           action={<ViewAll to="/documents" label={t("exec.viewAll")} />}
@@ -1248,10 +1280,11 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
             </ul>
           )}
         </Panel>
+        )}
 
         <Panel title={t("exec.queue.title")}>
           <ul className="space-y-2">
-            {(canManageMembers || canManageFinance || isBQT || isPlatformAdmin) && (
+            {canFin && (canManageMembers || canManageFinance || isBQT || isPlatformAdmin) && (
               <QueueRow
                 to="/renewal"
                 icon={RefreshCw}
@@ -1260,7 +1293,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
                 count={s.pendingRenewals}
               />
             )}
-            {(canManageFinance || isBQT || isPlatformAdmin) && (
+            {canFin && (canManageFinance || isBQT || isPlatformAdmin) && (
               <QueueRow
                 to="/fees"
                 icon={FileWarning}
@@ -1269,20 +1302,24 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
                 count={s.unpaidInvoices}
               />
             )}
-            <QueueRow
-              to="/trainings"
-              icon={GraduationCap}
-              tone="blue"
-              label="Khóa đào tạo đang mở"
-              count={recentTrainings.length}
-            />
-            <QueueRow
-              to="/documents"
-              icon={FolderOpen}
-              tone="gold"
-              label="Tài liệu chuyên môn"
-              count={recentDocs.length}
-            />
+            {canCls && (
+              <QueueRow
+                to="/trainings"
+                icon={GraduationCap}
+                tone="blue"
+                label="Khóa đào tạo đang mở"
+                count={recentTrainings.length}
+              />
+            )}
+            {canDoc && (
+              <QueueRow
+                to="/documents"
+                icon={FolderOpen}
+                tone="gold"
+                label="Tài liệu chuyên môn"
+                count={recentDocs.length}
+              />
+            )}
           </ul>
         </Panel>
       </div>
@@ -1290,17 +1327,21 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
       {/* Quick actions */}
       <Panel title={t("exec.quick.title")}>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {(canManageEvents || isBQT || isPlatformAdmin) && (
+          {can("EVT_ADD") && (
             <QuickAction to="/events" icon={CalendarPlus} label={t("exec.quick.newEvent")} />
           )}
-          {(canManageFinance || isBQT || isPlatformAdmin) && (
+          {canFin && (canManageFinance || isBQT || isPlatformAdmin) && (
             <QuickAction to="/fees" icon={DollarSign} label={t("exec.quick.collectFee")} />
           )}
-          {(canManageMedia || isBQT || isPlatformAdmin) && (
+          {(can("NTF_ADD") || can("EML_ADD")) && (
             <QuickAction to="/notifications" icon={Send} label={t("exec.quick.sendNotif")} />
           )}
-          <QuickAction to="/trainings" icon={GraduationCap} label="Khóa đào tạo" />
-          <QuickAction to="/documents" icon={FolderOpen} label="Tài liệu & Học liệu" />
+          {canCls && (
+            <QuickAction to="/trainings" icon={GraduationCap} label="Khóa đào tạo" />
+          )}
+          {canDoc && (
+            <QuickAction to="/documents" icon={FolderOpen} label="Tài liệu & Học liệu" />
+          )}
         </div>
       </Panel>
 

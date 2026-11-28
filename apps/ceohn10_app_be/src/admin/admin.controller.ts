@@ -31,14 +31,15 @@ export { UpdateDemoLeadDto, CreateInvoiceDto, AddInvoiceReminderDto };
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(
-  'admin',
   'platform_admin',
-  'adm',
-  'bqt',
-  'btc',
-  'btk',
-  'chu_tich',
-  'pho_chu_tich',
+  'admin',
+  'lop_truong',
+  'lop_pho',
+  'truong_team',
+  'pho_team',
+  'truong_ban_chuyen_trach',
+  'giang_vien',
+  'custom_account',
 )
 export class AdminController {
   constructor(private readonly adminService: AdminService) { }

@@ -68,14 +68,14 @@ export class ZaloController {
 
   @Get('template-configs')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin', 'platform_admin', 'adm', 'bqt', 'btc', 'btk')
+  @Roles('platform_admin', 'admin', 'lop_truong', 'lop_pho', 'truong_team', 'pho_team', 'truong_ban_chuyen_trach', 'custom_account')
   async getTemplateConfigurations() {
     return this.zaloService.getTemplateConfigurations();
   }
 
   @Put('template-configs/:templateCode')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin', 'platform_admin', 'adm', 'bqt', 'btc', 'btk')
+  @Roles('platform_admin', 'admin', 'lop_truong', 'lop_pho', 'truong_team', 'pho_team', 'truong_ban_chuyen_trach', 'custom_account')
   async saveTemplateConfiguration(
     @Param('templateCode') templateCode: string,
     @Body() body: unknown,
@@ -143,7 +143,7 @@ export class ZaloController {
    */
   @Post('send-zns')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin', 'platform_admin', 'adm', 'bqt', 'btc', 'btk', 'quan_tri')
+  @Roles('platform_admin', 'admin', 'lop_truong', 'lop_pho', 'truong_team', 'pho_team', 'truong_ban_chuyen_trach', 'custom_account')
   async sendZns(@Body() dto: SendZnsMessageDto) {
     return this.zaloService.sendZns(dto);
   }
@@ -153,7 +153,7 @@ export class ZaloController {
    */
   @Post('send-bulk-zns')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin', 'platform_admin', 'adm', 'bqt', 'btc', 'btk', 'quan_tri')
+  @Roles('platform_admin', 'admin', 'lop_truong', 'lop_pho', 'truong_team', 'pho_team', 'truong_ban_chuyen_trach', 'custom_account')
   async sendBulkZns(@Body() dto: any) {
     return this.zaloService.sendBulkZns(dto);
   }

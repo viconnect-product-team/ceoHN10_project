@@ -275,8 +275,22 @@ export class RolesGuard implements CanActivate {
     // 4. Kiểm tra Phân Quyền Chức Năng (Roles / Functional Permissions)
     let roleGranted = true;
     if (requiredRoles && requiredRoles.length > 0) {
+      const expandedRoles = new Set(normalizedUserRoles);
+      if (expandedRoles.has('lop_truong')) {
+        ['bqt', 'btc', 'btk', 'btt', 'bxt'].forEach((r) => expandedRoles.add(r));
+      }
+      if (expandedRoles.has('lop_pho')) {
+        ['bqt', 'btc', 'btk', 'btt', 'bxt'].forEach((r) => expandedRoles.add(r));
+      }
+      if (expandedRoles.has('truong_ban_chuyen_trach') || normalizedUserRoles.some((r) => r.startsWith('truong_ban_'))) {
+        ['btt', 'btc', 'btk', 'bxt', 'truong_ban_chuyen_trach'].forEach((r) => expandedRoles.add(r));
+      }
+      if (expandedRoles.has('truong_team') || expandedRoles.has('pho_team')) {
+        ['btt', 'bxt'].forEach((r) => expandedRoles.add(r));
+      }
+
       roleGranted = requiredRoles.some((role) =>
-        normalizedUserRoles.includes(role.toLowerCase().trim()),
+        expandedRoles.has(role.toLowerCase().trim()),
       );
       if (
         !roleGranted &&
